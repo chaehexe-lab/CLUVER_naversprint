@@ -24,8 +24,7 @@
     const soundBase = "/samunmong/sound";
     const bgmTracks = {
       main: new Audio(`${soundBase}/bgm/main.mp3`),
-      joseon: new Audio(`${soundBase}/bgm/joseon.mp3`),
-      deduction: new Audio(`${soundBase}/bgm/deduction.mp3`)
+      joseon: new Audio(`${soundBase}/bgm/joseon.mp3`)
     };
     const sfxPaths = {
       ask: `${soundBase}/sfx/ask.mp3`,
@@ -37,7 +36,6 @@
       evidence: `${soundBase}/sfx/evidence.mp3`,
       map: `${soundBase}/sfx/map.mp3`,
       move: `${soundBase}/sfx/move.mp3`,
-      note: `${soundBase}/sfx/note.mp3`,
       type1: `${soundBase}/sfx/type-1.mp3`,
       type2: `${soundBase}/sfx/type-2.mp3`,
       type3: `${soundBase}/sfx/type-3.mp3`
@@ -896,7 +894,7 @@
         button.classList.add("pressing");
         playSfx("move", 0.82);
         closeGlobalPanel();
-        go(target, "마을지도에서 이동 중...");
+        go(target, "마을 지도에서 이동 중...");
       });
     });
 
