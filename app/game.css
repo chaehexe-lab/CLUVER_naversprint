@@ -14,7 +14,7 @@
       src: url("/samunmong/assets/fonts/ChosunNm.ttf") format("truetype");
       font-weight: 400;
       font-style: normal;
-      font-display: swap;
+      font-display: block;
     }
 
     @font-face {
@@ -22,7 +22,7 @@
       src: url("/samunmong/assets/fonts/VITRO-PRIDE.ttf") format("truetype");
       font-weight: 400;
       font-style: normal;
-      font-display: swap;
+      font-display: block;
     }
 
     @font-face {
@@ -30,7 +30,7 @@
       src: url("/samunmong/assets/fonts/Nanum-BareunJeongsin.ttf") format("truetype");
       font-weight: 400;
       font-style: normal;
-      font-display: swap;
+      font-display: block;
     }
 
     @font-face {
@@ -38,7 +38,7 @@
       src: url("/samunmong/assets/fonts/Chilgok_ljh.otf") format("opentype");
       font-weight: 400;
       font-style: normal;
-      font-display: swap;
+      font-display: block;
     }
 
     * { box-sizing: border-box; }
@@ -95,6 +95,18 @@
       background: #05070b;
     }
 
+    #dreamScreen {
+      background:
+        radial-gradient(ellipse at 50% 24%, rgba(116, 38, 32, .2), transparent 36%),
+        radial-gradient(ellipse at 18% 72%, rgba(172, 112, 60, .12), transparent 32%),
+        radial-gradient(ellipse at 82% 68%, rgba(29, 49, 73, .18), transparent 34%),
+        linear-gradient(180deg, #080606 0%, #130c09 48%, #030303 100%);
+    }
+
+    #dreamScreen .plate {
+      display: none;
+    }
+
     .shade {
       position: absolute;
       inset: 0;
@@ -121,6 +133,13 @@
       display: none;
       opacity: .76;
       filter: drop-shadow(0 5px 9px rgba(0,0,0,.48)) saturate(.68) brightness(.78) contrast(.92);
+    }
+
+    #fieldOne .field-evidence-prop {
+      display: block;
+      opacity: .82;
+      filter: drop-shadow(0 4px 7px rgba(0,0,0,.58)) saturate(.58) brightness(.72) contrast(.9);
+      mix-blend-mode: normal;
     }
 
     .tool-status {
@@ -365,18 +384,28 @@
     }
 
     .dream-select-card {
-      left: 50%;
-      top: 50%;
-      width: min(1080px, 90%);
-      padding: clamp(18px, 2.5vw, 30px);
-      border-radius: 28px;
-      transform: translate(-50%, -50%);
+      inset: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: clamp(16px, 2.1vw, 26px);
+      width: 100%;
+      height: 100%;
+      padding: clamp(34px, 5vw, 64px) clamp(30px, 5.6vw, 78px);
+      border: 0;
+      border-radius: 0;
+      background:
+        linear-gradient(90deg, rgba(5, 4, 3, .84), rgba(5, 4, 3, .18) 34%, rgba(5, 4, 3, .74)),
+        radial-gradient(ellipse at 50% 106%, rgba(213, 168, 96, .1), transparent 46%);
+      box-shadow: inset 0 0 120px rgba(0,0,0,.72);
+      backdrop-filter: none;
+      transform: none;
     }
 
     .dream-select-head {
       display: grid;
       gap: 5px;
-      margin-bottom: 18px;
+      align-content: end;
+      margin: 0;
       text-align: left;
     }
 
@@ -391,9 +420,10 @@
     .dream-select-head h2 {
       margin: 0;
       font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
-      font-size: clamp(25px, 3vw, 40px);
+      font-size: clamp(35px, 4.5vw, 64px);
       font-weight: 400;
       letter-spacing: 0;
+      text-shadow: 0 4px 18px rgba(0,0,0,.74);
     }
 
     .dream-select-head p {
@@ -408,20 +438,21 @@
     .dream-grid {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
+      gap: clamp(14px, 1.7vw, 24px);
+      min-height: 0;
     }
 
     .dream {
       position: relative;
-      min-height: clamp(205px, 27vw, 280px);
+      min-height: 0;
       display: flex;
       flex-direction: column;
       justify-content: flex-end;
       align-items: flex-start;
       overflow: hidden;
       border: 1px solid rgba(255,233,190,.2);
-      border-radius: 20px;
-      padding: 15px;
+      border-radius: 6px;
+      padding: clamp(16px, 2vw, 26px);
       color: var(--ink);
       background:
         linear-gradient(180deg, rgba(0,0,0,.1), rgba(0,0,0,.78) 62%, rgba(0,0,0,.94)),
@@ -498,7 +529,7 @@
       display: block;
       margin-top: 6px;
       font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
-      font-size: clamp(17px, 1.75vw, 23px);
+      font-size: clamp(23px, 2.45vw, 36px);
       font-weight: 400;
       line-height: 1.16;
       letter-spacing: 0;
@@ -854,13 +885,31 @@
     }
 
     .screen.hint-active .evidence-hotspot:not(.collected)::before {
-      opacity: .84;
+      inset: -15px;
+      background:
+        radial-gradient(ellipse at 50% 52%, rgba(255, 219, 142, .22), rgba(226, 167, 96, .1) 36%, rgba(140, 49, 35, .045) 58%, transparent 80%);
+      box-shadow:
+        0 0 20px rgba(224, 166, 90, .24),
+        0 0 42px rgba(164, 64, 43, .11);
+      filter: blur(6px);
+      opacity: .76;
+      animation: hintEvidenceGlow 2.4s ease-in-out both;
+    }
+
+    .screen.hint-active .evidence-hotspot:not(.collected)::after {
+      inset: -20px;
+      border: 0;
+      background:
+        radial-gradient(ellipse at 50% 54%, rgba(255, 239, 175, .12), rgba(212, 123, 72, .055) 44%, transparent 78%);
+      box-shadow: none;
+      filter: blur(14px);
+      opacity: .58;
       animation: hintEvidenceGlow 2.4s ease-in-out both;
     }
 
     @keyframes hintEvidenceGlow {
       0%, 100% { opacity: 0; transform: scale(.92); }
-      24%, 70% { opacity: .84; transform: scale(1.05); }
+      24%, 70% { opacity: .72; transform: scale(1.035); }
     }
 
     .scene-hint {
@@ -1101,12 +1150,12 @@
     .inspect-pop strong {
       display: block;
       margin-bottom: 4px;
-      font-size: 13px;
+      font-size: 14px;
     }
 
     .inspect-pop p {
       color: var(--muted);
-      font-size: 11px;
+      font-size: 12px;
       line-height: 1.45;
     }
 
@@ -1164,7 +1213,8 @@
       z-index: 4;
     }
 
-    .global-panel.bag-panel {
+    .global-panel.bag-panel,
+    .global-panel.tool-panel {
       top: 50%;
       left: 50%;
       right: auto;
@@ -1173,9 +1223,24 @@
       max-height: 84%;
       transform: translate(-50%, -50%);
       padding: 18px;
-      border-radius: 26px;
-      background: radial-gradient(circle at 50% 16%, rgba(92, 56, 35, .94), rgba(10, 7, 6, .98) 60%);
-      box-shadow: 0 28px 120px rgba(0,0,0,.82), inset 0 0 0 1px rgba(255,255,255,.04);
+      border: 0;
+      border-radius: 4px;
+      background:
+        radial-gradient(circle at 16% 13%, rgba(141, 77, 38, .2), transparent 30%),
+        radial-gradient(circle at 84% 82%, rgba(76, 31, 22, .17), transparent 34%),
+        linear-gradient(90deg, rgba(69, 38, 24, .18) 0 8px, transparent 8px),
+        linear-gradient(180deg, #dbc28f, #ba925d 52%, #866039);
+      box-shadow:
+        0 28px 110px rgba(0,0,0,.78),
+        inset 0 0 0 1px rgba(64, 33, 20, .42),
+        inset 0 0 34px rgba(42, 19, 11, .32);
+      color: #2f2118;
+      font-family: "NanumBareunJeongsin", "Noto Serif KR", "Batang", serif;
+    }
+
+    .global-panel.tool-panel {
+      width: min(1040px, 92vw);
+      padding: 22px;
     }
 
     .global-panel-head {
@@ -1192,11 +1257,24 @@
       font-size: 17px;
     }
 
+    .global-panel.bag-panel h2,
+    .global-panel.tool-panel h2 {
+      color: #321a13;
+      text-shadow: 0 1px 0 rgba(255,241,199,.42);
+    }
+
     .global-panel p,
     .global-panel li {
       color: var(--muted);
-      font-size: 11px;
+      font-size: 13px;
       line-height: 1.55;
+    }
+
+    .global-panel.bag-panel p,
+    .global-panel.bag-panel li,
+    .global-panel.tool-panel p,
+    .global-panel.tool-panel li {
+      color: rgba(49, 31, 22, .76);
     }
 
     .bag-item {
@@ -1233,7 +1311,7 @@
     }
 
     .bag-item span {
-      font-size: 10px;
+      font-size: 12px;
       line-height: 1.35;
       color: rgba(247,236,216,.78);
     }
@@ -1242,7 +1320,7 @@
       display: block;
       margin-bottom: 2px;
       color: rgba(247,236,216,.94);
-      font-size: 11px;
+      font-size: 13px;
     }
 
     .bag-item.empty {
@@ -1253,12 +1331,12 @@
     .evidence-empty {
       grid-column: 1 / -1;
       padding: 18px;
-      border: 1px solid rgba(255,233,190,.14);
+      border: 1px solid rgba(79, 42, 25, .22);
       border-radius: 16px;
-      color: var(--muted);
-      background: rgba(0,0,0,.22);
+      color: rgba(49, 31, 22, .68);
+      background: rgba(255, 238, 191, .16);
       text-align: center;
-      font-size: 11px;
+      font-size: 13px;
     }
 
     .bag-panel-grid {
@@ -1271,15 +1349,15 @@
     .analysis-target {
       margin-top: 16px;
       padding: 10px 12px;
-      border: 1px solid rgba(255,233,190,.12);
+      border: 1px solid rgba(79, 42, 25, .2);
       border-radius: 14px;
-      color: var(--muted);
-      background: rgba(0,0,0,.18);
-      font-size: 11px;
+      color: rgba(49, 31, 22, .74);
+      background: rgba(255, 238, 191, .14);
+      font-size: 13px;
     }
 
     .analysis-target strong {
-      color: var(--gold);
+      color: #6d211d;
     }
 
     .tool-grid {
@@ -1287,6 +1365,127 @@
       grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
       gap: 10px;
       margin-top: 12px;
+    }
+
+    .tool-panel-kicker {
+      margin: 0 0 4px;
+      color: rgba(111, 26, 23, .78);
+      font-family: "ChilgokLjh", "NanumBareunJeongsin", serif;
+      font-size: 13px;
+      line-height: 1;
+    }
+
+    .tool-workbench {
+      display: grid;
+      grid-template-columns: minmax(190px, .72fr) minmax(0, 1.6fr);
+      gap: 16px;
+      margin-top: 14px;
+      align-items: stretch;
+    }
+
+    .tool-evidence-list {
+      display: grid;
+      align-content: start;
+      gap: 9px;
+      max-height: 430px;
+      overflow: auto;
+      padding: 10px;
+      border: 1px solid rgba(79, 42, 25, .2);
+      background: rgba(255, 238, 191, .12);
+    }
+
+    .tool-evidence-option {
+      min-height: 72px;
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 9px;
+      align-items: center;
+      border: 1px solid rgba(79, 42, 25, .18);
+      border-radius: 4px;
+      padding: 7px;
+      color: #321a13;
+      background: rgba(255, 238, 191, .16);
+      text-align: left;
+    }
+
+    .tool-evidence-option.selected,
+    .tool-evidence-option:hover,
+    .tool-evidence-option:focus-visible {
+      border-color: rgba(111, 26, 23, .48);
+      background: rgba(255, 230, 178, .26);
+      outline: 0;
+    }
+
+    .tool-evidence-option.analyzed {
+      box-shadow: inset 4px 0 0 rgba(111, 26, 23, .52);
+    }
+
+    .tool-evidence-option img {
+      width: 58px;
+      height: 58px;
+      object-fit: contain;
+      background: rgba(40, 22, 13, .12);
+    }
+
+    .tool-evidence-option span {
+      display: grid;
+      gap: 4px;
+      color: rgba(49, 31, 22, .7);
+      font-size: 12px;
+      line-height: 1.25;
+    }
+
+    .tool-evidence-option strong {
+      color: #321a13;
+      font-size: 14px;
+    }
+
+    .tool-preview {
+      min-height: 430px;
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) minmax(220px, .7fr);
+      gap: 14px;
+      padding: 14px;
+      border: 1px solid rgba(79, 42, 25, .22);
+      background:
+        radial-gradient(ellipse at 50% 16%, rgba(255, 238, 191, .18), transparent 48%),
+        rgba(44, 24, 14, .12);
+    }
+
+    .tool-preview-image {
+      display: grid;
+      place-items: center;
+      min-height: 100%;
+      background:
+        radial-gradient(ellipse at center, rgba(22, 12, 8, .2), transparent 68%),
+        rgba(255, 238, 191, .12);
+      box-shadow: inset 0 0 0 1px rgba(64, 33, 20, .2);
+    }
+
+    .tool-preview-image img {
+      width: 100%;
+      max-height: 390px;
+      object-fit: contain;
+      filter: drop-shadow(0 14px 22px rgba(42, 19, 11, .34));
+    }
+
+    .tool-preview-copy {
+      align-self: center;
+    }
+
+    .tool-preview-copy h3 {
+      margin: 0 0 10px;
+      color: #321a13;
+      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
+      font-size: clamp(22px, 2.4vw, 34px);
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+
+    .tool-preview-copy p {
+      font-size: 17px;
+      line-height: 1.5;
+      word-break: keep-all;
     }
 
     .tool-card {
@@ -1356,20 +1555,43 @@
       background: transparent;
       transform: translate(-50%, -50%);
       cursor: pointer;
+      transition: filter .12s ease, transform .12s ease;
     }
 
     .map-pin-button::before {
-      content: none;
+      content: "";
+      position: absolute;
+      inset: -28%;
+      border: 0;
+      border-radius: 999px;
+      background:
+        radial-gradient(ellipse at 50% 52%, rgba(255, 221, 150, .18), rgba(189, 61, 43, .07) 40%, transparent 76%);
+      box-shadow: none;
+      filter: blur(13px);
+      opacity: 0;
+      transform: scale(.82);
+      pointer-events: none;
+      transition: opacity .12s ease, transform .12s ease, filter .12s ease;
     }
 
     .map-pin-button:hover::before,
-    .map-pin-button:focus-visible::before {
-      content: none;
+    .map-pin-button:focus-visible::before,
+    .map-pin-button:active::before,
+    .map-pin-button.pressing::before {
+      opacity: .72;
+      transform: scale(1.02);
+      filter: blur(16px);
+    }
+
+    .map-pin-button:active,
+    .map-pin-button.pressing {
+      filter: brightness(1.1) saturate(1.04);
+      transform: translate(-50%, -50%) scale(.96);
     }
 
     .map-pin-button:focus-visible {
-      outline: 2px solid rgba(255,248,207,.7);
-      outline-offset: 3px;
+      outline: 0;
+      filter: brightness(1.18) saturate(1.08);
     }
 
     .map-label {
@@ -1571,8 +1793,9 @@
     .room-prop { left: calc(2.2% + 92px); bottom: 3%; }
     .bag-prop { right: calc(2.4% + 82px); bottom: 27%; }
     .note-prop { right: 2.4%; bottom: 27%; }
-    .hint-prop { right: calc(2.4% + 86px); top: 20%; }
-    .accuse-prop { right: calc(2.4% + 86px); top: 31%; }
+    .tool-kit-prop { right: 2.4%; bottom: 15.5%; }
+    .hint-prop { right: calc(2.4% + 82px); top: 18.5%; }
+    .accuse-prop { right: calc(2.4% + 82px); top: 29.5%; }
 
     .tool-prop:hover,
     .tool-prop:focus-visible {
@@ -1661,7 +1884,16 @@
       background: url("/samunmong/assets/ui-generated/tool-bag.png") center / contain no-repeat;
     }
 
-    .bag-prop::after {
+    .tool-kit-prop::before {
+      width: 54px;
+      height: 50px;
+      border: 0;
+      background: url("/samunmong/assets/ui-generated/tool-kit.png") center / contain no-repeat;
+      transform: translate(-50%, -50%) rotate(4deg);
+    }
+
+    .bag-prop::after,
+    .tool-kit-prop::after {
       content: none;
     }
 
@@ -2094,7 +2326,7 @@
       max-width: 82%;
       margin: 0 0 16px;
       color: rgba(49, 31, 22, .78);
-      font-size: 20px;
+      font-size: 22px;
       line-height: 1.45;
       word-break: keep-all;
     }
@@ -2110,7 +2342,7 @@
       margin: 7px 0;
       padding-left: 16px;
       color: #352216;
-      font-size: 18px;
+      font-size: 20px;
       line-height: 1.48;
       word-break: keep-all;
     }
@@ -2152,6 +2384,196 @@
       font-size: 21px;
       font-weight: 400;
       letter-spacing: 0;
+    }
+
+    .investigation-note-panel {
+      color: #2f2118;
+      border: 0;
+      border-radius: 4px;
+      background:
+        radial-gradient(circle at 16% 13%, rgba(141, 77, 38, .2), transparent 30%),
+        radial-gradient(circle at 84% 82%, rgba(76, 31, 22, .17), transparent 34%),
+        linear-gradient(90deg, rgba(69, 38, 24, .18) 0 8px, transparent 8px),
+        linear-gradient(180deg, #dbc28f, #ba925d 52%, #866039);
+      box-shadow:
+        0 28px 110px rgba(0,0,0,.78),
+        inset 0 0 0 1px rgba(64, 33, 20, .42),
+        inset 0 0 34px rgba(42, 19, 11, .32);
+      font-family: "NanumBareunJeongsin", "Noto Serif KR", "Batang", serif;
+    }
+
+    .investigation-note-panel::before {
+      content: "";
+      position: absolute;
+      inset: 10px;
+      border: 1px solid rgba(82, 42, 24, .34);
+      pointer-events: none;
+    }
+
+    .investigation-note-panel::after {
+      content: "수사";
+      position: absolute;
+      right: 36px;
+      top: 32px;
+      width: 54px;
+      height: 54px;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(111, 26, 23, .62);
+      border-radius: 50%;
+      color: rgba(111, 26, 23, .62);
+      font-family: "ChilgokLjh", "NanumBareunJeongsin", serif;
+      font-size: 18px;
+      line-height: 1;
+      transform: rotate(-10deg);
+      pointer-events: none;
+    }
+
+    .note-drawer.investigation-note-panel,
+    .global-panel.investigation-note-panel {
+      left: 50%;
+      top: 50%;
+      right: auto;
+      bottom: auto;
+      width: min(680px, 86vw);
+      max-height: min(720px, 84%);
+      padding: 34px 38px 36px;
+      overflow: auto;
+      transform: translate(-50%, -48%) scale(.96);
+    }
+
+    .global-panel.investigation-note-panel.show {
+      display: block;
+      transform: translate(-50%, -50%) scale(1);
+    }
+
+    .investigation-note-panel .global-panel-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 72px;
+      margin-bottom: 8px;
+    }
+
+    .investigation-note-panel .note-kicker {
+      margin: 0 0 6px;
+      color: rgba(111, 26, 23, .78);
+      font-family: "ChilgokLjh", "NanumBareunJeongsin", serif;
+      font-size: 15px;
+      line-height: 1;
+      letter-spacing: 0;
+    }
+
+    .investigation-note-panel h2 {
+      margin: 0 78px 12px 0;
+      color: #321a13;
+      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
+      font-size: clamp(29px, 3.1vw, 40px);
+      font-weight: 400;
+      letter-spacing: 0;
+      text-shadow: 0 1px 0 rgba(255,241,199,.45);
+    }
+
+    .investigation-note-panel h2::after {
+      content: "";
+      display: block;
+      width: min(240px, 62%);
+      height: 1px;
+      margin-top: 12px;
+      background: linear-gradient(90deg, rgba(103, 28, 24, .82), transparent);
+    }
+
+    .investigation-note-panel .note-lead,
+    .global-panel.investigation-note-panel .note-lead {
+      max-width: 82%;
+      margin: 0 0 16px;
+      color: rgba(49, 31, 22, .78);
+      font-size: 19px;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    .investigation-note-panel ul {
+      margin: 8px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .investigation-note-panel li,
+    .global-panel.investigation-note-panel li {
+      position: relative;
+      margin: 7px 0;
+      padding-left: 16px;
+      color: #352216;
+      font-size: 18px;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    .investigation-note-panel li::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: .62em;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: rgba(104, 31, 25, .72);
+      box-shadow: 0 0 0 2px rgba(255,230,178,.28);
+    }
+
+    .investigation-note-panel .note-section {
+      position: relative;
+      margin-top: 14px;
+      padding: 14px 16px 13px;
+      border: 0;
+      border-top: 1px solid rgba(75, 41, 25, .28);
+      border-bottom: 1px solid rgba(255,230,178,.22);
+      border-radius: 0;
+      background:
+        linear-gradient(90deg, rgba(88, 43, 25, .12), transparent 54%),
+        rgba(255, 238, 191, .12);
+    }
+
+    .investigation-note-panel .note-section h3 {
+      margin: 0 0 6px;
+      color: #6d211d;
+      font-family: "ChilgokLjh", "NanumBareunJeongsin", serif;
+      font-size: 21px;
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+
+    .investigation-note-panel span {
+      color: #6d211d;
+      font-weight: 700;
+    }
+
+    .note-close {
+      position: absolute;
+      z-index: 2;
+      top: 22px;
+      right: 24px;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(111, 26, 23, .5);
+      border-radius: 50%;
+      color: #6d211d;
+      background: rgba(255, 234, 183, .24);
+      box-shadow: inset 0 0 0 1px rgba(255, 241, 199, .18);
+      font-family: "ChilgokLjh", "NanumBareunJeongsin", serif;
+      font-size: 23px;
+      line-height: 1;
+    }
+
+    .note-close:hover,
+    .note-close:focus-visible {
+      color: #3a1712;
+      background: rgba(117, 38, 29, .18);
+      outline: 2px solid rgba(111, 26, 23, .3);
+      outline-offset: 2px;
     }
 
     .overlay {

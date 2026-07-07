@@ -89,9 +89,9 @@ export default function InterrogationScreen() {
         </div>
 
         <nav className="interrogation-tools" aria-label="취조실 도구">
-          <button className="tool-prop map-prop" id="openMapFromInterrogation" type="button" aria-label="마을지도 열기">
-            <img src="/samunmong/assets/labels/transparent/tool-map-short.png" alt="" />
-            <span className="sr-only">마을지도</span>
+          <button className="tool-prop map-prop" id="openMapFromInterrogation" type="button" aria-label="마을 지도 열기">
+            <img src="/samunmong/assets/labels/transparent/tool-village-map.png" alt="" />
+            <span className="sr-only">마을 지도</span>
           </button>
           <button className="tool-prop room-prop current-room-prop" type="button" aria-current="page" aria-label="현재 위치: 취조실">
             <img src="/samunmong/assets/labels/transparent/tool-interrogation-room.png" alt="" />
@@ -110,6 +110,10 @@ export default function InterrogationScreen() {
           >
             <img src="/samunmong/assets/labels/transparent/tool-bag-short.png" alt="" />
             <span className="sr-only">가방</span>
+          </button>
+          <button className="tool-prop tool-kit-prop open-tool-panel" type="button" aria-label="수사 도구 열기">
+            <img src="/samunmong/assets/labels/transparent/tool-investigation-tools.png" alt="" />
+            <span className="sr-only">도구</span>
           </button>
           <button className="tool-prop hint-prop" id="interrogationHint" type="button" aria-label="심문 힌트">
             힌트
@@ -164,12 +168,13 @@ export default function InterrogationScreen() {
 
         <div className="overlay" id="overlay" />
         <InvestigationNote>
-        <aside className="note-drawer" id="noteDrawer" aria-hidden="true">
-          <button className="button primary" id="closeNote" type="button">
-            닫기
+        <aside className="note-drawer investigation-note-panel" id="noteDrawer" aria-hidden="true">
+          <button className="note-close" id="closeNote" type="button" aria-label="수사노트 닫기">
+            ×
           </button>
+          <p className="note-kicker">조사 기록</p>
           <h2>수사노트</h2>
-          <p>심문 중 확인한 내용과 증거를 정리합니다.</p>
+          <p className="note-lead">심문 중 확인한 내용과 증거를 정리합니다.</p>
           <div className="note-section">
             <h3>현재 사건</h3>
             <ul>
@@ -223,22 +228,51 @@ export default function InterrogationScreen() {
         <div className="bag-panel-grid" id="bagPanelList">
           <div className="bag-item empty">아직 새로 수집한 증거가 없습니다.</div>
         </div>
-        <div className="analysis-target">
-          분석할 증거: <strong id="analysisTarget">선택 안 됨</strong>
-        </div>
-        <p>수집한 증거를 가방에서 선택하고 도구를 사용해 추가 분석합니다.</p>
-        <div className="tool-grid" id="toolGrid" />
       </aside>
-      <InvestigationNote>
-
-      <aside className="global-panel" id="fieldNotePanel" aria-hidden="true">
+      <aside className="global-panel tool-panel" id="toolPanel" aria-hidden="true">
         <div className="global-panel-head">
-          <h2>수사노트</h2>
+          <div>
+            <p className="tool-panel-kicker">증거 분석</p>
+            <h2>수사 도구</h2>
+          </div>
           <button className="button primary global-close" type="button">
             닫기
           </button>
         </div>
-        <p>현장에서 확인한 단서와 사실 지점을 정리합니다.</p>
+        <p>수집한 증거를 고르면 크게 펼쳐 볼 수 있습니다. 알맞은 도구를 사용하면 추가 단서가 수사노트에 기록됩니다.</p>
+        <div className="tool-workbench">
+          <div className="tool-evidence-list" id="toolEvidenceList">
+            <div className="evidence-empty">아직 분석할 증거가 없습니다.</div>
+          </div>
+          <section className="tool-preview" aria-live="polite">
+            <div className="tool-preview-image">
+              <img id="toolPreviewImage" src="/samunmong/assets/evidence-wooden-tag.png" alt="" />
+            </div>
+            <div className="tool-preview-copy">
+              <span className="tool-panel-kicker">선택한 증거</span>
+              <h3 id="toolPreviewTitle">증거를 선택하세요</h3>
+              <p id="toolPreviewNote">왼쪽 목록에서 분석할 증거를 고르면 이곳에 크게 표시됩니다.</p>
+              <div className="analysis-target">
+                분석 대상: <strong id="analysisTarget">선택 안 됨</strong>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div className="tool-grid" id="toolGrid" />
+      </aside>
+      <InvestigationNote>
+
+      <aside className="global-panel investigation-note-panel" id="fieldNotePanel" aria-hidden="true">
+        <div className="global-panel-head">
+          <div>
+            <p className="note-kicker">현장 기록</p>
+            <h2>수사노트</h2>
+          </div>
+          <button className="note-close global-close" type="button" aria-label="수사노트 닫기">
+            ×
+          </button>
+        </div>
+        <p className="note-lead">현장에서 확인한 단서와 사실 지점을 정리합니다.</p>
         <ul id="fieldNoteList">
           <li id="emptyFieldNote">아직 기록한 단서가 없습니다.</li>
         </ul>

@@ -3,7 +3,7 @@
     mainScreen: "/samunmong/assets/main-screen-v2.png",
     tutorialScreen: "/samunmong/assets/main-screen-v2.png",
     dreamScreen: "/samunmong/assets/main-screen-v2.png",
-    fieldOne: "/samunmong/assets/scenes-evidence-baked/scene-gatehouse-jeomsun-door-footprints-v4-evidence-baked.png",
+    fieldOne: "/samunmong/assets/scene-field-one-clean.png",
     chunwolRoom: "/samunmong/assets/scenes-evidence-baked/scene-chunwol-room-evidence-baked.png",
     mudeokServantRoom: "/samunmong/assets/scenes-evidence-baked/scene-mudeok-servant-room-evidence-baked.png",
     yoomunseokSarangbang: "/samunmong/assets/scenes-evidence-baked/scene-yoomunseok-sarangbang-evidence-baked.png",
