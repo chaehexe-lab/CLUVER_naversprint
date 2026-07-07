@@ -30,11 +30,11 @@
 
 ## 프로젝트 구조
 
-app/          페이지
-components/   공통 컴포넌트
-assets/       이미지 및 참고 자료
-public/       정적 파일
-lib/          게임 데이터
+- app/          : 페이지
+- components/   : 공통 컴포넌트
+- assets/       : 이미지 및 참고 자료
+- public/       : 정적 파일
+- lib/          : 게임 데이터
 
 ## 팀원
 | 이름 | 역할 |
@@ -43,7 +43,7 @@ lib/          게임 데이터
 | 강성주 | API 대장 |
 | 이채희 | UI/UX 대장 |
 | 노경섭 | 개발 대장 |
-| 이채희 | PM |
+| 이지혜 | PM |
 
 ## 접속
 https://psychic-adventure-v6z2rm5.pages.github.io/
