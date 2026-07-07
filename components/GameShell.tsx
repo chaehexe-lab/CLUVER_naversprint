@@ -27,6 +27,7 @@ function ensureRequestedStartScreen(initialScreen?: string) {
   document.querySelectorAll(".screen").forEach((screen) => {
     screen.classList.toggle("active", screen.id === startScreen);
   });
+  window.dispatchEvent(new CustomEvent("samunmong:screen-change", { detail: { screenId: startScreen } }));
 }
 
 export default function GameShell({ initialScreen }: GameShellProps) {
@@ -73,6 +74,10 @@ export default function GameShell({ initialScreen }: GameShellProps) {
       <DolsoeQuartersScene />
       <BackGateCourtyardScene />
       <InterrogationScreen />
+      <div className="current-location-indicator" id="currentLocationIndicator" aria-live="polite" hidden>
+        <span className="location-kicker">현재 위치</span>
+        <strong id="currentLocationName">유문석 집 앞</strong>
+      </div>
     </main>
   );
 }
