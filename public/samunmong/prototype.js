@@ -696,7 +696,7 @@
       const item = document.createElement("li");
       const suspect = suspects[suspectIndex].name;
       const evidence = selectedEvidence || "증거 제시 없음";
-      item.textContent = `${suspect}에게 질문: "${question}" / 제시 증거: ${evidence}`;
+      item.textContent = `${suspect} 심문 질문: "${question}" / 제시 증거: ${evidence}`;
       list.appendChild(item);
     }
 
@@ -714,15 +714,13 @@
       if (badge) badge.textContent = text;
     }
 
-    function appendDialogueEntry(kind, text) {
-      const list = document.querySelector("#dialogueLog");
-      if (!list) return;
-      document.querySelector("#emptyDialogue")?.remove();
-      const item = document.createElement("li");
-      item.className = kind;
-      item.textContent = text;
-      list.appendChild(item);
-      list.scrollTop = list.scrollHeight;
+    function showSuspectReply(text, mode = "답변") {
+      const reply = document.querySelector("#suspectReply");
+      const replyText = document.querySelector("#suspectReplyText");
+      if (!reply || !replyText) return;
+      reply.hidden = false;
+      replyText.textContent = text;
+      setAiMode(mode);
     }
 
     function addInterrogationAnswer(answer, source, warning) {
@@ -730,11 +728,11 @@
       document.querySelector("#emptyInterrogationSummary")?.remove();
       const suspect = suspects[suspectIndex].name;
       const item = document.createElement("li");
-      item.textContent = `${suspect} 답변: "${answer}"`;
+      item.textContent = `${suspect} 심문 답변: "${answer}"`;
       list.appendChild(item);
-      appendDialogueEntry("answer", `${suspect}: ${answer}`);
+      showSuspectReply(answer, source === "mistral" ? "Mistral" : "임시 답변");
       if (source === "fallback" && warning) {
-        appendDialogueEntry("system", `시스템: ${warning}`);
+        showToast(warning);
       }
     }
 
@@ -742,12 +740,10 @@
       if (isAskingAi) return;
       const askButton = document.querySelector("#askButton");
       const suspect = suspects[suspectIndex];
-      const evidence = selectedEvidence || "증거 제시 없음";
       isAskingAi = true;
       askButton.disabled = true;
       askButton.textContent = "답변 중";
-      setAiMode("답변 중");
-      appendDialogueEntry("question", `사또: ${question} / 제시 증거: ${evidence}`);
+      showSuspectReply("...", "답변 중");
 
       try {
         const response = await fetch("/api/interrogate/", {
@@ -775,8 +771,7 @@
         showToast(data.source === "mistral" ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
       } catch (error) {
         const message = error instanceof Error ? error.message : "알 수 없는 오류";
-        appendDialogueEntry("system", `시스템: ${message}`);
-        setAiMode("오류");
+        showSuspectReply("지금은 답하기 어려워 보입니다.", "오류");
         showToast("AI 답변을 받지 못했습니다.");
       } finally {
         isAskingAi = false;

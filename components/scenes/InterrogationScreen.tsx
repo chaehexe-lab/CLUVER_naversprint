@@ -107,7 +107,7 @@ export default function InterrogationScreen() {
             <img src="/samunmong/assets/labels/transparent/tool-bag-short.png" alt="" />
             <span className="sr-only">가방</span>
           </button>
-          <button className="tool-prop hint-prop" id="interrogationHint" type="button" aria-label="신문 힌트">
+          <button className="tool-prop hint-prop" id="interrogationHint" type="button" aria-label="심문 힌트">
             힌트
           </button>
           <AccuseSuspect>
@@ -146,22 +146,17 @@ export default function InterrogationScreen() {
             <span className="presented-mini">
               증거: <strong id="presentedEvidence">아직 없음</strong>
             </span>
-            <input id="questionInput" type="text" placeholder="자유롭게 신문 내용을 입력하세요" />
+            <input id="questionInput" type="text" placeholder="자유롭게 심문 내용을 입력하세요" />
             <button className="ask" id="askButton" type="button">
               질문
             </button>
           </div>
         </section>
 
-        <aside className="hud dialogue-panel" aria-label="용의자 답변 기록">
-          <div className="dialogue-head">
-            <strong>신문 기록</strong>
-            <span id="aiModeBadge">AI 대기</span>
-          </div>
-          <ul id="dialogueLog" className="dialogue-log">
-            <li id="emptyDialogue">질문을 보내면 이곳에 용의자의 답변이 기록됩니다.</li>
-          </ul>
-        </aside>
+        <div className="hud suspect-reply" id="suspectReply" aria-live="polite" hidden>
+          <span id="aiModeBadge">AI 대기</span>
+          <p id="suspectReplyText">질문을 보내면 용의자가 답합니다.</p>
+        </div>
 
         <div className="overlay" id="overlay" />
         <InvestigationNote>
@@ -170,14 +165,14 @@ export default function InterrogationScreen() {
             닫기
           </button>
           <h2>수사노트</h2>
-          <p>신문 중 확인한 내용과 증거를 정리합니다.</p>
+          <p>심문 중 확인한 내용과 증거를 정리합니다.</p>
           <div className="note-section">
             <h3>현재 사건</h3>
             <ul>
               <li>사건명: 조선시대 살인사건</li>
               <li>목표: 점순이 쓰러진 이유와 호패 조각의 주인 확인</li>
               <li>
-                현재 신문 대상: <span id="noteSuspect">돌쇠</span>
+                현재 심문 대상: <span id="noteSuspect">돌쇠</span>
               </li>
             </ul>
           </div>
@@ -188,9 +183,9 @@ export default function InterrogationScreen() {
             </ul>
           </div>
           <div className="note-section">
-            <h3>신문 요약</h3>
+            <h3>심문 요약</h3>
             <ul id="interrogationSummary">
-              <li id="emptyInterrogationSummary">아직 기록한 신문 내용이 없습니다.</li>
+              <li id="emptyInterrogationSummary">아직 기록한 심문 내용이 없습니다.</li>
             </ul>
           </div>
         </aside>
