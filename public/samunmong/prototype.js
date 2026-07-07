@@ -17,7 +17,41 @@
     let suspectIndex = 0;
     const sleeveCheckedSuspects = new Set();
     const saveKey = "samunmong-demo-state";
+    const collectedEvidenceKey = "samunmong-collected-evidence";
     const settingsKey = "samunmong-demo-settings";
+    const soundBase = "/samunmong/sound";
+    const bgmTracks = {
+      main: new Audio(`${soundBase}/bgm/main.mp3`),
+      joseon: new Audio(`${soundBase}/bgm/joseon.mp3`),
+      deduction: new Audio(`${soundBase}/bgm/deduction.mp3`)
+    };
+    const sfxPaths = {
+      ask: `${soundBase}/sfx/ask.mp3`,
+      bag: `${soundBase}/sfx/bag.mp3`,
+      briefingNext: `${soundBase}/sfx/briefing-next.mp3`,
+      button: `${soundBase}/sfx/button.mp3`,
+      buttonAlt: `${soundBase}/sfx/button-alt.mp3`,
+      dream: `${soundBase}/sfx/dream.mp3`,
+      evidence: `${soundBase}/sfx/evidence.mp3`,
+      map: `${soundBase}/sfx/map.mp3`,
+      move: `${soundBase}/sfx/move.mp3`,
+      note: `${soundBase}/sfx/note.mp3`,
+      type1: `${soundBase}/sfx/type-1.mp3`,
+      type2: `${soundBase}/sfx/type-2.mp3`,
+      type3: `${soundBase}/sfx/type-3.mp3`
+    };
+    const typeSfxKeys = ["type1", "type2", "type3"];
+    let audioUnlocked = false;
+    let currentBgm = "";
+    let typeSfxIndex = 0;
+    let lastTypeSfxAt = 0;
+    let lastButtonSfxAt = 0;
+    let autoplayRetryTimer = null;
+
+    Object.values(bgmTracks).forEach((track) => {
+      track.loop = true;
+      track.preload = "auto";
+    });
 
     function readStored(key, fallback) {
       try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -29,12 +63,117 @@
       localStorage.setItem(saveKey, JSON.stringify({ screenId, savedAt: Date.now() }));
     }
 
+    function saveCollectedEvidence(name) {
+      const collected = new Set(readStored(collectedEvidenceKey, []));
+      collected.add(name);
+      localStorage.setItem(collectedEvidenceKey, JSON.stringify([...collected]));
+    }
+
+    function getAudioLevel() {
+      const stored = readStored(settingsKey, {});
+      const fromInput = Number(document.querySelector("#volumeSetting")?.value);
+      const volume = Number.isFinite(fromInput) ? fromInput : Number(stored.volume ?? 70);
+      return Math.max(0, Math.min(1, volume / 100));
+    }
+
+    function applyAudioVolume() {
+      const level = getAudioLevel();
+      Object.values(bgmTracks).forEach((track) => {
+        track.volume = level * 0.42;
+      });
+    }
+
+    function bgmForScreen(screenId) {
+      if (screenId === "mainScreen" || screenId === "tutorialScreen" || screenId === "dreamScreen") return "main";
+      return "joseon";
+    }
+
+    function getActiveScreenId() {
+      return document.querySelector(".screen.active")?.id || "mainScreen";
+    }
+
+    function updateBgmForScreen(screenId = getActiveScreenId()) {
+      const nextBgm = bgmForScreen(screenId);
+      if (currentBgm === nextBgm) return;
+      Object.entries(bgmTracks).forEach(([key, track]) => {
+        if (key !== nextBgm) {
+          track.pause();
+          track.currentTime = 0;
+        }
+      });
+      currentBgm = nextBgm;
+      if (!audioUnlocked) return;
+      bgmTracks[nextBgm]?.play().catch(() => {});
+    }
+
+    function unlockAudio() {
+      audioUnlocked = true;
+      clearInterval(autoplayRetryTimer);
+      applyAudioVolume();
+      updateBgmForScreen();
+      const activeBgm = currentBgm || bgmForScreen(getActiveScreenId());
+      bgmTracks[activeBgm]?.play().catch(() => {});
+    }
+
+    function tryAutoplayBgm() {
+      applyAudioVolume();
+      const activeBgm = currentBgm || bgmForScreen(getActiveScreenId());
+      currentBgm = activeBgm;
+      bgmTracks[activeBgm]?.play()
+        .then(() => {
+          audioUnlocked = true;
+          clearInterval(autoplayRetryTimer);
+        })
+        .catch(() => {});
+    }
+
+    function startAutoplayRetries() {
+      clearInterval(autoplayRetryTimer);
+      tryAutoplayBgm();
+      autoplayRetryTimer = setInterval(() => {
+        if (audioUnlocked) {
+          clearInterval(autoplayRetryTimer);
+          return;
+        }
+        tryAutoplayBgm();
+      }, 700);
+      setTimeout(() => clearInterval(autoplayRetryTimer), 9000);
+    }
+
+    function playSfx(key, volumeScale = 1) {
+      if (!audioUnlocked || !sfxPaths[key]) return;
+      const sound = new Audio(sfxPaths[key]);
+      sound.volume = Math.max(0, Math.min(1, getAudioLevel() * volumeScale));
+      sound.play().catch(() => {});
+    }
+
+    function playButtonSfx(volumeScale = 0.58) {
+      const now = performance.now();
+      if (now - lastButtonSfxAt < 120) return;
+      lastButtonSfxAt = now;
+      playSfx("button", volumeScale);
+    }
+
+    function playTypeSfx() {
+      const now = performance.now();
+      if (now - lastTypeSfxAt < 95) return;
+      const key = typeSfxKeys[typeSfxIndex % typeSfxKeys.length];
+      typeSfxIndex += 1;
+      lastTypeSfxAt = now;
+      playSfx(key, 0.28);
+    }
+
+    function stopBriefingTyping() {
+      clearInterval(typeBriefing.timer);
+    }
+
     function applySettings(settings) {
       document.body.classList.toggle("reduce-motion", settings.reduceMotion);
       document.body.classList.toggle("high-contrast", settings.highContrast);
       document.querySelector("#volumeSetting").value = settings.volume;
       document.querySelector("#motionSetting").checked = settings.reduceMotion;
       document.querySelector("#contrastSetting").checked = settings.highContrast;
+      applyAudioVolume();
     }
 
     function showToast(message) {
@@ -45,16 +184,21 @@
     }
 
     function go(id, message = "이동 중...") {
+      stopBriefingTyping();
+      playSfx("move", 0.82);
       fade.textContent = message;
       fade.classList.add("show");
       setTimeout(() => {
         screens.forEach((screen) => screen.classList.toggle("active", screen.id === id));
         saveProgress(id);
         fade.classList.remove("show");
+        updateBgmForScreen(id);
       }, 260);
     }
 
     function goRush(id, message = "사건 현장으로 진입 중...") {
+      stopBriefingTyping();
+      playSfx("briefingNext", 0.9);
       fade.textContent = message;
       fade.classList.add("show", "long");
       setTimeout(() => {
@@ -69,6 +213,7 @@
         });
         fade.classList.remove("show");
         saveProgress(id);
+        updateBgmForScreen(id);
       }, 520);
       setTimeout(() => fade.classList.remove("long"), 980);
     }
@@ -84,6 +229,9 @@
       clearInterval(typeBriefing.timer);
       typeBriefing.timer = setInterval(() => {
         briefingCopy.textContent = briefingText.slice(0, index);
+        if (briefingText[index] && !/\s/.test(briefingText[index]) && index % 3 === 0) {
+          playTypeSfx();
+        }
         index += 1;
 
         if (index > briefingText.length) {
@@ -103,6 +251,7 @@
       }
 
       screens.forEach((screen) => screen.classList.toggle("active", screen.id === startScreen));
+      updateBgmForScreen(startScreen);
       if (startScreen === "briefingScreen") {
         typeBriefing();
       } else {
@@ -112,12 +261,13 @@
 
     function openResultPage() {
       const suspect = suspects[suspectIndex].name;
-      const outcome = suspect === "최춘월" ? "success" : "fail";
+      const suspectId = suspects[suspectIndex].id;
       const params = new URLSearchParams({
-        outcome,
-        suspect
+        suspect,
+        suspectId
       });
 
+      playSfx("dream", 0.85);
       window.location.href = `/result?${params.toString()}`;
     }
 
@@ -125,8 +275,26 @@
     const exitDialog = document.querySelector("#exitDialog");
     const defaultSettings = { volume: 70, reduceMotion: false, highContrast: false };
     applySettings({ ...defaultSettings, ...readStored(settingsKey, {}) });
+    updateBgmForScreen();
+    startAutoplayRetries();
+    window.addEventListener("focus", tryAutoplayBgm);
+    document.addEventListener("visibilitychange", () => {
+      if (!document.hidden) tryAutoplayBgm();
+    });
+    document.addEventListener("pointerdown", (event) => {
+      unlockAudio();
+      if (event.target.closest("button, a")) playButtonSfx(0.72);
+    }, { once: true, capture: true });
+    document.addEventListener("keydown", unlockAudio, { once: true });
+    document.addEventListener("click", (event) => {
+      if (event.target.closest("button, a")) playButtonSfx(0.52);
+    });
 
-    document.querySelector("#newDream").addEventListener("click", () => go("tutorialScreen"));
+    document.querySelector("#newDream").addEventListener("click", () => {
+      localStorage.removeItem(saveKey);
+      localStorage.removeItem(collectedEvidenceKey);
+      go("tutorialScreen");
+    });
     document.querySelector("#continueDream").addEventListener("click", () => {
       const saved = readStored(saveKey, null);
       const valid = screens.some((screen) => screen.id === saved?.screenId) && saved.screenId !== "mainScreen";
@@ -157,6 +325,7 @@
     document.querySelector("#skipTutorial").addEventListener("click", () => go("dreamScreen"));
     document.querySelector("#nextTutorial").addEventListener("click", () => go("dreamScreen"));
     document.querySelector("#chooseJoseon").addEventListener("click", () => {
+      playSfx("dream", 0.9);
       go("briefingScreen");
       setTimeout(typeBriefing, 300);
     });
@@ -369,11 +538,13 @@
     }
 
     function addEvidenceToBag(name) {
+      saveCollectedEvidence(name);
       const list = document.querySelector("#bagPanelList");
       list.querySelector(".empty")?.remove();
       const exists = [...list.children].some((item) => item.dataset.evidence === name);
       if (exists) {
         addEvidenceCardToInterrogation(name);
+        addEvidenceToToolPanel(name);
         return;
       }
 
@@ -384,9 +555,12 @@
       item.innerHTML = `<img src="${evidenceData[name]?.img || "/samunmong/assets/evidence-wooden-tag.png"}" alt=""><span><strong>${name}</strong><br>${evidenceData[name]?.note || "현장에서 발견된 단서"}</span>`;
       item.addEventListener("click", () => {
         setAnalysisTarget(name);
+        showToast(`${name} 선택. 도구 탭에서 크게 확인할 수 있습니다.`);
       });
       list.appendChild(item);
       addEvidenceCardToInterrogation(name);
+      addEvidenceToToolPanel(name);
+      playSfx("bag", 0.7);
     }
 
     function setAnalysisTarget(name) {
@@ -395,6 +569,42 @@
       document.querySelectorAll("#bagPanelList .bag-item").forEach((item) => {
         item.classList.toggle("selected", item.dataset.evidence === name);
       });
+      document.querySelectorAll("#toolEvidenceList .tool-evidence-option").forEach((item) => {
+        item.classList.toggle("selected", item.dataset.evidence === name);
+      });
+      updateToolPreview(name);
+    }
+
+    function addEvidenceToToolPanel(name) {
+      const list = document.querySelector("#toolEvidenceList");
+      if (!list) return;
+      list.querySelector(".evidence-empty")?.remove();
+      const exists = [...list.children].some((item) => item.dataset.evidence === name);
+      if (exists) return;
+
+      const data = evidenceData[name] || {};
+      const button = document.createElement("button");
+      button.className = "tool-evidence-option";
+      button.type = "button";
+      button.dataset.evidence = name;
+      button.innerHTML = `<img src="${data.img || "/samunmong/assets/evidence-wooden-tag.png"}" alt=""><span><strong>${name}</strong>${data.tool ? `${data.tool} 필요` : "추가 분석 없음"}</span>`;
+      button.addEventListener("click", () => setAnalysisTarget(name));
+      list.appendChild(button);
+    }
+
+    function updateToolPreview(name) {
+      const data = evidenceData[name] || {};
+      const image = document.querySelector("#toolPreviewImage");
+      const title = document.querySelector("#toolPreviewTitle");
+      const note = document.querySelector("#toolPreviewNote");
+      if (!image || !title || !note) return;
+
+      image.src = data.img || "/samunmong/assets/evidence-wooden-tag.png";
+      image.alt = name ? `${name} 확대 이미지` : "";
+      title.textContent = name || "증거를 선택하세요";
+      note.textContent = name
+        ? `${data.note || "현장에서 발견된 단서입니다."} ${data.tool ? `알맞은 도구: ${data.tool}` : "추가 도구 분석은 필요하지 않습니다."}`
+        : "왼쪽 목록에서 분석할 증거를 고르면 이곳에 크게 표시됩니다.";
     }
 
     function addEvidenceCardToInterrogation(name) {
@@ -421,6 +631,7 @@
       selectedEvidence = button.dataset.evidence;
       document.querySelector("#presentedEvidence").textContent = selectedEvidence;
       setEvidenceBag(false);
+      playSfx("buttonAlt", 0.62);
       showToast(`증거 제시: ${selectedEvidence}`);
     }
 
@@ -460,6 +671,9 @@
 
       addObservationToNote(`${currentEvidenceForTool} 추가 분석`, data.toolResult);
       document.querySelectorAll(`[data-evidence-name="${currentEvidenceForTool}"]`).forEach((item) => item.classList.add("analyzed"));
+      document.querySelectorAll(`#toolEvidenceList [data-evidence="${currentEvidenceForTool}"]`).forEach((item) => item.classList.add("analyzed"));
+      const previewNote = document.querySelector("#toolPreviewNote");
+      if (previewNote) previewNote.textContent = data.toolResult;
       showToast(`${toolName}로 ${currentEvidenceForTool}을 분석했습니다.`);
     }
 
@@ -477,12 +691,13 @@
     function collectHopae() {
       if (hopaeCollected) {
         setAnalysisTarget("호패 조각");
-        openGlobalPanel("bagPanel");
+        openGlobalPanel("toolPanel");
         return;
       }
       hopaeCollected = true;
       document.querySelector("#collectHopae").textContent = "수집 완료";
       document.querySelector("#hopaeHotspot")?.classList.add("collected");
+      playSfx("evidence", 0.85);
       addEvidenceToBag("호패 조각");
       addEvidenceToNote("호패 조각");
       hideInspectPanels();
@@ -498,12 +713,13 @@
     function collectPortrait() {
       if (portraitCollected) {
         setAnalysisTarget("돌쇠의 그림");
-        openGlobalPanel("bagPanel");
+        openGlobalPanel("toolPanel");
         return;
       }
       portraitCollected = true;
       document.querySelector("#collectPortrait").textContent = "수집 완료";
       document.querySelector("#portraitHotspot")?.classList.add("collected");
+      playSfx("evidence", 0.85);
       addEvidenceToBag("돌쇠의 그림");
       addEvidenceToNote("돌쇠의 그림");
       hideInspectPanels();
@@ -522,6 +738,7 @@
       const alreadyCollected = hotspot.classList.contains("collected");
       if (!alreadyCollected) {
         hotspot.classList.add("collected");
+        playSfx("evidence", 0.85);
         addEvidenceToBag(name);
         addEvidenceToNote(name);
       }
@@ -545,7 +762,7 @@
       }
       hideInspectPanels();
       setAnalysisTarget(pendingEvidenceName);
-      openGlobalPanel("bagPanel");
+      openGlobalPanel("toolPanel");
     }
 
     document.querySelector("#collectGenericEvidence").addEventListener("click", collectGenericEvidence);
@@ -613,6 +830,7 @@
       evidenceBagPop.setAttribute("aria-hidden", String(!open));
       toggleEvidenceBag.setAttribute("aria-expanded", String(open));
       globalOverlay.classList.toggle("show", open);
+      if (open) playSfx("bag", 0.7);
     }
     toggleEvidenceBag.addEventListener("click", () => setEvidenceBag(!evidenceBagPop.classList.contains("open")));
     document.querySelector("#closeEvidenceBag").addEventListener("click", () => setEvidenceBag(false));
@@ -623,13 +841,15 @@
     function openGlobalPanel(id) {
       hideInspectPanels();
       setEvidenceBag(false);
-      if (id === "toolPanel") id = "bagPanel";
       globalPanels.forEach((panel) => {
         const isOpen = panel.id === id;
         panel.classList.toggle("show", isOpen);
         panel.setAttribute("aria-hidden", String(!isOpen));
       });
       globalOverlay.classList.add("show");
+      if (id === "mapPanel") playSfx("map", 0.78);
+      if (id === "bagPanel") playSfx("bag", 0.72);
+      if (id === "toolPanel") playSfx("buttonAlt", 0.62);
     }
 
     function closeGlobalPanel() {
@@ -654,7 +874,7 @@
       button.addEventListener("click", () => openGlobalPanel("bagPanel"));
     });
     document.querySelectorAll(".open-tool-panel").forEach((button) => {
-      button.addEventListener("click", () => openGlobalPanel("bagPanel"));
+      button.addEventListener("click", () => openGlobalPanel("toolPanel"));
     });
     ["#openNoteFromField", "#openNoteFromRoom", "#openNoteFromMudeokRoom"].forEach((selector) => {
       document.querySelector(selector)?.addEventListener("click", () => openGlobalPanel("fieldNotePanel"));
@@ -672,6 +892,7 @@
       button.addEventListener("click", () => {
         const target = button.dataset.mapGo;
         button.classList.add("pressing");
+        playSfx("move", 0.82);
         closeGlobalPanel();
         go(target, "마을 지도에서 이동 중...");
       });
@@ -683,6 +904,7 @@
 
     document.querySelectorAll(".prompt-line").forEach((button) => {
       button.addEventListener("click", () => {
+        playSfx("buttonAlt", 0.6);
         document.querySelector("#questionInput").value = button.textContent;
         document.querySelector("#questionInput").focus();
       });
@@ -709,6 +931,7 @@
         showToast("질문을 입력하거나 위의 문장을 눌러줘");
         return;
       }
+      playSfx("ask", 0.82);
       addInterrogationSummary(question);
       if (/소매/.test(question) && /(걷|올리|보|확인|드러|살펴)/.test(question)) {
         const suspect = suspects[suspectIndex];
