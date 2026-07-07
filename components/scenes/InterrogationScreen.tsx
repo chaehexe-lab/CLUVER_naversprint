@@ -155,12 +155,13 @@ export default function InterrogationScreen() {
 
         <div className="overlay" id="overlay" />
         <InvestigationNote>
-        <aside className="note-drawer" id="noteDrawer" aria-hidden="true">
-          <button className="button primary" id="closeNote" type="button">
-            닫기
+        <aside className="note-drawer investigation-note-panel" id="noteDrawer" aria-hidden="true">
+          <button className="note-close" id="closeNote" type="button" aria-label="수사노트 닫기">
+            ×
           </button>
+          <p className="note-kicker">조사 기록</p>
           <h2>수사노트</h2>
-          <p>신문 중 확인한 내용과 증거를 정리합니다.</p>
+          <p className="note-lead">신문 중 확인한 내용과 증거를 정리합니다.</p>
           <div className="note-section">
             <h3>현재 사건</h3>
             <ul>
@@ -222,14 +223,17 @@ export default function InterrogationScreen() {
       </aside>
       <InvestigationNote>
 
-      <aside className="global-panel" id="fieldNotePanel" aria-hidden="true">
+      <aside className="global-panel investigation-note-panel" id="fieldNotePanel" aria-hidden="true">
         <div className="global-panel-head">
-          <h2>수사노트</h2>
-          <button className="button primary global-close" type="button">
-            닫기
+          <div>
+            <p className="note-kicker">현장 기록</p>
+            <h2>수사노트</h2>
+          </div>
+          <button className="note-close global-close" type="button" aria-label="수사노트 닫기">
+            ×
           </button>
         </div>
-        <p>현장에서 확인한 단서와 사실 지점을 정리합니다.</p>
+        <p className="note-lead">현장에서 확인한 단서와 사실 지점을 정리합니다.</p>
         <ul id="fieldNoteList">
           <li id="emptyFieldNote">아직 기록한 단서가 없습니다.</li>
         </ul>

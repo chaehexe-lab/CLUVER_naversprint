@@ -41,7 +41,7 @@
       toast.textContent = message;
       toast.classList.add("show");
       clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => toast.classList.remove("show"), 1500);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 1900);
     }
 
     function go(id, message = "이동 중...") {
@@ -486,7 +486,7 @@
       addEvidenceToBag("호패 조각");
       addEvidenceToNote("호패 조각");
       hideInspectPanels();
-      showToast("호패 조각이 수사 가방에 들어갔습니다.");
+      showToast("호패 조각이 조용히 가방 속으로 들어갔다. 이 조각은 누군가 일부러 남긴 말처럼 보인다.");
     }
     document.querySelector("#collectHopae").addEventListener("click", collectHopae);
     document.querySelector("#hopaeHotspot").addEventListener("click", () => {
@@ -507,7 +507,7 @@
       addEvidenceToBag("돌쇠의 그림");
       addEvidenceToNote("돌쇠의 그림");
       hideInspectPanels();
-      showToast("돌쇠의 그림이 수사 가방에 들어갔습니다.");
+      showToast("돌쇠의 그림이 기록에 남았다. 감춰둔 시선에는 반드시 이유가 있다.");
     }
     document.querySelector("#collectPortrait").addEventListener("click", collectPortrait);
     document.querySelector("#portraitHotspot").addEventListener("click", () => {
@@ -533,7 +533,7 @@
       document.querySelector("#genericEvidenceInspect").classList.add("show");
       clearTimeout(showInspect.timer);
       showInspect.timer = setTimeout(hideInspectPanels, 1500);
-      showToast(alreadyCollected ? `이미 수집한 증거: ${name}` : `${name}이 수사 가방에 들어갔습니다.`);
+      showToast(alreadyCollected ? `이미 수집한 증거: ${name}` : `${name} 확보. 이 단서는 누군가의 말끝을 다시 묻게 만든다.`);
     }
 
     function collectGenericEvidence() {
@@ -665,8 +665,13 @@
     document.querySelectorAll(".global-close").forEach((button) => button.addEventListener("click", closeGlobalPanel));
     globalOverlay.addEventListener("click", closeGlobalPanel);
     document.querySelectorAll("[data-map-go]").forEach((button) => {
+      button.addEventListener("pointerdown", () => button.classList.add("pressing"));
+      button.addEventListener("pointerup", () => button.classList.remove("pressing"));
+      button.addEventListener("pointerleave", () => button.classList.remove("pressing"));
+      button.addEventListener("blur", () => button.classList.remove("pressing"));
       button.addEventListener("click", () => {
         const target = button.dataset.mapGo;
+        button.classList.add("pressing");
         closeGlobalPanel();
         go(target, "마을 지도에서 이동 중...");
       });
