@@ -668,7 +668,7 @@
       button.addEventListener("click", () => {
         const target = button.dataset.mapGo;
         closeGlobalPanel();
-        go(target, "마을 지도에서 이동 중...");
+        go(target, "마을지도에서 이동 중...");
       });
     });
 

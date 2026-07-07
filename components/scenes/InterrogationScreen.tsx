@@ -89,9 +89,13 @@ export default function InterrogationScreen() {
         </div>
 
         <nav className="interrogation-tools" aria-label="취조실 도구">
-          <button className="tool-prop map-prop" id="openMapFromInterrogation" type="button" aria-label="마을 지도 열기">
+          <button className="tool-prop map-prop" id="openMapFromInterrogation" type="button" aria-label="마을지도 열기">
             <img src="/samunmong/assets/labels/transparent/tool-map-short.png" alt="" />
-            <span className="sr-only">지도</span>
+            <span className="sr-only">마을지도</span>
+          </button>
+          <button className="tool-prop room-prop current-room-prop" type="button" aria-current="page" aria-label="현재 위치: 취조실">
+            <img src="/samunmong/assets/labels/transparent/tool-interrogation-room.png" alt="" />
+            <span className="sr-only">취조실</span>
           </button>
           <button className="tool-prop note-prop" id="openNoteProp" type="button" aria-label="수사노트 보기">
             <img src="/samunmong/assets/labels/transparent/tool-note-short.png" alt="" />
