@@ -983,7 +983,7 @@
       transition: transform .16s ease, filter .16s ease;
     }
 
-    .scene-dock .room-chip { left: 2.2%; top: 2.8%; }
+    .scene-dock .room-chip { left: calc(2.2% + 92px); bottom: 3%; }
     .scene-dock .note-chip { right: 2.4%; top: 42%; }
     .scene-dock .map-chip { left: 2.2%; bottom: 3%; }
     .scene-dock .bag-chip { right: calc(2.4% + 96px); bottom: 3%; }
@@ -1561,7 +1561,15 @@
       transition: transform .15s ease, filter .15s ease;
     }
 
-    .map-prop { left: 2.4%; bottom: 3.4%; }
+    .map-prop,
+    .room-prop {
+      width: 88px;
+      height: 72px;
+      font-size: 13px;
+    }
+
+    .map-prop { left: 2.2%; bottom: 3%; }
+    .room-prop { left: calc(2.2% + 92px); bottom: 3%; }
     .bag-prop { right: calc(2.4% + 82px); bottom: 27%; }
     .note-prop { right: 2.4%; bottom: 27%; }
     .hint-prop { right: calc(2.4% + 86px); top: 20%; }
@@ -1627,6 +1635,17 @@
       background: url("/samunmong/assets/ui-generated/tool-map.png") center / contain no-repeat;
       transform: translate(-50%, -50%) rotate(-8deg);
       box-shadow: 0 0 8px rgba(217,178,104,.18);
+    }
+
+    .room-prop::before {
+      width: 44px;
+      height: 54px;
+      background: url("/samunmong/assets/ui-generated/tool-interrogation.png") center / contain no-repeat;
+      transform: translate(-50%, -50%) rotate(3deg);
+    }
+
+    .current-room-prop {
+      cursor: default;
     }
 
     .note-prop::before {

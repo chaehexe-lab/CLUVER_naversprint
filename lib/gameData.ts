@@ -62,9 +62,9 @@ export const briefing = {
 const investigationDock = [
   {
     className: "map-chip open-map-panel",
-    ariaLabel: "마을 지도 열기",
+    ariaLabel: "마을지도 열기",
     image: "/samunmong/assets/labels/transparent/tool-village-map.png",
-    label: "마을 지도"
+    label: "마을지도"
   },
   {
     className: "bag-chip open-bag-panel",
