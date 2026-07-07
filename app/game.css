@@ -1619,7 +1619,7 @@
     }
 
     .hint-prop::after {
-      content: "?뚰듃";
+      content: "힌트";
       position: absolute;
       left: 50%;
       bottom: 1px;
