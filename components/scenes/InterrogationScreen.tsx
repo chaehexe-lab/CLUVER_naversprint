@@ -93,6 +93,10 @@ export default function InterrogationScreen() {
             <img src="/samunmong/assets/labels/transparent/tool-village-map.png" alt="" />
             <span className="sr-only">마을 지도</span>
           </button>
+          <button className="tool-prop room-prop current-room-prop" type="button" aria-current="page" aria-label="현재 위치: 취조실">
+            <img src="/samunmong/assets/labels/transparent/tool-interrogation-room.png" alt="" />
+            <span className="sr-only">취조실</span>
+          </button>
           <button className="tool-prop note-prop" id="openNoteProp" type="button" aria-label="수사노트 보기">
             <img src="/samunmong/assets/labels/transparent/tool-note-short.png" alt="" />
             <span className="sr-only">노트</span>
@@ -111,7 +115,7 @@ export default function InterrogationScreen() {
             <img src="/samunmong/assets/labels/transparent/tool-investigation-tools.png" alt="" />
             <span className="sr-only">도구</span>
           </button>
-          <button className="tool-prop hint-prop" id="interrogationHint" type="button" aria-label="신문 힌트">
+          <button className="tool-prop hint-prop" id="interrogationHint" type="button" aria-label="심문 힌트">
             힌트
           </button>
           <AccuseSuspect>
@@ -150,12 +154,17 @@ export default function InterrogationScreen() {
             <span className="presented-mini">
               증거: <strong id="presentedEvidence">아직 없음</strong>
             </span>
-            <input id="questionInput" type="text" placeholder="자유롭게 신문 내용을 입력하세요" />
+            <input id="questionInput" type="text" placeholder="자유롭게 심문 내용을 입력하세요" />
             <button className="ask" id="askButton" type="button">
               질문
             </button>
           </div>
         </section>
+
+        <div className="hud suspect-reply" id="suspectReply" aria-live="polite" hidden>
+          <span id="aiModeBadge">AI 대기</span>
+          <p id="suspectReplyText">질문을 보내면 용의자가 답합니다.</p>
+        </div>
 
         <div className="overlay" id="overlay" />
         <InvestigationNote>
@@ -165,14 +174,14 @@ export default function InterrogationScreen() {
           </button>
           <p className="note-kicker">조사 기록</p>
           <h2>수사노트</h2>
-          <p className="note-lead">신문 중 확인한 내용과 증거를 정리합니다.</p>
+          <p className="note-lead">심문 중 확인한 내용과 증거를 정리합니다.</p>
           <div className="note-section">
             <h3>현재 사건</h3>
             <ul>
               <li>사건명: 조선시대 살인사건</li>
               <li>목표: 점순이 쓰러진 이유와 호패 조각의 주인 확인</li>
               <li>
-                현재 신문 대상: <span id="noteSuspect">돌쇠</span>
+                현재 심문 대상: <span id="noteSuspect">돌쇠</span>
               </li>
             </ul>
           </div>
@@ -183,9 +192,9 @@ export default function InterrogationScreen() {
             </ul>
           </div>
           <div className="note-section">
-            <h3>신문 요약</h3>
+            <h3>심문 요약</h3>
             <ul id="interrogationSummary">
-              <li id="emptyInterrogationSummary">아직 기록한 신문 내용이 없습니다.</li>
+              <li id="emptyInterrogationSummary">아직 기록한 심문 내용이 없습니다.</li>
             </ul>
           </div>
         </aside>

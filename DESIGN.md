@@ -32,7 +32,7 @@
 - **꿈의 정체:** 플레이어의 환상
 - **주인공 위치:** 꿈을 꾸는 인물이지만, 꿈 안에서는 사건을 조사하는 역할을 수행
 - **용의자 수:** 총 4명
-- **플레이 방식:** 포인트 앤 클릭 조사와 대화형 AI 신문을 함께 사용
+- **플레이 방식:** 포인트 앤 클릭 조사와 대화형 AI 심문을 함께 사용
 - **시간 제한:** 없음
 - **진행 구조:** 모든 플레이어가 결국 진상에 도달하고 범인을 지목하는 구조
 - **기술 방향:** Next.js로 구현
@@ -57,7 +57,7 @@
    - 수집한 단서는 카드 형태의 인벤토리에 저장된다.
    - 증거 카드에는 이미지, 이름, 발견 장소, 관련 인물, 의심 포인트를 표시한다.
 
-5. **신문 또는 추론**
+5. **심문 또는 추론**
    - 플레이어는 4명의 용의자 진술과 증거를 대조한다.
    - 서로 맞지 않는 시간, 장소, 물건 소유 관계를 찾아 모순으로 기록한다.
 
@@ -122,8 +122,8 @@
 | 장소 선택 | 지도에서 조선시대 사건의 조사 장소를 선택해 진입한다. | 플레이어가 사건 현장을 직접 오가는 느낌을 만든다. | 지도 화면 | 사용자 결정 반영 |
 | 현장 클릭 조사 | 배경 속 단서를 클릭하면 증거 또는 관찰 메모가 열린다. | 플레이어가 직접 수사하는 느낌을 준다. | 모든 조사 화면 | 사용자 결정 반영 |
 | 증거 카드 | 발견한 물건을 카드로 저장한다. | 단서를 비교하기 쉽게 만든다. | 증거 인벤토리 | 이미지 기반 확정 방향 |
-| 대화형 AI 신문 | 4명의 용의자에게 질문하고, 답변과 증거를 비교한다. | 대화로 의심점을 좁히는 추리 경험을 만든다. | 신문/추론 화면 | 사용자 결정 반영 |
-| 모순 기록 | 진술과 증거가 충돌하면 모순 노트에 저장한다. | 추리 진행도를 보여준다. | 신문/추론 화면 | 사용자 결정 반영 |
+| 대화형 AI 심문 | 4명의 용의자에게 질문하고, 답변과 증거를 비교한다. | 대화로 의심점을 좁히는 추리 경험을 만든다. | 심문/추론 화면 | 사용자 결정 반영 |
+| 모순 기록 | 진술과 증거가 충돌하면 모순 노트에 저장한다. | 추리 진행도를 보여준다. | 심문/추론 화면 | 사용자 결정 반영 |
 | 최종 지목 | 범인을 선택한다. | 플레이어의 추론을 정리하고 진상 도달을 완성한다. | 결과 화면 | 사용자 결정 반영 |
 | 진상 도달형 진행 | 틀리거나 헤매도 최종적으로 진상에 도달할 수 있게 한다. | 플레이어가 막혀서 끝나는 실패 경험을 줄인다. | 전체 흐름 | 사용자 결정 반영 |
 
@@ -141,15 +141,15 @@
 | 점순 관련 문간 | ![점순 관련 문간](assets/references/scenes/scene-04-gatehouse-jeomsun-door.png) | 문 앞 흔적, 발자국, 출입 단서 조사 |
 | 무덕의 하인방 | ![무덕의 하인방](assets/references/scenes/scene-05-mudeok-servant-room.png) | 하인방 조사, 문서와 생활 흔적 확인 |
 | 유문석 사랑방 | ![유문석 사랑방](assets/references/scenes/scene-06-yoomunseok-sarangbang.png) | 양반/주요 인물의 방 조사 |
-| 빈 취조실 | ![빈 취조실](assets/references/scenes/scene-07-interrogation-room-empty.png) | 용의자 신문 전 기본 화면 |
-| 용의자 취조실 | ![용의자 취조실](assets/references/scenes/scene-08-interrogation-room-suspect.png) | 용의자 신문 화면의 배경 |
-| 춘월 취조 | ![춘월 취조](assets/references/scenes/scene-09-interrogation-chunwol.png) | 춘월 신문 장면 |
+| 빈 취조실 | ![빈 취조실](assets/references/scenes/scene-07-interrogation-room-empty.png) | 용의자 심문 전 기본 화면 |
+| 용의자 취조실 | ![용의자 취조실](assets/references/scenes/scene-08-interrogation-room-suspect.png) | 용의자 심문 화면의 배경 |
+| 춘월 취조 | ![춘월 취조](assets/references/scenes/scene-09-interrogation-chunwol.png) | 춘월 심문 장면 |
 | 춘월 소매 확인 | ![춘월 소매 확인](assets/references/scenes/scene-10-interrogation-chunwol-sleeve.png) | 춘월에게 소매 확인 질문을 했을 때의 장면 |
-| 돌쇠 취조 | ![돌쇠 취조](assets/references/scenes/scene-11-interrogation-dolsoe.png) | 돌쇠 신문 장면 |
+| 돌쇠 취조 | ![돌쇠 취조](assets/references/scenes/scene-11-interrogation-dolsoe.png) | 돌쇠 심문 장면 |
 | 돌쇠 소매 확인 | ![돌쇠 소매 확인](assets/references/scenes/scene-12-interrogation-dolsoe-sleeve.png) | 돌쇠에게 소매 확인 질문을 했을 때의 장면 |
-| 무덕 취조 | ![무덕 취조](assets/references/scenes/scene-13-interrogation-mudeok.png) | 무덕 신문 장면 |
+| 무덕 취조 | ![무덕 취조](assets/references/scenes/scene-13-interrogation-mudeok.png) | 무덕 심문 장면 |
 | 무덕 소매 확인 | ![무덕 소매 확인](assets/references/scenes/scene-14-interrogation-mudeok-sleeve.png) | 무덕에게 소매 확인 질문을 했을 때의 장면 |
-| 유문석 취조 | ![유문석 취조](assets/references/scenes/scene-15-interrogation-yoomunseok.png) | 유문석 신문 장면 |
+| 유문석 취조 | ![유문석 취조](assets/references/scenes/scene-15-interrogation-yoomunseok.png) | 유문석 심문 장면 |
 | 유문석 소매 확인 | ![유문석 소매 확인](assets/references/scenes/scene-16-interrogation-yoomunseok-sleeve.png) | 유문석에게 소매 확인 질문을 했을 때의 장면 |
 | 점순 호패 문간 | ![점순 호패 문간](assets/references/scenes/scene-17-gatehouse-jeomsun-hopae.png) | 문간과 호패 관련 단서 확인 장면 |
 | 외부 전경 | ![외부 전경](assets/references/scenes/scene-18-castle-exterior.png) | 조선시대 테마의 외부 분위기 참고 장면 |
@@ -208,7 +208,7 @@
 - 용의자 관계는 사용자가 이미 정해두었으며, 추후 별도로 확인한다.
 - 조선 한옥, 불탄 서재, 우주 정거장을 하나의 사건으로 억지로 연결하지 않고, 사건을 선택할 수 있는 구조로 확장할 수 있게 둔다.
 - 현재는 조선시대 테마만 제작한다.
-- 플레이 방식은 포인트 앤 클릭 조사와 대화형 AI 신문을 섞는다.
+- 플레이 방식은 포인트 앤 클릭 조사와 대화형 AI 심문을 섞는다.
 - 제한시간은 일단 없앤다.
 - 실패 조건으로 막히지 않고, 모든 플레이어가 결국 진상에 도달해 범인을 지목한다.
 - 앞으로 구현은 Next.js를 기준으로 한다.
