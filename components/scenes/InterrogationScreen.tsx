@@ -153,6 +153,16 @@ export default function InterrogationScreen() {
           </div>
         </section>
 
+        <aside className="hud dialogue-panel" aria-label="용의자 답변 기록">
+          <div className="dialogue-head">
+            <strong>신문 기록</strong>
+            <span id="aiModeBadge">AI 대기</span>
+          </div>
+          <ul id="dialogueLog" className="dialogue-log">
+            <li id="emptyDialogue">질문을 보내면 이곳에 용의자의 답변이 기록됩니다.</li>
+          </ul>
+        </aside>
+
         <div className="overlay" id="overlay" />
         <InvestigationNote>
         <aside className="note-drawer" id="noteDrawer" aria-hidden="true">

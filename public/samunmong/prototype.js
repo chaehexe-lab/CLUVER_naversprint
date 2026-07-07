@@ -6,6 +6,8 @@
     const briefingCopy = document.querySelector("#briefingCopy");
     const startCaseButton = document.querySelector("#startCase");
     let selectedEvidence = "";
+    let isAskingAi = false;
+    const interrogationHistory = [];
     const entryParams = new URLSearchParams(window.location.search);
     const briefingText = "“사또님, 관아 근처에서 사람이 쓰러진 채 발견되었습니다.”\n\n당신은 이 꿈에서 고을의 사또입니다. 현장을 조사하고, 증거를 모아 용의자를 심문해야 합니다.";
     const suspects = window.SAMUNMONG_CONTENT?.suspects || [
@@ -698,7 +700,92 @@
       list.appendChild(item);
     }
 
-    document.querySelector("#askButton").addEventListener("click", () => {
+    function getCollectedEvidenceNames() {
+      const names = new Set();
+      document.querySelectorAll("#bagPanelList .bag-item[data-evidence], #evidenceList .evidence[data-evidence]").forEach((item) => {
+        if (item.dataset.evidence) names.add(item.dataset.evidence);
+      });
+      if (selectedEvidence) names.add(selectedEvidence);
+      return [...names];
+    }
+
+    function setAiMode(text) {
+      const badge = document.querySelector("#aiModeBadge");
+      if (badge) badge.textContent = text;
+    }
+
+    function appendDialogueEntry(kind, text) {
+      const list = document.querySelector("#dialogueLog");
+      if (!list) return;
+      document.querySelector("#emptyDialogue")?.remove();
+      const item = document.createElement("li");
+      item.className = kind;
+      item.textContent = text;
+      list.appendChild(item);
+      list.scrollTop = list.scrollHeight;
+    }
+
+    function addInterrogationAnswer(answer, source, warning) {
+      const list = document.querySelector("#interrogationSummary");
+      document.querySelector("#emptyInterrogationSummary")?.remove();
+      const suspect = suspects[suspectIndex].name;
+      const item = document.createElement("li");
+      item.textContent = `${suspect} 답변: "${answer}"`;
+      list.appendChild(item);
+      appendDialogueEntry("answer", `${suspect}: ${answer}`);
+      if (source === "fallback" && warning) {
+        appendDialogueEntry("system", `시스템: ${warning}`);
+      }
+    }
+
+    async function requestAiAnswer(question) {
+      if (isAskingAi) return;
+      const askButton = document.querySelector("#askButton");
+      const suspect = suspects[suspectIndex];
+      const evidence = selectedEvidence || "증거 제시 없음";
+      isAskingAi = true;
+      askButton.disabled = true;
+      askButton.textContent = "답변 중";
+      setAiMode("답변 중");
+      appendDialogueEntry("question", `사또: ${question} / 제시 증거: ${evidence}`);
+
+      try {
+        const response = await fetch("/api/interrogate/", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            suspectId: suspect.id,
+            userMessage: question,
+            presentedEvidenceNames: selectedEvidence ? [selectedEvidence] : [],
+            collectedEvidenceNames: getCollectedEvidenceNames(),
+            conversationHistory: interrogationHistory.slice(-8)
+          })
+        });
+
+        const data = await response.json();
+        if (!response.ok || data.error) {
+          throw new Error(data.error || "AI 답변을 받지 못했습니다.");
+        }
+
+        const answer = data.answer || "지금은 답하기 어렵습니다.";
+        addInterrogationAnswer(answer, data.source, data.warning);
+        interrogationHistory.push({ role: "user", content: question }, { role: "assistant", content: answer });
+        while (interrogationHistory.length > 8) interrogationHistory.shift();
+        setAiMode(data.source === "mistral" ? "Mistral" : "임시 답변");
+        showToast(data.source === "mistral" ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "알 수 없는 오류";
+        appendDialogueEntry("system", `시스템: ${message}`);
+        setAiMode("오류");
+        showToast("AI 답변을 받지 못했습니다.");
+      } finally {
+        isAskingAi = false;
+        askButton.disabled = false;
+        askButton.textContent = "질문";
+      }
+    }
+
+    document.querySelector("#askButton").addEventListener("click", async () => {
       const question = document.querySelector("#questionInput").value.trim();
       if (!question) {
         showToast("질문을 입력하거나 위의 문장을 눌러줘");
@@ -709,7 +796,7 @@
         const suspect = suspects[suspectIndex];
         sleeveCheckedSuspects.add(suspect.id);
         document.querySelector("#interrogationPlate").src = suspect.sleeveScene;
-        if (suspect.id === "dolsoe") {
+        if (suspect.id === "chunwol") {
           addEvidenceToBag("긁힌 팔 흔적");
           addEvidenceToNote("긁힌 팔 흔적");
           addObservationToNote("소매 확인", `${suspect.name}의 소매 아래에서 긁힌 듯한 흔적을 확인했다.`);
@@ -723,6 +810,14 @@
         showToast(`${suspects[suspectIndex].name}에게 질문을 던졌습니다.`);
       }
       document.querySelector("#questionInput").value = "";
+      await requestAiAnswer(question);
+    });
+
+    document.querySelector("#questionInput").addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        document.querySelector("#askButton").click();
+      }
     });
 
     function applyContentImages() {
