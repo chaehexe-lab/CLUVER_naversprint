@@ -1356,13 +1356,14 @@
       width: var(--w);
       height: var(--h);
       border: 0;
-      border-radius: 999px;
+      border-radius: var(--radius, 999px);
       background: transparent;
-      transform: translate(-50%, -50%);
+      clip-path: var(--clip, none);
+      transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
     }
 
     .hotspot.object-outline {
-      border-radius: 999px;
+      border-radius: var(--radius, 999px);
     }
 
     .hotspot::before,
@@ -1371,15 +1372,16 @@
       position: absolute;
       inset: 0;
       border-radius: inherit;
+      clip-path: var(--clip, none);
       pointer-events: none;
     }
 
     .hotspot::before {
-      inset: -10px;
+      inset: 0;
       border: 0;
       background:
-        radial-gradient(ellipse at 50% 52%, rgba(226,167,96,.08), rgba(160,101,55,.035) 40%, transparent 74%);
-      box-shadow: 0 0 12px rgba(166,98,51,.05);
+        radial-gradient(ellipse at 50% 52%, rgba(226,167,96,.1), rgba(160,101,55,.04) 44%, transparent 78%);
+      filter: drop-shadow(0 0 10px rgba(166,98,51,.12));
       opacity: 0;
       animation: none;
     }
@@ -1389,43 +1391,45 @@
     }
 
     .evidence-hotspot::after {
-      inset: -7px;
-      border: 2px solid rgba(255, 224, 165, 0);
-      border-radius: 10px;
-      background: transparent;
+      inset: 0;
+      border: 0;
+      background:
+        radial-gradient(ellipse at 50% 54%, rgba(255, 224, 165, .0), rgba(217, 178, 104, 0) 56%, transparent 80%);
       box-shadow: none;
       opacity: 0;
-      transition: opacity .16s ease, border-color .16s ease, box-shadow .16s ease;
+      transition: opacity .16s ease, filter .16s ease, background .16s ease;
     }
 
     .evidence-hotspot:not(.collected):hover::after,
     .evidence-hotspot:not(.collected):focus-visible::after {
-      border-color: rgba(255, 224, 165, .9);
-      box-shadow:
-        0 0 0 1px rgba(111, 26, 23, .45),
-        0 0 24px rgba(217, 178, 104, .28);
+      background:
+        radial-gradient(ellipse at 50% 54%, rgba(255, 224, 165, .28), rgba(217, 178, 104, .14) 48%, transparent 82%);
+      filter:
+        drop-shadow(0 0 8px rgba(255, 224, 165, .62))
+        drop-shadow(0 0 18px rgba(217, 178, 104, .38));
       opacity: 1;
     }
 
     .screen.hint-active .evidence-hotspot:not(.collected)::before {
-      inset: -15px;
+      inset: 0;
       background:
-        radial-gradient(ellipse at 50% 52%, rgba(255, 219, 142, .22), rgba(226, 167, 96, .1) 36%, rgba(140, 49, 35, .045) 58%, transparent 80%);
-      box-shadow:
-        0 0 20px rgba(224, 166, 90, .24),
-        0 0 42px rgba(164, 64, 43, .11);
-      filter: blur(6px);
+        radial-gradient(ellipse at 50% 52%, rgba(255, 219, 142, .34), rgba(226, 167, 96, .18) 44%, rgba(140, 49, 35, .08) 68%, transparent 90%);
+      filter:
+        blur(2px)
+        drop-shadow(0 0 16px rgba(224, 166, 90, .52))
+        drop-shadow(0 0 34px rgba(164, 64, 43, .22));
       opacity: .76;
       animation: hintEvidenceGlow 2.4s ease-in-out both;
     }
 
     .screen.hint-active .evidence-hotspot:not(.collected)::after {
-      inset: -20px;
+      inset: 0;
       border: 0;
       background:
-        radial-gradient(ellipse at 50% 54%, rgba(255, 239, 175, .12), rgba(212, 123, 72, .055) 44%, transparent 78%);
-      box-shadow: none;
-      filter: blur(14px);
+        radial-gradient(ellipse at 50% 54%, rgba(255, 239, 175, .18), rgba(212, 123, 72, .08) 54%, transparent 88%);
+      filter:
+        blur(4px)
+        drop-shadow(0 0 22px rgba(255, 224, 165, .38));
       opacity: .58;
       animation: hintEvidenceGlow 2.4s ease-in-out both;
     }
@@ -1497,10 +1501,10 @@
     }
 
     .hotspot::after {
-      inset: -14px;
+      inset: 0;
       border: 0;
-      background: radial-gradient(ellipse at 50% 52%, rgba(222,171,109,.035), transparent 76%);
-      opacity: .22;
+      background: radial-gradient(ellipse at 50% 52%, rgba(222,171,109,.04), transparent 78%);
+      opacity: 0;
     }
 
     .door-glow {
