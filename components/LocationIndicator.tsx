@@ -8,7 +8,7 @@ type LocationIndicatorProps = {
 };
 
 const LOCATION_KICKER = "\uD604\uC7AC \uC704\uCE58";
-const HIDDEN_LOCATION_SCREENS = new Set(["mainScreen"]);
+const HIDDEN_LOCATION_SCREENS = new Set(["mainScreen", "tutorialScreen", "dreamScreen", "briefingScreen"]);
 
 function isKnownLocation(screenId?: string | null): screenId is ScreenLocationId {
   return Boolean(screenId && screenId in screenLocationLabels);
