@@ -220,50 +220,110 @@ body {
   display: grid;
   place-items: center;
   padding: 22px;
-  background: rgba(0, 0, 0, 0.58);
+  background:
+    radial-gradient(circle at 50% 48%, rgba(116, 45, 30, 0.2), transparent 34%),
+    rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(1px);
 }
 
 .accusation-dialog {
   position: relative;
-  width: min(560px, calc(100vw - 44px));
-  padding: 34px 34px 30px;
-  border: 1px solid rgba(89, 50, 30, 0.68);
-  border-radius: 4px;
+  width: min(650px, calc(100vw - 44px));
+  padding: 42px clamp(26px, 4.2vw, 54px) 34px;
+  border: 1px solid rgba(89, 48, 25, 0.72);
+  border-radius: 2px;
   background:
-    radial-gradient(circle at 20% 18%, rgba(121, 64, 33, 0.18), transparent 34%),
-    linear-gradient(180deg, #d2b37b, #a97943 58%, #704c2e);
-  box-shadow: 0 30px 90px rgba(0, 0, 0, 0.68), inset 0 0 34px rgba(54, 25, 14, 0.26);
-  color: #26160f;
+    radial-gradient(circle at 20% 12%, rgba(255, 239, 190, 0.22), transparent 28%),
+    radial-gradient(circle at 88% 90%, rgba(99, 43, 22, 0.22), transparent 34%),
+    repeating-linear-gradient(0deg, rgba(67, 39, 20, 0.045) 0 1px, transparent 1px 9px),
+    linear-gradient(180deg, #dcc08a 0%, #c2975a 52%, #8d5b32 100%);
+  box-shadow:
+    0 32px 90px rgba(0, 0, 0, 0.72),
+    inset 0 0 0 6px rgba(58, 29, 15, 0.22),
+    inset 0 0 0 9px rgba(232, 189, 114, 0.18),
+    inset 0 0 42px rgba(43, 19, 10, 0.32);
+  color: #24150d;
   text-align: center;
 }
 
-.accusation-dialog h2 {
-  margin: 0 0 14px;
-  color: #5f1915;
-  font-family: "VitroPride", "ChosunNm", serif;
-  font-size: 34px;
-  font-weight: 400;
+.accusation-dialog::before,
+.accusation-dialog::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.accusation-dialog::before {
+  inset: 13px;
+  border: 1px solid rgba(74, 41, 22, 0.54);
+  box-shadow: inset 0 0 0 1px rgba(255, 228, 161, 0.18);
+}
+
+.accusation-dialog::after {
+  right: 28px;
+  bottom: 22px;
+  width: 82px;
+  aspect-ratio: 1;
+  border: 4px solid rgba(126, 25, 21, 0.42);
+  color: rgba(126, 25, 21, 0.48);
+  display: grid;
+  place-items: center;
+  font-family: "ChilgokLjh", "ChosunNm", serif;
+  font-size: 28px;
   line-height: 1;
+  transform: rotate(-13deg);
+}
+
+.accusation-dialog h2 {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 18px;
+  color: #5e1713;
+  font-family: "NanumBareunJeongsin", "ChosunNm", serif;
+  font-size: clamp(34px, 4.7vw, 56px);
+  font-weight: 400;
+  line-height: 1.05;
+  text-shadow: 0 1px 0 rgba(255, 231, 178, 0.42);
 }
 
 .accusation-dialog p {
-  margin: 0 0 24px;
-  color: rgba(38, 22, 15, 0.84);
-  font-size: 20px;
-  line-height: 1.55;
+  position: relative;
+  z-index: 1;
+  margin: 0 auto 30px;
+  max-width: 520px;
+  color: rgba(39, 22, 12, 0.9);
+  font-family: "NanumBareunJeongsin", "ChosunNm", serif;
+  font-size: clamp(22px, 2.35vw, 29px);
+  line-height: 1.58;
   word-break: keep-all;
 }
 
 .accusation-dialog .accusation-dialog-actions {
   position: static;
+  z-index: 1;
+  display: flex;
   transform: none;
   justify-content: center;
 }
 
 .accusation-dialog .wood-result-button {
-  min-width: 178px;
-  min-height: 48px;
-  font-size: 18px;
+  min-width: 188px;
+  min-height: 54px;
+  border-color: rgba(78, 46, 26, 0.72);
+  background:
+    linear-gradient(180deg, rgba(83, 51, 31, 0.86), rgba(35, 22, 15, 0.96)),
+    repeating-linear-gradient(0deg, rgba(255, 226, 154, 0.05) 0 1px, transparent 1px 7px),
+    #2f1f16;
+  font-family: "NanumBareunJeongsin", "ChosunNm", serif;
+  font-size: 20px;
+}
+
+.accusation-dialog .wood-result-button.primary {
+  border-color: rgba(126, 54, 35, 0.78);
+  background:
+    linear-gradient(180deg, rgba(112, 55, 31, 0.9), rgba(55, 27, 19, 0.98)),
+    repeating-linear-gradient(0deg, rgba(255, 226, 154, 0.06) 0 1px, transparent 1px 7px),
+    #4a2618;
 }
 
 .result-complete {
@@ -447,6 +507,7 @@ body {
   min-height: 1.55em;
   margin: 0;
   color: #efdcb6;
+  font-family: "NanumBareunJeongsin", "ChosunNm", serif;
   font-size: clamp(20px, 2vw, 28px);
   line-height: 1.55;
   word-break: keep-all;

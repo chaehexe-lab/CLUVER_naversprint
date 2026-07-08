@@ -443,6 +443,7 @@
     on("#skipTutorial", "click", () => go("dreamScreen"));
     on("#nextTutorial", "click", () => go("dreamScreen"));
     on("#closeDreamNotice", "click", closeDreamNotice);
+    on("#closeDreamNoticeX", "click", closeDreamNotice);
     document.querySelectorAll("[data-dream-disabled='true']").forEach((button) => {
       button.addEventListener("click", () => {
         showDreamNotice(

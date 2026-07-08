@@ -86,6 +86,20 @@
 
     .screen.active { display: block; }
 
+    .game-shell[data-start-screen] #mainScreen.active { display: none; }
+    .game-shell[data-start-screen="tutorialScreen"] #tutorialScreen,
+    .game-shell[data-start-screen="dreamScreen"] #dreamScreen,
+    .game-shell[data-start-screen="briefingScreen"] #briefingScreen,
+    .game-shell[data-start-screen="fieldOne"] #fieldOne,
+    .game-shell[data-start-screen="chunwolRoom"] #chunwolRoom,
+    .game-shell[data-start-screen="mudeokServantRoom"] #mudeokServantRoom,
+    .game-shell[data-start-screen="yoomunseokSarangbang"] #yoomunseokSarangbang,
+    .game-shell[data-start-screen="dolsoeQuarters"] #dolsoeQuarters,
+    .game-shell[data-start-screen="backGateCourtyard"] #backGateCourtyard,
+    .game-shell[data-start-screen="interrogationScreen"] #interrogationScreen {
+      display: block;
+    }
+
     .team-intro {
       position: absolute;
       inset: 0;
@@ -962,15 +976,7 @@
     }
 
     .dream-notice-panel::after {
-      content: "";
-      position: absolute;
-      right: 18px;
-      bottom: 18px;
-      width: 58px;
-      height: 42px;
-      border: 4px solid rgba(52, 52, 52, .58);
-      transform: rotate(-8deg);
-      pointer-events: none;
+      display: none;
     }
 
     .dream-notice-titlebar {
@@ -992,13 +998,28 @@
       letter-spacing: .04em;
     }
 
-    .dream-notice-titlebar span:last-child {
-      width: 22px;
-      height: 22px;
+    .dream-notice-close {
+      width: 24px;
+      height: 24px;
       display: grid;
       place-items: center;
+      padding: 0;
       border: 2px solid #f4f4ef;
+      border-radius: 0;
+      color: #f4f4ef;
+      background: transparent;
       line-height: 1;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 20px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .dream-notice-close:hover,
+    .dream-notice-close:focus-visible {
+      color: #111;
+      background: #f4f4ef;
+      outline: none;
     }
 
     .dream-notice-seal {
@@ -1031,8 +1052,8 @@
       grid-area: title;
       margin: 0;
       color: #1e1e1e;
-      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
-      font-size: clamp(27px, 3.7vw, 42px);
+      font-family: "PFStardust", "VitroPride", "Noto Serif KR", "Batang", serif;
+      font-size: clamp(25px, 3.28vw, 38px);
       font-weight: 400;
       line-height: 1.12;
       letter-spacing: 0;
@@ -1062,6 +1083,22 @@
       box-shadow: 5px 5px 0 rgba(0, 0, 0, .34);
       font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
       font-size: 21px;
+    }
+
+    .dream-notice-actions {
+      grid-area: action;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-top: 2px;
+    }
+
+    .dream-notice-actions .button {
+      grid-area: auto;
+      justify-self: auto;
+      min-width: 126px;
+      text-decoration: none;
     }
 
     .briefing-screen {

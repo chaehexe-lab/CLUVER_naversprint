@@ -65,9 +65,9 @@ const outcomeCopy = {
     title: "이 자가 범인이 아니다",
     stamp: "무죄",
     lines: [
-      "호패의 긁힌 흔적은 아직 다른 이름을 가리키고 있다.",
-      "남은 발자국과 끊어진 끈을 다시 맞춰 보아야 한다.",
-      "취조실로 돌아가 진술이 어긋나는 지점을 확인하라."
+      "이 자의 죄로는 꿈이 풀리지 않는다.",
+      "사라진 말과 남은 흔적이 아직 맞물리지 않았다.",
+      "진술의 틈으로 다시 돌아가라."
     ]
   }
 } as const;
@@ -97,24 +97,27 @@ function TypewriterLines({ lines }: { lines: readonly string[] }) {
     let lineIndex = 0;
     let charIndex = 0;
     let timer: number;
+    let cancelled = false;
 
     setVisibleLines(lines.map(() => ""));
     setActiveLine(0);
 
     const tick = () => {
-      const line = lines[lineIndex];
-      if (!line) return;
+      if (cancelled || lineIndex >= lines.length) return;
 
-      const nextText = line.slice(0, charIndex + 1);
+      const currentLineIndex = lineIndex;
+      const currentCharIndex = charIndex;
+      const currentLine = lines[currentLineIndex];
+
       setVisibleLines((current) => {
         const next = [...current];
-        next[lineIndex] = nextText;
+        next[currentLineIndex] = currentLine.slice(0, currentCharIndex + 1);
         return next;
       });
 
       charIndex += 1;
 
-      if (charIndex < line.length) {
+      if (charIndex < currentLine.length) {
         timer = window.setTimeout(tick, 38);
         return;
       }
@@ -129,7 +132,10 @@ function TypewriterLines({ lines }: { lines: readonly string[] }) {
     };
 
     timer = window.setTimeout(tick, 220);
-    return () => window.clearTimeout(timer);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timer);
+    };
   }, [lines]);
 
   return (
@@ -149,7 +155,8 @@ export default function ResultScreen() {
   const [selectedSuspectId, setSelectedSuspectId] = useState(
     suspects.some((suspect) => suspect.id === initialSuspectId) ? initialSuspectId : suspects[0].id
   );
-  const [showWarning, setShowWarning] = useState(false);
+  const [showWarning, setShowWarning] = useState(() => searchParams.get("previewWarning") === "1");
+  const [showExitPrompt, setShowExitPrompt] = useState(false);
 
   const selectedSuspect = suspects.find((suspect) => suspect.id === selectedSuspectId) ?? suspects[0];
   const selectedIndex = suspects.findIndex((suspect) => suspect.id === selectedSuspect.id);
@@ -206,15 +213,40 @@ export default function ResultScreen() {
             <h1 id="resultTitle">{copy.title}</h1>
             <TypewriterLines lines={copy.lines} />
             <div className="verdict-actions">
-              <Link className="wood-result-button" href="/?start=tutorialScreen" onClick={resetDreamProgress}>
+              <Link className="wood-result-button" href="/?start=briefingScreen" onClick={resetDreamProgress}>
                 이번 꿈을 다시 꾸기
               </Link>
-              <Link className="wood-result-button primary" href="/?start=dreamScreen&dreamExit=1">
+              <button className="wood-result-button primary" type="button" onClick={() => setShowExitPrompt(true)}>
                 꿈에서 나가기
-              </Link>
+              </button>
             </div>
           </article>
         </section>
+
+        {showExitPrompt ? (
+          <aside className="dream-notice-dialog result-exit-dialog open" role="dialog" aria-modal="true" aria-labelledby="resultExitTitle">
+            <div className="dream-notice-panel">
+              <div className="dream-notice-titlebar">
+                <span>DREAM_ALERT</span>
+                <button className="dream-notice-close" type="button" aria-label="안내 닫기" onClick={() => setShowExitPrompt(false)}>
+                  ×
+                </button>
+              </div>
+              <span className="dream-notice-seal" aria-hidden="true">!</span>
+              <p className="dream-notice-kicker">SYSTEM MESSAGE</p>
+              <h2 id="resultExitTitle">꿈은 아직 끝나지 않았습니다.</h2>
+              <p>테마 선택으로 돌아가시겠습니까?</p>
+              <div className="dream-notice-actions">
+                <Link className="button primary" href="/?start=dreamScreen">
+                  돌아가기
+                </Link>
+                <button className="button" type="button" onClick={() => setShowExitPrompt(false)}>
+                  머무르기
+                </button>
+              </div>
+            </div>
+          </aside>
+        ) : null}
       </main>
     );
   }
@@ -275,7 +307,7 @@ export default function ResultScreen() {
         <div className="accusation-dialog-backdrop" role="presentation">
           <section className="accusation-dialog" role="alertdialog" aria-modal="true" aria-labelledby="warningTitle">
             <h2 id="warningTitle">사또님...</h2>
-            <p>아직 거둬들이지 못한 주요 단서가 남아 있는 듯합니다. 이대로 지목하시겠습니까?</p>
+            <p>아직 맞춰 보지 못한 흔적이 있습니다. 그래도 이 자를 지목하시겠습니까?</p>
             <div className="accusation-dialog-actions">
               <button className="wood-result-button primary" type="button" onClick={() => confirmAccusation(true)}>
                 그래도 지목한다
