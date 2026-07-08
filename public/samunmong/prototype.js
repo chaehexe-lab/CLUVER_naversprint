@@ -21,6 +21,18 @@
     const saveKey = "samunmong-demo-state";
     const collectedEvidenceKey = "samunmong-collected-evidence";
     const settingsKey = "samunmong-demo-settings";
+    const locationMeta = {
+      tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
+      dreamScreen: { name: "꿈 선택", x: "18%", y: "18%" },
+      briefingScreen: { name: "사건 브리핑", x: "18%", y: "18%" },
+      fieldOne: { name: "유문석 집 앞", x: "29%", y: "32%" },
+      chunwolRoom: { name: "춘월의 방", x: "67%", y: "25%" },
+      mudeokServantRoom: { name: "무덕의 하인방", x: "63%", y: "44%" },
+      yoomunseokSarangbang: { name: "유문석 사랑방", x: "50%", y: "33%" },
+      dolsoeQuarters: { name: "돌쇠 처소", x: "24%", y: "68%" },
+      backGateCourtyard: { name: "뒷문 마당", x: "48%", y: "86%" },
+      interrogationScreen: { name: "취조실", x: "73%", y: "78%" }
+    };
     const soundBase = "/samunmong/sound";
     const bgmTracks = {
       main: document.querySelector("#mainBgm") || new Audio(`${soundBase}/bgm/main.mp3`),
@@ -220,13 +232,13 @@
     function go(id, message = "이동 중...") {
       stopBriefingTyping();
       playSfx("move", 0.82);
-      fade.textContent = message;
-      fade.classList.add("show");
+      fade?.classList.add("show");
+      if (fade) fade.textContent = message;
       setTimeout(() => {
         screens.forEach((screen) => screen.classList.toggle("active", screen.id === id));
         updateCurrentLocation(id);
         saveProgress(id);
-        fade.classList.remove("show");
+        fade?.classList.remove("show");
         updateBgmForScreen(id);
       }, 260);
     }
@@ -234,8 +246,8 @@
     function goRush(id, message = "사건 현장으로 진입 중...") {
       stopBriefingTyping();
       playSfx("briefingNext", 0.9);
-      fade.textContent = message;
-      fade.classList.add("show", "long");
+      fade?.classList.add("show", "long");
+      if (fade) fade.textContent = message;
       setTimeout(() => {
         screens.forEach((screen) => {
           const isActive = screen.id === id;
@@ -246,12 +258,12 @@
             screen.classList.add("rush-in");
           }
         });
-        fade.classList.remove("show");
+        fade?.classList.remove("show");
         updateCurrentLocation(id);
         saveProgress(id);
         updateBgmForScreen(id);
       }, 520);
-      setTimeout(() => fade.classList.remove("long"), 980);
+      setTimeout(() => fade?.classList.remove("long"), 980);
     }
 
     function typeBriefing() {
