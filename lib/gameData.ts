@@ -95,15 +95,12 @@ const investigationDock = [
 
 export const fieldOneScene = {
   id: "fieldOne",
-  image: "/samunmong/assets/scene-field-one-clean.png",
+  image: "/samunmong/assets/scene-field-one-evidence-integrated.png",
   alt: "유문석 집 문 앞에 쓰러진 점순과 조사할 증거가 놓인 사건 현장",
-  props: [
-    { image: "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.png", alt: "", x: "54.2%", y: "92.4%", w: "72px", rot: "4deg" },
-    { image: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png", alt: "", x: "70.9%", y: "91.2%", w: "82px", rot: "12deg" }
-  ] satisfies SceneProp[],
+  props: [] satisfies SceneProp[],
   hotspots: [
-    { evidenceName: "찢어진 문서 조각", ariaLabel: "찢어진 문서 조각 조사", x: "70.9%", y: "91.2%", w: "104px", h: "76px" },
-    { id: "hopaeHotspot", className: "hopae-glow", ariaLabel: "호패 조각 조사", x: "54.2%", y: "92.4%", w: "112px", h: "74px" }
+    { evidenceName: "찢어진 문서 조각", ariaLabel: "찢어진 문서 조각 조사", x: "70.7%", y: "86.7%", w: "6.5%", h: "7.6%" },
+    { id: "hopaeHotspot", className: "hopae-glow", ariaLabel: "호패 조각 조사", x: "54.3%", y: "87.9%", w: "6.6%", h: "8.4%" }
   ] satisfies SceneHotspot[],
   dock: [
     { id: "openMapFromField", ...investigationDock[0], className: "map-chip" },
