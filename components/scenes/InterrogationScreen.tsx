@@ -223,16 +223,15 @@ export default function InterrogationScreen() {
 
       {/* 전역/현장 보따리 패널 - 취조실 보따리 기능을 수행하도록 구조 및 문구 변경 */}
       <EvidenceInventory>
-        <aside className="global-panel bag-panel" id="bagPanel" aria-hidden="true">
-          <div className="global-panel-head">
-            <h2>보따리</h2>
-            <button className="close-button global-close" type="button" aria-label="보따리 닫기">
-              닫기
+        <aside className="hud evidence-bag-pop" id="evidenceBagPop" aria-hidden="true">
+          <div className="bag-pop-head">
+            <strong>보따리</strong>
+            <button className="close-button mini-close" id="closeEvidenceBag" type="button" aria-label="보따리 닫기">
+              ×
             </button>
           </div>
-          <p>보따리에서 증거를 선택하여 용의자에게 제시하거나 수사 도구로 분석할 수 있습니다.</p>
-          <div className="evidence-list evidence-grid" id="bagPanelList">
-            <div className="evidence-empty" id="emptyFieldEvidence">
+          <div className="evidence-list evidence-grid" id="evidenceList">
+            <div className="evidence-empty" id="emptyInterrogationEvidence">
               보따리에 담긴 증거가 없습니다.
             </div>
           </div>
