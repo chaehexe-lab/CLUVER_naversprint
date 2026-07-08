@@ -330,6 +330,49 @@
       background: linear-gradient(135deg, rgba(67,75,49,.82), rgba(34,38,28,.78));
     }
 
+    .close-button {
+      position: relative;
+      z-index: 2;
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid rgba(111, 26, 23, .5);
+      border-radius: 50%;
+      color: #6d211d;
+      background: rgba(255, 234, 183, .24);
+      box-shadow: inset 0 0 0 1px rgba(255, 241, 199, .18);
+      font-size: 0;
+      line-height: 1;
+    }
+
+    .close-button::before,
+    .close-button::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 15px;
+      height: 2px;
+      border-radius: 999px;
+      background: currentColor;
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .close-button::after {
+      transform: translate(-50%, -50%) rotate(-45deg);
+    }
+
+    .close-button:hover,
+    .close-button:focus-visible {
+      color: #3a1712;
+      background: rgba(117, 38, 29, .18);
+      outline: 2px solid rgba(111, 26, 23, .3);
+      outline-offset: 2px;
+    }
+
     .label-img {
       display: inline-block;
       height: .95em;
@@ -2334,16 +2377,6 @@
       font-weight: 400;
     }
 
-    .mini-close {
-      width: 24px;
-      height: 24px;
-      border: 1px solid rgba(255,233,190,.2);
-      border-radius: 999px;
-      color: var(--ink);
-      background: rgba(0,0,0,.25);
-      font-weight: 900;
-    }
-
     .evidence-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
@@ -2936,29 +2969,8 @@
 
     .note-close {
       position: absolute;
-      z-index: 2;
       top: 22px;
       right: 24px;
-      width: 34px;
-      height: 34px;
-      display: grid;
-      place-items: center;
-      border: 1px solid rgba(111, 26, 23, .5);
-      border-radius: 50%;
-      color: #6d211d;
-      background: rgba(255, 234, 183, .24);
-      box-shadow: inset 0 0 0 1px rgba(255, 241, 199, .18);
-      font-family: "ChilgokLjh", "NanumBareunJeongsin", serif;
-      font-size: 23px;
-      line-height: 1;
-    }
-
-    .note-close:hover,
-    .note-close:focus-visible {
-      color: #3a1712;
-      background: rgba(117, 38, 29, .18);
-      outline: 2px solid rgba(111, 26, 23, .3);
-      outline-offset: 2px;
     }
 
     .overlay {
