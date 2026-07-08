@@ -5,12 +5,12 @@ type ChatMessage = {
   content: string;
 };
 
-type MistralMessage = {
-  role: "system" | "user" | "assistant";
+type OpenAIMessage = {
+  role: "developer" | "user" | "assistant";
   content: string;
 };
 
-type MistralAnswerResult = { ok: true; answer: string } | { ok: false; error: string };
+type OpenAIAnswerResult = { ok: true; answer: string } | { ok: false; error: string };
 
 type InterrogateRequest = {
   suspectId?: string;
@@ -23,7 +23,7 @@ type InterrogateRequest = {
   conversationHistory?: ChatMessage[];
 };
 
-const MISTRAL_ENDPOINT = "https://api.mistral.ai/v1/chat/completions";
+const OPENAI_RESPONSES_ENDPOINT = "https://api.openai.com/v1/responses";
 const FOREIGN_TEXT_PATTERN = /[A-Za-z\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3040-\u30FF\u0400-\u04FF\u0600-\u06FF\u0900-\u097F]/;
 
 function unique(values: string[]) {
@@ -143,30 +143,43 @@ ${pressureGuide}
 - 증거가 부족하면 모호하게 답하고, 증거가 불리하면 방어적으로 흔들린다.`;
 }
 
-async function requestMistralAnswer(apiKey: string, messages: MistralMessage[], temperature = 0.55): Promise<MistralAnswerResult> {
-  const response = await fetch(MISTRAL_ENDPOINT, {
+function extractOpenAIText(data: unknown) {
+  const directText = (data as { output_text?: unknown })?.output_text;
+  if (typeof directText === "string" && directText.trim()) return directText.trim();
+
+  const output = (data as { output?: unknown })?.output;
+  if (!Array.isArray(output)) return "";
+
+  return output
+    .flatMap((item) => (Array.isArray((item as { content?: unknown }).content) ? ((item as { content: unknown[] }).content) : []))
+    .map((content) => {
+      const text = (content as { text?: unknown }).text;
+      return typeof text === "string" ? text : "";
+    })
+    .join("")
+    .trim();
+}
+
+async function requestOpenAIAnswer(apiKey: string, messages: OpenAIMessage[]): Promise<OpenAIAnswerResult> {
+  const response = await fetch(OPENAI_RESPONSES_ENDPOINT, {
     method: "POST",
     headers: {
       Authorization: `Bearer ${apiKey}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: process.env.MISTRAL_MODEL || "mistral-small-latest",
-      messages,
-      temperature,
-      max_tokens: 360
+      model: process.env.OPENAI_MODEL || "gpt-5.4-mini",
+      input: messages
     })
   });
 
   if (!response.ok) {
     const detail = await response.text();
-    return { ok: false, error: `Mistral API 호출 실패: ${response.status} ${detail.slice(0, 160)}` };
+    return { ok: false, error: `OpenAI API 호출 실패: ${response.status} ${detail.slice(0, 160)}` };
   }
 
   const data = await response.json();
-  const answer = data?.choices?.[0]?.message?.content;
-
-  return { ok: true, answer: typeof answer === "string" ? answer.trim() : "" };
+  return { ok: true, answer: extractOpenAIText(data) };
 }
 
 function fallbackAnswer(persona: SuspectPersona, evidenceNames: string[], reactions: EvidenceReaction[], reason: string) {
@@ -195,21 +208,21 @@ export async function POST(req: Request) {
   const inferredEvidence = inferEvidenceNamesFromText(question).filter((name) => !collectedEvidence.length || collectedEvidence.includes(name));
   const usableEvidence = unique([...presentedEvidence, ...inferredEvidence]);
   const reactions = getRelevantReactions(persona, usableEvidence);
-  const apiKey = process.env.MISTRAL_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
-    return Response.json(fallbackAnswer(persona, usableEvidence, reactions, "MISTRAL_API_KEY가 설정되지 않아 임시 답변을 반환했습니다."));
+    return Response.json(fallbackAnswer(persona, usableEvidence, reactions, "OPENAI_API_KEY가 설정되지 않아 임시 답변을 반환했습니다."));
   }
 
   const systemPrompt = buildSystemPrompt(persona, usableEvidence, reactions);
-  const messages: MistralMessage[] = [
-    { role: "system", content: systemPrompt },
+  const messages: OpenAIMessage[] = [
+    { role: "developer", content: systemPrompt },
     ...sanitizeConversationHistory(body.conversationHistory),
     { role: "user", content: question }
   ];
 
   try {
-    const firstAnswer = await requestMistralAnswer(apiKey, messages);
+    const firstAnswer = await requestOpenAIAnswer(apiKey, messages);
     if (!firstAnswer.ok) {
       return Response.json(fallbackAnswer(persona, usableEvidence, reactions, firstAnswer.error), { status: 200 });
     }
@@ -217,9 +230,9 @@ export async function POST(req: Request) {
     let answer = firstAnswer.answer;
 
     if (answer && hasForeignText(answer)) {
-      const repairMessages: MistralMessage[] = [
+      const repairMessages: OpenAIMessage[] = [
         {
-          role: "system",
+          role: "developer",
           content: `${systemPrompt}
 
 출력 검수 규칙:
@@ -229,7 +242,7 @@ export async function POST(req: Request) {
         },
         { role: "user", content: `질문: ${question}\n\n${persona.name}의 입장에서 한국어만 사용해 새로 답하라.` }
       ];
-      const repairedAnswer = await requestMistralAnswer(apiKey, repairMessages, 0.25);
+      const repairedAnswer = await requestOpenAIAnswer(apiKey, repairMessages);
       answer = repairedAnswer.ok ? repairedAnswer.answer : "";
     }
 
@@ -241,11 +254,11 @@ export async function POST(req: Request) {
 
     return Response.json({
       answer,
-      source: "mistral",
+      source: "openai",
       usedEvidenceNames: usableEvidence
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "알 수 없는 오류";
-    return Response.json(fallbackAnswer(persona, usableEvidence, reactions, `Mistral API 오류: ${message}`), { status: 200 });
+    return Response.json(fallbackAnswer(persona, usableEvidence, reactions, `OpenAI API 오류: ${message}`), { status: 200 });
   }
 }

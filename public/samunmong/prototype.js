@@ -1310,7 +1310,7 @@
         history.push({ role: "user", content: question }, { role: "assistant", content: answer });
         while (history.length > 8) history.shift();
         setAiMode(suspect.name);
-        showToast(data.source === "mistral" ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
+        showToast(data.source === "openai" ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
       } catch (error) {
         const message = error instanceof Error ? error.message : "알 수 없는 오류";
         showSuspectReply("지금은 답하기 어려워 보입니다.", "오류");
