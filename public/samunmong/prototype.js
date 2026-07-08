@@ -544,6 +544,9 @@
       if (saved?.screenId === "briefingScreen") setTimeout(typeBriefing, 300);
     });
     on("#openSettings", "click", () => settingsDialog?.classList.add("open"));
+    on("#volumeSetting", "input", () => {
+      applyAudioVolume();
+    });
     on("#closeSettings", "click", () => {
       const settings = {
         volume: Number(document.querySelector("#volumeSetting").value),
