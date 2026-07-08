@@ -23,14 +23,14 @@ export const tutorialCopy = {
 
 export const dreamOptions: DreamOption[] = [
   {
-    state: "LOCKED",
+    id: "chooseJoseon",
+    state: "PLAYABLE",
     kicker: "DREAM 01",
-    title: "우주정거장 살인사건",
-    description: "중력이 사라진 복도 안, 시체만이 제자리를 떠나지 못했습니다.",
-    meta: "폐쇄 공간 · 산소 기록 · 사라진 카메라",
-    image: "/samunmong/assets/theme-space-station.png",
-    disabled: true,
-    ariaLabel: "우주정거장 살인사건은 아직 잠겨 있습니다"
+    title: "조선시대 살인사건",
+    description: "문 앞에 쓰러진 사람, 곁에 남은 호패 조각 하나가 모두의 관계를 뒤집습니다.",
+    meta: "호패 조각 · 젖은 발자국 · 거짓 증언",
+    image: "/samunmong/assets/theme-joseon-murder.png",
+    disabled: false
   },
   {
     state: "LOCKED",
@@ -43,14 +43,14 @@ export const dreamOptions: DreamOption[] = [
     ariaLabel: "마법학교 방화사건은 아직 잠겨 있습니다"
   },
   {
-    id: "chooseJoseon",
-    state: "PLAYABLE",
+    state: "LOCKED",
     kicker: "DREAM 03",
-    title: "조선시대 살인사건",
-    description: "문 앞에 쓰러진 사람, 곁에 남은 호패 조각 하나가 모두의 관계를 뒤집습니다.",
-    meta: "호패 조각 · 젖은 발자국 · 거짓 증언",
-    image: "/samunmong/assets/theme-joseon-murder.png",
-    disabled: false
+    title: "우주정거장 살인사건",
+    description: "중력이 사라진 복도 안, 시체만이 제자리를 떠나지 못했습니다.",
+    meta: "폐쇄 공간 · 산소 기록 · 사라진 카메라",
+    image: "/samunmong/assets/theme-space-station.png",
+    disabled: true,
+    ariaLabel: "우주정거장 살인사건은 아직 잠겨 있습니다"
   }
 ] as const;
 
@@ -68,9 +68,9 @@ const investigationDock = [
   },
   {
     className: "bag-chip open-bag-panel",
-    ariaLabel: "수사 가방 열기",
-    image: "/samunmong/assets/labels/transparent/tool-evidence-bag.png",
-    label: "수사 가방"
+    ariaLabel: "보따리 열기",
+    image: "/samunmong/assets/labels/transparent/tool-bag-short.png",
+    label: "보따리"
   },
   {
     className: "tool-chip open-tool-panel",
@@ -80,9 +80,9 @@ const investigationDock = [
   },
   {
     className: "note-chip open-note-panel",
-    ariaLabel: "수사노트 열기",
-    image: "/samunmong/assets/labels/transparent/tool-investigation-note.png",
-    label: "수사노트"
+    ariaLabel: "기록장 열기",
+    image: "/samunmong/assets/labels/transparent/tool-note-short.png",
+    label: "기록장"
   },
   {
     className: "room-chip",
@@ -115,7 +115,7 @@ export const fieldOneScene = {
     title: "호패 조각 발견",
     text: "신분을 밝히는 호패로 추정되는 나무 조각을 발견했다. 일부 글자가 긁혀 있어 주인을 바로 알 수 없다.",
     buttonId: "collectHopae",
-    buttonLabel: "가방에 넣기"
+    buttonLabel: "보따리에 넣기"
   }
 } as const;
 
@@ -141,7 +141,7 @@ export const chunwolRoomScene = {
     title: "돌쇠의 그림 발견",
     text: "춘월의 방에서 돌쇠를 그린 듯한 초상화를 발견했다. 그림의 보관 상태가 지나치게 조심스럽다.",
     buttonId: "collectPortrait",
-    buttonLabel: "가방에 넣기"
+    buttonLabel: "보따리에 넣기"
   }
 } as const;
 

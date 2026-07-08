@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import BriefingScreen from "@/components/front/BriefingScreen";
 import DreamSelectScreen from "@/components/front/DreamSelectScreen";
 import MainScreen from "@/components/front/MainScreen";
+import TeamIntro from "@/components/front/TeamIntro";
 import TutorialScreen from "@/components/front/TutorialScreen";
 import LocationIndicator from "@/components/LocationIndicator";
 import BackGateCourtyardScene from "@/components/scenes/BackGateCourtyardScene";
@@ -33,6 +34,8 @@ function ensureRequestedStartScreen(initialScreen?: string) {
 }
 
 export default function GameShell({ initialScreen }: GameShellProps) {
+  const skipIntro = Boolean(initialScreen);
+
   useEffect(() => {
     let cancelled = false;
     const loadedScripts: HTMLScriptElement[] = [];
@@ -65,6 +68,7 @@ export default function GameShell({ initialScreen }: GameShellProps) {
 
   return (
     <main className="game-shell">
+      <TeamIntro disabled={skipIntro} />
       <MainScreen />
       <TutorialScreen />
       <DreamSelectScreen />
