@@ -604,17 +604,9 @@
         img: "/samunmong/assets/mudeok-interaction/tool-dusting-brush.png",
         note: "흙먼지나 재를 털어 숨은 표면을 드러냅니다."
       },
-      "문서칼": {
-        img: "/samunmong/assets/mudeok-interaction/tool-document-knife.png",
-        note: "겹친 종이나 묶인 끈을 조심스럽게 벌립니다."
-      },
       "촛불 비추기": {
         img: "/samunmong/assets/mudeok-interaction/tool-candle-lantern.png",
         note: "어두운 곳, 비침, 눌린 자국을 빛으로 확인합니다."
-      },
-      "먹물 테스트 천": {
-        img: "/samunmong/assets/mudeok-interaction/tool-ink-test-cloth.png",
-        note: "먹, 피, 젖은 얼룩을 문질러 반응을 봅니다."
       }
     };
 
@@ -640,14 +632,14 @@
       "나무 상자": {
         note: "사랑방에서 확인한 작은 나무 상자. 안에 무엇이 있었는지 살펴야 한다.",
         img: "/samunmong/assets/evidence-transparent/evidence-wooden-box-transparent.png",
-        tool: "문서칼",
-        toolResult: "문서칼로 틈을 살피자 상자 안쪽에 종이 가루가 남아 있다."
+        tool: "돋보기",
+        toolResult: "틈새를 자세히 살피자 상자 안쪽에 종이 가루가 남아 있다."
       },
       "무덕의 번진 일기": {
         note: "먹이 번져 읽기 어려운 일기. 도구로 얼룩을 확인하면 숨긴 문장을 더 추적할 수 있다.",
         img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.png",
-        tool: "먹물 테스트 천",
-        toolResult: "먹물 테스트 천에 묻어난 얼룩이 최근에 젖은 흔적처럼 번진다."
+        tool: "촛불 비추기",
+        toolResult: "빛을 비추자 번진 먹 아래로 최근에 젖은 듯한 얼룩 경계가 드러난다."
       },
       "진흙 묻은 짚신": {
         note: "문밖 젖은 길과 닮은 진흙이 묻은 짚신. 이동 경로를 비교할 단서다.",
@@ -682,8 +674,8 @@
       "하인 장부": {
         note: "하인들의 출입과 심부름 기록이 적힌 장부. 장소 이동을 대조할 수 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-servant-ledger.png",
-        tool: "문서칼",
-        toolResult: "붙어 있던 장부장을 벌리자 빠진 줄 하나가 드러난다."
+        tool: "촛불 비추기",
+        toolResult: "빛에 비추자 장부장 사이로 눌려 있던 빈 줄 하나가 드러난다."
       },
       "종이칼": {
         note: "사랑방 책상에 놓인 종이칼. 편지 조각과 절단면을 비교할 수 있다.",
@@ -694,8 +686,8 @@
       "먹가루": {
         note: "책상 주변에 흩어진 먹가루. 문서가 급히 지워졌는지 확인할 수 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-ink-powder.png",
-        tool: "먹물 테스트 천",
-        toolResult: "천에 묻은 가루가 물기와 닿자 짙은 먹빛으로 번진다."
+        tool: "돋보기",
+        toolResult: "확대해 보니 가루가 문지른 자국을 따라 고르게 흩어져 있다."
       },
       "혼서 조각": {
         note: "혼례와 관련 있어 보이는 문서 조각. 인물 관계를 다시 보게 만드는 단서다.",
@@ -706,20 +698,20 @@
       "도끼와 칼": {
         note: "돌쇠 처소에서 확인한 날붙이. 직접 결론보다 사용 흔적을 조사해야 한다.",
         img: "/samunmong/assets/evidence-transparent/evidence-axe-knife.png",
-        tool: "먹물 테스트 천",
-        toolResult: "날 가장자리에는 오래된 얼룩과 새 얼룩이 섞여 있다."
+        tool: "돋보기",
+        toolResult: "날 가장자리에 오래된 얼룩과 새 얼룩이 섞인 듯한 흔적이 보인다."
       },
       "피 묻은 붕대": {
         note: "피처럼 보이는 얼룩이 남은 붕대. 상처나 몸싸움 흔적과 연결될 수 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-bloodied-bandage.png",
-        tool: "먹물 테스트 천",
-        toolResult: "천으로 찍어 보니 얼룩 일부는 아직 짙게 번진다."
+        tool: "돋보기",
+        toolResult: "얼룩 가장자리가 아직 짙고 불규칙하게 번진 흔적이 보인다."
       },
       "도망 보따리": {
         note: "급히 싼 듯한 보따리. 누군가 떠날 준비를 했는지 확인해야 한다.",
         img: "/samunmong/assets/evidence-transparent/evidence-escape-bundle.png",
-        tool: "문서칼",
-        toolResult: "묶음을 살짝 벌리자 안쪽에 접힌 종이 조각이 끼어 있다."
+        tool: "돋보기",
+        toolResult: "묶음 틈을 살피자 안쪽에 접힌 종이 조각이 끼어 있다."
       },
       "긁힌 팔 흔적": {
         note: "심문 중 소매 아래에서 확인한 긁힌 흔적. 실오라기나 몸싸움 흔적과 대조할 수 있다.",
@@ -742,8 +734,8 @@
       "맞물리는 종이 조각": {
         note: "다른 편지 조각과 맞물릴 수 있는 종이. 조각들을 맞춰 확인해야 한다.",
         img: "/samunmong/assets/evidence-transparent/evidence-matching-paper-scraps.png",
-        tool: "문서칼",
-        toolResult: "문서칼로 가장자리를 맞추자 찢어진 결이 자연스럽게 이어진다."
+        tool: "촛불 비추기",
+        toolResult: "빛 아래에서 가장자리를 맞춰 보니 찢어진 결이 자연스럽게 이어진다."
       },
       "찢어진 편지 조각": {
         note: "찢겨 나간 편지의 일부. 누군가 숨기려 했던 말이 남아 있을 수 있다.",
@@ -831,7 +823,7 @@
       button.className = `tool-evidence-option${hasAnalyzedEvidence(name) ? " analyzed" : ""}`;
       button.type = "button";
       button.dataset.evidence = name;
-      button.innerHTML = `<img src="${data.img || "/samunmong/assets/evidence-wooden-tag.png"}" alt=""><span><strong>${name}</strong>${data.tool ? `${data.tool} 필요` : "추가 분석 없음"}</span>`;
+      button.innerHTML = `<img src="${data.img || "/samunmong/assets/evidence-wooden-tag.png"}" alt=""><span><strong>${name}</strong>${data.tool ? "자세히 살펴보기" : "확인 완료"}</span>`;
       button.addEventListener("click", () => setAnalysisTarget(name));
       list.appendChild(button);
     }
@@ -863,7 +855,7 @@
       note.textContent = analyzed
         ? data.toolResult
         : name
-          ? `${data.note || "현장에서 발견된 단서입니다."} ${data.tool ? "알맞은 도구를 고른 뒤 증거 위를 문질러 보세요." : "추가 도구 분석은 필요하지 않습니다."}`
+          ? `${data.note || "현장에서 발견된 단서입니다."} ${data.tool ? "증거를 관찰하고 어울리는 도구를 직접 골라 보세요." : "추가 도구 분석은 필요하지 않습니다."}`
         : "수집한 증거를 고르면 이곳에 크게 표시됩니다.";
       const preview = document.querySelector(".tool-preview");
       preview?.classList.remove("revealed", "wrong-tool");
@@ -1017,7 +1009,7 @@
       if (data.tool !== toolName) {
         document.querySelector(".tool-preview")?.classList.add("wrong-tool");
         setTimeout(() => document.querySelector(".tool-preview")?.classList.remove("wrong-tool"), 520);
-        showToast(`${currentEvidenceForTool}에는 ${data.tool}이 더 알맞아 보입니다.`);
+        showToast("다른 도구를 시도해 보세요.");
         return;
       }
 
@@ -1145,8 +1137,8 @@
 
       document.querySelector("#genericEvidenceImage").src = data.img || "/samunmong/assets/evidence-wooden-tag.png";
       document.querySelector("#genericEvidenceTitle").textContent = name;
-      document.querySelector("#genericEvidenceText").textContent = `${data.note || "현장에서 발견한 단서입니다."} ${data.tool ? "도구 버튼을 눌러 이 증거를 자세히 살펴볼 수 있습니다." : "도구 없이 확인 가능한 단서입니다."}`;
-      document.querySelector("#collectGenericEvidence").textContent = data.tool ? "보따리에서 분석하기" : "확인";
+      document.querySelector("#genericEvidenceText").textContent = `${data.note || "현장에서 발견한 단서입니다."} ${data.tool ? "수사 도구로 더 자세히 살펴볼 수 있습니다." : "도구 없이 확인 가능한 단서입니다."}`;
+      document.querySelector("#collectGenericEvidence").textContent = data.tool ? "자세히 살펴보기" : "확인";
       document.querySelector("#genericEvidenceInspect").classList.add("show");
       clearTimeout(showInspect.timer);
       showInspect.timer = setTimeout(hideInspectPanels, 1500);
