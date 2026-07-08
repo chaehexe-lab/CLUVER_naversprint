@@ -25,7 +25,7 @@
     "사라진 노리개": { note: "장식 고리가 느슨해진 노리개. 누가 떨어뜨렸는지 확인해야 한다.", img: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.png", tool: "돋보기", toolResult: "고리 부분에 급히 잡아당긴 듯한 흠집이 있다." },
     "나무 상자": { note: "사랑방에서 확인한 작은 나무 상자. 안에 무엇이 있었는지 확인해야 한다.", img: "/samunmong/assets/evidence-transparent/evidence-wooden-box-transparent.png", tool: "문서칼", toolResult: "상자 안쪽에 잘게 부서진 종이 가루가 남아 있다." },
     "무덕의 번진 일기": { note: "먹이 번져 읽기 어려운 일기. 숨긴 문장을 추적할 수 있다.", img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.png", tool: "먹물 테스트 천", toolResult: "최근 젖은 흔적처럼 먹이 번져 있다." },
-    "진흙 묻은 짚신": { note: "문밖의 젖은 길과 같은 진흙이 묻은 짚신.", img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-muddy-straw-shoes.png", tool: "먼지 털이 붓", toolResult: "짚신 바닥의 흙 결이 현장 발자국과 비슷하다." },
+    "진흙 묻은 짚신": { note: "문밖의 젖은 길과 같은 진흙이 묻은 짚신.", img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-muddy-straw-shoes.png", tool: "먼지털이 붓", toolResult: "짚신 바닥의 흙 결이 현장 발자국과 비슷하다." },
     "찢어진 옷고름": { note: "거칠게 끊어진 옷고름. 급한 몸싸움의 흔적일 수 있다.", img: "/samunmong/assets/mudeok-interaction/evidence-torn-collar-tie.png", tool: "돋보기", toolResult: "천 올이 한 방향으로 잡아당겨져 있다." },
     "손톱 밑 실타래": { note: "작은 실타래 표본. 옷감이나 끈과 대조할 수 있다.", img: "/samunmong/assets/mudeok-interaction/evidence-fingernail-thread-sample.png", tool: "돋보기", toolResult: "찢어진 옷고름의 섬유와 비슷한 꼬임이 보인다." },
     "점순 목 검안 종이": { note: "점순의 목 주변을 살핀 기록지. 직접적인 결론은 없지만 중요한 단서다.", img: "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png", tool: "촛불 비추기", toolResult: "종이 위에 눌린 선이 희미하게 드러난다." },
