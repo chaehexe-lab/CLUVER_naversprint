@@ -97,7 +97,7 @@ export const fieldOneScene = {
   id: "fieldOne",
   image: "/samunmong/assets/scene-field-one-evidence-integrated.png",
   alt: "유문석 집 문 앞에 쓰러진 점순과 조사할 증거가 놓인 사건 현장",
-  props: [] satisfies SceneProp[],
+  props: [] as SceneProp[],
   hotspots: [
     { evidenceName: "찢어진 문서 조각", ariaLabel: "찢어진 문서 조각 조사", x: "70.7%", y: "86.7%", w: "6.5%", h: "7.6%" },
     { id: "hopaeHotspot", className: "hopae-glow", ariaLabel: "호패 조각 조사", x: "54.3%", y: "87.9%", w: "6.6%", h: "8.4%" }
