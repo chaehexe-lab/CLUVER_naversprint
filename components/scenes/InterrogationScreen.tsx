@@ -291,10 +291,6 @@ export default function InterrogationScreen() {
         <button className="close-button global-close map-floating-close" type="button" aria-label="마을 지도 닫기">
           닫기
         </button>
-        <div className="map-location-banner" aria-live="polite">
-          <span>현재 위치</span>
-          <strong id="mapCurrentLocation">유문석 집 앞</strong>
-        </div>
         <div className="map-board">
           <img src="/samunmong/assets/joseon-village-map-seven-locations-v2.png" alt="조사 장소가 붉은 인장으로 표시된 조선시대 수사 지도" />
           {mapLabels.map((label) => (
@@ -302,12 +298,6 @@ export default function InterrogationScreen() {
               {label.text}
             </span>
           ))}
-          <span
-            className="map-current-marker"
-            id="mapCurrentMarker"
-            style={mapPinStyle({ x: "29%", y: "32%" })}
-            aria-hidden="true"
-          />
           {mapPins.map((pin) => (
             <button
               className="map-pin-button"

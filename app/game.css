@@ -1564,36 +1564,6 @@
       box-shadow: 0 28px 120px rgba(0,0,0,.82), inset 0 0 0 1px rgba(255,255,255,.04);
     }
 
-    .map-location-banner {
-      position: absolute;
-      left: 28px;
-      top: 24px;
-      z-index: 4;
-      min-width: 176px;
-      padding: 9px 13px 10px;
-      border: 1px solid rgba(129, 36, 31, .7);
-      border-radius: 4px;
-      color: #f5ead8;
-      background:
-        linear-gradient(90deg, rgba(107, 28, 24, .62), rgba(28, 16, 10, .76)),
-        rgba(9, 6, 5, .82);
-      box-shadow: 0 10px 25px rgba(0,0,0,.42), inset 0 0 0 1px rgba(255,255,255,.04);
-    }
-
-    .map-location-banner span {
-      display: block;
-      color: rgba(217,178,104,.9);
-      font-size: 10px;
-      line-height: 1;
-    }
-
-    .map-location-banner strong {
-      display: block;
-      margin-top: 5px;
-      font-size: 17px;
-      line-height: 1.12;
-    }
-
     .map-floating-close {
       position: absolute;
       right: 28px;
@@ -2176,52 +2146,6 @@
       pointer-events: none;
       white-space: nowrap;
       mix-blend-mode: screen;
-    }
-
-    .map-label.current {
-      z-index: 3;
-      color: #fff4d9;
-      border-color: rgba(162, 43, 37, .72);
-      background: rgba(77, 16, 13, .58);
-      box-shadow: 0 0 13px rgba(156, 38, 32, .28);
-    }
-
-    .map-current-marker {
-      position: absolute;
-      z-index: 4;
-      left: var(--x);
-      top: var(--y);
-      width: var(--w);
-      height: var(--h);
-      border: 2px solid rgba(255, 224, 165, .82);
-      border-radius: 50%;
-      background:
-        radial-gradient(circle at 50% 50%, rgba(226, 54, 45, .96) 0 18%, rgba(226, 54, 45, .48) 19% 31%, transparent 32%),
-        radial-gradient(ellipse at 50% 50%, rgba(255, 224, 165, .18), rgba(188, 40, 33, .18) 46%, transparent 67%);
-      box-shadow: 0 0 22px rgba(188, 40, 33, .5), inset 0 0 0 1px rgba(38, 6, 4, .38);
-      transform: translate(-50%, -50%);
-      pointer-events: none;
-      animation: currentLocationPulse 1.8s ease-in-out infinite;
-    }
-
-    .map-current-marker::after {
-      content: "현재";
-      position: absolute;
-      left: 50%;
-      bottom: 100%;
-      padding: 2px 5px;
-      border-radius: 999px;
-      color: #fff5dc;
-      background: rgba(70, 12, 10, .82);
-      font-size: 10px;
-      line-height: 1;
-      white-space: nowrap;
-      transform: translate(-50%, -5px);
-    }
-
-    @keyframes currentLocationPulse {
-      0%, 100% { filter: brightness(.92); transform: translate(-50%, -50%) scale(.96); }
-      50% { filter: brightness(1.14); transform: translate(-50%, -50%) scale(1.08); }
     }
 
     @keyframes outlineGlow {
