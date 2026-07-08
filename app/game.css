@@ -2124,7 +2124,7 @@
     }
 
     .map-pin-button.current {
-      outline: 2px solid rgba(226, 54, 45, .78);
+      outline: 0px solid rgba(226, 54, 45, .78);
       outline-offset: 0;
     }
 
