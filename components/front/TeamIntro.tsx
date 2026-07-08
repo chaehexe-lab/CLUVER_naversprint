@@ -7,6 +7,41 @@ type TeamIntroProps = {
 };
 
 const INTRO_DURATION_MS = 5600;
+const introTypeSfxPaths = [
+  "/samunmong/sound/sfx/type-1.mp3",
+  "/samunmong/sound/sfx/type-2.mp3",
+  "/samunmong/sound/sfx/type-3.mp3"
+] as const;
+const introClickSfxPath = "/samunmong/sound/sfx/button.mp3";
+
+function readIntroAudioVolume() {
+  if (typeof window === "undefined") return 0.7;
+
+  try {
+    const raw = window.localStorage.getItem("samunmong-demo-settings");
+    const parsed = raw ? JSON.parse(raw) : null;
+    const volume = Number(parsed?.volume ?? 70);
+    return Math.max(0, Math.min(1, volume / 100));
+  } catch {
+    return 0.7;
+  }
+}
+
+function playIntroTypeSfx(index: number) {
+  if (typeof window === "undefined") return;
+
+  const audio = new Audio(introTypeSfxPaths[index % introTypeSfxPaths.length]);
+  audio.volume = readIntroAudioVolume() * 0.48;
+  audio.play().catch(() => {});
+}
+
+function playIntroClickSfx() {
+  if (typeof window === "undefined") return;
+
+  const audio = new Audio(introClickSfxPath);
+  audio.volume = readIntroAudioVolume() * 0.58;
+  audio.play().catch(() => {});
+}
 
 export default function TeamIntro({ disabled = false }: TeamIntroProps) {
   const [visible, setVisible] = useState(!disabled);
@@ -20,6 +55,19 @@ export default function TeamIntro({ disabled = false }: TeamIntroProps) {
     const timer = window.setTimeout(() => setVisible(false), INTRO_DURATION_MS);
     return () => window.clearTimeout(timer);
   }, [disabled]);
+
+  useEffect(() => {
+    if (disabled || !visible) return;
+
+    const timeouts = Array.from({ length: 14 }, (_, index) =>
+      window.setTimeout(() => playIntroTypeSfx(index), 1180 + index * 74)
+    );
+    timeouts.push(window.setTimeout(playIntroClickSfx, 2150));
+
+    return () => {
+      timeouts.forEach((timeout) => window.clearTimeout(timeout));
+    };
+  }, [disabled, visible]);
 
   if (!visible) return null;
 

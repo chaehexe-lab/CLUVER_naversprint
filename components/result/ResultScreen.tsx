@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { finalCulpritId } from "@/lib/persona";
 
@@ -49,6 +49,16 @@ const requiredEvidence = [
 ] as const;
 
 const correctSuspectId = process.env.NEXT_PUBLIC_SAMUNMONG_CULPRIT_ID || finalCulpritId;
+const soundBase = "/samunmong/sound";
+const resultBgmPath = `${soundBase}/bgm/joseon.mp3`;
+const buttonSfxPath = `${soundBase}/sfx/button.mp3`;
+const bgmStateKey = "samunmong-bgm-state";
+const joseonBgmKey = "joseon";
+const typeSfxPaths = [
+  `${soundBase}/sfx/type-1.mp3`,
+  `${soundBase}/sfx/type-2.mp3`,
+  `${soundBase}/sfx/type-3.mp3`
+] as const;
 
 const outcomeCopy = {
   success: {
@@ -90,7 +100,112 @@ function resetDreamProgress() {
   window.localStorage.removeItem("samunmong-collected-evidence");
 }
 
-function TypewriterLines({ lines }: { lines: readonly string[] }) {
+function readAudioVolume() {
+  if (typeof window === "undefined") return 0.7;
+
+  try {
+    const raw = window.localStorage.getItem("samunmong-demo-settings");
+    const parsed = raw ? JSON.parse(raw) : null;
+    const volume = Number(parsed?.volume ?? 70);
+    return Math.max(0, Math.min(1, volume / 100));
+  } catch {
+    return 0.7;
+  }
+}
+
+function readBgmState() {
+  if (typeof window === "undefined") return {} as Record<string, { time?: number; savedAt?: number }>;
+
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(bgmStateKey) || "{}");
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeBgmState(track: HTMLAudioElement) {
+  if (typeof window === "undefined" || !Number.isFinite(track.currentTime)) return;
+  const previous = readBgmState();
+  window.localStorage.setItem(
+    bgmStateKey,
+    JSON.stringify({
+      ...previous,
+      [joseonBgmKey]: {
+        time: track.currentTime,
+        savedAt: Date.now()
+      }
+    })
+  );
+}
+
+function restoreBgmState(track: HTMLAudioElement) {
+  const state = readBgmState()[joseonBgmKey];
+  if (!state || !Number.isFinite(state.time) || !track.duration) return;
+  const age = Date.now() - Number(state.savedAt || 0);
+  if (age > 1000 * 60 * 30) return;
+  track.currentTime = Math.min(Number(state.time), Math.max(0, track.duration - 0.2));
+}
+
+function useResultAudio() {
+  const typeIndexRef = useRef(0);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const audio = new Audio(resultBgmPath);
+    audio.loop = true;
+    audio.preload = "auto";
+    audio.volume = readAudioVolume() * 0.7;
+
+    let disposed = false;
+    const restore = () => restoreBgmState(audio);
+    const playBgm = () => {
+      if (disposed) return;
+      audio.volume = readAudioVolume() * 0.7;
+      audio.play().catch(() => {});
+    };
+
+    audio.addEventListener("loadedmetadata", restore, { once: true });
+    if (audio.readyState) restore();
+    playBgm();
+    const handlePageHide = () => writeBgmState(audio);
+    window.addEventListener("pointerdown", playBgm, { once: true });
+    window.addEventListener("keydown", playBgm, { once: true });
+    window.addEventListener("pagehide", handlePageHide);
+    const saveTimer = window.setInterval(() => writeBgmState(audio), 1200);
+
+    return () => {
+      disposed = true;
+      writeBgmState(audio);
+      window.clearInterval(saveTimer);
+      window.removeEventListener("pointerdown", playBgm);
+      window.removeEventListener("keydown", playBgm);
+      window.removeEventListener("pagehide", handlePageHide);
+      audio.pause();
+    };
+  }, []);
+
+  const playButtonSfx = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const audio = new Audio(buttonSfxPath);
+    audio.volume = readAudioVolume() * 0.6;
+    audio.play().catch(() => {});
+  }, []);
+
+  const playTypingSfx = useCallback(() => {
+    if (typeof window === "undefined") return;
+    const source = typeSfxPaths[typeIndexRef.current % typeSfxPaths.length];
+    typeIndexRef.current += 1;
+    const audio = new Audio(source);
+    audio.volume = readAudioVolume() * 0.48;
+    audio.play().catch(() => {});
+  }, []);
+
+  return { playButtonSfx, playTypingSfx };
+}
+
+function TypewriterLines({ lines, onType }: { lines: readonly string[]; onType?: () => void }) {
   const [visibleLines, setVisibleLines] = useState(() => lines.map(() => ""));
   const [activeLine, setActiveLine] = useState(0);
 
@@ -109,12 +224,17 @@ function TypewriterLines({ lines }: { lines: readonly string[] }) {
       const currentLineIndex = lineIndex;
       const currentCharIndex = charIndex;
       const currentLine = lines[currentLineIndex];
+      const currentChar = currentLine[currentCharIndex] ?? "";
 
       setVisibleLines((current) => {
         const next = [...current];
         next[currentLineIndex] = currentLine.slice(0, currentCharIndex + 1);
         return next;
       });
+
+      if (currentChar.trim() && currentCharIndex % 3 === 0) {
+        onType?.();
+      }
 
       charIndex += 1;
 
@@ -137,7 +257,7 @@ function TypewriterLines({ lines }: { lines: readonly string[] }) {
       cancelled = true;
       window.clearTimeout(timer);
     };
-  }, [lines]);
+  }, [lines, onType]);
 
   return (
     <div className="typewriter-lines" aria-label={lines.join(" ")}>
@@ -152,11 +272,12 @@ function TypewriterLines({ lines }: { lines: readonly string[] }) {
 
 export default function ResultScreen() {
   const searchParams = useSearchParams();
+  const { playButtonSfx, playTypingSfx } = useResultAudio();
   const initialSuspectId = searchParams.get("suspectId");
   const [selectedSuspectId, setSelectedSuspectId] = useState(
     suspects.some((suspect) => suspect.id === initialSuspectId) ? initialSuspectId : suspects[0].id
   );
-  const [showWarning, setShowWarning] = useState(() => searchParams.get("previewWarning") === "1");
+  const [showWarning, setShowWarning] = useState(false);
   const [showExitPrompt, setShowExitPrompt] = useState(false);
 
   const selectedSuspect = suspects.find((suspect) => suspect.id === selectedSuspectId) ?? suspects[0];
@@ -165,6 +286,19 @@ export default function ResultScreen() {
     const collected = new Set(readCollectedEvidence());
     return requiredEvidence.filter((name) => !collected.has(name));
   }, [showWarning]);
+
+  useEffect(() => {
+    if (searchParams.get("previewWarning") === "1" && missingEvidence.length > 0) {
+      setShowWarning(true);
+    }
+  }, [missingEvidence.length, searchParams]);
+
+  function handleResultClick(event: MouseEvent<HTMLElement>) {
+    const target = event.target;
+    if (target instanceof Element && target.closest("button, a")) {
+      playButtonSfx();
+    }
+  }
 
   function confirmAccusation(force = false) {
     if (!force && missingEvidence.length > 0) {
@@ -190,7 +324,7 @@ export default function ResultScreen() {
       selectedSuspect;
 
     return (
-      <main className={`result-screen result-verdict result-${outcome}`}>
+      <main className={`result-screen result-verdict result-${outcome}`} onClickCapture={handleResultClick}>
         <img className="result-full-bg" src="/samunmong/assets/final-accusation-bg.png" alt="" />
         <section className="verdict-stage" aria-labelledby="resultTitle">
           <article
@@ -212,7 +346,7 @@ export default function ResultScreen() {
           <article className="verdict-message">
             <p className="verdict-kicker">{copy.kicker}</p>
             <h1 id="resultTitle">{copy.title}</h1>
-            <TypewriterLines lines={copy.lines} />
+            <TypewriterLines lines={copy.lines} onType={playTypingSfx} />
             <div className="verdict-actions">
               <Link className="wood-result-button" href="/?start=briefingScreen" onClick={resetDreamProgress}>
                 이번 꿈을 다시 꾸기
@@ -253,7 +387,7 @@ export default function ResultScreen() {
   }
 
   return (
-    <main className="result-screen accusation-screen">
+    <main className="result-screen accusation-screen" onClickCapture={handleResultClick}>
       <section className="accusation-stage" aria-labelledby="resultTitle">
         <img className="accusation-bg" src="/samunmong/assets/final-accusation-bg.png" alt="" />
         <h1 id="resultTitle" className="accusation-title">

@@ -31,6 +31,7 @@
     const collectedEvidenceKey = "samunmong-collected-evidence";
     const analyzedEvidenceKey = "samunmong-analyzed-evidence";
     const settingsKey = "samunmong-demo-settings";
+    const bgmStateKey = "samunmong-bgm-state";
     const locationMeta = {
       tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
       dreamScreen: { name: "꿈 선택", x: "18%", y: "18%" },
@@ -130,6 +131,30 @@
       });
     }
 
+    function readBgmState() {
+      return readStored(bgmStateKey, {});
+    }
+
+    function writeBgmState(trackKey, track) {
+      if (!trackKey || !track || !Number.isFinite(track.currentTime)) return;
+      const previous = readBgmState();
+      localStorage.setItem(bgmStateKey, JSON.stringify({
+        ...previous,
+        [trackKey]: {
+          time: track.currentTime,
+          savedAt: Date.now()
+        }
+      }));
+    }
+
+    function restoreBgmState(trackKey, track) {
+      const state = readBgmState()[trackKey];
+      if (!state || !Number.isFinite(state.time) || !track.duration) return;
+      const age = Date.now() - Number(state.savedAt || 0);
+      if (age > 1000 * 60 * 30) return;
+      track.currentTime = Math.min(state.time, Math.max(0, track.duration - 0.2));
+    }
+
     function bgmForScreen(screenId) {
       if (screenId === "mainScreen" || screenId === "tutorialScreen" || screenId === "dreamScreen") return "main";
       return "joseon";
@@ -144,13 +169,16 @@
       if (currentBgm === nextBgm) return;
       Object.entries(bgmTracks).forEach(([key, track]) => {
         if (key !== nextBgm) {
+          writeBgmState(key, track);
           track.pause();
-          track.currentTime = 0;
         }
       });
       currentBgm = nextBgm;
+      const nextTrack = bgmTracks[nextBgm];
+      if (nextTrack?.readyState) restoreBgmState(nextBgm, nextTrack);
+      else nextTrack?.addEventListener("loadedmetadata", () => restoreBgmState(nextBgm, nextTrack), { once: true });
       if (!audioUnlocked) return;
-      bgmTracks[nextBgm]?.play().catch(() => {});
+      nextTrack?.play().catch(() => {});
     }
 
     function unlockAudio() {
@@ -166,7 +194,10 @@
       applyAudioVolume();
       const activeBgm = currentBgm || bgmForScreen(getActiveScreenId());
       currentBgm = activeBgm;
-      bgmTracks[activeBgm]?.play()
+      const activeTrack = bgmTracks[activeBgm];
+      if (activeTrack?.readyState) restoreBgmState(activeBgm, activeTrack);
+      else activeTrack?.addEventListener("loadedmetadata", () => restoreBgmState(activeBgm, activeTrack), { once: true });
+      activeTrack?.play()
         .then(() => {
           audioUnlocked = true;
           clearInterval(autoplayRetryTimer);
@@ -505,6 +536,7 @@
       });
 
       playSfx("dream", 0.85);
+      writeBgmState(currentBgm || bgmForScreen(getActiveScreenId()), bgmTracks[currentBgm || bgmForScreen(getActiveScreenId())]);
       window.location.href = `/result?${params.toString()}`;
     }
 
@@ -516,6 +548,9 @@
     updateBgmForScreen();
     startAutoplayRetries();
     window.addEventListener("focus", tryAutoplayBgm);
+    window.addEventListener("pagehide", () => {
+      writeBgmState(currentBgm || bgmForScreen(getActiveScreenId()), bgmTracks[currentBgm || bgmForScreen(getActiveScreenId())]);
+    });
     document.addEventListener("visibilitychange", () => {
       if (!document.hidden) tryAutoplayBgm();
     });

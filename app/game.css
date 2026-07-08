@@ -1146,6 +1146,12 @@
       grid-area: auto;
       justify-self: auto;
       min-width: 126px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 16px;
+      line-height: 1;
+      text-align: center;
       text-decoration: none;
     }
 
@@ -3243,6 +3249,35 @@
     .global-panel.investigation-note-panel.show {
       display: block;
       transform: translate(-50%, -50%) scale(1);
+    }
+
+    .global-panel.bag-panel,
+    .global-panel.tool-panel,
+    .global-panel.investigation-note-panel,
+    .note-drawer,
+    .evidence-bag-pop {
+      border: 0;
+      border-radius: 4px;
+      background:
+        linear-gradient(180deg, rgba(56, 30, 18, .04), rgba(42, 20, 13, .2)),
+        url("/samunmong/assets/ui/joseon-paper-panel-bg.png") center / 100% 100% no-repeat;
+      box-shadow:
+        0 30px 118px rgba(0, 0, 0, .8),
+        inset 0 0 32px rgba(48, 21, 11, .24);
+      color: #2f2118;
+    }
+
+    .global-panel.bag-panel p,
+    .global-panel.bag-panel li,
+    .global-panel.tool-panel p,
+    .global-panel.tool-panel li,
+    .global-panel.investigation-note-panel p,
+    .global-panel.investigation-note-panel li,
+    .note-drawer p,
+    .note-drawer li,
+    .evidence-bag-pop p,
+    .evidence-bag-pop li {
+      color: rgba(47, 33, 24, .82);
     }
 
     .investigation-note-panel .global-panel-head {
