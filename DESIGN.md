@@ -149,3 +149,32 @@
 - **Decision status:** Confirmed for direction. `긁힌 팔 흔적`은 돌쇠의 소매 아래에서만 수집되는 방향.
 
 ### 증거 인벤토리
+
+- **Role in the flow:** 플레이어가 수집한 단서를 비교하고 재검토하는 화면.
+- **User action:** 증거 카드를 선택하고 상세 정보를 본다.
+- **Included elements:** 초상화 조각, 장신구, 상자, 찢어진 문서, 목패.
+- **Purpose:** 추리의 핵심 재료를 시각적으로 기억하기 쉽게 만든다.
+- **Why I chose this design:** 수집한 단서를 다시 읽고 증언과 비교할 수 있어야 범인 지목이 설득력을 가진다.
+- **Connected pages or mechanisms:** 사건 현장, 취조실, 범인 지목.
+- **Decision status:** Confirmed for direction.
+
+### 범인 지목 결과 화면
+
+- **Role in the flow:** 최종 범인 지목 이후 플레이어의 판단 결과를 보여준다.
+- **User action:** 성공 또는 실패 결과를 확인하고, 이번 꿈을 다시 꾸거나 꿈 선택 화면으로 나간다.
+- **Included elements:** 선택한 용의자의 판결패, 최종 지목 화면과 같은 호패형 패널, 붉은 도장, 타자 효과 문장.
+- **Purpose:** 플레이어의 지목 결과를 강하게 각인시키고, 다음 꿈으로 이어질 여운을 만든다.
+- **Why I chose this design:** 지목 화면과 결과 화면의 패널 디자인을 통일하면 선택과 판결이 같은 의식처럼 느껴진다.
+- **Connected pages or mechanisms:** 범인 지목, 취조실, 꿈 선택 화면.
+- **Decision status:** User-approved direction. 실제 범인과 최종 진상 문구는 추후 확정 필요.
+
+### 꿈 선택 복귀 안내
+
+- **Role in the flow:** 결과 화면에서 꿈을 나간 뒤, 아직 남은 두 개의 꿈이 있음을 알려준다.
+- **User action:** 안내를 닫고 꿈 선택 화면에서 다른 꿈을 살핀다.
+- **Included elements:** 흑백 레트로 시스템 팝업, 경고 아이콘, 잠긴 꿈을 암시하는 문구.
+- **Purpose:** 조선시대 꿈이 끝나도 전체 게임의 세 꿈 구조가 이어진다는 사실을 자연스럽게 전달한다.
+- **Why I chose this design:** 꿈 선택 화면은 메타적인 허브이므로, 고문서보다 레트로 시스템 경고창 같은 비현실적 UI가 꿈의 층위를 더 잘 보여준다.
+- **Result exit copy:** `꿈은 아직 끝나지 않았습니다` / `첫 번째 꿈은 멀어졌지만, 남은 두 꿈은 아직 당신을 부르고 있습니다.`
+- **Locked dream copy:** `아직 꿈을 그리고 있습니다...` / `이 꿈은 아직 완성되지 않았습니다. 봉인이 풀릴 때까지 기다려 주세요.`
+- **Decision status:** User-approved direction. 나머지 두 꿈의 실제 테마와 해금 조건은 추후 확정 필요.

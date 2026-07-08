@@ -200,6 +200,27 @@
       showToast.timer = setTimeout(() => toast.classList.remove("show"), 1900);
     }
 
+    function showDreamNotice(title = "꿈은 아직 끝나지 않았습니다", copy = "첫 번째 꿈은 멀어졌지만, 남은 두 꿈은 아직 당신을 부르고 있습니다.") {
+      const dialog = document.querySelector("#dreamNoticeDialog");
+      const titleEl = document.querySelector("#dreamNoticeTitle");
+      const copyEl = document.querySelector("#dreamNoticeCopy");
+      if (!dialog) {
+        showToast(copy);
+        return;
+      }
+
+      if (titleEl) titleEl.textContent = title;
+      if (copyEl) copyEl.textContent = copy;
+      dialog.classList.add("open");
+      dialog.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDreamNotice() {
+      const dialog = document.querySelector("#dreamNoticeDialog");
+      dialog?.classList.remove("open");
+      dialog?.setAttribute("aria-hidden", "true");
+    }
+
     function updateCurrentLocation(screenId) {
       const location = locationMeta[screenId];
       const indicator = document.querySelector("#currentLocationIndicator");
@@ -311,6 +332,11 @@
 
       if (startScreen === "briefingScreen") {
         typeBriefing();
+      } else if (startScreen === "dreamScreen" && entryParams.get("dreamExit") === "1") {
+        showDreamNotice(
+          "꿈은 아직 끝나지 않았습니다",
+          "첫 번째 꿈은 멀어졌지만, 남은 두 꿈은 아직 당신을 부르고 있습니다."
+        );
       } else {
         showToast("선택한 설정으로 사건을 시작합니다.");
       }
@@ -381,6 +407,15 @@
     });
     document.querySelector("#skipTutorial")?.addEventListener("click", () => go("dreamScreen"));
     document.querySelector("#nextTutorial").addEventListener("click", () => go("dreamScreen"));
+    document.querySelector("#closeDreamNotice")?.addEventListener("click", closeDreamNotice);
+    document.querySelectorAll("[data-dream-disabled='true']").forEach((button) => {
+      button.addEventListener("click", () => {
+        showDreamNotice(
+          "아직 꿈을 그리고 있습니다...",
+          "이 꿈은 아직 완성되지 않았습니다. 봉인이 풀릴 때까지 기다려 주세요."
+        );
+      });
+    });
     document.querySelector("#chooseJoseon").addEventListener("click", () => {
       playSfx("dream", 0.9);
       go("briefingScreen");
