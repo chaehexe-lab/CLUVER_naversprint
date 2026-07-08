@@ -87,7 +87,11 @@
       const enabled = isValidSavedProgress();
       continueButton.disabled = !enabled;
       continueButton.setAttribute("aria-disabled", String(!enabled));
-      continueButton.title = enabled ? "지난 꿈으로 돌아가기" : "저장된 꿈이 없습니다";
+      if (enabled) {
+        continueButton.removeAttribute("title");
+      } else {
+        continueButton.title = "저장된 꿈이 없습니다";
+      }
     }
 
     function saveProgress(screenId) {
