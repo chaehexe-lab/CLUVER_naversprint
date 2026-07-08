@@ -102,15 +102,19 @@ function TypewriterLines({ lines }: { lines: readonly string[] }) {
     setActiveLine(0);
 
     const tick = () => {
+      const line = lines[lineIndex];
+      if (!line) return;
+
+      const nextText = line.slice(0, charIndex + 1);
       setVisibleLines((current) => {
         const next = [...current];
-        next[lineIndex] = lines[lineIndex].slice(0, charIndex + 1);
+        next[lineIndex] = nextText;
         return next;
       });
 
       charIndex += 1;
 
-      if (charIndex < lines[lineIndex].length) {
+      if (charIndex < line.length) {
         timer = window.setTimeout(tick, 38);
         return;
       }
