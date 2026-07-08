@@ -1013,7 +1013,7 @@
       const item = document.createElement("li");
       item.textContent = `${suspect} 심문 답변: "${answer}"`;
       list.appendChild(item);
-      showSuspectReply(answer, source === "mistral" ? "Mistral" : "임시 답변");
+      showSuspectReply(answer, suspect);
       if (source === "fallback" && warning) {
         showToast(warning);
       }
@@ -1050,7 +1050,7 @@
         addInterrogationAnswer(answer, data.source, data.warning);
         interrogationHistory.push({ role: "user", content: question }, { role: "assistant", content: answer });
         while (interrogationHistory.length > 8) interrogationHistory.shift();
-        setAiMode(data.source === "mistral" ? "Mistral" : "임시 답변");
+        setAiMode(suspect.name);
         showToast(data.source === "mistral" ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
       } catch (error) {
         const message = error instanceof Error ? error.message : "알 수 없는 오류";
