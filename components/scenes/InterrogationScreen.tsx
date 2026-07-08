@@ -251,7 +251,7 @@ export default function InterrogationScreen() {
 
       <aside className="global-panel tool-result-panel" id="toolResultPopup" aria-hidden="true" aria-live="polite">
         <p className="tool-panel-kicker" id="toolResultKicker">도구 분석</p>
-        <h2>증거 분석 결과</h2>
+        <h2 id="toolResultTitle">증거 분석 결과</h2>
         <p id="toolResultText">새로운 정보가 드러났습니다.</p>
         <button className="button primary" id="closeToolResult" type="button">
           기록장에 기록
