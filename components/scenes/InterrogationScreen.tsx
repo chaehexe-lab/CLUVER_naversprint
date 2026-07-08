@@ -188,14 +188,14 @@ export default function InterrogationScreen() {
       </div>
 
       <aside className="hud inspect-pop" id="genericEvidenceInspect" aria-live="polite">
+        <button className="inspect-close" id="closeGenericEvidenceInspect" type="button" aria-label="단서 팝업 닫기">
+          ×
+        </button>
         <img id="genericEvidenceImage" src="/samunmong/assets/evidence-wooden-tag.png" alt="" />
         <div>
           <strong id="genericEvidenceTitle">단서 발견</strong>
           <p id="genericEvidenceText">단서를 확인했습니다.</p>
         </div>
-        <button className="button primary" id="collectGenericEvidence" type="button">
-          도구로 분석
-        </button>
       </aside>
 
       <div className="global-overlay" id="globalOverlay" />
