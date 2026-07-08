@@ -21,6 +21,7 @@ export default function DreamSelectScreen() {
               className={`dream${dream.disabled ? " disabled" : ""}`}
               id={"id" in dream ? dream.id : undefined}
               type="button"
+              data-dream-disabled={dream.disabled ? "true" : undefined}
               style={{ "--dream-image": `url('${dream.image}')` } as DreamStyle}
               aria-label={dream.ariaLabel}
             >
@@ -33,6 +34,21 @@ export default function DreamSelectScreen() {
           ))}
         </div>
       </article>
+      <aside className="dream-notice-dialog" id="dreamNoticeDialog" aria-hidden="true" role="dialog" aria-labelledby="dreamNoticeTitle">
+        <div className="dream-notice-panel">
+          <div className="dream-notice-titlebar" aria-hidden="true">
+            <span>DREAM_ALERT</span>
+            <span>×</span>
+          </div>
+          <span className="dream-notice-seal" aria-hidden="true">!</span>
+          <p className="dream-notice-kicker">SYSTEM MESSAGE</p>
+          <h2 id="dreamNoticeTitle">꿈은 아직 끝나지 않았습니다</h2>
+          <p id="dreamNoticeCopy">첫 번째 꿈은 멀어졌지만, 남은 두 꿈은 아직 당신을 부르고 있습니다.</p>
+          <button className="button primary" id="closeDreamNotice" type="button">
+            확인
+          </button>
+        </div>
+      </aside>
     </section>
   );
 }

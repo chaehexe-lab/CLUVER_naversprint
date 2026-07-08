@@ -1,11 +1,18 @@
+* {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+*::-webkit-scrollbar {
+  display: none;
+}
+
 html,
 body {
   margin: 0;
   min-height: 100%;
-}
-
-body {
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .result-screen {
@@ -163,7 +170,7 @@ body {
     inset 0 18px 24px rgba(255, 219, 143, 0.05),
     inset 0 -18px 22px rgba(0, 0, 0, 0.28);
   color: rgba(229, 206, 168, 0.94);
-  font-family: "ChilgokLjh", "ChosunNm", serif;
+  font-family: "VitroPride", "ChosunNm", serif;
   font-size: clamp(18px, 2.03vw, 34px);
   line-height: 1;
   letter-spacing: 0;
@@ -285,8 +292,224 @@ body {
   font-size: 30px;
 }
 
+.verdict-stage {
+  position: relative;
+  z-index: 1;
+  width: min(1120px, calc(100vw - 48px));
+  min-height: min(680px, calc(100vh - 48px));
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) minmax(320px, 1fr);
+  align-items: center;
+  gap: clamp(28px, 5vw, 76px);
+  padding: clamp(24px, 4vw, 56px);
+}
+
+.verdict-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background:
+    radial-gradient(circle at 28% 50%, rgba(124, 42, 30, 0.2), transparent 34%),
+    linear-gradient(90deg, rgba(0, 0, 0, 0.76), rgba(0, 0, 0, 0.34) 52%, rgba(0, 0, 0, 0.78));
+}
+
+.verdict-tag {
+  position: relative;
+  width: min(29vw, 360px);
+  aspect-ratio: 314 / 520;
+  border: 0;
+  background: url("/samunmong/assets/final-verdict-card-base.png") center / 100% 100% no-repeat;
+  filter: drop-shadow(0 28px 56px rgba(0, 0, 0, 0.64));
+  color: #f8e0b5;
+  transform: rotate(-1.5deg);
+}
+
+.verdict-tag::before,
+.verdict-tag::after {
+  content: "";
+  position: absolute;
+  pointer-events: none;
+}
+
+.verdict-tag::before {
+  display: none;
+}
+
+.verdict-tag::after {
+  display: none;
+}
+
+.verdict-seal {
+  display: none;
+}
+
+.verdict-seal::after {
+  display: none;
+}
+
+.verdict-corner-stamp {
+  display: none;
+}
+
+.verdict-portrait-frame {
+  position: absolute;
+  left: 14%;
+  top: 19.2%;
+  z-index: 1;
+  width: 72%;
+  height: 52.2%;
+  overflow: hidden;
+  border: 0;
+  background: rgba(42, 32, 24, 0.08);
+}
+
+.verdict-portrait-frame img {
+  position: absolute;
+  left: calc(50% + var(--portrait-x, 0%));
+  top: 55%;
+  width: 225%;
+  max-width: none;
+  height: auto;
+  filter: sepia(0.06) contrast(0.98) drop-shadow(0 12px 14px rgba(0, 0, 0, 0.45));
+  transform: translate(-50%, -50%);
+}
+
+.verdict-stamp {
+  position: absolute;
+  right: 6%;
+  bottom: 7.5%;
+  z-index: 3;
+  width: 38%;
+  height: 11%;
+  display: grid;
+  place-items: center;
+  border: clamp(3px, 0.42vw, 6px) solid rgba(151, 39, 36, 0.82);
+  color: rgba(151, 39, 36, 0.88);
+  font-family: "ChilgokLjh", "ChosunNm", serif;
+  font-size: clamp(20px, 2.3vw, 34px);
+  line-height: 1;
+  transform: rotate(-9deg);
+}
+
+.verdict-stamp-success {
+  border-color: rgba(164, 36, 32, 0.86);
+  color: rgba(164, 36, 32, 0.92);
+}
+
+.verdict-tag strong {
+  position: absolute;
+  left: 13%;
+  bottom: 6.5%;
+  z-index: 2;
+  display: block;
+  color: #fff0c9;
+  font-family: "ChilgokLjh", "ChosunNm", serif;
+  font-size: clamp(24px, 3vw, 42px);
+  line-height: 1;
+  text-shadow: 0 3px 0 rgba(0, 0, 0, 0.68);
+}
+
+.verdict-message {
+  position: relative;
+  padding: clamp(28px, 4vw, 48px);
+  border-left: 1px solid rgba(158, 43, 37, 0.42);
+  background: linear-gradient(90deg, rgba(16, 9, 7, 0.76), rgba(16, 9, 7, 0.24));
+  box-shadow: inset 22px 0 34px rgba(0, 0, 0, 0.18);
+}
+
+.verdict-kicker {
+  margin: 0 0 12px;
+  color: rgba(198, 69, 56, 0.86);
+  font-family: "VitroPride", "ChosunNm", serif;
+  font-size: 22px;
+}
+
+.verdict-message h1 {
+  margin: 0 0 30px;
+  color: #fff1cc;
+  font-family: "VitroPride", "ChosunNm", serif;
+  font-size: clamp(36px, 5vw, 72px);
+  font-weight: 400;
+  line-height: 1.12;
+  letter-spacing: 0;
+  text-shadow: 0 5px 0 rgba(0, 0, 0, 0.58), 0 0 24px rgba(0, 0, 0, 0.82);
+  word-break: keep-all;
+}
+
+.typewriter-lines {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 34px;
+}
+
+.typewriter-lines p {
+  min-height: 1.55em;
+  margin: 0;
+  color: #efdcb6;
+  font-size: clamp(20px, 2vw, 28px);
+  line-height: 1.55;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+
+.typewriter-lines p.typing::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 4px;
+  background: rgba(244, 218, 169, 0.76);
+  transform: translateY(0.14em);
+  animation: verdictCaret 0.72s step-end infinite;
+}
+
+.verdict-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.verdict-actions .wood-result-button {
+  min-width: 238px;
+  min-height: 58px;
+  font-size: 20px;
+}
+
+@keyframes verdictCaret {
+  50% { opacity: 0; }
+}
+
 @media (max-width: 760px) {
   .result-screen {
     min-height: 100svh;
+  }
+
+  .verdict-stage {
+    width: min(100vw, 430px);
+    min-height: 100svh;
+    grid-template-columns: 1fr;
+    align-content: start;
+    gap: 20px;
+    padding: 24px 18px;
+    overflow-y: auto;
+  }
+
+  .verdict-tag {
+    width: min(82vw, 300px);
+  }
+
+  .verdict-portrait-frame {
+    height: 52.2%;
+  }
+
+  .verdict-message {
+    padding: 24px 18px 34px;
+    border-left: 0;
+    border-top: 1px solid rgba(158, 43, 37, 0.42);
+  }
+
+  .typewriter-lines p {
+    white-space: normal;
   }
 }

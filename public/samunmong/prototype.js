@@ -7,7 +7,7 @@
     const startCaseButton = document.querySelector("#startCase");
     let selectedEvidence = "";
     let isAskingAi = false;
-    const interrogationHistory = [];
+    const interrogationHistories = new Map();
     const entryParams = new URLSearchParams(window.location.search);
     const briefingText = "“사또님, 관아 근처에서 사람이 쓰러진 채 발견되었습니다.”\n\n당신은 이 꿈에서 고을의 사또입니다. 현장을 조사하고, 증거를 모아 용의자를 심문해야 합니다.";
     const suspects = window.SAMUNMONG_CONTENT?.suspects || [
@@ -16,12 +16,33 @@
       { name: "유문석", id: "yoomunseok", scene: "/samunmong/assets/scene-interrogation-yoomunseok.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-yoomunseok-sleeve.png?v=sleeve-20260707" },
       { name: "무덕", id: "mudeok", scene: "/samunmong/assets/scene-interrogation-mudeok.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-mudeok-sleeve.png?v=sleeve-20260707" }
     ];
+
+    function getInterrogationHistory(suspectId) {
+      if (!interrogationHistories.has(suspectId)) {
+        interrogationHistories.set(suspectId, []);
+      }
+
+      return interrogationHistories.get(suspectId);
+    }
+
     let suspectIndex = 0;
     const sleeveCheckedSuspects = new Set();
     const saveKey = "samunmong-demo-state";
     const collectedEvidenceKey = "samunmong-collected-evidence";
     const analyzedEvidenceKey = "samunmong-analyzed-evidence";
     const settingsKey = "samunmong-demo-settings";
+    const locationMeta = {
+      tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
+      dreamScreen: { name: "꿈 선택", x: "18%", y: "18%" },
+      briefingScreen: { name: "사건 브리핑", x: "18%", y: "18%" },
+      fieldOne: { name: "유문석 집 앞", x: "29%", y: "32%" },
+      chunwolRoom: { name: "춘월의 방", x: "67%", y: "25%" },
+      mudeokServantRoom: { name: "무덕의 하인방", x: "63%", y: "44%" },
+      yoomunseokSarangbang: { name: "유문석 사랑방", x: "50%", y: "33%" },
+      dolsoeQuarters: { name: "돌쇠 처소", x: "24%", y: "68%" },
+      backGateCourtyard: { name: "뒷문 마당", x: "48%", y: "86%" },
+      interrogationScreen: { name: "취조실", x: "73%", y: "78%" }
+    };
     const soundBase = "/samunmong/sound";
     const bgmTracks = {
       main: document.querySelector("#mainBgm") || new Audio(`${soundBase}/bgm/main.mp3`),
@@ -194,6 +215,27 @@
       document.querySelector(selector)?.addEventListener(eventName, handler);
     }
 
+    function showDreamNotice(title = "꿈은 아직 끝나지 않았습니다", copy = "첫 번째 꿈은 멀어졌지만, 남은 두 꿈은 아직 당신을 부르고 있습니다.") {
+      const dialog = document.querySelector("#dreamNoticeDialog");
+      const titleEl = document.querySelector("#dreamNoticeTitle");
+      const copyEl = document.querySelector("#dreamNoticeCopy");
+      if (!dialog) {
+        showToast(copy);
+        return;
+      }
+
+      if (titleEl) titleEl.textContent = title;
+      if (copyEl) copyEl.textContent = copy;
+      dialog.classList.add("open");
+      dialog.setAttribute("aria-hidden", "false");
+    }
+
+    function closeDreamNotice() {
+      const dialog = document.querySelector("#dreamNoticeDialog");
+      dialog?.classList.remove("open");
+      dialog?.setAttribute("aria-hidden", "true");
+    }
+
     function updateCurrentLocation(screenId) {
       const location = locationMeta[screenId];
       const indicator = document.querySelector("#currentLocationIndicator");
@@ -235,13 +277,13 @@
     function go(id, message = "이동 중...") {
       stopBriefingTyping();
       playSfx("move", 0.82);
-      fade.textContent = message;
-      fade.classList.add("show");
+      fade?.classList.add("show");
+      if (fade) fade.textContent = message;
       setTimeout(() => {
         screens.forEach((screen) => screen.classList.toggle("active", screen.id === id));
         updateCurrentLocation(id);
         saveProgress(id);
-        fade.classList.remove("show");
+        fade?.classList.remove("show");
         updateBgmForScreen(id);
       }, 260);
     }
@@ -249,8 +291,8 @@
     function goRush(id, message = "사건 현장으로 진입 중...") {
       stopBriefingTyping();
       playSfx("briefingNext", 0.9);
-      fade.textContent = message;
-      fade.classList.add("show", "long");
+      fade?.classList.add("show", "long");
+      if (fade) fade.textContent = message;
       setTimeout(() => {
         screens.forEach((screen) => {
           const isActive = screen.id === id;
@@ -261,12 +303,12 @@
             screen.classList.add("rush-in");
           }
         });
-        fade.classList.remove("show");
+        fade?.classList.remove("show");
         updateCurrentLocation(id);
         saveProgress(id);
         updateBgmForScreen(id);
       }, 520);
-      setTimeout(() => fade.classList.remove("long"), 980);
+      setTimeout(() => fade?.classList.remove("long"), 980);
     }
 
     function typeBriefing() {
@@ -305,6 +347,11 @@
 
       if (startScreen === "briefingScreen") {
         typeBriefing();
+      } else if (startScreen === "dreamScreen" && entryParams.get("dreamExit") === "1") {
+        showDreamNotice(
+          "꿈은 아직 끝나지 않았습니다",
+          "첫 번째 꿈은 멀어졌지만, 남은 두 꿈은 아직 당신을 부르고 있습니다."
+        );
       } else {
         showToast("선택한 설정으로 사건을 시작합니다.");
       }
@@ -376,6 +423,15 @@
     });
     on("#skipTutorial", "click", () => go("dreamScreen"));
     on("#nextTutorial", "click", () => go("dreamScreen"));
+    on("#closeDreamNotice", "click", closeDreamNotice);
+    document.querySelectorAll("[data-dream-disabled='true']").forEach((button) => {
+      button.addEventListener("click", () => {
+        showDreamNotice(
+          "아직 꿈을 그리고 있습니다...",
+          "이 꿈은 아직 완성되지 않았습니다. 봉인이 풀릴 때까지 기다려 주세요."
+        );
+      });
+    });
     on("#chooseJoseon", "click", () => {
       playSfx("dream", 0.9);
       go("briefingScreen");
@@ -1215,7 +1271,7 @@
       const item = document.createElement("li");
       item.textContent = `${suspect} 심문 답변: "${answer}"`;
       list.appendChild(item);
-      showSuspectReply(answer, source === "mistral" ? "Mistral" : "임시 답변");
+      showSuspectReply(answer, suspect);
       if (source === "fallback" && warning) {
         showToast(warning);
       }
@@ -1225,6 +1281,7 @@
       if (isAskingAi) return;
       const askButton = document.querySelector("#askButton");
       const suspect = suspects[suspectIndex];
+      const history = getInterrogationHistory(suspect.id);
       isAskingAi = true;
       askButton.disabled = true;
       askButton.textContent = "답변 중";
@@ -1239,7 +1296,7 @@
             userMessage: question,
             presentedEvidenceNames: selectedEvidence ? [selectedEvidence] : [],
             collectedEvidenceNames: getCollectedEvidenceNames(),
-            conversationHistory: interrogationHistory.slice(-8)
+            conversationHistory: history.slice(-8)
           })
         });
 
@@ -1250,9 +1307,9 @@
 
         const answer = data.answer || "지금은 답하기 어렵습니다.";
         addInterrogationAnswer(answer, data.source, data.warning);
-        interrogationHistory.push({ role: "user", content: question }, { role: "assistant", content: answer });
-        while (interrogationHistory.length > 8) interrogationHistory.shift();
-        setAiMode(data.source === "mistral" ? "Mistral" : "임시 답변");
+        history.push({ role: "user", content: question }, { role: "assistant", content: answer });
+        while (history.length > 8) history.shift();
+        setAiMode(suspect.name);
         showToast(data.source === "mistral" ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
       } catch (error) {
         const message = error instanceof Error ? error.message : "알 수 없는 오류";

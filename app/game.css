@@ -115,6 +115,14 @@
       display: none;
     }
 
+    #tutorialScreen {
+      background: #000;
+    }
+
+    #tutorialScreen .plate {
+      display: none;
+    }
+
     .shade {
       position: absolute;
       inset: 0;
@@ -327,6 +335,49 @@
 
     .button.green {
       background: linear-gradient(135deg, rgba(67,75,49,.82), rgba(34,38,28,.78));
+    }
+
+    .close-button {
+      position: relative;
+      z-index: 2;
+      flex: 0 0 auto;
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 1px solid rgba(111, 26, 23, .5);
+      border-radius: 50%;
+      color: #6d211d;
+      background: rgba(255, 234, 183, .24);
+      box-shadow: inset 0 0 0 1px rgba(255, 241, 199, .18);
+      font-size: 0;
+      line-height: 1;
+    }
+
+    .close-button::before,
+    .close-button::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 15px;
+      height: 2px;
+      border-radius: 999px;
+      background: currentColor;
+      transform: translate(-50%, -50%) rotate(45deg);
+    }
+
+    .close-button::after {
+      transform: translate(-50%, -50%) rotate(-45deg);
+    }
+
+    .close-button:hover,
+    .close-button:focus-visible {
+      color: #3a1712;
+      background: rgba(117, 38, 29, .18);
+      outline: 2px solid rgba(111, 26, 23, .3);
+      outline-offset: 2px;
     }
 
     .label-img {
@@ -681,6 +732,163 @@
       color: rgba(217,178,104,.86);
       font-size: 9px;
       font-weight: 800;
+    }
+
+    .dream-notice-dialog {
+      position: absolute;
+      inset: 0;
+      z-index: 40;
+      display: none;
+      place-items: center;
+      padding: 24px;
+      background:
+        repeating-linear-gradient(0deg, rgba(255,255,255,.025) 0 1px, transparent 1px 5px),
+        radial-gradient(circle at 50% 48%, rgba(210, 210, 210, .1), transparent 32%),
+        rgba(0, 0, 0, .66);
+      box-shadow: inset 0 0 120px rgba(0,0,0,.88);
+    }
+
+    .dream-notice-dialog.open {
+      display: grid;
+    }
+
+    .dream-notice-panel {
+      position: relative;
+      width: min(560px, calc(100vw - 44px));
+      display: grid;
+      grid-template-columns: 82px 1fr;
+      grid-template-areas:
+        "bar bar"
+        "icon kicker"
+        "icon title"
+        "icon copy"
+        "icon action";
+      column-gap: 22px;
+      row-gap: 8px;
+      padding: 0 22px 22px;
+      border: 4px solid #1e1e1e;
+      border-radius: 0;
+      background:
+        repeating-linear-gradient(0deg, rgba(0, 0, 0, .045) 0 1px, transparent 1px 5px),
+        linear-gradient(180deg, #efefea, #c4c4be);
+      box-shadow:
+        10px 10px 0 rgba(0,0,0,.52),
+        inset 0 0 0 3px rgba(255,255,255,.36);
+      color: #1e1e1e;
+      text-align: left;
+    }
+
+    .dream-notice-panel::before {
+      content: "";
+      position: absolute;
+      inset: -10px;
+      z-index: -1;
+      border: 2px solid rgba(44, 44, 44, .72);
+      transform: translate(8px, 8px);
+      pointer-events: none;
+    }
+
+    .dream-notice-panel::after {
+      content: "";
+      position: absolute;
+      right: 18px;
+      bottom: 18px;
+      width: 58px;
+      height: 42px;
+      border: 4px solid rgba(52, 52, 52, .58);
+      transform: rotate(-8deg);
+      pointer-events: none;
+    }
+
+    .dream-notice-titlebar {
+      grid-area: bar;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 38px;
+      margin: 0 -22px 12px;
+      padding: 0 10px 0 14px;
+      border-bottom: 4px solid #1e1e1e;
+      background:
+        repeating-linear-gradient(90deg, rgba(255,255,255,.12) 0 1px, transparent 1px 6px),
+        #2d2d2d;
+      color: #f4f4ef;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: .04em;
+    }
+
+    .dream-notice-titlebar span:last-child {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border: 2px solid #f4f4ef;
+      line-height: 1;
+    }
+
+    .dream-notice-seal {
+      grid-area: icon;
+      align-self: start;
+      width: 70px;
+      aspect-ratio: 1;
+      display: grid;
+      place-items: center;
+      margin-top: 8px;
+      clip-path: polygon(50% 0, 100% 88%, 0 88%);
+      color: #f4f4ef;
+      background: #202020;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 38px;
+      font-weight: 900;
+    }
+
+    .dream-notice-kicker {
+      grid-area: kicker;
+      margin: 0;
+      color: #333;
+      font-family: "Consolas", "Courier New", monospace;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: .08em;
+    }
+
+    .dream-notice-panel h2 {
+      grid-area: title;
+      margin: 0;
+      color: #1e1e1e;
+      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
+      font-size: clamp(27px, 3.7vw, 42px);
+      font-weight: 400;
+      line-height: 1.12;
+      letter-spacing: 0;
+      word-break: keep-all;
+    }
+
+    .dream-notice-panel p:not(.dream-notice-kicker) {
+      grid-area: copy;
+      margin: 0 0 10px;
+      color: rgba(34, 34, 34, .84);
+      font-family: "NanumBareunJeongsin", "Noto Serif KR", "Batang", serif;
+      font-size: 19px;
+      line-height: 1.5;
+      word-break: keep-all;
+    }
+
+    .dream-notice-panel .button {
+      grid-area: action;
+      justify-self: start;
+      min-width: 142px;
+      min-height: 42px;
+      margin-top: 2px;
+      border: 4px solid #1e1e1e;
+      border-radius: 0;
+      color: #1e1e1e;
+      background: #edede8;
+      box-shadow: 5px 5px 0 rgba(0, 0, 0, .34);
+      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
+      font-size: 21px;
     }
 
     .briefing-screen {
@@ -1947,7 +2155,7 @@
 
     .map-pin-button.current {
       outline: 2px solid rgba(226, 54, 45, .78);
-      outline-offset: 2px;
+      outline-offset: 0;
     }
 
     .map-label {
@@ -1980,17 +2188,17 @@
 
     .map-current-marker {
       position: absolute;
-      z-index: 3;
+      z-index: 4;
       left: var(--x);
       top: var(--y);
-      width: 34px;
-      height: 34px;
-      border: 1px solid rgba(255, 224, 165, .82);
+      width: var(--w);
+      height: var(--h);
+      border: 2px solid rgba(255, 224, 165, .82);
       border-radius: 50%;
       background:
-        radial-gradient(circle, rgba(190, 38, 32, .95) 0 30%, rgba(190, 38, 32, .34) 31% 48%, transparent 49%),
-        radial-gradient(circle, rgba(255, 224, 165, .28), transparent 64%);
-      box-shadow: 0 0 22px rgba(188, 40, 33, .55), inset 0 0 0 3px rgba(38, 6, 4, .38);
+        radial-gradient(circle at 50% 50%, rgba(226, 54, 45, .96) 0 18%, rgba(226, 54, 45, .48) 19% 31%, transparent 32%),
+        radial-gradient(ellipse at 50% 50%, rgba(255, 224, 165, .18), rgba(188, 40, 33, .18) 46%, transparent 67%);
+      box-shadow: 0 0 22px rgba(188, 40, 33, .5), inset 0 0 0 1px rgba(38, 6, 4, .38);
       transform: translate(-50%, -50%);
       pointer-events: none;
       animation: currentLocationPulse 1.8s ease-in-out infinite;
@@ -2365,16 +2573,6 @@
       font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
       font-size: 22px;
       font-weight: 400;
-    }
-
-    .mini-close {
-      width: 24px;
-      height: 24px;
-      border: 1px solid rgba(255,233,190,.2);
-      border-radius: 999px;
-      color: var(--ink);
-      background: rgba(0,0,0,.25);
-      font-weight: 900;
     }
 
     .evidence-grid {
@@ -2969,29 +3167,8 @@
 
     .note-close {
       position: absolute;
-      z-index: 2;
       top: 22px;
       right: 24px;
-      width: 34px;
-      height: 34px;
-      display: grid;
-      place-items: center;
-      border: 1px solid rgba(111, 26, 23, .5);
-      border-radius: 50%;
-      color: #6d211d;
-      background: rgba(255, 234, 183, .24);
-      box-shadow: inset 0 0 0 1px rgba(255, 241, 199, .18);
-      font-family: "ChilgokLjh", "NanumBareunJeongsin", serif;
-      font-size: 23px;
-      line-height: 1;
-    }
-
-    .note-close:hover,
-    .note-close:focus-visible {
-      color: #3a1712;
-      background: rgba(117, 38, 29, .18);
-      outline: 2px solid rgba(111, 26, 23, .3);
-      outline-offset: 2px;
     }
 
     .overlay {

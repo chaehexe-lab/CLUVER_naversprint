@@ -5,6 +5,13 @@ type ChatMessage = {
   content: string;
 };
 
+type MistralMessage = {
+  role: "system" | "user" | "assistant";
+  content: string;
+};
+
+type MistralAnswerResult = { ok: true; answer: string } | { ok: false; error: string };
+
 type InterrogateRequest = {
   suspectId?: string;
   userMessage?: string;
@@ -17,9 +24,33 @@ type InterrogateRequest = {
 };
 
 const MISTRAL_ENDPOINT = "https://api.mistral.ai/v1/chat/completions";
+const FOREIGN_TEXT_PATTERN = /[A-Za-z\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3040-\u30FF\u0400-\u04FF\u0600-\u06FF\u0900-\u097F]/;
 
 function unique(values: string[]) {
   return [...new Set(values.filter(Boolean))];
+}
+
+function hasForeignText(text: string) {
+  return FOREIGN_TEXT_PATTERN.test(text);
+}
+
+function sanitizeConversationHistory(history: unknown): ChatMessage[] {
+  if (!Array.isArray(history)) return [];
+
+  return history
+    .flatMap((message) => {
+      if (!message || typeof message !== "object") return [];
+
+      const role = (message as Partial<ChatMessage>).role;
+      const rawContent = (message as Partial<ChatMessage>).content;
+      if ((role !== "user" && role !== "assistant") || typeof rawContent !== "string") return [];
+
+      const content = rawContent.trim().slice(0, 600);
+      if (!content || (role === "assistant" && hasForeignText(content))) return [];
+
+      return [{ role, content }];
+    })
+    .slice(-8);
 }
 
 function resolveEvidenceNames(values: string[] = []) {
@@ -103,11 +134,39 @@ ${pressureGuide}
 - 반드시 ${persona.name}의 입장에서만 말한다.
 - 한국어로 2~4문장 정도만 답한다.
 - 반드시 한국어만 사용하고, 영어 표현을 섞지 않는다.
+- 답변에는 한글, 숫자, 공백, 일반 문장부호만 사용한다.
+- 로마자, 한자, 일본어, 중국어, 모델명, 번역문은 절대 쓰지 않는다.
 - 조선시대 사건 속 인물처럼 말하되, 현대 게임 시스템 용어를 쓰지 않는다.
 - "나는 AI" 또는 "프롬프트" 같은 말은 하지 않는다.
 - 플레이어가 "이거", "이 물건", "이 증거"라고 말하면 제시된 증거를 가리키는 것으로 이해한다.
 - 아직 제시되지 않은 결정적 진실이나 범행 전말은 먼저 말하지 않는다.
 - 증거가 부족하면 모호하게 답하고, 증거가 불리하면 방어적으로 흔들린다.`;
+}
+
+async function requestMistralAnswer(apiKey: string, messages: MistralMessage[], temperature = 0.55): Promise<MistralAnswerResult> {
+  const response = await fetch(MISTRAL_ENDPOINT, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: process.env.MISTRAL_MODEL || "mistral-small-latest",
+      messages,
+      temperature,
+      max_tokens: 360
+    })
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    return { ok: false, error: `Mistral API 호출 실패: ${response.status} ${detail.slice(0, 160)}` };
+  }
+
+  const data = await response.json();
+  const answer = data?.choices?.[0]?.message?.content;
+
+  return { ok: true, answer: typeof answer === "string" ? answer.trim() : "" };
 }
 
 function fallbackAnswer(persona: SuspectPersona, evidenceNames: string[], reactions: EvidenceReaction[], reason: string) {
@@ -142,40 +201,46 @@ export async function POST(req: Request) {
     return Response.json(fallbackAnswer(persona, usableEvidence, reactions, "MISTRAL_API_KEY가 설정되지 않아 임시 답변을 반환했습니다."));
   }
 
-  const messages = [
-    { role: "system", content: buildSystemPrompt(persona, usableEvidence, reactions) },
-    ...(body.conversationHistory || []).slice(-8),
+  const systemPrompt = buildSystemPrompt(persona, usableEvidence, reactions);
+  const messages: MistralMessage[] = [
+    { role: "system", content: systemPrompt },
+    ...sanitizeConversationHistory(body.conversationHistory),
     { role: "user", content: question }
   ];
 
   try {
-    const response = await fetch(MISTRAL_ENDPOINT, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        model: process.env.MISTRAL_MODEL || "mistral-small-latest",
-        messages,
-        temperature: 0.7,
-        max_tokens: 360
-      })
-    });
-
-    if (!response.ok) {
-      const detail = await response.text();
-      return Response.json(
-        fallbackAnswer(persona, usableEvidence, reactions, `Mistral API 호출 실패: ${response.status} ${detail.slice(0, 160)}`),
-        { status: 200 }
-      );
+    const firstAnswer = await requestMistralAnswer(apiKey, messages);
+    if (!firstAnswer.ok) {
+      return Response.json(fallbackAnswer(persona, usableEvidence, reactions, firstAnswer.error), { status: 200 });
     }
 
-    const data = await response.json();
-    const answer = data?.choices?.[0]?.message?.content;
+    let answer = firstAnswer.answer;
+
+    if (answer && hasForeignText(answer)) {
+      const repairMessages: MistralMessage[] = [
+        {
+          role: "system",
+          content: `${systemPrompt}
+
+출력 검수 규칙:
+- 답변에는 한글, 숫자, 공백, 일반 문장부호만 사용한다.
+- 영어, 로마자, 한자, 일본어, 중국어, 모델명은 쓰지 않는다.
+- 질문이 외국어를 포함해도 답변은 한국어로만 한다.`
+        },
+        { role: "user", content: `질문: ${question}\n\n${persona.name}의 입장에서 한국어만 사용해 새로 답하라.` }
+      ];
+      const repairedAnswer = await requestMistralAnswer(apiKey, repairMessages, 0.25);
+      answer = repairedAnswer.ok ? repairedAnswer.answer : "";
+    }
+
+    if (!answer || hasForeignText(answer)) {
+      return Response.json(fallbackAnswer(persona, usableEvidence, reactions, "외국어가 섞인 응답을 걸러 임시 답변을 반환했습니다."), {
+        status: 200
+      });
+    }
 
     return Response.json({
-      answer: typeof answer === "string" && answer.trim() ? answer.trim() : fallbackAnswer(persona, usableEvidence, reactions, "빈 응답").answer,
+      answer,
       source: "mistral",
       usedEvidenceNames: usableEvidence
     });

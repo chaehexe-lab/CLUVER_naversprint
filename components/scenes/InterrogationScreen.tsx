@@ -130,7 +130,7 @@ export default function InterrogationScreen() {
         <aside className="hud evidence-bag-pop" id="evidenceBagPop" aria-hidden="true">
           <div className="bag-pop-head">
             <strong>증거 가방</strong>
-            <button className="mini-close" id="closeEvidenceBag" type="button" aria-label="증거 가방 닫기">
+            <button className="close-button mini-close" id="closeEvidenceBag" type="button" aria-label="증거 가방 닫기">
               ×
             </button>
           </div>
@@ -169,7 +169,7 @@ export default function InterrogationScreen() {
         <div className="overlay" id="overlay" />
         <InvestigationNote>
         <aside className="note-drawer investigation-note-panel" id="noteDrawer" aria-hidden="true">
-          <button className="note-close" id="closeNote" type="button" aria-label="수사노트 닫기">
+          <button className="close-button note-close" id="closeNote" type="button" aria-label="수사노트 닫기">
             ×
           </button>
           <p className="note-kicker">조사 기록</p>
@@ -220,7 +220,7 @@ export default function InterrogationScreen() {
       <aside className="global-panel bag-panel" id="bagPanel" aria-hidden="true">
         <div className="global-panel-head">
           <h2>수사 가방</h2>
-          <button className="button primary global-close" type="button">
+          <button className="close-button global-close" type="button" aria-label="수사 가방 닫기">
             닫기
           </button>
         </div>
@@ -235,7 +235,7 @@ export default function InterrogationScreen() {
             <p className="tool-panel-kicker">증거 분석</p>
             <h2>수사 도구</h2>
           </div>
-          <button className="button primary global-close" type="button">
+          <button className="close-button global-close" type="button" aria-label="수사 도구 닫기">
             닫기
           </button>
         </div>
@@ -276,7 +276,7 @@ export default function InterrogationScreen() {
             <p className="note-kicker">현장 기록</p>
             <h2>수사노트</h2>
           </div>
-          <button className="note-close global-close" type="button" aria-label="수사노트 닫기">
+          <button className="close-button note-close global-close" type="button" aria-label="수사노트 닫기">
             ×
           </button>
         </div>
@@ -288,7 +288,7 @@ export default function InterrogationScreen() {
       </InvestigationNote>
 
       <aside className="global-panel map-panel" id="mapPanel" aria-hidden="true">
-        <button className="button primary global-close map-floating-close" type="button">
+        <button className="close-button global-close map-floating-close" type="button" aria-label="마을 지도 닫기">
           닫기
         </button>
         <div className="map-location-banner" aria-live="polite">
