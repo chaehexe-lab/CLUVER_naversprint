@@ -7,7 +7,7 @@
     const startCaseButton = document.querySelector("#startCase");
     let selectedEvidence = "";
     let isAskingAi = false;
-    const interrogationHistory = [];
+    const interrogationHistories = new Map();
     const entryParams = new URLSearchParams(window.location.search);
     const briefingText = "“사또님, 관아 근처에서 사람이 쓰러진 채 발견되었습니다.”\n\n당신은 이 꿈에서 고을의 사또입니다. 현장을 조사하고, 증거를 모아 용의자를 심문해야 합니다.";
     const suspects = window.SAMUNMONG_CONTENT?.suspects || [
@@ -16,6 +16,15 @@
       { name: "유문석", id: "yoomunseok", scene: "/samunmong/assets/scene-interrogation-yoomunseok.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-yoomunseok-sleeve.png?v=sleeve-20260707" },
       { name: "무덕", id: "mudeok", scene: "/samunmong/assets/scene-interrogation-mudeok.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-mudeok-sleeve.png?v=sleeve-20260707" }
     ];
+
+    function getInterrogationHistory(suspectId) {
+      if (!interrogationHistories.has(suspectId)) {
+        interrogationHistories.set(suspectId, []);
+      }
+
+      return interrogationHistories.get(suspectId);
+    }
+
     let suspectIndex = 0;
     const sleeveCheckedSuspects = new Set();
     const saveKey = "samunmong-demo-state";
@@ -1014,6 +1023,7 @@
       if (isAskingAi) return;
       const askButton = document.querySelector("#askButton");
       const suspect = suspects[suspectIndex];
+      const history = getInterrogationHistory(suspect.id);
       isAskingAi = true;
       askButton.disabled = true;
       askButton.textContent = "답변 중";
@@ -1028,7 +1038,7 @@
             userMessage: question,
             presentedEvidenceNames: selectedEvidence ? [selectedEvidence] : [],
             collectedEvidenceNames: getCollectedEvidenceNames(),
-            conversationHistory: interrogationHistory.slice(-8)
+            conversationHistory: history.slice(-8)
           })
         });
 
@@ -1039,8 +1049,8 @@
 
         const answer = data.answer || "지금은 답하기 어렵습니다.";
         addInterrogationAnswer(answer, data.source, data.warning);
-        interrogationHistory.push({ role: "user", content: question }, { role: "assistant", content: answer });
-        while (interrogationHistory.length > 8) interrogationHistory.shift();
+        history.push({ role: "user", content: question }, { role: "assistant", content: answer });
+        while (history.length > 8) history.shift();
         setAiMode(suspect.name);
         showToast(data.source === "mistral" ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
       } catch (error) {
