@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { finalCulpritId } from "@/lib/persona";
 
 const suspects = [
   {
@@ -47,7 +48,7 @@ const requiredEvidence = [
   "찢어진 문서 조각"
 ] as const;
 
-const correctSuspectId = process.env.NEXT_PUBLIC_SAMUNMONG_CULPRIT_ID || "";
+const correctSuspectId = process.env.NEXT_PUBLIC_SAMUNMONG_CULPRIT_ID || finalCulpritId;
 
 const outcomeCopy = {
   success: {
