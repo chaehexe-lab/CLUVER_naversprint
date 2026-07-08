@@ -99,7 +99,7 @@ export default function InterrogationScreen() {
           </button>
           <button className="tool-prop note-prop" id="openNoteProp" type="button" aria-label="수사노트 보기">
             <img src="/samunmong/assets/labels/transparent/tool-note-short.png" alt="" />
-            <span className="sr-only">노트</span>
+            <span className="sr-only">기록장</span>
           </button>
           <button
             className="tool-prop bag-prop"
@@ -109,7 +109,7 @@ export default function InterrogationScreen() {
             aria-label="증거 가방 열기"
           >
             <img src="/samunmong/assets/labels/transparent/tool-bag-short.png" alt="" />
-            <span className="sr-only">가방</span>
+            <span className="sr-only">보따리</span>
           </button>
           <button className="tool-prop tool-kit-prop open-tool-panel" type="button" aria-label="수사 도구 열기">
             <img src="/samunmong/assets/labels/transparent/tool-investigation-tools.png" alt="" />
@@ -129,7 +129,7 @@ export default function InterrogationScreen() {
 
         <aside className="hud evidence-bag-pop" id="evidenceBagPop" aria-hidden="true">
           <div className="bag-pop-head">
-            <strong>증거 가방</strong>
+            <strong>보따리</strong>
             <button className="close-button mini-close" id="closeEvidenceBag" type="button" aria-label="증거 가방 닫기">
               ×
             </button>
@@ -173,7 +173,7 @@ export default function InterrogationScreen() {
             ×
           </button>
           <p className="note-kicker">조사 기록</p>
-          <h2>수사노트</h2>
+          <h2>기록장</h2>
           <p className="note-lead">심문 중 확인한 내용과 증거를 정리합니다.</p>
           <div className="note-section">
             <h3>현재 사건</h3>
@@ -219,7 +219,7 @@ export default function InterrogationScreen() {
       <div className="global-overlay" id="globalOverlay" />
       <aside className="global-panel bag-panel" id="bagPanel" aria-hidden="true">
         <div className="global-panel-head">
-          <h2>수사 가방</h2>
+          <h2>보따리</h2>
           <button className="close-button global-close" type="button" aria-label="수사 가방 닫기">
             닫기
           </button>
@@ -239,7 +239,7 @@ export default function InterrogationScreen() {
             닫기
           </button>
         </div>
-        <p>도구를 먼저 고른 뒤 증거를 선택하면 추가 단서가 새로 드러나고 수사노트에 기록됩니다.</p>
+        <p>도구를 먼저 고른 뒤 증거를 선택하면 추가 단서가 새로 드러나고 기록장에 기록됩니다.</p>
         <div className="tool-workbench">
           <div className="tool-evidence-list" id="toolEvidenceList">
             <div className="evidence-empty">아직 분석할 증거가 없습니다.</div>
@@ -265,7 +265,7 @@ export default function InterrogationScreen() {
         <h2 id="toolResultTitle">증거 분석 결과</h2>
         <p id="toolResultText">새로운 정보가 드러났습니다.</p>
         <button className="button primary" id="closeToolResult" type="button">
-          수사노트에 기록
+          기록장에 기록
         </button>
       </aside>
       <InvestigationNote>
@@ -274,7 +274,7 @@ export default function InterrogationScreen() {
         <div className="global-panel-head">
           <div>
             <p className="note-kicker">현장 기록</p>
-            <h2>수사노트</h2>
+            <h2>기록장</h2>
           </div>
           <button className="close-button note-close global-close" type="button" aria-label="수사노트 닫기">
             ×
