@@ -126,23 +126,6 @@ export default function InterrogationScreen() {
           </AccuseSuspect>
         </nav>
 
-        {/* 취조실 전용 보따리 팝업 */}
-        <EvidenceInventory>
-          <aside className="hud evidence-bag-pop" id="evidenceBagPop" aria-hidden="true">
-            <div className="bag-pop-head">
-              <strong>보따리</strong>
-              <button className="close-button mini-close" id="closeEvidenceBag" type="button" aria-label="보따리 닫기">
-                ×
-              </button>
-            </div>
-            <div className="evidence-list evidence-grid" id="evidenceList">
-              <div className="evidence-empty" id="emptyInterrogationEvidence">
-                보따리에 담긴 증거가 없습니다.
-              </div>
-            </div>
-          </aside>
-        </EvidenceInventory>
-
         <section className="hud inquiry-bar">
           <div className="prompt-lines" aria-label="추천 질문">
             {promptLines.map((line) => (
@@ -221,7 +204,7 @@ export default function InterrogationScreen() {
 
       <div className="global-overlay" id="globalOverlay" />
 
-      {/* 전역/현장 보따리 패널 - 취조실 보따리 기능을 수행하도록 구조 및 문구 변경 */}
+      {/* 현장과 취조실이 함께 사용하는 보따리 팝업 */}
       <EvidenceInventory>
         <aside className="hud evidence-bag-pop" id="evidenceBagPop" aria-hidden="true">
           <div className="bag-pop-head">
