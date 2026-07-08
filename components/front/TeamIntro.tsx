@@ -6,7 +6,7 @@ type TeamIntroProps = {
   disabled?: boolean;
 };
 
-const INTRO_DURATION_MS = 5600;
+const INTRO_DURATION_MS = 9000;
 const introTypeSfxPaths = [
   "/samunmong/sound/sfx/type-1.mp3",
   "/samunmong/sound/sfx/type-2.mp3",
@@ -62,7 +62,7 @@ export default function TeamIntro({ disabled = false }: TeamIntroProps) {
     const timeouts = Array.from({ length: 14 }, (_, index) =>
       window.setTimeout(() => playIntroTypeSfx(index), 1180 + index * 74)
     );
-    timeouts.push(window.setTimeout(playIntroClickSfx, 2150));
+    timeouts.push(window.setTimeout(playIntroClickSfx, 2720));
 
     return () => {
       timeouts.forEach((timeout) => window.clearTimeout(timeout));
@@ -85,6 +85,23 @@ export default function TeamIntro({ disabled = false }: TeamIntroProps) {
           <span className="search-lens" />
           <span className="search-type">https://cluver</span>
           <span className="search-submit" />
+        </div>
+
+      </div>
+
+      <div className="intro-logo-scene" aria-hidden="true">
+        <div className="intro-clouds">
+          <img className="intro-cloud intro-cloud-left" src="/samunmong/assets/intro/soft-cloud.png" alt="" />
+          <img className="intro-cloud intro-cloud-right" src="/samunmong/assets/intro/soft-cloud.png" alt="" />
+        </div>
+        <div className="intro-logo-aura" />
+        <div className="intro-logo-word" aria-label="CLUVER">
+          <span>C</span>
+          <span>L</span>
+          <span>U</span>
+          <span>V</span>
+          <span>E</span>
+          <span>R</span>
         </div>
       </div>
     </section>
