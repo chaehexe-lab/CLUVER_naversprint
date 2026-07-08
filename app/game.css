@@ -3116,8 +3116,7 @@
       line-height: 1.25;
     }
 
-    .evidence-card .evidence-location,
-    .evidence-card .evidence-question {
+    .evidence-card .evidence-location {
       color: rgba(217,178,104,.9);
       font-size: 12px;
     }
@@ -3160,11 +3159,6 @@
       text-decoration: underline;
       text-underline-offset: 3px;
       text-shadow: 0 2px 8px rgba(0,0,0,.9);
-    }
-
-    .prompt-line[data-evidence-prompt]:not([data-evidence-prompt=""]) {
-      color: rgba(255, 229, 169, .96);
-      text-shadow: 0 2px 8px rgba(0,0,0,.94), 0 0 12px rgba(217,178,104,.28);
     }
 
     .presented-mini {
@@ -3670,8 +3664,7 @@
       color: #321a13;
     }
 
-    .evidence-bag-pop .evidence-card .evidence-location,
-    .evidence-bag-pop .evidence-card .evidence-question {
+    .evidence-bag-pop .evidence-card .evidence-location {
       color: rgba(118, 64, 31, .92);
     }
 
