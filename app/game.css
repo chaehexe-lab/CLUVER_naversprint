@@ -583,10 +583,18 @@
       cursor: pointer;
     }
 
-    .main-menu-button:hover,
-    .main-menu-button:focus-visible {
+    .main-menu-button:hover:not(:disabled),
+    .main-menu-button:focus-visible:not(:disabled) {
       background: rgba(255, 242, 220, .07);
       box-shadow: 0 0 5px rgba(210, 176, 145, .7);
+    }
+
+    .main-menu-button:disabled {
+      background:
+        linear-gradient(90deg, transparent, rgba(0, 0, 0, .48) 12% 88%, transparent),
+        repeating-linear-gradient(-18deg, transparent 0 8px, rgba(255, 255, 255, .08) 8px 10px);
+      cursor: not-allowed;
+      opacity: .78;
     }
 
     .main-dialog {

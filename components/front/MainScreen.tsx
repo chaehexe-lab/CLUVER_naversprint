@@ -16,6 +16,8 @@ export default function MainScreen() {
           className="main-menu-button"
           id={item.id}
           type="button"
+          disabled={item.id === "continueDream"}
+          data-requires-save={item.id === "continueDream" ? "true" : undefined}
           style={{ "--menu-y": item.menuY } as MenuButtonStyle}
         >
           {item.label}
