@@ -33,6 +33,7 @@ export type SceneDockAction = {
 export type SceneProp = {
   image: string;
   alt: string;
+  className?: string;
   x: string;
   y: string;
   w: string;
