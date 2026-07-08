@@ -5,9 +5,6 @@ export default function TutorialScreen() {
     <section className="screen" id="tutorialScreen">
       <img className="plate" src={screenImages.tutorialScreen} alt="" />
       <div className="shade" />
-      <button className="button skip" id="skipTutorial" type="button">
-        SKIP
-      </button>
       <article className="hud story-card">
         <h1>{tutorialCopy.title}</h1>
         {tutorialCopy.paragraphs.map((paragraph) => (

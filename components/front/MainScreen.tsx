@@ -8,6 +8,7 @@ type MenuButtonStyle = CSSProperties & {
 export default function MainScreen() {
   return (
     <section className="screen active" id="mainScreen">
+      <audio id="mainBgm" src="/samunmong/sound/bgm/main.mp3" autoPlay loop preload="auto" playsInline />
       <img className="plate" src={screenImages.mainScreen} alt="삼운몽 세 개의 꿈 메인 화면" />
       {mainMenu.map((item) => (
         <button

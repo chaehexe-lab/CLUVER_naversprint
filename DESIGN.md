@@ -149,4 +149,3 @@
 - **Decision status:** Confirmed for direction. `긁힌 팔 흔적`은 돌쇠의 소매 아래에서만 수집되는 방향.
 
 ### 증거 인벤토리
-

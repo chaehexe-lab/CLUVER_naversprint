@@ -75,6 +75,7 @@ export default function GameShell({ initialScreen }: GameShellProps) {
       <DolsoeQuartersScene />
       <BackGateCourtyardScene />
       <InterrogationScreen />
-
+      <LocationIndicator />
+    </main>
   );
 }

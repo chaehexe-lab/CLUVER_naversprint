@@ -42,7 +42,7 @@ export default function BackGateCourtyardScene() {
       {backGateCourtyardScene.props.map((prop) => (
         <img
           key={`${prop.image}-${prop.x}-${prop.y}`}
-          className="scene-prop evidence-prop"
+          className={`scene-prop evidence-prop${prop.className ? ` ${prop.className}` : ""}`}
           src={prop.image}
           alt={prop.alt}
           style={propStyle(prop)}

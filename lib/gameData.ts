@@ -62,9 +62,9 @@ export const briefing = {
 const investigationDock = [
   {
     className: "map-chip open-map-panel",
-    ariaLabel: "마을지도 열기",
+    ariaLabel: "마을 지도 열기",
     image: "/samunmong/assets/labels/transparent/tool-village-map.png",
-    label: "마을지도"
+    label: "마을 지도"
   },
   {
     className: "bag-chip open-bag-panel",
@@ -129,7 +129,7 @@ export const chunwolRoomScene = {
   props: [{ image: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.png", alt: "", x: "44%", y: "78%", w: "52px", rot: "12deg" }] satisfies SceneProp[],
   hotspots: [
     { evidenceName: "사라진 노리개", ariaLabel: "사라진 노리개 조사", x: "44%", y: "78%", w: "70px", h: "56px" },
-    { id: "portraitHotspot", className: "portrait-glow", ariaLabel: "돌쇠의 그림 조사", x: "60.7%", y: "62.5%", w: "94px", h: "138px" }
+    { id: "portraitHotspot", className: "portrait-glow", ariaLabel: "돌쇠의 그림 조사", x: "63.4%", y: "55.9%", w: "112px", h: "150px" }
   ] satisfies SceneHotspot[],
   dock: [
     { id: "openMapFromRoom", ...investigationDock[0], className: "map-chip" },
@@ -220,8 +220,8 @@ export const backGateCourtyardScene = {
   image: "/samunmong/assets/scenes-evidence-baked/scene-back-gate-courtyard-evidence-baked.png",
   alt: "대문 뒤쪽 뒷문 마당",
   props: [
-    { image: "/samunmong/assets/evidence-transparent/evidence-small-footprints.png", alt: "", x: "47%", y: "76%", w: "66px", rot: "10deg" },
-    { image: "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.png", alt: "", x: "58%", y: "69%", w: "48px", rot: "-18deg" },
+    { image: "/samunmong/assets/evidence-transparent/evidence-small-footprints.png", alt: "", className: "backgate-focus-prop footprints-prop", x: "47%", y: "76%", w: "70px", rot: "10deg" },
+    { image: "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.png", alt: "", className: "backgate-focus-prop cord-prop", x: "58%", y: "69%", w: "58px", rot: "-18deg" },
     { image: "/samunmong/assets/evidence-transparent/evidence-matching-paper-scraps.png", alt: "", x: "70%", y: "77%", w: "58px", rot: "12deg" },
     { image: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png", alt: "", x: "35%", y: "68%", w: "52px", rot: "-6deg" }
   ] satisfies SceneProp[],

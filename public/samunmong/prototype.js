@@ -1,4 +1,4 @@
-
+﻿(() => {
 
     const screens = [...document.querySelectorAll(".screen")];
     const fade = document.querySelector("#fade");
@@ -21,6 +21,32 @@
     const saveKey = "samunmong-demo-state";
     const collectedEvidenceKey = "samunmong-collected-evidence";
     const settingsKey = "samunmong-demo-settings";
+    const soundBase = "/samunmong/sound";
+    const bgmTracks = {
+      main: document.querySelector("#mainBgm") || new Audio(`${soundBase}/bgm/main.mp3`),
+      joseon: new Audio(`${soundBase}/bgm/joseon.mp3`)
+    };
+    const sfxPaths = {
+      ask: `${soundBase}/sfx/ask.mp3`,
+      bag: `${soundBase}/sfx/bag.mp3`,
+      briefingNext: `${soundBase}/sfx/briefing-next.mp3`,
+      button: `${soundBase}/sfx/button.mp3`,
+      buttonAlt: `${soundBase}/sfx/button-alt.mp3`,
+      dream: `${soundBase}/sfx/dream.mp3`,
+      evidence: `${soundBase}/sfx/evidence.mp3`,
+      map: `${soundBase}/sfx/map.mp3`,
+      move: `${soundBase}/sfx/move.mp3`,
+      type1: `${soundBase}/sfx/type-1.mp3`,
+      type2: `${soundBase}/sfx/type-2.mp3`,
+      type3: `${soundBase}/sfx/type-3.mp3`
+    };
+    const typeSfxKeys = ["type1", "type2", "type3"];
+    let audioUnlocked = false;
+    let currentBgm = "";
+    let typeSfxIndex = 0;
+    let lastTypeSfxAt = 0;
+    let lastButtonSfxAt = 0;
+    let autoplayRetryTimer = null;
 
 
     function readStored(key, fallback) {
@@ -262,7 +288,6 @@
 
       screens.forEach((screen) => screen.classList.toggle("active", screen.id === startScreen));
 
-      
       if (startScreen === "briefingScreen") {
         typeBriefing();
       } else {
@@ -333,7 +358,7 @@
       showToast("게임을 종료했습니다. 창을 닫아도 진행 위치가 보존됩니다.");
       window.close();
     });
-    document.querySelector("#skipTutorial").addEventListener("click", () => go("dreamScreen"));
+    document.querySelector("#skipTutorial")?.addEventListener("click", () => go("dreamScreen"));
     document.querySelector("#nextTutorial").addEventListener("click", () => go("dreamScreen"));
     document.querySelector("#chooseJoseon").addEventListener("click", () => {
       playSfx("dream", 0.9);

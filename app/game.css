@@ -41,6 +41,14 @@
       font-display: block;
     }
 
+    @font-face {
+      font-family: "PFStardust";
+      src: url("/samunmong/assets/fonts/PF-Stardust.ttf") format("truetype");
+      font-weight: 400;
+      font-style: normal;
+      font-display: block;
+    }
+
     * { box-sizing: border-box; }
 
     body {
@@ -84,7 +92,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transform: scale(1.01);
+      transform: none;
     }
 
     #mainScreen .plate,
@@ -140,6 +148,28 @@
       opacity: .82;
       filter: drop-shadow(0 4px 7px rgba(0,0,0,.58)) saturate(.58) brightness(.72) contrast(.9);
       mix-blend-mode: normal;
+    }
+
+    #backGateCourtyard .backgate-focus-prop {
+      display: block;
+      z-index: 7;
+      opacity: .88;
+      filter:
+        drop-shadow(0 0 5px rgba(255, 226, 155, .2))
+        drop-shadow(0 8px 14px rgba(0,0,0,.68))
+        saturate(.9)
+        brightness(1.02)
+        contrast(1.04);
+    }
+
+    #backGateCourtyard .footprints-prop {
+      opacity: .68;
+      filter:
+        drop-shadow(0 0 3px rgba(255, 226, 155, .12))
+        drop-shadow(0 6px 10px rgba(0,0,0,.58))
+        saturate(.74)
+        brightness(.9)
+        contrast(.96);
     }
 
     .tool-status {
@@ -814,8 +844,7 @@
 
     .screen.rush-in .plate,
     .screen.rush-in .shade,
-    .screen.rush-in .hud,
-    .screen.rush-in .hotspot {
+    .screen.rush-in .hud {
       animation: rushIn .72s cubic-bezier(.14,.84,.16,1) both;
     }
 
@@ -836,7 +865,7 @@
       }
       100% {
         opacity: 1;
-        transform: scale(1.01) translateY(0);
+        transform: none;
         filter: blur(0) brightness(1);
       }
     }
@@ -1375,7 +1404,10 @@
     .global-panel h2 {
       margin: 0;
       color: var(--ink);
-      font-size: 17px;
+      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
+      font-size: clamp(26px, 2.8vw, 38px);
+      font-weight: 400;
+      letter-spacing: 0;
     }
 
     .global-panel.bag-panel h2,
@@ -1387,7 +1419,7 @@
     .global-panel p,
     .global-panel li {
       color: var(--muted);
-      font-size: 13px;
+      font-size: 22px;
       line-height: 1.55;
     }
 
@@ -1432,7 +1464,7 @@
     }
 
     .bag-item span {
-      font-size: 12px;
+      font-size: 21px;
       line-height: 1.35;
       color: rgba(247,236,216,.78);
     }
@@ -1441,7 +1473,7 @@
       display: block;
       margin-bottom: 2px;
       color: rgba(247,236,216,.94);
-      font-size: 13px;
+      font-size: 20px;
     }
 
     .bag-item.empty {
@@ -1457,7 +1489,7 @@
       color: rgba(49, 31, 22, .68);
       background: rgba(255, 238, 191, .16);
       text-align: center;
-      font-size: 13px;
+      font-size: 22px;
     }
 
     .bag-panel-grid {
@@ -1474,7 +1506,7 @@
       border-radius: 14px;
       color: rgba(49, 31, 22, .74);
       background: rgba(255, 238, 191, .14);
-      font-size: 13px;
+      font-size: 22px;
     }
 
     .analysis-target strong {
@@ -1492,7 +1524,7 @@
       margin: 0 0 4px;
       color: rgba(111, 26, 23, .78);
       font-family: "ChilgokLjh", "NanumBareunJeongsin", serif;
-      font-size: 13px;
+      font-size: 20px;
       line-height: 1;
     }
 
@@ -1552,13 +1584,13 @@
       display: grid;
       gap: 4px;
       color: rgba(49, 31, 22, .7);
-      font-size: 12px;
+      font-size: 21px;
       line-height: 1.25;
     }
 
     .tool-evidence-option strong {
       color: #321a13;
-      font-size: 14px;
+      font-size: 21px;
     }
 
     .tool-preview {
@@ -1604,7 +1636,7 @@
     }
 
     .tool-preview-copy p {
-      font-size: 17px;
+      font-size: 26px;
       line-height: 1.5;
       word-break: keep-all;
     }
@@ -1639,12 +1671,12 @@
     .tool-card strong {
       display: block;
       margin-bottom: 3px;
-      font-size: 11px;
+      font-size: 18px;
     }
 
     .tool-card span {
       color: var(--muted);
-      font-size: 9px;
+      font-size: 18px;
       line-height: 1.28;
     }
 
@@ -1893,13 +1925,29 @@
       pointer-events: auto;
       width: clamp(36px, 4vw, 54px);
       height: clamp(36px, 4vw, 54px);
+      display: grid;
+      place-items: center;
+      padding: 0;
       border: 1px solid rgba(255,255,255,.28);
       border-radius: 999px;
-      color: white;
+      color: transparent;
       background: rgba(0,0,0,.38);
-      font-size: clamp(20px, 2.6vw, 30px);
+      font-size: 0;
+      line-height: 1;
       box-shadow: 0 0 22px rgba(0,0,0,.48);
     }
+
+    .arrow::before {
+      color: white;
+      font-family: Arial, "Apple SD Gothic Neo", system-ui, sans-serif;
+      font-size: clamp(25px, 2.8vw, 35px);
+      font-weight: 700;
+      line-height: 1;
+      transform: translateY(-1px);
+    }
+
+    #prevSuspect::before { content: "‹"; }
+    #nextSuspect::before { content: "›"; }
 
     .bag {
       top: 13%;
@@ -2160,7 +2208,7 @@
     }
 
     .evidence-card span {
-      font-size: 10px;
+      font-size: 13px;
       line-height: 1.25;
       color: rgba(247,236,216,.8);
     }
@@ -2498,7 +2546,7 @@
       max-width: 82%;
       margin: 0 0 16px;
       color: rgba(49, 31, 22, .78);
-      font-size: 22px;
+      font-size: 25px;
       line-height: 1.45;
       word-break: keep-all;
     }
@@ -2514,7 +2562,7 @@
       margin: 7px 0;
       padding-left: 16px;
       color: #352216;
-      font-size: 20px;
+      font-size: 23px;
       line-height: 1.48;
       word-break: keep-all;
     }
@@ -2553,7 +2601,7 @@
       margin: 0 0 6px;
       color: #6d211d;
       font-family: "ChilgokLjh", "NanumBareunJeongsin", serif;
-      font-size: 21px;
+      font-size: 24px;
       font-weight: 400;
       letter-spacing: 0;
     }
@@ -2631,7 +2679,7 @@
       margin: 0 0 6px;
       color: rgba(111, 26, 23, .78);
       font-family: "ChilgokLjh", "NanumBareunJeongsin", serif;
-      font-size: 15px;
+      font-size: 22px;
       line-height: 1;
       letter-spacing: 0;
     }
@@ -2660,7 +2708,7 @@
       max-width: 82%;
       margin: 0 0 16px;
       color: rgba(49, 31, 22, .78);
-      font-size: 19px;
+      font-size: 26px;
       line-height: 1.5;
       word-break: keep-all;
     }
@@ -2677,7 +2725,7 @@
       margin: 7px 0;
       padding-left: 16px;
       color: #352216;
-      font-size: 18px;
+      font-size: 25px;
       line-height: 1.5;
       word-break: keep-all;
     }
@@ -2711,7 +2759,7 @@
       margin: 0 0 6px;
       color: #6d211d;
       font-family: "ChilgokLjh", "NanumBareunJeongsin", serif;
-      font-size: 21px;
+      font-size: 24px;
       font-weight: 400;
       letter-spacing: 0;
     }
@@ -2789,8 +2837,10 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity .42s ease;
+      font-family: "PFStardust", "VitroPride", "Noto Serif KR", serif;
       font-size: clamp(21px, 3.4vw, 40px);
-      font-weight: 900;
+      font-weight: 400;
+      letter-spacing: 0;
     }
 
     .fade.show { opacity: .96; }
