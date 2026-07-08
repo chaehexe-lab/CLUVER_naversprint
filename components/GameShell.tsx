@@ -31,6 +31,7 @@ function ensureRequestedStartScreen(initialScreen?: string) {
   document.querySelectorAll(".screen").forEach((screen) => {
     screen.classList.toggle("active", screen.id === startScreen);
   });
+  document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
   window.dispatchEvent(new CustomEvent("samunmong:screen-change", { detail: { screenId: startScreen } }));
 }
 

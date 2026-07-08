@@ -446,6 +446,7 @@
 
     function go(id, message = "이동 중...") {
       stopBriefingTyping();
+      document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
       playSfx("move", 0.82);
       fade?.classList.add("show");
       if (fade) fade.textContent = message;
@@ -460,6 +461,7 @@
 
     function goRush(id, message = "사건 현장으로 진입 중...") {
       stopBriefingTyping();
+      document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
       playSfx("briefingNext", 0.9);
       fade?.classList.add("show", "long");
       if (fade) fade.textContent = message;
