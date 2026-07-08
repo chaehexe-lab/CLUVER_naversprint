@@ -59,7 +59,7 @@ export const evidenceCatalog = [
   },
   {
     name: "종이칼",
-    aliases: ["종이칼", "문서칼", "칼", "작은 칼"]
+    aliases: ["종이칼", "칼", "작은 칼"]
   },
   {
     name: "작은 발자국",
