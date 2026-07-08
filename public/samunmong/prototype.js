@@ -251,6 +251,125 @@
       dialog?.setAttribute("aria-hidden", "true");
     }
 
+    const buttonGuideTextById = {
+      openMapFromInterrogation: "마을 지도: 조사 장소를 오갑니다.",
+      openNoteProp: "기록장: 수집한 증거와 심문 기록을 봅니다.",
+      toggleEvidenceBag: "보따리: 모은 증거를 꺼내 제시합니다.",
+      interrogationHint: "심문 힌트: 질문 방향을 떠올립니다.",
+      accuseButton: "범인 지목: 충분히 모았을 때 판결로 갑니다."
+    };
+
+    let buttonGuideHideTimer = null;
+    let activeGuideTarget = null;
+    const buttonGuideScreenIds = new Set([
+      "fieldOne",
+      "chunwolRoom",
+      "mudeokServantRoom",
+      "yoomunseokSarangbang",
+      "dolsoeQuarters",
+      "backGateCourtyard",
+      "interrogationScreen"
+    ]);
+
+    function getButtonGuideText(target) {
+      if (!target) return "";
+      if (target.dataset.guide) return target.dataset.guide;
+      if (buttonGuideTextById[target.id]) return buttonGuideTextById[target.id];
+      if (target.matches(".map-chip")) return "마을 지도: 조사 장소를 오갑니다.";
+      if (target.matches(".bag-chip")) return "보따리: 모은 증거를 확인합니다.";
+      if (target.matches(".tool-chip")) return "수사 도구: 증거를 더 자세히 분석합니다.";
+      if (target.matches(".note-chip")) return "기록장: 단서와 심문 내용을 정리합니다.";
+      if (target.matches(".room-chip")) return target.getAttribute("aria-current") === "page" ? "현재 위치입니다." : "취조실로 이동합니다.";
+      if (target.matches(".scene-hint")) return "힌트: 남은 단서 위치를 잠깐 밝힙니다.";
+      if (target.matches(".map-pin-button")) return target.getAttribute("aria-label") || "해당 장소로 이동합니다.";
+      if (target.matches(".close-button")) return target.getAttribute("aria-label") || "창을 닫습니다.";
+      return target.getAttribute("aria-label") || target.title || target.textContent.trim();
+    }
+
+    function positionGuideElement(element, target) {
+      const shell = document.querySelector(".game-shell");
+      if (!element || !target || !shell) return;
+      const shellRect = shell.getBoundingClientRect();
+      const targetRect = target.getBoundingClientRect();
+      const centerX = targetRect.left + targetRect.width / 2 - shellRect.left;
+      const targetTop = targetRect.top - shellRect.top;
+      const targetBottom = targetRect.bottom - shellRect.top;
+      const guideHalfWidth = Math.min(150, Math.max(96, shellRect.width * .36));
+      const left = Math.max(guideHalfWidth, Math.min(shellRect.width - guideHalfWidth, centerX));
+      const showBelow = targetTop < 130;
+      const top = showBelow ? targetBottom + 8 : targetTop - 8;
+      element.style.setProperty("--guide-left", `${left}px`);
+      element.style.setProperty("--guide-top", `${top}px`);
+      element.dataset.placement = showBelow ? "bottom" : "top";
+    }
+
+    function hideGuideElement(element) {
+      if (!element) return;
+      element.classList.remove("is-visible");
+      clearTimeout(element.hideTimer);
+      element.hideTimer = setTimeout(() => {
+        if (!element.classList.contains("is-visible")) element.hidden = true;
+      }, 180);
+    }
+
+    function hideButtonGuides() {
+      hideGuideElement(document.querySelector("#buttonGuideTooltip"));
+      activeGuideTarget = null;
+    }
+
+    function showHoverGuide(target) {
+      const tooltip = document.querySelector("#buttonGuideTooltip");
+      const text = getButtonGuideText(target);
+      if (!tooltip || !text || target.disabled || target.hidden) return;
+      clearTimeout(buttonGuideHideTimer);
+      activeGuideTarget = target;
+      tooltip.textContent = text;
+      tooltip.hidden = false;
+      positionGuideElement(tooltip, target);
+      requestAnimationFrame(() => tooltip.classList.add("is-visible"));
+    }
+
+    function scheduleHideHoverGuide() {
+      clearTimeout(buttonGuideHideTimer);
+      buttonGuideHideTimer = setTimeout(() => hideGuideElement(document.querySelector("#buttonGuideTooltip")), 80);
+    }
+
+    function setupButtonGuides() {
+      const selector = [
+        ".scene-chip",
+        ".tool-prop",
+        ".scene-hint"
+      ].join(",");
+
+      if (document.documentElement.dataset.buttonGuidesBound === "true") return;
+      document.documentElement.dataset.buttonGuidesBound = "true";
+
+      const findGuideTarget = (node) => {
+        const button = node instanceof Element ? node.closest(selector) : null;
+        const screen = button?.closest(".screen.active");
+        if (!screen || !buttonGuideScreenIds.has(screen.id)) return null;
+        return button;
+      };
+      const showFromEvent = (event) => {
+        const button = findGuideTarget(event.target);
+        if (button) showHoverGuide(button);
+      };
+      const hideFromEvent = (event) => {
+        const button = findGuideTarget(event.target);
+        const relatedButton = findGuideTarget(event.relatedTarget);
+        if (button && button !== relatedButton) scheduleHideHoverGuide();
+      };
+
+      document.addEventListener("pointerover", showFromEvent);
+      document.addEventListener("mouseover", showFromEvent);
+      document.addEventListener("pointerout", hideFromEvent);
+      document.addEventListener("mouseout", hideFromEvent);
+      window.addEventListener("resize", () => {
+        if (activeGuideTarget) positionGuideElement(document.querySelector("#buttonGuideTooltip"), activeGuideTarget);
+      });
+      document.addEventListener("pointerdown", hideButtonGuides, { capture: true });
+    }
+
     function updateCurrentLocation(screenId) {
       const location = locationMeta[screenId];
       const indicator = document.querySelector("#currentLocationIndicator");
@@ -286,7 +405,8 @@
     }
 
     window.addEventListener("samunmong:screen-change", (event) => {
-      updateCurrentLocation(event.detail?.screenId || getActiveScreenId());
+      const screenId = event.detail?.screenId || getActiveScreenId();
+      updateCurrentLocation(screenId);
     });
 
     function go(id, message = "이동 중...") {
@@ -1366,6 +1486,7 @@
 
     applyContentImages();
     renderTools();
+    setupButtonGuides();
     showInitialScreenFromSetup();
   
 
