@@ -5,6 +5,7 @@ import BriefingScreen from "@/components/front/BriefingScreen";
 import DreamSelectScreen from "@/components/front/DreamSelectScreen";
 import MainScreen from "@/components/front/MainScreen";
 import TutorialScreen from "@/components/front/TutorialScreen";
+import LocationIndicator from "@/components/LocationIndicator";
 import BackGateCourtyardScene from "@/components/scenes/BackGateCourtyardScene";
 import ChunwolRoomScene from "@/components/scenes/ChunwolRoomScene";
 import DolsoeQuartersScene from "@/components/scenes/DolsoeQuartersScene";
@@ -27,6 +28,7 @@ function ensureRequestedStartScreen(initialScreen?: string) {
   document.querySelectorAll(".screen").forEach((screen) => {
     screen.classList.toggle("active", screen.id === startScreen);
   });
+  window.dispatchEvent(new CustomEvent("samunmong:screen-change", { detail: { screenId: startScreen } }));
 }
 
 export default function GameShell({ initialScreen }: GameShellProps) {
@@ -73,6 +75,7 @@ export default function GameShell({ initialScreen }: GameShellProps) {
       <DolsoeQuartersScene />
       <BackGateCourtyardScene />
       <InterrogationScreen />
+      <LocationIndicator />
     </main>
   );
 }

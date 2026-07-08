@@ -44,6 +44,3 @@
 | 이채희 | UI/UX 대장 |
 | 노경섭 | 개발 대장 |
 | 이지혜 | PM |
-
-## 접속
-https://psychic-adventure-v6z2rm5.pages.github.io/
