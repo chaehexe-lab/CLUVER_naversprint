@@ -661,25 +661,6 @@
 
     function addEvidenceToBag(name) {
       saveCollectedEvidence(name);
-      const list = document.querySelector("#bagPanelList");
-      list.querySelector(".empty")?.remove();
-      const exists = [...list.children].some((item) => item.dataset.evidence === name);
-      if (exists) {
-        addEvidenceCardToInterrogation(name);
-        addEvidenceToToolPanel(name);
-        return;
-      }
-
-      const item = document.createElement("button");
-      item.className = "bag-item";
-      item.type = "button";
-      item.dataset.evidence = name;
-      item.innerHTML = `<img src="${evidenceData[name]?.img || "/samunmong/assets/evidence-wooden-tag.png"}" alt=""><span><strong>${name}</strong><br>${evidenceData[name]?.note || "현장에서 발견된 단서"}</span>`;
-      item.addEventListener("click", () => {
-        setAnalysisTarget(name);
-        showToast(`${name} 선택. 도구 탭에서 크게 확인할 수 있습니다.`);
-      });
-      list.appendChild(item);
       addEvidenceCardToInterrogation(name);
       addEvidenceToToolPanel(name);
       playSfx("bag", 0.7);
@@ -688,9 +669,6 @@
     function setAnalysisTarget(name) {
       currentEvidenceForTool = name;
       document.querySelector("#analysisTarget").textContent = name;
-      document.querySelectorAll("#bagPanelList .bag-item").forEach((item) => {
-        item.classList.toggle("selected", item.dataset.evidence === name);
-      });
       document.querySelectorAll("#toolEvidenceList .tool-evidence-option").forEach((item) => {
         item.classList.toggle("selected", item.dataset.evidence === name);
       });
@@ -978,12 +956,12 @@
       addEvidenceToBag("호패 조각");
       addEvidenceToNote("호패 조각");
       hideInspectPanels();
-      showToast("호패 조각이 조용히 가방 속으로 들어갔다. 이 조각은 누군가 일부러 남긴 말처럼 보인다.");
+      showToast("호패 조각이 조용히 보따리 속으로 들어갔다. 이 조각은 누군가 일부러 남긴 말처럼 보인다.");
     }
     document.querySelector("#collectHopae").addEventListener("click", collectHopae);
     document.querySelector("#hopaeHotspot").addEventListener("click", () => {
       collectHopae();
-      document.querySelector("#collectHopae").textContent = "가방에서 분석하기";
+      document.querySelector("#collectHopae").textContent = "보따리에서 분석하기";
       showInspect("#hopaeInspect");
     });
 
@@ -1005,7 +983,7 @@
     document.querySelector("#collectPortrait").addEventListener("click", collectPortrait);
     document.querySelector("#portraitHotspot").addEventListener("click", () => {
       collectPortrait();
-      document.querySelector("#collectPortrait").textContent = "가방에서 분석하기";
+      document.querySelector("#collectPortrait").textContent = "보따리에서 분석하기";
       showInspect("#portraitInspect");
     });
     function showGenericEvidence(name, hotspot) {
@@ -1024,7 +1002,7 @@
       document.querySelector("#genericEvidenceImage").src = data.img || "/samunmong/assets/evidence-wooden-tag.png";
       document.querySelector("#genericEvidenceTitle").textContent = name;
       document.querySelector("#genericEvidenceText").textContent = `${data.note || "현장에서 발견한 단서입니다."} ${data.tool ? "도구 버튼을 눌러 이 증거를 자세히 살펴볼 수 있습니다." : "도구 없이 확인 가능한 단서입니다."}`;
-      document.querySelector("#collectGenericEvidence").textContent = data.tool ? "가방에서 분석하기" : "확인";
+      document.querySelector("#collectGenericEvidence").textContent = data.tool ? "보따리에서 분석하기" : "확인";
       document.querySelector("#genericEvidenceInspect").classList.add("show");
       clearTimeout(showInspect.timer);
       showInspect.timer = setTimeout(hideInspectPanels, 1500);
@@ -1130,7 +1108,9 @@
     function setEvidenceBag(open) {
       evidenceBagPop.classList.toggle("open", open);
       evidenceBagPop.setAttribute("aria-hidden", String(!open));
-      toggleEvidenceBag.setAttribute("aria-expanded", String(open));
+      document.querySelectorAll("#toggleEvidenceBag, .bag-chip, .open-bag-panel").forEach((button) => {
+        button.setAttribute("aria-expanded", String(open));
+      });
       globalOverlay.classList.toggle("show", open);
       if (open) playSfx("bag", 0.7);
     }
@@ -1151,7 +1131,6 @@
       });
       globalOverlay.classList.add("show");
       if (id === "mapPanel") playSfx("map", 0.78);
-      if (id === "bagPanel") playSfx("bag", 0.72);
       if (id === "toolPanel") playSfx("buttonAlt", 0.62);
       updateToolCursor();
     }
@@ -1176,10 +1155,10 @@
       button.addEventListener("click", () => openGlobalPanel("mapPanel"));
     });
     ["#openBagFromField", "#openBagFromRoom", "#openBagFromMudeokRoom"].forEach((selector) => {
-      document.querySelector(selector)?.addEventListener("click", () => openGlobalPanel("bagPanel"));
+      document.querySelector(selector)?.addEventListener("click", () => setEvidenceBag(true));
     });
     document.querySelectorAll(".open-bag-panel").forEach((button) => {
-      button.addEventListener("click", () => openGlobalPanel("bagPanel"));
+      button.addEventListener("click", () => setEvidenceBag(true));
     });
     document.querySelectorAll(".open-tool-panel").forEach((button) => {
       button.addEventListener("click", () => openGlobalPanel("toolPanel"));
@@ -1243,7 +1222,7 @@
 
     function getCollectedEvidenceNames() {
       const names = new Set();
-      document.querySelectorAll("#bagPanelList .bag-item[data-evidence], #evidenceList .evidence[data-evidence]").forEach((item) => {
+      document.querySelectorAll("#evidenceList .evidence[data-evidence]").forEach((item) => {
         if (item.dataset.evidence) names.add(item.dataset.evidence);
       });
       if (selectedEvidence) names.add(selectedEvidence);

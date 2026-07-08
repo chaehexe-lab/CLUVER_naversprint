@@ -1,4 +1,4 @@
-﻿import AccuseSuspect from "@/components/AccuseSuspect";
+import AccuseSuspect from "@/components/AccuseSuspect";
 import EvidenceInventory from "@/components/EvidenceInventory";
 import InvestigationNote from "@/components/InvestigationNote";
 import type { CSSProperties } from "react";
@@ -97,7 +97,7 @@ export default function InterrogationScreen() {
             <img src="/samunmong/assets/labels/transparent/tool-interrogation-room.png" alt="" />
             <span className="sr-only">취조실</span>
           </button>
-          <button className="tool-prop note-prop" id="openNoteProp" type="button" aria-label="수사노트 보기">
+          <button className="tool-prop note-prop" id="openNoteProp" type="button" aria-label="기록장 보기">
             <img src="/samunmong/assets/labels/transparent/tool-note-short.png" alt="" />
             <span className="sr-only">기록장</span>
           </button>
@@ -106,7 +106,7 @@ export default function InterrogationScreen() {
             id="toggleEvidenceBag"
             type="button"
             aria-expanded="false"
-            aria-label="증거 가방 열기"
+            aria-label="보따리 열기"
           >
             <img src="/samunmong/assets/labels/transparent/tool-bag-short.png" alt="" />
             <span className="sr-only">보따리</span>
@@ -119,28 +119,12 @@ export default function InterrogationScreen() {
             힌트
           </button>
           <AccuseSuspect>
-          <button className="tool-prop accuse-prop" id="accuseButton" type="button" aria-label="범인 지목">
-            <img src="/samunmong/assets/labels/transparent/tool-accuse-short.png" alt="" />
-            <span className="sr-only">지목</span>
-          </button>
+            <button className="tool-prop accuse-prop" id="accuseButton" type="button" aria-label="범인 지목">
+              <img src="/samunmong/assets/labels/transparent/tool-accuse-short.png" alt="" />
+              <span className="sr-only">지목</span>
+            </button>
           </AccuseSuspect>
         </nav>
-        <EvidenceInventory>
-
-        <aside className="hud evidence-bag-pop" id="evidenceBagPop" aria-hidden="true">
-          <div className="bag-pop-head">
-            <strong>보따리</strong>
-            <button className="close-button mini-close" id="closeEvidenceBag" type="button" aria-label="증거 가방 닫기">
-              ×
-            </button>
-          </div>
-          <div className="evidence-list evidence-grid" id="evidenceList">
-            <div className="evidence-empty" id="emptyInterrogationEvidence">
-              현장에서 수집한 증거가 없습니다.
-            </div>
-          </div>
-        </aside>
-        </EvidenceInventory>
 
         <section className="hud inquiry-bar">
           <div className="prompt-lines" aria-label="추천 질문">
@@ -167,37 +151,39 @@ export default function InterrogationScreen() {
         </div>
 
         <div className="overlay" id="overlay" />
+
+        {/* 사이드 서랍형 기록장 패널 */}
         <InvestigationNote>
-        <aside className="note-drawer investigation-note-panel" id="noteDrawer" aria-hidden="true">
-          <button className="close-button note-close" id="closeNote" type="button" aria-label="수사노트 닫기">
-            ×
-          </button>
-          <p className="note-kicker">조사 기록</p>
-          <h2>기록장</h2>
-          <p className="note-lead">심문 중 확인한 내용과 증거를 정리합니다.</p>
-          <div className="note-section">
-            <h3>현재 사건</h3>
-            <ul>
-              <li>사건명: 조선시대 살인사건</li>
-              <li>목표: 점순이 쓰러진 이유와 호패 조각의 주인 확인</li>
-              <li>
-                현재 심문 대상: <span id="noteSuspect">돌쇠</span>
-              </li>
-            </ul>
-          </div>
-          <div className="note-section">
-            <h3>수집한 증거</h3>
-            <ul id="collectedEvidenceNote">
-              <li id="emptyEvidenceNote">아직 수집한 증거가 없습니다.</li>
-            </ul>
-          </div>
-          <div className="note-section">
-            <h3>심문 요약</h3>
-            <ul id="interrogationSummary">
-              <li id="emptyInterrogationSummary">아직 기록한 심문 내용이 없습니다.</li>
-            </ul>
-          </div>
-        </aside>
+          <aside className="note-drawer investigation-note-panel" id="noteDrawer" aria-hidden="true">
+            <button className="close-button note-close" id="closeNote" type="button" aria-label="기록장 닫기">
+              ×
+            </button>
+            <p className="note-kicker">조사 기록</p>
+            <h2>기록장</h2>
+            <p className="note-lead">심문 중 확인한 내용과 증거를 정리합니다.</p>
+            <div className="note-section">
+              <h3>현재 사건</h3>
+              <ul>
+                <li>사건명: 조선시대 살인사건</li>
+                <li>목표: 점순이 쓰러진 이유와 호패 조각의 주인 확인</li>
+                <li>
+                  현재 심문 대상: <span id="noteSuspect">돌쇠</span>
+                </li>
+              </ul>
+            </div>
+            <div className="note-section">
+              <h3>수집한 증거</h3>
+              <ul id="collectedEvidenceNote">
+                <li id="emptyEvidenceNote">아직 수집한 증거가 없습니다.</li>
+              </ul>
+            </div>
+            <div className="note-section">
+              <h3>심문 요약</h3>
+              <ul id="interrogationSummary">
+                <li id="emptyInterrogationSummary">아직 기록한 심문 내용이 없습니다.</li>
+              </ul>
+            </div>
+          </aside>
         </InvestigationNote>
       </section>
 
@@ -217,18 +203,24 @@ export default function InterrogationScreen() {
       </aside>
 
       <div className="global-overlay" id="globalOverlay" />
-      <aside className="global-panel bag-panel" id="bagPanel" aria-hidden="true">
-        <div className="global-panel-head">
-          <h2>보따리</h2>
-          <button className="close-button global-close" type="button" aria-label="수사 가방 닫기">
-            닫기
-          </button>
-        </div>
-        <p>현장에서 발견한 증거가 이곳에 보관됩니다. 취조실에서는 증거를 꺼내 용의자에게 제시할 수 있습니다.</p>
-        <div className="bag-panel-grid" id="bagPanelList">
-          <div className="bag-item empty">아직 새로 수집한 증거가 없습니다.</div>
-        </div>
-      </aside>
+
+      {/* 현장과 취조실이 함께 사용하는 보따리 팝업 */}
+      <EvidenceInventory>
+        <aside className="hud evidence-bag-pop" id="evidenceBagPop" aria-hidden="true">
+          <div className="bag-pop-head">
+            <strong>보따리</strong>
+            <button className="close-button mini-close" id="closeEvidenceBag" type="button" aria-label="보따리 닫기">
+              ×
+            </button>
+          </div>
+          <div className="evidence-list evidence-grid" id="evidenceList">
+            <div className="evidence-empty" id="emptyInterrogationEvidence">
+              보따리에 담긴 증거가 없습니다.
+            </div>
+          </div>
+        </aside>
+      </EvidenceInventory>
+
       <aside className="global-panel tool-panel" id="toolPanel" aria-hidden="true">
         <div className="global-panel-head">
           <div>
@@ -260,31 +252,33 @@ export default function InterrogationScreen() {
         </div>
         <div className="tool-grid" id="toolGrid" />
       </aside>
+
       <aside className="global-panel tool-result-panel" id="toolResultPopup" aria-hidden="true" aria-live="polite">
         <p className="tool-panel-kicker" id="toolResultKicker">도구 분석</p>
-        <h2 id="toolResultTitle">증거 분석 결과</h2>
+        <h2>증거 분석 결과</h2>
         <p id="toolResultText">새로운 정보가 드러났습니다.</p>
         <button className="button primary" id="closeToolResult" type="button">
           기록장에 기록
         </button>
       </aside>
-      <InvestigationNote>
 
-      <aside className="global-panel investigation-note-panel" id="fieldNotePanel" aria-hidden="true">
-        <div className="global-panel-head">
-          <div>
-            <p className="note-kicker">현장 기록</p>
-            <h2>기록장</h2>
+      {/* 전역 기록장 패널 */}
+      <InvestigationNote>
+        <aside className="global-panel investigation-note-panel" id="fieldNotePanel" aria-hidden="true">
+          <div className="global-panel-head">
+            <div>
+              <p className="note-kicker">조사 기록</p>
+              <h2>기록장</h2>
+            </div>
+            <button className="close-button note-close global-close" type="button" aria-label="기록장 닫기">
+              ×
+            </button>
           </div>
-          <button className="close-button note-close global-close" type="button" aria-label="수사노트 닫기">
-            ×
-          </button>
-        </div>
-        <p className="note-lead">현장에서 확인한 단서와 사실 지점을 정리합니다.</p>
-        <ul id="fieldNoteList">
-          <li id="emptyFieldNote">아직 기록한 단서가 없습니다.</li>
-        </ul>
-      </aside>
+          <p className="note-lead">현장에서 확인한 단서와 사실 지점을 정리합니다.</p>
+          <ul id="fieldNoteList">
+            <li id="emptyFieldNote">아직 기록한 단서가 없습니다.</li>
+          </ul>
+        </aside>
       </InvestigationNote>
 
       <aside className="global-panel map-panel" id="mapPanel" aria-hidden="true">
