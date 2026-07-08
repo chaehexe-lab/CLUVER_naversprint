@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import BriefingScreen from "@/components/front/BriefingScreen";
+import ButtonGuideLayer from "@/components/ButtonGuideLayer";
 import DreamSelectScreen from "@/components/front/DreamSelectScreen";
 import MainScreen from "@/components/front/MainScreen";
 import TeamIntro from "@/components/front/TeamIntro";
@@ -81,6 +82,7 @@ export default function GameShell({ initialScreen }: GameShellProps) {
       <BackGateCourtyardScene />
       <InterrogationScreen />
       <LocationIndicator initialScreen={initialScreen} />
+      <ButtonGuideLayer />
     </main>
   );
 }
