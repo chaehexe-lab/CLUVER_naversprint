@@ -904,7 +904,7 @@
 
     .main-dialog-panel h2 { margin: 0 0 18px; font-family: "ChosunNm", "Batang", serif; }
     .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 16px 0; }
-    .setting-row input[type="range"] { width: 52%; accent-color: #a87862; }
+    .setting-row input[type="range"] { width: 52%; accent-color: #a87862; padding: 0; border: 0;}
     .setting-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: #a87862; }
     .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
     .dialog-actions button { min-width: 92px; }
