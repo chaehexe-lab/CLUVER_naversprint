@@ -23,14 +23,14 @@ export const tutorialCopy = {
 
 export const dreamOptions: DreamOption[] = [
   {
-    state: "LOCKED",
+    id: "chooseJoseon",
+    state: "PLAYABLE",
     kicker: "DREAM 01",
-    title: "우주정거장 살인사건",
-    description: "중력이 사라진 복도 안, 시체만이 제자리를 떠나지 못했습니다.",
-    meta: "폐쇄 공간 · 산소 기록 · 사라진 카메라",
-    image: "/samunmong/assets/theme-space-station.png",
-    disabled: true,
-    ariaLabel: "우주정거장 살인사건은 아직 잠겨 있습니다"
+    title: "조선시대 살인사건",
+    description: "문 앞에 쓰러진 사람, 곁에 남은 호패 조각 하나가 모두의 관계를 뒤집습니다.",
+    meta: "호패 조각 · 젖은 발자국 · 거짓 증언",
+    image: "/samunmong/assets/theme-joseon-murder.png",
+    disabled: false
   },
   {
     state: "LOCKED",
@@ -43,14 +43,14 @@ export const dreamOptions: DreamOption[] = [
     ariaLabel: "마법학교 방화사건은 아직 잠겨 있습니다"
   },
   {
-    id: "chooseJoseon",
-    state: "PLAYABLE",
+    state: "LOCKED",
     kicker: "DREAM 03",
-    title: "조선시대 살인사건",
-    description: "문 앞에 쓰러진 사람, 곁에 남은 호패 조각 하나가 모두의 관계를 뒤집습니다.",
-    meta: "호패 조각 · 젖은 발자국 · 거짓 증언",
-    image: "/samunmong/assets/theme-joseon-murder.png",
-    disabled: false
+    title: "우주정거장 살인사건",
+    description: "중력이 사라진 복도 안, 시체만이 제자리를 떠나지 못했습니다.",
+    meta: "폐쇄 공간 · 산소 기록 · 사라진 카메라",
+    image: "/samunmong/assets/theme-space-station.png",
+    disabled: true,
+    ariaLabel: "우주정거장 살인사건은 아직 잠겨 있습니다"
   }
 ] as const;
 
