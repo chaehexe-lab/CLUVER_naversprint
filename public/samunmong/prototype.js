@@ -76,9 +76,24 @@
       catch { return fallback; }
     }
 
+    function isValidSavedProgress(saved = readStored(saveKey, null)) {
+      return screens.some((screen) => screen.id === saved?.screenId) && saved.screenId !== "mainScreen";
+    }
+
+    function updateContinueButtonState() {
+      const continueButton = document.querySelector("#continueDream");
+      if (!continueButton) return;
+
+      const enabled = isValidSavedProgress();
+      continueButton.disabled = !enabled;
+      continueButton.setAttribute("aria-disabled", String(!enabled));
+      continueButton.title = enabled ? "지난 꿈으로 돌아가기" : "저장된 꿈이 없습니다";
+    }
+
     function saveProgress(screenId) {
       if (screenId === "mainScreen") return;
       localStorage.setItem(saveKey, JSON.stringify({ screenId, savedAt: Date.now() }));
+      updateContinueButtonState();
     }
 
     function saveCollectedEvidence(name) {
@@ -373,6 +388,7 @@
     const exitDialog = document.querySelector("#exitDialog");
     const defaultSettings = { volume: 70, reduceMotion: false, highContrast: false };
     applySettings({ ...defaultSettings, ...readStored(settingsKey, {}) });
+    updateContinueButtonState();
     updateBgmForScreen();
     startAutoplayRetries();
     window.addEventListener("focus", tryAutoplayBgm);
@@ -392,12 +408,15 @@
       localStorage.removeItem(saveKey);
       localStorage.removeItem(collectedEvidenceKey);
       localStorage.removeItem(analyzedEvidenceKey);
+      updateContinueButtonState();
       go("tutorialScreen");
     });
     on("#continueDream", "click", () => {
       const saved = readStored(saveKey, null);
-      const valid = screens.some((screen) => screen.id === saved?.screenId) && saved.screenId !== "mainScreen";
-      go(valid ? saved.screenId : "tutorialScreen", valid ? "지난 꿈으로 돌아가는 중..." : "새로운 꿈을 시작합니다...");
+      const valid = isValidSavedProgress(saved);
+      if (!valid) return;
+
+      go(saved.screenId, "지난 꿈으로 돌아가는 중...");
       if (saved?.screenId === "briefingScreen") setTimeout(typeBriefing, 300);
     });
     on("#openSettings", "click", () => settingsDialog?.classList.add("open"));
