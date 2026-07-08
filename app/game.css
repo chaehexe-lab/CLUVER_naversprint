@@ -2057,6 +2057,7 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.45;
+      white-space: pre-line;
     }
 
     .inspect-close {
@@ -2572,6 +2573,11 @@
       font-size: 26px;
       line-height: 1.5;
       word-break: keep-all;
+      white-space: pre-line;
+    }
+
+    #toolResultText {
+      white-space: pre-line;
     }
 
     .tool-card {
@@ -3097,6 +3103,31 @@
       color: rgba(247,236,216,.8);
     }
 
+    .evidence-card-copy {
+      display: grid;
+      gap: 5px;
+      width: min(24em, 100%);
+      margin-inline: auto;
+    }
+
+    .evidence-card-copy strong {
+      color: rgba(247,236,216,.94);
+      font-size: 15px;
+      line-height: 1.25;
+    }
+
+    .evidence-card .evidence-location,
+    .evidence-card .evidence-question {
+      color: rgba(217,178,104,.9);
+      font-size: 12px;
+    }
+
+    .evidence-card .evidence-logic {
+      color: rgba(247,236,216,.68);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
     .inquiry-bar {
       left: 50%;
       right: auto;
@@ -3129,6 +3160,11 @@
       text-decoration: underline;
       text-underline-offset: 3px;
       text-shadow: 0 2px 8px rgba(0,0,0,.9);
+    }
+
+    .prompt-line[data-evidence-prompt]:not([data-evidence-prompt=""]) {
+      color: rgba(255, 229, 169, .96);
+      text-shadow: 0 2px 8px rgba(0,0,0,.94), 0 0 12px rgba(217,178,104,.28);
     }
 
     .presented-mini {
@@ -3628,6 +3664,19 @@
 
     .evidence-bag-pop .evidence-card span {
       color: rgba(47, 33, 24, .82);
+    }
+
+    .evidence-bag-pop .evidence-card-copy strong {
+      color: #321a13;
+    }
+
+    .evidence-bag-pop .evidence-card .evidence-location,
+    .evidence-bag-pop .evidence-card .evidence-question {
+      color: rgba(118, 64, 31, .92);
+    }
+
+    .evidence-bag-pop .evidence-card .evidence-logic {
+      color: rgba(47, 33, 24, .72);
     }
 
     .investigation-note-panel .global-panel-head {

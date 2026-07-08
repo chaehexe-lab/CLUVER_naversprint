@@ -790,6 +790,85 @@
       }
     };
 
+    const defaultPromptLines = [...document.querySelectorAll(".prompt-line")].map((button) => button.textContent.trim());
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function getEvidenceLocation(name) {
+      return evidenceData[name]?.location || "획득 장소 미상";
+    }
+
+    function formatEvidenceEntries(name) {
+      const entries = evidenceData[name]?.entries;
+      if (!Array.isArray(entries) || !entries.length) return "";
+
+      return entries.map((entry) => `${entry.date}: ${entry.text}`).join("\n");
+    }
+
+    function getEvidenceAnalysisText(name) {
+      const data = evidenceData[name] || {};
+      const lines = [data.toolResult || "추가 분석 결과가 없습니다."];
+      const entries = formatEvidenceEntries(name);
+      if (entries) {
+        lines.push("드러난 기록", entries);
+      }
+      if (data.logic) {
+        lines.push(`논리 근거: ${data.logic}`);
+      }
+      if (data.contradiction) {
+        lines.push(`대조할 모순: ${data.contradiction}`);
+      }
+      return lines.filter(Boolean).join("\n\n");
+    }
+
+    function getEvidenceDetailText(name, analyzed = false) {
+      const data = evidenceData[name] || {};
+      const lines = [
+        data.note || "현장에서 발견한 단서입니다.",
+        `획득 장소: ${getEvidenceLocation(name)}`
+      ];
+
+      if (data.logic) lines.push(`논리 근거: ${data.logic}`);
+      if (data.relatedSuspects?.length) lines.push(`관련 인물: ${data.relatedSuspects.join(", ")}`);
+      if (data.questions?.length) lines.push(`심문 질문: ${data.questions.slice(0, 2).join(" / ")}`);
+      if (analyzed && formatEvidenceEntries(name)) lines.push(`확인된 내용:\n${formatEvidenceEntries(name)}`);
+      if (data.tool) lines.push(`추천 도구: ${data.tool}`);
+
+      return lines.filter(Boolean).join("\n");
+    }
+
+    function evidenceCardHtml(name) {
+      const data = evidenceData[name] || {};
+      const questions = Array.isArray(data.questions) ? data.questions : [];
+      return `
+        <img class="evidence-thumb" src="${escapeHtml(data.img || "/samunmong/assets/evidence-wooden-tag.png")}" alt="">
+        <span class="evidence-card-copy">
+          <strong>${escapeHtml(name)}</strong>
+          <span class="evidence-location">획득: ${escapeHtml(getEvidenceLocation(name))}</span>
+          <span>${escapeHtml(data.note || "현장에서 발견된 단서")}</span>
+          ${data.logic ? `<span class="evidence-logic">근거: ${escapeHtml(data.logic)}</span>` : ""}
+          ${questions[0] ? `<span class="evidence-question">질문: ${escapeHtml(questions[0])}</span>` : ""}
+        </span>`;
+    }
+
+    function updatePromptLinesForEvidence(name = "") {
+      const data = evidenceData[name] || {};
+      const questions = Array.isArray(data.questions) ? data.questions : [];
+      const prompts = questions.length ? questions : defaultPromptLines;
+
+      document.querySelectorAll(".prompt-line").forEach((button, index) => {
+        button.textContent = prompts[index] || defaultPromptLines[index] || "이 단서에 대해 물어본다";
+        button.dataset.evidencePrompt = questions.length ? name : "";
+      });
+    }
+
     function addEvidenceToNote(name) {
       const list = document.querySelector("#collectedEvidenceNote");
       document.querySelector("#emptyEvidenceNote")?.remove();
@@ -797,7 +876,7 @@
       if (!exists) {
         const item = document.createElement("li");
         item.dataset.evidence = name;
-        item.textContent = `${name}: ${evidenceData[name]?.note || "현장에서 발견된 단서"}`;
+        item.textContent = `${name} / 획득: ${getEvidenceLocation(name)} - ${evidenceData[name]?.logic || evidenceData[name]?.note || "현장에서 발견된 단서"}`;
         list.appendChild(item);
       }
 
@@ -807,7 +886,7 @@
       if (!fieldExists) {
         const item = document.createElement("li");
         item.dataset.evidence = name;
-        item.textContent = `${name}: ${evidenceData[name]?.note || "현장에서 발견된 단서"}`;
+        item.textContent = `${name} / 획득: ${getEvidenceLocation(name)} - ${evidenceData[name]?.logic || evidenceData[name]?.note || "현장에서 발견된 단서"}`;
         fieldList.appendChild(item);
       }
     }
@@ -898,9 +977,9 @@
       image.alt = name ? `${name} 확대 이미지` : "";
       title.textContent = name || "증거를 선택하세요";
       note.textContent = analyzed
-        ? data.toolResult
+        ? getEvidenceAnalysisText(name)
         : name
-          ? `${data.note || "현장에서 발견된 단서입니다."} ${data.tool ? "증거를 관찰하고 어울리는 도구를 직접 골라 보세요." : "추가 도구 분석은 필요하지 않습니다."}`
+          ? `${getEvidenceDetailText(name)}\n${data.tool ? "증거를 관찰하고 어울리는 도구를 직접 골라 보세요." : "추가 도구 분석은 필요하지 않습니다."}`
         : "수집한 증거를 고르면 이곳에 크게 표시됩니다.";
       const preview = document.querySelector(".tool-preview");
       preview?.classList.remove("revealed", "wrong-tool");
@@ -925,7 +1004,7 @@
       button.className = "evidence evidence-card";
       button.type = "button";
       button.dataset.evidence = name;
-      button.innerHTML = `<img class="evidence-thumb" src="${evidenceData[name]?.img || "/samunmong/assets/evidence-wooden-tag.png"}" alt=""><span>${evidenceData[name]?.note || "현장에서 발견된 단서"}</span>`;
+      button.innerHTML = evidenceCardHtml(name);
       button.addEventListener("click", () => selectEvidence(button));
       list.appendChild(button);
     }
@@ -935,6 +1014,7 @@
       button.classList.add("active");
       selectedEvidence = button.dataset.evidence;
       document.querySelector("#presentedEvidence").textContent = selectedEvidence;
+      updatePromptLinesForEvidence(selectedEvidence);
       setEvidenceBag(false);
       playSfx("buttonAlt", 0.62);
       showToast(`증거 제시: ${selectedEvidence}`);
@@ -1058,14 +1138,15 @@
         return;
       }
 
-      addObservationToNote(`${currentEvidenceForTool} 추가 분석`, data.toolResult);
+      const resultText = getEvidenceAnalysisText(currentEvidenceForTool);
+      addObservationToNote(`${currentEvidenceForTool} 추가 분석`, resultText);
       saveAnalyzedEvidence(currentEvidenceForTool);
       document.querySelectorAll(`[data-evidence-name="${currentEvidenceForTool}"]`).forEach((item) => item.classList.add("analyzed"));
       document.querySelectorAll(`#toolEvidenceList [data-evidence="${currentEvidenceForTool}"]`).forEach((item) => item.classList.add("analyzed"));
       document.querySelector(".tool-preview")?.classList.add("revealed");
       const previewNote = document.querySelector("#toolPreviewNote");
-      if (previewNote) previewNote.textContent = data.toolResult;
-      showToolResultPopup(currentEvidenceForTool, toolName, data.toolResult);
+      if (previewNote) previewNote.textContent = resultText;
+      showToolResultPopup(currentEvidenceForTool, toolName, resultText);
       showToast(`${toolName}로 ${currentEvidenceForTool}을 분석했습니다.`);
     }
 
@@ -1176,7 +1257,7 @@
 
       document.querySelector("#genericEvidenceImage").src = data.img || "/samunmong/assets/evidence-wooden-tag.png";
       document.querySelector("#genericEvidenceTitle").textContent = name;
-      document.querySelector("#genericEvidenceText").textContent = `${data.note || "현장에서 발견한 단서입니다."} ${data.tool ? "수사 도구로 더 자세히 살펴볼 수 있습니다." : "도구 없이 확인 가능한 단서입니다."}`;
+      document.querySelector("#genericEvidenceText").textContent = `${getEvidenceDetailText(name, hasAnalyzedEvidence(name))}\n${data.tool ? "수사 도구로 더 자세히 살펴볼 수 있습니다." : "도구 없이 확인 가능한 단서입니다."}`;
       document.querySelector("#genericEvidenceInspect").classList.add("show");
       clearTimeout(showInspect.timer);
     }
