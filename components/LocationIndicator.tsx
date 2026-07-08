@@ -8,6 +8,7 @@ type LocationIndicatorProps = {
 };
 
 const LOCATION_KICKER = "\uD604\uC7AC \uC704\uCE58";
+const HIDDEN_LOCATION_SCREENS = new Set(["mainScreen"]);
 
 function isKnownLocation(screenId?: string | null): screenId is ScreenLocationId {
   return Boolean(screenId && screenId in screenLocationLabels);
@@ -19,7 +20,8 @@ function getActiveScreenId() {
 
 export default function LocationIndicator({ initialScreen }: LocationIndicatorProps) {
   const [activeScreen, setActiveScreen] = useState<string>(initialScreen ?? "mainScreen");
-  const currentLocation = isKnownLocation(activeScreen) ? screenLocationLabels[activeScreen] : null;
+  const currentLocation =
+    isKnownLocation(activeScreen) && !HIDDEN_LOCATION_SCREENS.has(activeScreen) ? screenLocationLabels[activeScreen] : null;
 
   useEffect(() => {
     const syncActiveScreen = () => {
