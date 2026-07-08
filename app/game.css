@@ -1749,7 +1749,7 @@
 
     .map-pin-button.current {
       outline: 2px solid rgba(226, 54, 45, .78);
-      outline-offset: 2px;
+      outline-offset: 0;
     }
 
     .map-label {
@@ -1782,17 +1782,17 @@
 
     .map-current-marker {
       position: absolute;
-      z-index: 3;
+      z-index: 4;
       left: var(--x);
       top: var(--y);
-      width: 34px;
-      height: 34px;
-      border: 1px solid rgba(255, 224, 165, .82);
+      width: var(--w);
+      height: var(--h);
+      border: 2px solid rgba(255, 224, 165, .82);
       border-radius: 50%;
       background:
-        radial-gradient(circle, rgba(190, 38, 32, .95) 0 30%, rgba(190, 38, 32, .34) 31% 48%, transparent 49%),
-        radial-gradient(circle, rgba(255, 224, 165, .28), transparent 64%);
-      box-shadow: 0 0 22px rgba(188, 40, 33, .55), inset 0 0 0 3px rgba(38, 6, 4, .38);
+        radial-gradient(circle at 50% 50%, rgba(226, 54, 45, .96) 0 18%, rgba(226, 54, 45, .48) 19% 31%, transparent 32%),
+        radial-gradient(ellipse at 50% 50%, rgba(255, 224, 165, .18), rgba(188, 40, 33, .18) 46%, transparent 67%);
+      box-shadow: 0 0 22px rgba(188, 40, 33, .5), inset 0 0 0 1px rgba(38, 6, 4, .38);
       transform: translate(-50%, -50%);
       pointer-events: none;
       animation: currentLocationPulse 1.8s ease-in-out infinite;
