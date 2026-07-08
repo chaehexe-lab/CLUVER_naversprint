@@ -81,14 +81,14 @@ export default function FieldOneScene() {
       </nav>
 
       <aside className="hud inspect-pop" id={fieldOneScene.inspect.id} aria-live="polite">
+        <button className="inspect-close" id="closeHopaeInspect" type="button" aria-label="호패 조각 팝업 닫기">
+          ×
+        </button>
         <img src={fieldOneScene.inspect.image} alt="" />
         <div>
           <strong>{fieldOneScene.inspect.title}</strong>
           <p>{fieldOneScene.inspect.text}</p>
         </div>
-        <button className="button primary" id={fieldOneScene.inspect.buttonId} type="button">
-          {fieldOneScene.inspect.buttonLabel}
-        </button>
       </aside>
     </section>
   );

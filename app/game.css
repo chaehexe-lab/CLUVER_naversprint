@@ -1743,6 +1743,7 @@
       bottom: 7%;
       z-index: 14;
       width: min(520px, 72%);
+      position: absolute;
       display: none;
       grid-template-columns: 64px 1fr auto;
       gap: 12px;
@@ -1773,6 +1774,28 @@
       color: var(--muted);
       font-size: 12px;
       line-height: 1.45;
+    }
+
+    .inspect-close {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      width: 28px;
+      height: 28px;
+      border: 1px solid rgba(255,233,190,.28);
+      border-radius: 999px;
+      color: #f6e5c7;
+      background: rgba(20,12,8,.74);
+      font-size: 20px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .inspect-close:hover,
+    .inspect-close:focus-visible {
+      border-color: rgba(248,213,154,.75);
+      background: rgba(94,54,30,.9);
+      outline: none;
     }
 
     .global-overlay {

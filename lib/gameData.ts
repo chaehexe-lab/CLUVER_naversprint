@@ -116,9 +116,7 @@ export const fieldOneScene = {
     id: "hopaeInspect",
     image: "/samunmong/assets/evidence-wooden-tag.png",
     title: "호패 조각 발견",
-    text: "신분을 밝히는 호패로 추정되는 나무 조각을 발견했다. 일부 글자가 긁혀 있어 주인을 바로 알 수 없다.",
-    buttonId: "collectHopae",
-    buttonLabel: "보따리에 넣기"
+    text: "신분을 밝히는 호패로 추정되는 나무 조각을 발견했다. 일부 글자가 긁혀 있어 주인을 바로 알 수 없다."
   }
 } as const;
 

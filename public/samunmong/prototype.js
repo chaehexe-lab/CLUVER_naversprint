@@ -1075,7 +1075,6 @@
       document.querySelectorAll(".inspect-pop").forEach((panel) => panel.classList.remove("show"));
       document.querySelector(id)?.classList.add("show");
       clearTimeout(showInspect.timer);
-      showInspect.timer = setTimeout(hideInspectPanels, 1500);
     }
 
     function hideInspectPanels() {
@@ -1085,24 +1084,19 @@
     function collectHopae() {
       if (hopaeCollected) {
         setAnalysisTarget("호패 조각");
-        openGlobalPanel("toolPanel");
         return;
       }
       hopaeCollected = true;
-      document.querySelector("#collectHopae").textContent = "수집 완료";
       document.querySelector("#hopaeHotspot")?.classList.add("collected");
       playSfx("evidence", 0.85);
       addEvidenceToBag("호패 조각");
       addEvidenceToNote("호패 조각");
-      hideInspectPanels();
-      showToast("호패 조각이 조용히 보따리 속으로 들어갔다. 이 조각은 누군가 일부러 남긴 말처럼 보인다.");
     }
-    document.querySelector("#collectHopae").addEventListener("click", collectHopae);
     document.querySelector("#hopaeHotspot").addEventListener("click", () => {
       collectHopae();
-      document.querySelector("#collectHopae").textContent = "보따리에서 분석하기";
       showInspect("#hopaeInspect");
     });
+    document.querySelector("#closeHopaeInspect")?.addEventListener("click", hideInspectPanels);
 
     function collectPortrait() {
       if (portraitCollected) {
@@ -1141,26 +1135,10 @@
       document.querySelector("#genericEvidenceImage").src = data.img || "/samunmong/assets/evidence-wooden-tag.png";
       document.querySelector("#genericEvidenceTitle").textContent = name;
       document.querySelector("#genericEvidenceText").textContent = `${data.note || "현장에서 발견한 단서입니다."} ${data.tool ? "수사 도구로 더 자세히 살펴볼 수 있습니다." : "도구 없이 확인 가능한 단서입니다."}`;
-      document.querySelector("#collectGenericEvidence").textContent = data.tool ? "자세히 살펴보기" : "확인";
       document.querySelector("#genericEvidenceInspect").classList.add("show");
       clearTimeout(showInspect.timer);
-      showInspect.timer = setTimeout(hideInspectPanels, 1500);
-      showToast(alreadyCollected ? `이미 수집한 증거: ${name}` : `${name} 확보. 이 단서는 누군가의 말끝을 다시 묻게 만든다.`);
     }
-
-    function collectGenericEvidence() {
-      if (!pendingEvidenceName) return;
-      const data = evidenceData[pendingEvidenceName] || {};
-      if (!data.tool) {
-        hideInspectPanels();
-        return;
-      }
-      hideInspectPanels();
-      setAnalysisTarget(pendingEvidenceName);
-      openGlobalPanel("toolPanel");
-    }
-
-    document.querySelector("#collectGenericEvidence").addEventListener("click", collectGenericEvidence);
+    document.querySelector("#closeGenericEvidenceInspect")?.addEventListener("click", hideInspectPanels);
     document.addEventListener("pointermove", (event) => {
       updateToolAreaHover(event);
       moveToolCursor(event);
