@@ -52,6 +52,15 @@
       type2: `${soundBase}/sfx/type-2.mp3`,
       type3: `${soundBase}/sfx/type-3.mp3`
     };
+    const locationMeta = {
+      fieldOne: { name: "유문석 집 앞", x: "29%", y: "32%" },
+      chunwolRoom: { name: "춘월의 방", x: "67%", y: "25%" },
+      mudeokServantRoom: { name: "무덕의 하인방", x: "63%", y: "44%" },
+      yoomunseokSarangbang: { name: "유문석 사랑방", x: "50%", y: "33%" },
+      dolsoeQuarters: { name: "돌쇠 처소", x: "24%", y: "68%" },
+      backGateCourtyard: { name: "뒷문 마당", x: "48%", y: "86%" },
+      interrogationScreen: { name: "취조실", x: "73%", y: "78%" }
+    };
     const typeSfxKeys = ["type1", "type2", "type3"];
     let audioUnlocked = false;
     let currentBgm = "";
