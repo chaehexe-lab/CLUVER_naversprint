@@ -19,6 +19,9 @@ export type SceneHotspot = {
   y: string;
   w: string;
   h: string;
+  clipPath?: string;
+  radius?: string;
+  rot?: string;
 };
 
 export type SceneDockAction = {

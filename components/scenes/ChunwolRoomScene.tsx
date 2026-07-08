@@ -1,12 +1,7 @@
 ﻿import { chunwolRoomScene } from "@/lib/gameData";
+import { hotspotStyle } from "./hotspotStyle";
 import type { CSSProperties } from "react";
 
-type HotspotStyle = CSSProperties & {
-  "--x": string;
-  "--y": string;
-  "--w": string;
-  "--h": string;
-};
 
 type PropStyle = CSSProperties & {
   "--x": string;
@@ -15,14 +10,6 @@ type PropStyle = CSSProperties & {
   "--rot"?: string;
 };
 
-function hotspotStyle(hotspot: (typeof chunwolRoomScene.hotspots)[number]): HotspotStyle {
-  return {
-    "--x": hotspot.x,
-    "--y": hotspot.y,
-    "--w": hotspot.w,
-    "--h": hotspot.h
-  };
-}
 
 function propStyle(prop: (typeof chunwolRoomScene.props)[number]): PropStyle {
   return {

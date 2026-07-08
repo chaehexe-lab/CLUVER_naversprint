@@ -3,12 +3,12 @@
     mainScreen: "/samunmong/assets/main-screen-v2.png",
     tutorialScreen: "/samunmong/assets/main-screen-v2.png",
     dreamScreen: "/samunmong/assets/main-screen-v2.png",
-    fieldOne: "/samunmong/assets/scene-field-one-clean.png",
-    chunwolRoom: "/samunmong/assets/scenes-evidence-baked/scene-chunwol-room-evidence-baked.png",
-    mudeokServantRoom: "/samunmong/assets/scenes-evidence-baked/scene-mudeok-servant-room-evidence-baked.png",
-    yoomunseokSarangbang: "/samunmong/assets/scenes-evidence-baked/scene-yoomunseok-sarangbang-evidence-baked.png",
-    dolsoeQuarters: "/samunmong/assets/scenes-evidence-baked/scene-dolsoe-quarters-evidence-baked.png",
-    backGateCourtyard: "/samunmong/assets/scenes-evidence-baked/scene-back-gate-courtyard-evidence-baked.png",
+    fieldOne: "/samunmong/assets/scenes-integrated/scene-field-one-evidence-integrated.png",
+    chunwolRoom: "/samunmong/assets/scenes-integrated/scene-chunwol-room-evidence-integrated.png",
+    mudeokServantRoom: "/samunmong/assets/scenes-integrated/scene-mudeok-servant-room-evidence-integrated.png",
+    yoomunseokSarangbang: "/samunmong/assets/scenes-integrated/scene-yoomunseok-sarangbang-evidence-integrated.png",
+    dolsoeQuarters: "/samunmong/assets/scenes-integrated/scene-dolsoe-quarters-evidence-integrated.png",
+    backGateCourtyard: "/samunmong/assets/scenes-integrated/scene-back-gate-courtyard-evidence-integrated.png",
     interrogationScreen: "/samunmong/assets/scene-interrogation-dolsoe.png?v=scene-20260707"
   },
 

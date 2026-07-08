@@ -95,15 +95,12 @@ const investigationDock = [
 
 export const fieldOneScene = {
   id: "fieldOne",
-  image: "/samunmong/assets/scene-field-one-clean.png",
+  image: "/samunmong/assets/scenes-integrated/scene-field-one-evidence-integrated.png",
   alt: "유문석 집 문 앞에 쓰러진 점순과 조사할 증거가 놓인 사건 현장",
-  props: [
-    { image: "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.png", alt: "", x: "54.2%", y: "92.4%", w: "72px", rot: "4deg" },
-    { image: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png", alt: "", x: "70.9%", y: "91.2%", w: "82px", rot: "12deg" }
-  ] satisfies SceneProp[],
+  props: [] as SceneProp[],
   hotspots: [
-    { evidenceName: "찢어진 문서 조각", ariaLabel: "찢어진 문서 조각 조사", x: "70.9%", y: "91.2%", w: "104px", h: "76px" },
-    { id: "hopaeHotspot", className: "hopae-glow", ariaLabel: "호패 조각 조사", x: "54.2%", y: "92.4%", w: "112px", h: "74px" }
+    { evidenceName: "찢어진 문서 조각", ariaLabel: "찢어진 문서 조각 조사", x: "70.6%", y: "88.6%", w: "10.2%", h: "8.8%", clipPath: "polygon(7% 35%, 44% 8%, 94% 24%, 98% 76%, 32% 96%, 2% 70%)", radius: "12px", rot: "7deg" },
+    { id: "hopaeHotspot", className: "hopae-glow", ariaLabel: "호패 조각 조사", x: "56.6%", y: "87.0%", w: "7.2%", h: "8.8%", clipPath: "polygon(26% 6%, 75% 8%, 96% 58%, 70% 96%, 24% 90%, 3% 43%)", radius: "14px", rot: "-10deg" }
   ] satisfies SceneHotspot[],
   dock: [
     { id: "openMapFromField", ...investigationDock[0], className: "map-chip" },
@@ -122,12 +119,12 @@ export const fieldOneScene = {
 
 export const chunwolRoomScene = {
   id: "chunwolRoom",
-  image: "/samunmong/assets/scenes-evidence-baked/scene-chunwol-room-evidence-baked.png",
+  image: "/samunmong/assets/scenes-integrated/scene-chunwol-room-evidence-integrated.png",
   alt: "춘월의 방과 초상화 그림 증거",
-  props: [{ image: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.png", alt: "", x: "44%", y: "78%", w: "52px", rot: "12deg" }] satisfies SceneProp[],
+  props: [] as SceneProp[],
   hotspots: [
-    { evidenceName: "사라진 노리개", ariaLabel: "사라진 노리개 조사", x: "44%", y: "78%", w: "70px", h: "56px" },
-    { id: "portraitHotspot", className: "portrait-glow", ariaLabel: "돌쇠의 그림 조사", x: "63.4%", y: "55.9%", w: "112px", h: "150px" }
+    { evidenceName: "사라진 노리개", ariaLabel: "사라진 노리개 조사", x: "56.0%", y: "76.0%", w: "7.6%", h: "6.8%", clipPath: "ellipse(46% 38% at 50% 54%)", radius: "999px", rot: "-8deg" },
+    { id: "portraitHotspot", className: "portrait-glow", ariaLabel: "돌쇠의 그림 조사", x: "63.0%", y: "59.8%", w: "8.0%", h: "20.5%", clipPath: "polygon(18% 4%, 92% 16%, 81% 98%, 8% 84%)", radius: "8px", rot: "4deg" }
   ] satisfies SceneHotspot[],
   dock: [
     { id: "openMapFromRoom", ...investigationDock[0], className: "map-chip" },
@@ -148,21 +145,15 @@ export const chunwolRoomScene = {
 
 export const mudeokServantRoomScene = {
   id: "mudeokServantRoom",
-  image: "/samunmong/assets/scenes-evidence-baked/scene-mudeok-servant-room-evidence-baked.png",
+  image: "/samunmong/assets/scenes-integrated/scene-mudeok-servant-room-evidence-integrated.png",
   alt: "무덕의 하인방",
-  props: [
-    { image: "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.png", alt: "", x: "47%", y: "76%", w: "56px", rot: "-8deg" },
-    { image: "/samunmong/assets/mudeok-interaction/evidence-mudeok-muddy-straw-shoes.png", alt: "", x: "76%", y: "81%", w: "58px", rot: "11deg" },
-    { image: "/samunmong/assets/mudeok-interaction/evidence-torn-collar-tie.png", alt: "", x: "27%", y: "70%", w: "48px", rot: "-18deg" },
-    { image: "/samunmong/assets/mudeok-interaction/evidence-fingernail-thread-sample.png", alt: "", x: "39%", y: "63%", w: "34px", rot: "8deg" },
-    { image: "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png", alt: "", x: "54%", y: "79%", w: "58px", rot: "5deg" }
-  ] satisfies SceneProp[],
+  props: [] as SceneProp[],
   hotspots: [
-    { evidenceName: "무덕의 번진 일기", ariaLabel: "무덕의 번진 일기 조사", x: "47%", y: "76%", w: "72px", h: "54px" },
-    { evidenceName: "진흙 묻은 짚신", ariaLabel: "진흙 묻은 짚신 조사", x: "76%", y: "81%", w: "76px", h: "56px" },
-    { evidenceName: "찢어진 옷고름", ariaLabel: "찢어진 옷고름 조사", x: "27%", y: "70%", w: "62px", h: "74px" },
-    { evidenceName: "손톱 밑 실타래", ariaLabel: "손톱 밑 실타래 조사", x: "39%", y: "63%", w: "52px", h: "52px" },
-    { evidenceName: "점순 목 검안 종이", ariaLabel: "점순 목 검안 종이 조사", x: "54%", y: "79%", w: "72px", h: "62px" }
+    { evidenceName: "무덕의 번진 일기", ariaLabel: "무덕의 번진 일기 조사", x: "44.6%", y: "79.2%", w: "9.2%", h: "7.6%", clipPath: "polygon(10% 22%, 82% 5%, 96% 73%, 20% 96%)", radius: "8px", rot: "-6deg" },
+    { evidenceName: "진흙 묻은 짚신", ariaLabel: "진흙 묻은 짚신 조사", x: "71.7%", y: "65.4%", w: "7.0%", h: "8.2%", clipPath: "ellipse(45% 40% at 50% 52%)", radius: "999px", rot: "-12deg" },
+    { evidenceName: "찢어진 옷고름", ariaLabel: "찢어진 옷고름 조사", x: "28.0%", y: "81.8%", w: "8.0%", h: "6.4%", clipPath: "polygon(8% 45%, 92% 8%, 98% 42%, 18% 96%)", radius: "999px", rot: "-13deg" },
+    { evidenceName: "손톱 밑 실타래", ariaLabel: "손톱 밑 실타래 조사", x: "30.5%", y: "86.4%", w: "9.0%", h: "5.2%", clipPath: "polygon(2% 56%, 40% 18%, 98% 34%, 72% 82%, 18% 96%)", radius: "999px", rot: "-9deg" },
+    { evidenceName: "점순 목 검안 종이", ariaLabel: "점순 목 검안 종이 조사", x: "51.2%", y: "84.0%", w: "6.8%", h: "5.6%", clipPath: "polygon(8% 20%, 86% 8%, 96% 82%, 18% 96%)", radius: "8px", rot: "5deg" }
   ] satisfies SceneHotspot[],
   dock: [
     { id: "openMapFromMudeokRoom", ...investigationDock[0], className: "map-chip" },
@@ -175,59 +166,43 @@ export const mudeokServantRoomScene = {
 
 export const yoomunseokSarangbangScene = {
   id: "yoomunseokSarangbang",
-  image: "/samunmong/assets/scenes-evidence-baked/scene-yoomunseok-sarangbang-evidence-baked.png",
+  image: "/samunmong/assets/scenes-integrated/scene-yoomunseok-sarangbang-evidence-integrated.png",
   alt: "유문석의 사랑방",
-  props: [
-    { image: "/samunmong/assets/evidence-transparent/evidence-empty-hopae-holder.png", alt: "", x: "42%", y: "64%", w: "54px", rot: "-5deg" },
-    { image: "/samunmong/assets/evidence-transparent/evidence-wooden-box-transparent.png", alt: "", x: "28%", y: "67%", w: "58px", rot: "6deg" },
-    { image: "/samunmong/assets/evidence-transparent/evidence-servant-ledger.png", alt: "", x: "61%", y: "58%", w: "60px", rot: "4deg" },
-    { image: "/samunmong/assets/evidence-transparent/evidence-paper-knife.png", alt: "", x: "70%", y: "74%", w: "52px", rot: "18deg" },
-    { image: "/samunmong/assets/evidence-transparent/evidence-ink-powder.png", alt: "", x: "52%", y: "73%", w: "54px", rot: "-11deg" },
-    { image: "/samunmong/assets/evidence-transparent/evidence-marriage-letter.png", alt: "", x: "34%", y: "75%", w: "58px", rot: "-7deg" }
-  ] satisfies SceneProp[],
+  props: [] as SceneProp[],
   hotspots: [
-    { evidenceName: "빈 호패 주머니", ariaLabel: "빈 호패 주머니 조사", x: "42%", y: "64%", w: "72px", h: "54px" },
-    { evidenceName: "나무 상자", ariaLabel: "나무 상자 조사", x: "28%", y: "67%", w: "74px", h: "60px" },
-    { evidenceName: "하인 장부", ariaLabel: "하인 장부 조사", x: "61%", y: "58%", w: "78px", h: "64px" },
-    { evidenceName: "종이칼", ariaLabel: "종이칼 조사", x: "70%", y: "74%", w: "66px", h: "72px" },
-    { evidenceName: "먹가루", ariaLabel: "먹가루 조사", x: "52%", y: "73%", w: "68px", h: "62px" },
-    { evidenceName: "혼서 조각", ariaLabel: "혼서 조각 조사", x: "34%", y: "75%", w: "74px", h: "58px" }
+    { evidenceName: "빈 호패 주머니", ariaLabel: "빈 호패 주머니 조사", x: "21.0%", y: "79.0%", w: "9.0%", h: "13.0%", clipPath: "ellipse(42% 48% at 50% 52%)", radius: "999px", rot: "-9deg" },
+    { evidenceName: "나무 상자", ariaLabel: "나무 상자 조사", x: "29.5%", y: "71.0%", w: "13.0%", h: "13.0%", clipPath: "polygon(7% 14%, 90% 5%, 97% 78%, 24% 96%, 2% 42%)", radius: "10px", rot: "-3deg" },
+    { evidenceName: "하인 장부", ariaLabel: "하인 장부 조사", x: "10.5%", y: "78.2%", w: "15.6%", h: "16.8%", clipPath: "polygon(4% 14%, 88% 4%, 98% 80%, 12% 96%)", radius: "10px", rot: "1deg" },
+    { evidenceName: "종이칼", ariaLabel: "종이칼 조사", x: "57.6%", y: "70.6%", w: "14.4%", h: "4.8%", clipPath: "polygon(8% 42%, 92% 12%, 98% 48%, 14% 86%)", radius: "999px", rot: "-7deg" },
+    { evidenceName: "먹가루", ariaLabel: "먹가루 조사", x: "74.4%", y: "77.0%", w: "8.6%", h: "6.8%", clipPath: "ellipse(46% 34% at 54% 54%)", radius: "999px", rot: "4deg" },
+    { evidenceName: "혼서 조각", ariaLabel: "혼서 조각 조사", x: "64.4%", y: "75.8%", w: "12.8%", h: "7.4%", clipPath: "polygon(5% 24%, 90% 8%, 98% 70%, 28% 96%)", radius: "8px", rot: "5deg" }
   ] satisfies SceneHotspot[],
   dock: investigationDock
 } as const;
 
 export const dolsoeQuartersScene = {
   id: "dolsoeQuarters",
-  image: "/samunmong/assets/scenes-evidence-baked/scene-dolsoe-quarters-evidence-baked.png",
+  image: "/samunmong/assets/scenes-integrated/scene-dolsoe-quarters-evidence-integrated.png",
   alt: "돌쇠의 처소",
-  props: [
-    { image: "/samunmong/assets/evidence-transparent/evidence-axe-knife.png", alt: "", x: "43%", y: "71%", w: "62px", rot: "-10deg" },
-    { image: "/samunmong/assets/evidence-transparent/evidence-bloodied-bandage.png", alt: "", x: "58%", y: "76%", w: "54px", rot: "8deg" },
-    { image: "/samunmong/assets/evidence-transparent/evidence-escape-bundle.png", alt: "", x: "69%", y: "67%", w: "64px", rot: "5deg" }
-  ] satisfies SceneProp[],
+  props: [] as SceneProp[],
   hotspots: [
-    { evidenceName: "낡은 칼", ariaLabel: "낡은 칼 조사", x: "43%", y: "71%", w: "84px", h: "70px" },
-    { evidenceName: "피 묻은 붕대", ariaLabel: "피 묻은 붕대 조사", x: "58%", y: "76%", w: "76px", h: "58px" },
-    { evidenceName: "도망 보따리", ariaLabel: "도망 보따리 조사", x: "69%", y: "67%", w: "82px", h: "70px" }
+    { evidenceName: "낡은 칼", ariaLabel: "낡은 칼 조사", x: "80.0%", y: "91.0%", w: "5.0%", h: "13.5%", clipPath: "polygon(38% 4%, 66% 5%, 76% 68%, 55% 98%, 34% 98%, 24% 70%)", radius: "999px", rot: "16deg" },
+    { evidenceName: "피 묻은 붕대", ariaLabel: "피 묻은 붕대 조사", x: "15.8%", y: "77.0%", w: "13.0%", h: "12.0%", clipPath: "polygon(8% 24%, 92% 8%, 98% 74%, 20% 96%)", radius: "12px", rot: "-8deg" },
+    { evidenceName: "도망 보따리", ariaLabel: "도망 보따리 조사", x: "45.4%", y: "52.8%", w: "9.2%", h: "15.0%", clipPath: "ellipse(43% 48% at 50% 52%)", radius: "999px", rot: "-3deg" }
   ] satisfies SceneHotspot[],
   dock: investigationDock
 } as const;
 
 export const backGateCourtyardScene = {
   id: "backGateCourtyard",
-  image: "/samunmong/assets/scenes-evidence-baked/scene-back-gate-courtyard-evidence-baked.png",
+  image: "/samunmong/assets/scenes-integrated/scene-back-gate-courtyard-evidence-integrated.png",
   alt: "대문 뒤쪽 뒷문 마당",
-  props: [
-    { image: "/samunmong/assets/evidence-transparent/evidence-small-footprints.png", alt: "", className: "backgate-focus-prop footprints-prop", x: "47%", y: "76%", w: "70px", rot: "10deg" },
-    { image: "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.png", alt: "", className: "backgate-focus-prop cord-prop", x: "58%", y: "69%", w: "58px", rot: "-18deg" },
-    { image: "/samunmong/assets/evidence-transparent/evidence-matching-paper-scraps.png", alt: "", x: "70%", y: "77%", w: "58px", rot: "12deg" },
-    { image: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png", alt: "", x: "35%", y: "68%", w: "52px", rot: "-6deg" }
-  ] satisfies SceneProp[],
+  props: [] as SceneProp[],
   hotspots: [
-    { evidenceName: "작은 발자국", ariaLabel: "작은 발자국 조사", x: "47%", y: "76%", w: "90px", h: "64px" },
-    { evidenceName: "끊어진 호패끈", ariaLabel: "끊어진 호패끈 조사", x: "58%", y: "69%", w: "68px", h: "54px" },
-    { evidenceName: "맞물리는 종이 조각", ariaLabel: "맞물리는 종이 조각 조사", x: "70%", y: "77%", w: "78px", h: "58px" },
-    { evidenceName: "찢어진 문서 조각", ariaLabel: "찢어진 문서 조각 조사", x: "35%", y: "68%", w: "70px", h: "58px" }
+    { evidenceName: "작은 발자국", ariaLabel: "작은 발자국 조사", x: "59.0%", y: "72.8%", w: "11.2%", h: "10.6%", clipPath: "polygon(8% 34%, 24% 12%, 52% 18%, 68% 4%, 96% 34%, 82% 88%, 22% 96%)", radius: "999px", rot: "8deg" },
+    { evidenceName: "끊어진 호패끈", ariaLabel: "끊어진 호패끈 조사", x: "36.4%", y: "87.6%", w: "14.4%", h: "6.8%", clipPath: "polygon(2% 60%, 36% 18%, 98% 34%, 78% 80%, 18% 96%)", radius: "999px", rot: "-14deg" },
+    { evidenceName: "맞물리는 종이 조각", ariaLabel: "맞물리는 종이 조각 조사", x: "62.3%", y: "89.4%", w: "8.2%", h: "7.4%", clipPath: "polygon(8% 28%, 84% 5%, 98% 78%, 26% 96%)", radius: "8px", rot: "4deg" },
+    { evidenceName: "찢어진 문서 조각", ariaLabel: "찢어진 문서 조각 조사", x: "59.8%", y: "91.4%", w: "7.6%", h: "6.2%", clipPath: "polygon(6% 30%, 72% 6%, 98% 62%, 34% 96%)", radius: "8px", rot: "-5deg" }
   ] satisfies SceneHotspot[],
   dock: investigationDock
 } as const;
