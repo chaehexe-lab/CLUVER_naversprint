@@ -1356,14 +1356,14 @@
       width: var(--w);
       height: var(--h);
       border: 0;
-      border-radius: var(--radius, 999px);
+      border-radius: clamp(16px, 2vw, 28px);
       background: transparent;
-      clip-path: var(--clip, none);
+      clip-path: none;
       transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
     }
 
     .hotspot.object-outline {
-      border-radius: var(--radius, 999px);
+      border-radius: clamp(16px, 2vw, 28px);
     }
 
     .hotspot::before,
@@ -1372,7 +1372,7 @@
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      clip-path: var(--clip, none);
+      clip-path: none;
       pointer-events: none;
     }
 
@@ -1400,14 +1400,28 @@
       transition: opacity .16s ease, filter .16s ease, background .16s ease;
     }
 
+    .evidence-hotspot:not(.collected):hover::before,
+    .evidence-hotspot:not(.collected):focus-visible::before {
+      background:
+        radial-gradient(ellipse at 50% 52%, rgba(255, 219, 142, .22), rgba(226, 167, 96, .12) 44%, rgba(140, 49, 35, .05) 68%, transparent 90%);
+      filter:
+        blur(1.5px)
+        drop-shadow(0 0 12px rgba(224, 166, 90, .42))
+        drop-shadow(0 0 24px rgba(164, 64, 43, .16));
+      opacity: .66;
+      animation: hoverEvidenceGlow 1.35s ease-in-out infinite alternate;
+    }
+
     .evidence-hotspot:not(.collected):hover::after,
     .evidence-hotspot:not(.collected):focus-visible::after {
       background:
-        radial-gradient(ellipse at 50% 54%, rgba(255, 224, 165, .28), rgba(217, 178, 104, .14) 48%, transparent 82%);
+        radial-gradient(ellipse at 50% 54%, rgba(255, 235, 178, .34), rgba(217, 178, 104, .18) 50%, transparent 84%);
       filter:
-        drop-shadow(0 0 8px rgba(255, 224, 165, .62))
-        drop-shadow(0 0 18px rgba(217, 178, 104, .38));
-      opacity: 1;
+        blur(2px)
+        drop-shadow(0 0 10px rgba(255, 224, 165, .68))
+        drop-shadow(0 0 20px rgba(217, 178, 104, .42));
+      opacity: .88;
+      animation: hoverEvidenceGlow 1.35s ease-in-out infinite alternate;
     }
 
     .screen.hint-active .evidence-hotspot:not(.collected)::before {
@@ -1437,6 +1451,11 @@
     @keyframes hintEvidenceGlow {
       0%, 100% { opacity: 0; transform: scale(.92); }
       24%, 70% { opacity: .72; transform: scale(1.035); }
+    }
+
+    @keyframes hoverEvidenceGlow {
+      from { transform: scale(.98); opacity: .48; }
+      to { transform: scale(1.04); opacity: .9; }
     }
 
     .scene-hint {
