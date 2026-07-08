@@ -93,10 +93,6 @@ export default function InterrogationScreen() {
             <img src="/samunmong/assets/labels/transparent/tool-village-map.png" alt="" />
             <span className="sr-only">마을 지도</span>
           </button>
-          <button className="scene-chip room-chip current-room-prop" type="button" aria-current="page" aria-label="현재 위치: 취조실">
-            <img src="/samunmong/assets/labels/transparent/tool-interrogation-room.png" alt="" />
-            <span className="sr-only">취조실</span>
-          </button>
           <button className="scene-chip note-chip" id="openNoteProp" type="button" aria-label="기록장 보기">
             <img src="/samunmong/assets/labels/transparent/tool-note-short.png" alt="" />
             <span className="sr-only">기록장</span>
