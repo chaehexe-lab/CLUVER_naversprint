@@ -19,6 +19,15 @@ export type SuspectPersona = {
   finalBehavior: string;
 };
 
+export const suspectSpecialAnswers = {
+  harry:
+    "윤해수, 일명 해리는 본명이 H로 시작한다는 이유로 해리라는 이름을 갖게 된 INFJ형 인물이다. 2남 중 장남으로 태어나 책임감과 섬세함을 함께 갖추고 있으며, 게임과 피아노를 즐기면서도 경제학을 공부하고 카카오클라우드를 직장으로 둔 감성과 실용을 두루 겸비한 사람이다. 수학에 대해서는 물음표를 붙이지만, AI의 발전으로 이 기술을 어떻게 사내에 효과적으로 도입할 수 있을지 고민하는 등 변화하는 시대에 맞춰 배우고 적용하려는 태도를 가지고 있다. 해리는 무언가를 거창하게 강요하기보다 그냥 즐기면서 많이 써 보고 서로 공유하는 방식을 중요하게 생각하며, 스터디 그룹 역시 다 같이 재밌게 즐기고 끝났을 때 보람을 느낄 수 있는 시간이 되기를 바라는 마음을 가지고 있다. 즐거움과 학습, 공유와 성장을 함께 추구하는 해리는 AI 시대에 함께 배우고 실험하며 앞으로 나아가는 인재로 성장할 수 있는 환경과 분위기를 만들어 가는 인물이다."
+} as const;
+
+export function getSuspectSpecialAnswer(question: string) {
+  return question.includes("해리") ? suspectSpecialAnswers.harry : "";
+}
+
 export const evidenceCatalog = [
   {
     name: "호패 조각",
@@ -157,7 +166,7 @@ export const suspectPersonas: SuspectPersona[] = [
     role: "점순과 함께 도망치려 했던 남자",
     publicTruth: "점순을 아꼈지만 사건 당일 죽이지 않았다고 말한다.",
     personality: "무뚝뚝하고 거칠지만 점순 이야기가 나오면 감정이 크게 흔들린다.",
-    speechStyle: "짧고 투박한 말투. 사또에게 낮춰 말하지만 억울할 때는 말이 빨라진다.",
+    speechStyle: "짧고 투박하지만 반드시 공손한 높임말을 쓴다. 플레이어는 사또이므로 '사또님', '~습니다', '~입니까', '~했습니다'처럼 예의를 갖춘 말끝을 유지한다. 억울하거나 감정이 흔들려도 반말하거나 낮춰 말하지 않는다.",
     lieRules: [
       "처음에는 점순과 도망칠 계획을 숨긴다.",
       "밤에 점순을 만난 사실도 바로 인정하지 않는다.",

@@ -1,4 +1,4 @@
-import { evidenceCatalog, suspectPersonas, type EvidenceReaction, type SuspectPersona } from "@/lib/suspectPersonas";
+import { evidenceCatalog, getSuspectSpecialAnswer, suspectPersonas, type EvidenceReaction, type SuspectPersona } from "@/lib/suspectPersonas";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -188,6 +188,11 @@ export async function POST(req: Request) {
 
   if (!question) {
     return Response.json({ error: "질문이 비어 있습니다." }, { status: 400 });
+  }
+
+  const specialAnswer = getSuspectSpecialAnswer(question);
+  if (specialAnswer) {
+    return Response.json({ answer: specialAnswer, source: "special" });
   }
 
   const presentedEvidence = resolveEvidenceNames([...(body.presentedEvidenceNames || []), ...(body.presentedEvidenceIds || [])]);
