@@ -8,6 +8,13 @@ type HotspotStyle = CSSProperties & {
   "--h": string;
 };
 
+type PropStyle = CSSProperties & {
+  "--x": string;
+  "--y": string;
+  "--w": string;
+  "--rot"?: string;
+};
+
 function hotspotStyle(hotspot: (typeof fieldOneScene.hotspots)[number]): HotspotStyle {
   return {
     "--x": hotspot.x,
@@ -17,11 +24,30 @@ function hotspotStyle(hotspot: (typeof fieldOneScene.hotspots)[number]): Hotspot
   };
 }
 
+function propStyle(prop: (typeof fieldOneScene.props)[number]): PropStyle {
+  return {
+    "--x": prop.x,
+    "--y": prop.y,
+    "--w": prop.w,
+    "--rot": prop.rot
+  };
+}
+
 export default function FieldOneScene() {
   return (
     <section className="screen" id={fieldOneScene.id}>
       <img className="plate" src={fieldOneScene.image} alt={fieldOneScene.alt} />
       <div className="shade" />
+
+      {fieldOneScene.props.map((prop) => (
+        <img
+          key={`${prop.image}-${prop.x}-${prop.y}`}
+          className="scene-prop evidence-prop field-evidence-prop"
+          src={prop.image}
+          alt={prop.alt}
+          style={propStyle(prop)}
+        />
+      ))}
 
       {fieldOneScene.hotspots.map((hotspot) => (
         <button

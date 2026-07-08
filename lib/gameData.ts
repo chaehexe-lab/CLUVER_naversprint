@@ -28,7 +28,7 @@ export const dreamOptions: DreamOption[] = [
     title: "우주정거장 살인사건",
     description: "중력이 사라진 복도 안, 시체만이 제자리를 떠나지 못했습니다.",
     meta: "폐쇄 공간 · 산소 기록 · 사라진 카메라",
-    image: "../../assets/theme-space-station.png",
+    image: "/samunmong/assets/theme-space-station.png",
     disabled: true,
     ariaLabel: "우주정거장 살인사건은 아직 잠겨 있습니다"
   },
@@ -38,7 +38,7 @@ export const dreamOptions: DreamOption[] = [
     title: "마법학교 방화사건",
     description: "불길은 꺼졌지만 주문을 건 이름은 아직 재 속에 남아 있습니다.",
     meta: "금서 · 마력 흔적 · 사라진 목격자",
-    image: "../../assets/theme-magic-school.png",
+    image: "/samunmong/assets/theme-magic-school.png",
     disabled: true,
     ariaLabel: "마법학교 방화사건은 아직 잠겨 있습니다"
   },
@@ -49,7 +49,7 @@ export const dreamOptions: DreamOption[] = [
     title: "조선시대 살인사건",
     description: "문 앞에 쓰러진 사람, 곁에 남은 호패 조각 하나가 모두의 관계를 뒤집습니다.",
     meta: "호패 조각 · 젖은 발자국 · 거짓 증언",
-    image: "../../assets/theme-joseon-murder.png",
+    image: "/samunmong/assets/theme-joseon-murder.png",
     disabled: false
   }
 ] as const;
@@ -62,9 +62,9 @@ export const briefing = {
 const investigationDock = [
   {
     className: "map-chip open-map-panel",
-    ariaLabel: "마을 지도 열기",
+    ariaLabel: "마을지도 열기",
     image: "/samunmong/assets/labels/transparent/tool-village-map.png",
-    label: "마을 지도"
+    label: "마을지도"
   },
   {
     className: "bag-chip open-bag-panel",
@@ -95,12 +95,15 @@ const investigationDock = [
 
 export const fieldOneScene = {
   id: "fieldOne",
-  image: "/samunmong/assets/scenes-evidence-baked/scene-gatehouse-jeomsun-door-footprints-v4-evidence-baked.png",
-  alt: "유문석 집 문 앞에 쓰러진 점순과 호패 조각, 젖은 발자국이 있는 사건 현장",
+  image: "/samunmong/assets/scene-field-one-clean.png",
+  alt: "유문석 집 문 앞에 쓰러진 점순과 조사할 증거가 놓인 사건 현장",
+  props: [
+    { image: "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.png", alt: "", x: "54.2%", y: "92.4%", w: "72px", rot: "4deg" },
+    { image: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png", alt: "", x: "70.9%", y: "91.2%", w: "82px", rot: "12deg" }
+  ] satisfies SceneProp[],
   hotspots: [
-    { evidenceName: "작은 발자국", ariaLabel: "작은 발자국 조사", x: "38.5%", y: "84%", w: "118px", h: "168px" },
-    { evidenceName: "찢어진 문서 조각", ariaLabel: "찢어진 문서 조각 조사", x: "72%", y: "84%", w: "104px", h: "76px" },
-    { id: "hopaeHotspot", className: "hopae-glow", ariaLabel: "호패 조각 조사", x: "58%", y: "87%", w: "112px", h: "74px" }
+    { evidenceName: "찢어진 문서 조각", ariaLabel: "찢어진 문서 조각 조사", x: "70.9%", y: "91.2%", w: "104px", h: "76px" },
+    { id: "hopaeHotspot", className: "hopae-glow", ariaLabel: "호패 조각 조사", x: "54.2%", y: "92.4%", w: "112px", h: "74px" }
   ] satisfies SceneHotspot[],
   dock: [
     { id: "openMapFromField", ...investigationDock[0], className: "map-chip" },

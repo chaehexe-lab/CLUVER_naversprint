@@ -14,6 +14,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      <head>
+        <link rel="preload" href="/samunmong/assets/fonts/ChosunNm.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="/samunmong/assets/fonts/VITRO-PRIDE.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="/samunmong/assets/fonts/Nanum-BareunJeongsin.ttf" as="font" type="font/ttf" crossOrigin="anonymous" />
+        <link rel="preload" href="/samunmong/assets/fonts/Chilgok_ljh.otf" as="font" type="font/otf" crossOrigin="anonymous" />
+      </head>
       <body>{children}</body>
     </html>
   );
