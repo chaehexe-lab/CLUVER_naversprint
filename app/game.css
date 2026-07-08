@@ -3259,12 +3259,40 @@
       border: 0;
       border-radius: 4px;
       background:
-        linear-gradient(180deg, rgba(56, 30, 18, .04), rgba(42, 20, 13, .2)),
-        url("/samunmong/assets/ui/joseon-paper-panel-bg.png") center / 100% 100% no-repeat;
+        linear-gradient(180deg, rgba(56, 30, 18, .035), rgba(42, 20, 13, .16)),
+        url("/samunmong/assets/ui/joseon-paper-panel-clean-bg.png") center / 100% 100% no-repeat;
       box-shadow:
         0 30px 118px rgba(0, 0, 0, .8),
         inset 0 0 32px rgba(48, 21, 11, .24);
       color: #2f2118;
+    }
+
+    .global-panel.bag-panel,
+    .global-panel.tool-panel {
+      padding: clamp(32px, 3.4vw, 50px) clamp(38px, 4.4vw, 68px) clamp(40px, 4.4vw, 68px);
+    }
+
+    .global-panel.tool-panel {
+      padding-right: clamp(44px, 5.2vw, 82px);
+      padding-bottom: clamp(46px, 5.2vw, 78px);
+    }
+
+    .evidence-bag-pop {
+      padding: clamp(32px, 3.4vw, 48px) clamp(40px, 4.8vw, 76px) clamp(42px, 4.8vw, 74px);
+    }
+
+    .global-panel.bag-panel .global-panel-head,
+    .global-panel.bag-panel > p,
+    .global-panel.bag-panel .bag-panel-grid,
+    .global-panel.tool-panel .global-panel-head,
+    .global-panel.tool-panel > p,
+    .global-panel.tool-panel .tool-workbench,
+    .global-panel.tool-panel .tool-grid,
+    .evidence-bag-pop .bag-pop-head,
+    .evidence-bag-pop .evidence-grid {
+      position: relative;
+      z-index: 1;
+      max-width: calc(100% - clamp(12px, 2.2vw, 34px));
     }
 
     .global-panel.bag-panel p,
@@ -3277,6 +3305,28 @@
     .note-drawer li,
     .evidence-bag-pop p,
     .evidence-bag-pop li {
+      color: rgba(47, 33, 24, .82);
+    }
+
+    .evidence-bag-pop .bag-pop-head,
+    .evidence-bag-pop .bag-pop-head strong {
+      color: #321a13;
+      text-shadow: 0 1px 0 rgba(255,241,199,.42);
+    }
+
+    .evidence-bag-pop .mini-close {
+      border-color: rgba(79, 42, 25, .34);
+      color: #321a13;
+      background: rgba(255, 238, 191, .2);
+    }
+
+    .evidence-bag-pop .evidence-card {
+      border-color: rgba(79, 42, 25, .2);
+      background: rgba(255, 238, 191, .18);
+      box-shadow: inset 0 0 0 1px rgba(255, 246, 213, .18);
+    }
+
+    .evidence-bag-pop .evidence-card span {
       color: rgba(47, 33, 24, .82);
     }
 
