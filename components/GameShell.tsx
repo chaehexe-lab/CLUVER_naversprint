@@ -17,6 +17,7 @@ import { STARTABLE_SCREENS } from "@/lib/gameState";
 
 const CONTENT_SCRIPT = "/samunmong/content.js";
 const PROTOTYPE_SCRIPT = "/samunmong/prototype.js";
+
 type GameShellProps = {
   initialScreen?: string;
 };
@@ -75,7 +76,7 @@ export default function GameShell({ initialScreen }: GameShellProps) {
       <DolsoeQuartersScene />
       <BackGateCourtyardScene />
       <InterrogationScreen />
-      <LocationIndicator />
+      <LocationIndicator initialScreen={initialScreen} />
     </main>
   );
 }
