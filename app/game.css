@@ -86,7 +86,7 @@
 
     .screen.active { display: block; }
 
-    .game-shell[data-start-screen] #mainScreen.active { display: none; }
+    .game-shell[data-start-screen] .screen.active { display: none; }
     .game-shell[data-start-screen="tutorialScreen"] #tutorialScreen,
     .game-shell[data-start-screen="dreamScreen"] #dreamScreen,
     .game-shell[data-start-screen="briefingScreen"] #briefingScreen,
