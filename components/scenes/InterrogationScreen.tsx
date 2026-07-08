@@ -88,21 +88,21 @@ export default function InterrogationScreen() {
           </button>
         </div>
 
-        <nav className="interrogation-tools" aria-label="취조실 도구">
-          <button className="tool-prop map-prop" id="openMapFromInterrogation" type="button" aria-label="마을 지도 열기">
+        <nav className="hud scene-dock interrogation-tools" aria-label="취조실 도구">
+          <button className="scene-chip map-chip" id="openMapFromInterrogation" type="button" aria-label="마을 지도 열기">
             <img src="/samunmong/assets/labels/transparent/tool-village-map.png" alt="" />
             <span className="sr-only">마을 지도</span>
           </button>
-          <button className="tool-prop room-prop current-room-prop" type="button" aria-current="page" aria-label="현재 위치: 취조실">
+          <button className="scene-chip room-chip current-room-prop" type="button" aria-current="page" aria-label="현재 위치: 취조실">
             <img src="/samunmong/assets/labels/transparent/tool-interrogation-room.png" alt="" />
             <span className="sr-only">취조실</span>
           </button>
-          <button className="tool-prop note-prop" id="openNoteProp" type="button" aria-label="기록장 보기">
+          <button className="scene-chip note-chip" id="openNoteProp" type="button" aria-label="기록장 보기">
             <img src="/samunmong/assets/labels/transparent/tool-note-short.png" alt="" />
             <span className="sr-only">기록장</span>
           </button>
           <button
-            className="tool-prop bag-prop"
+            className="scene-chip bag-chip"
             id="toggleEvidenceBag"
             type="button"
             aria-expanded="false"
@@ -111,7 +111,7 @@ export default function InterrogationScreen() {
             <img src="/samunmong/assets/labels/transparent/tool-bag-short.png" alt="" />
             <span className="sr-only">보따리</span>
           </button>
-          <button className="tool-prop tool-kit-prop open-tool-panel" type="button" aria-label="수사 도구 열기">
+          <button className="scene-chip tool-chip open-tool-panel" type="button" aria-label="수사 도구 열기">
             <img src="/samunmong/assets/labels/transparent/tool-investigation-tools.png" alt="" />
             <span className="sr-only">도구</span>
           </button>
