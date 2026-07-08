@@ -86,6 +86,171 @@
 
     .screen.active { display: block; }
 
+    .team-intro {
+      position: absolute;
+      inset: 0;
+      z-index: 80;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      color: #f8f2ff;
+      background:
+        radial-gradient(circle at 50% 46%, rgba(255, 255, 255, .06), transparent 28%),
+        linear-gradient(180deg, rgba(0, 0, 0, .02), rgba(0, 0, 0, .18)),
+        url("/samunmong/assets/intro/cluver-dream-bg.png") center / cover no-repeat,
+        #100b17;
+      font-family: "PFStardust", "VitroPride", system-ui, sans-serif;
+      animation: intro-vacate .82s linear 4.78s forwards;
+    }
+
+    .intro-stage {
+      position: relative;
+      width: min(820px, 86%);
+      aspect-ratio: 2.25 / 1;
+      display: grid;
+      place-items: center;
+      filter: drop-shadow(0 0 24px rgba(115, 58, 255, .28));
+    }
+
+    .intro-search {
+      position: absolute;
+      z-index: 4;
+      left: 50%;
+      top: 45%;
+      width: min(680px, 90%);
+      height: clamp(58px, 9vw, 82px);
+      display: grid;
+      grid-template-columns: 58px minmax(0, 1fr) 78px;
+      align-items: center;
+      border: 3px solid #03c75a;
+      border-radius: 4px;
+      background:
+        linear-gradient(90deg, rgba(255, 255, 255, .96), rgba(236, 255, 247, .95)),
+        repeating-linear-gradient(90deg, transparent 0 18px, rgba(0, 0, 0, .05) 18px 19px);
+      box-shadow:
+        4px 0 0 rgba(255, 0, 128, .38),
+        -4px 0 0 rgba(0, 245, 255, .28),
+        0 0 36px rgba(3, 199, 90, .28);
+      color: #080b0d;
+      transform: translate(-50%, -50%) scale(.92);
+      animation: intro-search-fade 4.4s linear .25s forwards;
+    }
+
+    .search-lens {
+      position: relative;
+      width: 22px;
+      height: 22px;
+      margin-left: 22px;
+      border: 3px solid rgba(4, 15, 12, .72);
+      border-radius: 50%;
+      transform: rotate(-18deg);
+    }
+
+    .search-lens::after {
+      content: "";
+      position: absolute;
+      width: 13px;
+      height: 3px;
+      background: rgba(4, 15, 12, .72);
+      transform: translate(16px, 18px) rotate(44deg);
+      transform-origin: left center;
+    }
+
+    .search-type {
+      position: relative;
+      overflow: hidden;
+      width: 0;
+      white-space: nowrap;
+      color: #0a1712;
+      font-family: "PFStardust", monospace;
+      font-size: clamp(22px, 3.9vw, 38px);
+      letter-spacing: 0;
+      animation: intro-type-query 1.15s steps(14, end) 1.18s forwards;
+    }
+
+    .search-type::after {
+      content: "";
+      display: inline-block;
+      width: 3px;
+      height: .84em;
+      margin-left: 5px;
+      vertical-align: -.12em;
+      background: #03c75a;
+      animation: intro-caret .32s steps(2, end) infinite;
+    }
+
+    .search-submit {
+      align-self: stretch;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      background: #03c75a;
+      font-family: "VitroPride", system-ui, sans-serif;
+      font-size: clamp(26px, 4.7vw, 44px);
+      line-height: 1;
+      text-shadow: 2px 0 rgba(255, 0, 128, .38), -2px 0 rgba(0, 245, 255, .34);
+      animation: intro-submit-dim 2.2s linear 2.15s forwards;
+    }
+
+    .search-submit::before {
+      content: "";
+      width: 18px;
+      height: 18px;
+      border: 2px solid rgba(255, 255, 255, .86);
+      border-radius: 50%;
+      box-shadow: 9px 9px 0 -7px rgba(255, 255, 255, .86);
+      transform: rotate(-18deg);
+      opacity: .9;
+    }
+
+    .intro-cursor {
+      position: absolute;
+      z-index: 6;
+      left: 18%;
+      top: 74%;
+      width: clamp(34px, 5.2vw, 54px);
+      height: auto;
+      image-rendering: pixelated;
+      filter: drop-shadow(2px 0 0 rgba(255, 0, 128, .48)) drop-shadow(-2px 0 0 rgba(0, 245, 255, .34));
+      transform: translate(-50%, -50%);
+      animation: intro-cursor-type 2.7s linear forwards;
+    }
+
+    @keyframes intro-type-query {
+      to { width: 14.4ch; }
+    }
+
+    @keyframes intro-caret {
+      50% { opacity: 0; }
+    }
+
+    @keyframes intro-cursor-type {
+      0% { left: 18%; top: 76%; opacity: 0; transform: translate(-50%, -50%) scale(1); }
+      18% { opacity: 1; }
+      36% { left: 28%; top: 44%; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      72% { left: 56%; top: 44%; opacity: 1; transform: translate(-50%, -50%) scale(1); }
+      86% { left: 74%; top: 44%; opacity: .72; transform: translate(-50%, -50%) scale(1); }
+      100% { left: 82%; top: 32%; opacity: 0; transform: translate(-50%, -50%) scale(1); }
+    }
+
+    @keyframes intro-search-fade {
+      0% { opacity: 0; transform: translate(-50%, -50%) scale(.9); filter: blur(1px); }
+      12% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0); }
+      78% { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: blur(0); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1); filter: blur(12px) saturate(.28) brightness(.54); }
+    }
+
+    @keyframes intro-submit-dim {
+      0% { background: #03c75a; }
+      36% { background: #03c75a; }
+      72% { background: #1f3d2b; }
+      100% { background: #0a070d; }
+    }
+
+    @keyframes intro-vacate {
+      to { opacity: 0; visibility: hidden; }
+    }
+
     .plate {
       position: absolute;
       inset: 0;
