@@ -136,9 +136,9 @@ export default function InterrogationScreen() {
           </div>
           <div className="question-box">
             <span className="presented-mini">
-              증거: <strong id="presentedEvidence">아직 없음</strong>
+              제시할 증거: <strong id="presentedEvidence">없음</strong>
             </span>
-            <input id="questionInput" type="text" placeholder="자유롭게 심문 내용을 입력하세요" />
+            <input id="questionInput" type="text" placeholder="용의자에게 질문을 입력하세요. 필요하면 증거를 함께 제시할 수 있습니다." />
             <button className="ask" id="askButton" type="button">
               질문
             </button>
