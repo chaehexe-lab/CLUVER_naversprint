@@ -1,4 +1,4 @@
-﻿(() => {
+
 
     const screens = [...document.querySelectorAll(".screen")];
     const fade = document.querySelector("#fade");
@@ -21,37 +21,7 @@
     const saveKey = "samunmong-demo-state";
     const collectedEvidenceKey = "samunmong-collected-evidence";
     const settingsKey = "samunmong-demo-settings";
-    const soundBase = "/samunmong/sound";
-    const bgmTracks = {
-      main: new Audio(`${soundBase}/bgm/main.mp3`),
-      joseon: new Audio(`${soundBase}/bgm/joseon.mp3`)
-    };
-    const sfxPaths = {
-      ask: `${soundBase}/sfx/ask.mp3`,
-      bag: `${soundBase}/sfx/bag.mp3`,
-      briefingNext: `${soundBase}/sfx/briefing-next.mp3`,
-      button: `${soundBase}/sfx/button.mp3`,
-      buttonAlt: `${soundBase}/sfx/button-alt.mp3`,
-      dream: `${soundBase}/sfx/dream.mp3`,
-      evidence: `${soundBase}/sfx/evidence.mp3`,
-      map: `${soundBase}/sfx/map.mp3`,
-      move: `${soundBase}/sfx/move.mp3`,
-      type1: `${soundBase}/sfx/type-1.mp3`,
-      type2: `${soundBase}/sfx/type-2.mp3`,
-      type3: `${soundBase}/sfx/type-3.mp3`
-    };
-    const typeSfxKeys = ["type1", "type2", "type3"];
-    let audioUnlocked = false;
-    let currentBgm = "";
-    let typeSfxIndex = 0;
-    let lastTypeSfxAt = 0;
-    let lastButtonSfxAt = 0;
-    let autoplayRetryTimer = null;
 
-    Object.values(bgmTracks).forEach((track) => {
-      track.loop = true;
-      track.preload = "auto";
-    });
 
     function readStored(key, fallback) {
       try { return JSON.parse(localStorage.getItem(key)) ?? fallback; }
@@ -183,6 +153,44 @@
       showToast.timer = setTimeout(() => toast.classList.remove("show"), 1900);
     }
 
+    function updateCurrentLocation(screenId) {
+      const location = locationMeta[screenId];
+      const indicator = document.querySelector("#currentLocationIndicator");
+      const indicatorName = document.querySelector("#currentLocationName");
+      const mapName = document.querySelector("#mapCurrentLocation");
+      const marker = document.querySelector("#mapCurrentMarker");
+
+      if (indicator) {
+        indicator.hidden = !location;
+      }
+
+      if (!location) return;
+
+      if (indicatorName) indicatorName.textContent = location.name;
+      if (mapName) mapName.textContent = location.name;
+      if (marker) {
+        marker.style.setProperty("--x", location.x);
+        marker.style.setProperty("--y", location.y);
+      }
+
+      document.querySelectorAll(".map-label").forEach((label) => {
+        label.classList.toggle("current", label.dataset.locationScreen === screenId);
+      });
+      document.querySelectorAll(".map-pin-button").forEach((pin) => {
+        const isCurrent = pin.dataset.mapGo === screenId;
+        pin.classList.toggle("current", isCurrent);
+        pin.setAttribute("aria-current", isCurrent ? "location" : "false");
+      });
+    }
+
+    function getActiveScreenId() {
+      return document.querySelector(".screen.active")?.id || "mainScreen";
+    }
+
+    window.addEventListener("samunmong:screen-change", (event) => {
+      updateCurrentLocation(event.detail?.screenId || getActiveScreenId());
+    });
+
     function go(id, message = "이동 중...") {
       stopBriefingTyping();
       playSfx("move", 0.82);
@@ -190,6 +198,7 @@
       fade.classList.add("show");
       setTimeout(() => {
         screens.forEach((screen) => screen.classList.toggle("active", screen.id === id));
+        updateCurrentLocation(id);
         saveProgress(id);
         fade.classList.remove("show");
         updateBgmForScreen(id);
@@ -212,6 +221,7 @@
           }
         });
         fade.classList.remove("show");
+        updateCurrentLocation(id);
         saveProgress(id);
         updateBgmForScreen(id);
       }, 520);
@@ -251,7 +261,8 @@
       }
 
       screens.forEach((screen) => screen.classList.toggle("active", screen.id === startScreen));
-      updateBgmForScreen(startScreen);
+
+      
       if (startScreen === "briefingScreen") {
         typeBriefing();
       } else {
@@ -841,6 +852,7 @@
     function openGlobalPanel(id) {
       hideInspectPanels();
       setEvidenceBag(false);
+
       globalPanels.forEach((panel) => {
         const isOpen = panel.id === id;
         panel.classList.toggle("show", isOpen);
@@ -1054,4 +1066,3 @@
   
 
 })();
-

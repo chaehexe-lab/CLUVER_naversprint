@@ -28,6 +28,7 @@ function ensureRequestedStartScreen(initialScreen?: string) {
   document.querySelectorAll(".screen").forEach((screen) => {
     screen.classList.toggle("active", screen.id === startScreen);
   });
+  window.dispatchEvent(new CustomEvent("samunmong:screen-change", { detail: { screenId: startScreen } }));
 }
 
 export default function GameShell({ initialScreen }: GameShellProps) {
@@ -74,7 +75,6 @@ export default function GameShell({ initialScreen }: GameShellProps) {
       <DolsoeQuartersScene />
       <BackGateCourtyardScene />
       <InterrogationScreen />
-      <LocationIndicator initialScreen={initialScreen} />
-    </main>
+
   );
 }

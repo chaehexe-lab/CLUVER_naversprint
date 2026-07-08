@@ -19,13 +19,13 @@ const promptLines = [
 ] as const;
 
 const mapLabels = [
-  { text: "유문석 집 앞", x: "29%", y: "24%", rot: "-4deg" },
-  { text: "춘월의 방", x: "67%", y: "17%", rot: "4deg" },
-  { text: "무덕의 하인방", x: "63%", y: "36%", rot: "-4deg" },
-  { text: "유문석 사랑방", x: "50%", y: "25%", rot: "4deg" },
-  { text: "돌쇠 처소", x: "24%", y: "60%", rot: "-6deg" },
-  { text: "뒷문 마당", x: "48%", y: "78%", rot: "3deg" },
-  { text: "취조실", x: "73%", y: "70%", rot: "-3deg" }
+  { screen: "fieldOne", text: "유문석 집 앞", x: "29%", y: "24%", rot: "-4deg" },
+  { screen: "chunwolRoom", text: "춘월의 방", x: "67%", y: "17%", rot: "4deg" },
+  { screen: "mudeokServantRoom", text: "무덕의 하인방", x: "63%", y: "36%", rot: "-4deg" },
+  { screen: "yoomunseokSarangbang", text: "유문석 사랑방", x: "50%", y: "25%", rot: "4deg" },
+  { screen: "dolsoeQuarters", text: "돌쇠 처소", x: "24%", y: "60%", rot: "-6deg" },
+  { screen: "backGateCourtyard", text: "뒷문 마당", x: "48%", y: "78%", rot: "3deg" },
+  { screen: "interrogationScreen", text: "취조실", x: "73%", y: "70%", rot: "-3deg" }
 ] as const;
 
 const mapPins = [
@@ -283,13 +283,23 @@ export default function InterrogationScreen() {
         <button className="button primary global-close map-floating-close" type="button">
           닫기
         </button>
+        <div className="map-location-banner" aria-live="polite">
+          <span>현재 위치</span>
+          <strong id="mapCurrentLocation">유문석 집 앞</strong>
+        </div>
         <div className="map-board">
           <img src="/samunmong/assets/joseon-village-map-seven-locations-v2.png" alt="조사 장소가 붉은 인장으로 표시된 조선시대 수사 지도" />
           {mapLabels.map((label) => (
-            <span className="map-label" style={mapPositionStyle(label)} key={label.text}>
+            <span className="map-label" data-location-screen={label.screen} style={mapPositionStyle(label)} key={label.text}>
               {label.text}
             </span>
           ))}
+          <span
+            className="map-current-marker"
+            id="mapCurrentMarker"
+            style={mapPinStyle({ x: "29%", y: "32%" })}
+            aria-hidden="true"
+          />
           {mapPins.map((pin) => (
             <button
               className="map-pin-button"
