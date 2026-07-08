@@ -29,6 +29,7 @@
     const sleeveCheckedSuspects = new Set();
     const saveKey = "samunmong-demo-state";
     const collectedEvidenceKey = "samunmong-collected-evidence";
+    const analyzedEvidenceKey = "samunmong-analyzed-evidence";
     const settingsKey = "samunmong-demo-settings";
     const locationMeta = {
       tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
@@ -84,6 +85,16 @@
       const collected = new Set(readStored(collectedEvidenceKey, []));
       collected.add(name);
       localStorage.setItem(collectedEvidenceKey, JSON.stringify([...collected]));
+    }
+
+    function saveAnalyzedEvidence(name) {
+      const analyzed = new Set(readStored(analyzedEvidenceKey, []));
+      analyzed.add(name);
+      localStorage.setItem(analyzedEvidenceKey, JSON.stringify([...analyzed]));
+    }
+
+    function hasAnalyzedEvidence(name) {
+      return readStored(analyzedEvidenceKey, []).includes(name);
     }
 
     function getAudioLevel() {
@@ -198,6 +209,10 @@
       toast.classList.add("show");
       clearTimeout(showToast.timer);
       showToast.timer = setTimeout(() => toast.classList.remove("show"), 1900);
+    }
+
+    function on(selector, eventName, handler) {
+      document.querySelector(selector)?.addEventListener(eventName, handler);
     }
 
     function showDreamNotice(title = "꿈은 아직 끝나지 않았습니다", copy = "첫 번째 꿈은 멀어졌지만, 남은 두 꿈은 아직 당신을 부르고 있습니다.") {
@@ -373,19 +388,20 @@
       if (event.target.closest("button, a")) playButtonSfx(0.52);
     });
 
-    document.querySelector("#newDream").addEventListener("click", () => {
+    on("#newDream", "click", () => {
       localStorage.removeItem(saveKey);
       localStorage.removeItem(collectedEvidenceKey);
+      localStorage.removeItem(analyzedEvidenceKey);
       go("tutorialScreen");
     });
-    document.querySelector("#continueDream").addEventListener("click", () => {
+    on("#continueDream", "click", () => {
       const saved = readStored(saveKey, null);
       const valid = screens.some((screen) => screen.id === saved?.screenId) && saved.screenId !== "mainScreen";
       go(valid ? saved.screenId : "tutorialScreen", valid ? "지난 꿈으로 돌아가는 중..." : "새로운 꿈을 시작합니다...");
       if (saved?.screenId === "briefingScreen") setTimeout(typeBriefing, 300);
     });
-    document.querySelector("#openSettings").addEventListener("click", () => settingsDialog.classList.add("open"));
-    document.querySelector("#closeSettings").addEventListener("click", () => {
+    on("#openSettings", "click", () => settingsDialog?.classList.add("open"));
+    on("#closeSettings", "click", () => {
       const settings = {
         volume: Number(document.querySelector("#volumeSetting").value),
         reduceMotion: document.querySelector("#motionSetting").checked,
@@ -393,21 +409,21 @@
       };
       localStorage.setItem(settingsKey, JSON.stringify(settings));
       applySettings(settings);
-      settingsDialog.classList.remove("open");
+      settingsDialog?.classList.remove("open");
       showToast("설정을 저장했습니다.");
     });
-    document.querySelector("#exitGame").addEventListener("click", () => exitDialog.classList.add("open"));
-    document.querySelector("#cancelExit").addEventListener("click", () => exitDialog.classList.remove("open"));
-    document.querySelector("#confirmExit").addEventListener("click", () => {
-      exitDialog.classList.remove("open");
-      document.querySelector("#mainScreen").classList.add("exited");
+    on("#exitGame", "click", () => exitDialog?.classList.add("open"));
+    on("#cancelExit", "click", () => exitDialog?.classList.remove("open"));
+    on("#confirmExit", "click", () => {
+      exitDialog?.classList.remove("open");
+      document.querySelector("#mainScreen")?.classList.add("exited");
       document.querySelectorAll(".main-menu-button").forEach((button) => { button.hidden = true; });
       showToast("게임을 종료했습니다. 창을 닫아도 진행 위치가 보존됩니다.");
       window.close();
     });
-    document.querySelector("#skipTutorial")?.addEventListener("click", () => go("dreamScreen"));
-    document.querySelector("#nextTutorial").addEventListener("click", () => go("dreamScreen"));
-    document.querySelector("#closeDreamNotice")?.addEventListener("click", closeDreamNotice);
+    on("#skipTutorial", "click", () => go("dreamScreen"));
+    on("#nextTutorial", "click", () => go("dreamScreen"));
+    on("#closeDreamNotice", "click", closeDreamNotice);
     document.querySelectorAll("[data-dream-disabled='true']").forEach((button) => {
       button.addEventListener("click", () => {
         showDreamNotice(
@@ -416,22 +432,24 @@
         );
       });
     });
-    document.querySelector("#chooseJoseon").addEventListener("click", () => {
+    on("#chooseJoseon", "click", () => {
       playSfx("dream", 0.9);
       go("briefingScreen");
       setTimeout(typeBriefing, 300);
     });
-    document.querySelector("#startCase").addEventListener("click", () => goRush("fieldOne", "사건 현장으로 진입 중..."));
+    on("#startCase", "click", () => goRush("fieldOne", "사건 현장으로 진입 중..."));
     document.querySelectorAll("[data-go]").forEach((button) => {
       button.addEventListener("click", () => go(button.dataset.go));
     });
-    document.querySelector("#accuseButton").addEventListener("click", openResultPage);
+    on("#accuseButton", "click", openResultPage);
 
     let hopaeCollected = false;
     let portraitCollected = false;
     let pendingEvidenceName = "";
     let pendingEvidenceHotspot = null;
     let currentEvidenceForTool = "";
+    let selectedToolForAnalysis = "";
+    let swipeStartPoint = null;
 
     const tools = {
       "돋보기": {
@@ -446,7 +464,7 @@
         img: "/samunmong/assets/mudeok-interaction/tool-document-knife.png",
         note: "겹친 종이나 묶인 끈을 조심스럽게 벌립니다."
       },
-      "촛불 등불": {
+      "촛불 비추기": {
         img: "/samunmong/assets/mudeok-interaction/tool-candle-lantern.png",
         note: "어두운 곳, 비침, 눌린 자국을 빛으로 확인합니다."
       },
@@ -466,7 +484,7 @@
       "돌쇠의 그림": {
         note: "최춘월의 방에서 발견된 숨겨둔 초상. 춘월과 돌쇠의 관계를 추적할 단서다.",
         img: "/samunmong/assets/evidence-portrait.png",
-        tool: "촛불 등불",
+        tool: "촛불 비추기",
         toolResult: "빛을 비추자 그림 뒤쪽에 접착된 얇은 종이 흔적이 보인다."
       },
       "사라진 노리개": {
@@ -508,7 +526,7 @@
       "점순 목 검사 종이": {
         note: "점순의 목 주변을 살핀 기록지. 직접적인 결론 대신 흔적의 위치만 남겨져 있다.",
         img: "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png",
-        tool: "촛불 등불",
+        tool: "촛불 비추기",
         toolResult: "빛을 비추자 종이 위에 눌린 선이 희미하게 떠오른다."
       },
       "빈 호패 주머니": {
@@ -538,7 +556,7 @@
       "혼서 조각": {
         note: "혼례와 관련 있어 보이는 문서 조각. 인물 관계를 다시 보게 만드는 단서다.",
         img: "/samunmong/assets/evidence-transparent/evidence-marriage-letter.png",
-        tool: "촛불 등불",
+        tool: "촛불 비추기",
         toolResult: "빛에 비추자 접힌 자국 아래 희미한 붉은 인장이 보인다."
       },
       "도끼와 칼": {
@@ -568,8 +586,8 @@
       "작은 발자국": {
         note: "뒷문 마당에 남은 작은 발자국. 젖은 돌길의 이동 경로와 맞춰볼 수 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-small-footprints.png",
-        tool: "촛불 등불",
-        toolResult: "낮게 비춘 빛에 발자국 가장자리의 물기가 선명해진다."
+        tool: "촛불 비추기",
+        toolResult: "촛불을 낮게 비추자 발자국의 폭과 앞코 모양이 드러났다. 남성의 짚신이 아니라 여성의 고급 신발 자국으로 보인다."
       },
       "끊어진 호패끈": {
         note: "호패와 연결되었을 법한 끊어진 끈. 호패 조각과 함께 봐야 한다.",
@@ -586,7 +604,7 @@
       "찢어진 편지 조각": {
         note: "찢겨 나간 편지의 일부. 누군가 숨기려 했던 말이 남아 있을 수 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png",
-        tool: "촛불 등불",
+        tool: "촛불 비추기",
         toolResult: "빛을 비추자 종이 뒷면에 흐릿한 먹 자국이 보인다."
       }
     };
@@ -610,6 +628,18 @@
         item.dataset.evidence = name;
         item.textContent = `${name}: ${evidenceData[name]?.note || "현장에서 발견된 단서"}`;
         fieldList.appendChild(item);
+      }
+    }
+
+    function markEvidenceCollectedInScene(name) {
+      document.querySelectorAll(`[data-evidence-name="${name}"]`).forEach((item) => item.classList.add("collected"));
+      const propSelectors = {
+        "작은 발자국": ".footprints-prop",
+        "끊어진 호패끈": ".cord-prop"
+      };
+      const propSelector = propSelectors[name];
+      if (propSelector) {
+        document.querySelectorAll(propSelector).forEach((item) => item.classList.add("collected"));
       }
     }
 
@@ -676,12 +706,25 @@
 
       const data = evidenceData[name] || {};
       const button = document.createElement("button");
-      button.className = "tool-evidence-option";
+      button.className = `tool-evidence-option${hasAnalyzedEvidence(name) ? " analyzed" : ""}`;
       button.type = "button";
       button.dataset.evidence = name;
       button.innerHTML = `<img src="${data.img || "/samunmong/assets/evidence-wooden-tag.png"}" alt=""><span><strong>${name}</strong>${data.tool ? `${data.tool} 필요` : "추가 분석 없음"}</span>`;
       button.addEventListener("click", () => setAnalysisTarget(name));
       list.appendChild(button);
+    }
+
+    function syncEvidenceShadowBounds() {
+      const target = document.querySelector(".tool-preview-image");
+      const image = document.querySelector("#toolPreviewImage");
+      if (!target || !image) return;
+      const targetRect = target.getBoundingClientRect();
+      const imageRect = image.getBoundingClientRect();
+      if (imageRect.width < 2 || imageRect.height < 2) return;
+      target.style.setProperty("--evidence-left", `${imageRect.left - targetRect.left}px`);
+      target.style.setProperty("--evidence-top", `${imageRect.top - targetRect.top}px`);
+      target.style.setProperty("--evidence-width", `${imageRect.width}px`);
+      target.style.setProperty("--evidence-height", `${imageRect.height}px`);
     }
 
     function updateToolPreview(name) {
@@ -690,13 +733,24 @@
       const title = document.querySelector("#toolPreviewTitle");
       const note = document.querySelector("#toolPreviewNote");
       if (!image || !title || !note) return;
+      const analyzed = Boolean(name && hasAnalyzedEvidence(name));
 
       image.src = data.img || "/samunmong/assets/evidence-wooden-tag.png";
       image.alt = name ? `${name} 확대 이미지` : "";
       title.textContent = name || "증거를 선택하세요";
-      note.textContent = name
-        ? `${data.note || "현장에서 발견된 단서입니다."} ${data.tool ? `알맞은 도구: ${data.tool}` : "추가 도구 분석은 필요하지 않습니다."}`
-        : "왼쪽 목록에서 분석할 증거를 고르면 이곳에 크게 표시됩니다.";
+      note.textContent = analyzed
+        ? data.toolResult
+        : name
+          ? `${data.note || "현장에서 발견된 단서입니다."} ${data.tool ? "알맞은 도구를 고른 뒤 증거 위를 문질러 보세요." : "추가 도구 분석은 필요하지 않습니다."}`
+        : "수집한 증거를 고르면 이곳에 크게 표시됩니다.";
+      const preview = document.querySelector(".tool-preview");
+      preview?.classList.remove("revealed", "wrong-tool");
+      preview?.classList.toggle("revealed", analyzed);
+      document.querySelectorAll(`#toolEvidenceList [data-evidence="${name}"]`).forEach((item) => {
+        item.classList.toggle("analyzed", analyzed);
+      });
+      requestAnimationFrame(syncEvidenceShadowBounds);
+      setTimeout(syncEvidenceShadowBounds, 80);
     }
 
     function addEvidenceCardToInterrogation(name) {
@@ -737,16 +791,98 @@
         button.dataset.tool = name;
         button.innerHTML = `<img src="${tool.img}" alt=""><span><strong>${name}</strong>${tool.note}</span>`;
         button.addEventListener("click", () => {
+          selectedToolForAnalysis = name;
+          updateToolCursor();
           document.querySelectorAll(".tool-card").forEach((item) => item.classList.toggle("active", item.dataset.tool === name));
-          analyzeEvidenceWithTool(name);
+          showToast(`${name} 선택. 증거 위를 문질러 보세요.`);
         });
         grid.appendChild(button);
       });
     }
 
+    function ensureToolCursor() {
+      let cursor = document.querySelector("#selectedToolCursor");
+      if (cursor) return cursor;
+
+      cursor = document.createElement("img");
+      cursor.id = "selectedToolCursor";
+      cursor.className = "tool-cursor";
+      cursor.alt = "";
+      cursor.setAttribute("aria-hidden", "true");
+      document.body.appendChild(cursor);
+      return cursor;
+    }
+
+    function updateToolCursor() {
+      const tool = tools[selectedToolForAnalysis];
+      const cursor = ensureToolCursor();
+      const toolPanelOpen = document.querySelector("#toolPanel")?.classList.contains("show");
+      const inToolArea = document.querySelector(".tool-preview-image")?.classList.contains("cursor-inside");
+      if (!tool || !toolPanelOpen || !inToolArea) {
+        document.body.classList.remove("tool-cursor-active");
+        cursor.classList.remove("show");
+        return;
+      }
+
+      cursor.src = tool.img;
+      cursor.classList.add("show");
+      document.body.classList.add("tool-cursor-active");
+    }
+
+    function moveToolCursor(event) {
+      const cursor = document.querySelector("#selectedToolCursor");
+      if (!cursor || !cursor.classList.contains("show")) return;
+      cursor.style.left = `${event.clientX + 14}px`;
+      cursor.style.top = `${event.clientY + 16}px`;
+    }
+
+    function updateWipePosition(event) {
+      const target = document.querySelector(".tool-preview-image");
+      const image = document.querySelector("#toolPreviewImage");
+      if (!target || !image) return;
+      const imageRect = image.getBoundingClientRect();
+      syncEvidenceShadowBounds();
+      const x = Math.max(0, Math.min(100, ((event.clientX - imageRect.left) / imageRect.width) * 100));
+      const y = Math.max(0, Math.min(100, ((event.clientY - imageRect.top) / imageRect.height) * 100));
+      target.style.setProperty("--wipe-x", `${x}%`);
+      target.style.setProperty("--wipe-y", `${y}%`);
+    }
+
+    function updateToolAreaHover(event) {
+      const area = document.querySelector(".tool-preview-image");
+      if (!area) return;
+      const element = document.elementFromPoint(event.clientX, event.clientY);
+      const isInside = Boolean(element && area.contains(element));
+      area.classList.toggle("cursor-inside", isInside);
+      updateToolCursor();
+      if (isInside) updateWipePosition(event);
+    }
+
+    function showToolResultPopup(evidenceName, toolName, resultText) {
+      const panel = document.querySelector("#toolResultPopup");
+      if (!panel) return;
+
+      document.querySelector("#toolResultKicker").textContent = `${toolName} 분석`;
+      document.querySelector("#toolResultTitle").textContent = evidenceName;
+      document.querySelector("#toolResultText").textContent = resultText;
+      panel.classList.add("show");
+      panel.setAttribute("aria-hidden", "false");
+      globalOverlay.classList.add("show");
+    }
+
+    function closeToolResultPopup() {
+      const panel = document.querySelector("#toolResultPopup");
+      panel?.classList.remove("show");
+      panel?.setAttribute("aria-hidden", "true");
+      const hasOpenGlobalPanel = globalPanels.some((panel) => panel.classList.contains("show"));
+      if (!hasOpenGlobalPanel && !evidenceBagPop.classList.contains("open")) {
+        globalOverlay.classList.remove("show");
+      }
+    }
+
     function analyzeEvidenceWithTool(toolName) {
       if (!currentEvidenceForTool) {
-        showToast("먼저 수사 가방에서 분석할 증거를 선택하세요.");
+        showToast("분석할 증거를 선택하세요.");
         return;
       }
 
@@ -757,16 +893,65 @@
       }
 
       if (data.tool !== toolName) {
+        document.querySelector(".tool-preview")?.classList.add("wrong-tool");
+        setTimeout(() => document.querySelector(".tool-preview")?.classList.remove("wrong-tool"), 520);
         showToast(`${currentEvidenceForTool}에는 ${data.tool}이 더 알맞아 보입니다.`);
         return;
       }
 
       addObservationToNote(`${currentEvidenceForTool} 추가 분석`, data.toolResult);
+      saveAnalyzedEvidence(currentEvidenceForTool);
       document.querySelectorAll(`[data-evidence-name="${currentEvidenceForTool}"]`).forEach((item) => item.classList.add("analyzed"));
       document.querySelectorAll(`#toolEvidenceList [data-evidence="${currentEvidenceForTool}"]`).forEach((item) => item.classList.add("analyzed"));
+      document.querySelector(".tool-preview")?.classList.add("revealed");
       const previewNote = document.querySelector("#toolPreviewNote");
       if (previewNote) previewNote.textContent = data.toolResult;
+      showToolResultPopup(currentEvidenceForTool, toolName, data.toolResult);
       showToast(`${toolName}로 ${currentEvidenceForTool}을 분석했습니다.`);
+    }
+
+    function beginToolSwipe(event) {
+      if (!currentEvidenceForTool) {
+        showToast("먼저 분석할 증거를 선택하세요.");
+        return;
+      }
+      event.preventDefault();
+      event.currentTarget?.setPointerCapture?.(event.pointerId);
+      swipeStartPoint = { x: event.clientX, y: event.clientY };
+      updateWipePosition(event);
+      document.querySelector(".tool-preview")?.classList.add("swiping");
+    }
+
+    function moveToolSwipe(event) {
+      if (!swipeStartPoint) return;
+      event.preventDefault();
+      moveToolCursor(event);
+      updateWipePosition(event);
+      const dx = event.clientX - swipeStartPoint.x;
+      const dy = event.clientY - swipeStartPoint.y;
+      const distance = Math.min(170, Math.max(70, Math.hypot(dx, dy)));
+      document.querySelector(".tool-preview-image")?.style.setProperty("--wipe-size", `${distance}px`);
+    }
+
+    function finishToolSwipe(event) {
+      if (!swipeStartPoint) return;
+      event.preventDefault();
+      event.currentTarget?.releasePointerCapture?.(event.pointerId);
+      const dx = event.clientX - swipeStartPoint.x;
+      const dy = event.clientY - swipeStartPoint.y;
+      const distance = Math.hypot(dx, dy);
+      swipeStartPoint = null;
+      document.querySelector(".tool-preview")?.classList.remove("swiping");
+
+      if (!selectedToolForAnalysis) {
+        showToast("아래 도구 탭에서 도구를 먼저 고르세요.");
+        return;
+      }
+      if (distance < 56) {
+        showToast("증거 위를 조금 더 길게 문질러 보세요.");
+        return;
+      }
+      analyzeEvidenceWithTool(selectedToolForAnalysis);
     }
 
     function showInspect(id) {
@@ -829,15 +1014,16 @@
       pendingEvidenceHotspot = hotspot;
       const alreadyCollected = hotspot.classList.contains("collected");
       if (!alreadyCollected) {
-        hotspot.classList.add("collected");
+        markEvidenceCollectedInScene(name);
         playSfx("evidence", 0.85);
         addEvidenceToBag(name);
         addEvidenceToNote(name);
       }
+      setAnalysisTarget(name);
 
       document.querySelector("#genericEvidenceImage").src = data.img || "/samunmong/assets/evidence-wooden-tag.png";
       document.querySelector("#genericEvidenceTitle").textContent = name;
-      document.querySelector("#genericEvidenceText").textContent = `${data.note || "현장에서 발견한 단서입니다."} ${data.tool ? "수사 가방에서 이 증거를 선택하면 도구로 추가 분석할 수 있습니다." : "도구 없이 확인 가능한 단서입니다."}`;
+      document.querySelector("#genericEvidenceText").textContent = `${data.note || "현장에서 발견한 단서입니다."} ${data.tool ? "도구 버튼을 눌러 이 증거를 자세히 살펴볼 수 있습니다." : "도구 없이 확인 가능한 단서입니다."}`;
       document.querySelector("#collectGenericEvidence").textContent = data.tool ? "가방에서 분석하기" : "확인";
       document.querySelector("#genericEvidenceInspect").classList.add("show");
       clearTimeout(showInspect.timer);
@@ -858,6 +1044,30 @@
     }
 
     document.querySelector("#collectGenericEvidence").addEventListener("click", collectGenericEvidence);
+    document.addEventListener("pointermove", (event) => {
+      updateToolAreaHover(event);
+      moveToolCursor(event);
+    });
+    document.querySelector(".tool-preview-image")?.addEventListener("pointerenter", (event) => {
+      event.currentTarget.classList.add("cursor-inside");
+      updateToolCursor();
+      moveToolCursor(event);
+      updateWipePosition(event);
+    });
+    document.querySelector(".tool-preview-image")?.addEventListener("pointerleave", (event) => {
+      if (swipeStartPoint) return;
+      event.currentTarget.classList.remove("cursor-inside");
+      updateToolCursor();
+    });
+    document.querySelector(".tool-preview-image")?.addEventListener("pointerdown", beginToolSwipe);
+    document.querySelector(".tool-preview-image")?.addEventListener("pointermove", moveToolSwipe);
+    document.querySelector(".tool-preview-image")?.addEventListener("pointerup", finishToolSwipe);
+    document.querySelector(".tool-preview-image")?.addEventListener("pointercancel", () => {
+      swipeStartPoint = null;
+      document.querySelector(".tool-preview")?.classList.remove("swiping");
+    });
+    document.querySelector("#toolPreviewImage")?.addEventListener("dragstart", (event) => event.preventDefault());
+    document.querySelector("#toolPreviewImage")?.addEventListener("load", syncEvidenceShadowBounds);
     document.querySelectorAll("[data-evidence-name]").forEach((hotspot) => {
       hotspot.addEventListener("click", () => showGenericEvidence(hotspot.dataset.evidenceName, hotspot));
     });
@@ -943,6 +1153,7 @@
       if (id === "mapPanel") playSfx("map", 0.78);
       if (id === "bagPanel") playSfx("bag", 0.72);
       if (id === "toolPanel") playSfx("buttonAlt", 0.62);
+      updateToolCursor();
     }
 
     function closeGlobalPanel() {
@@ -950,8 +1161,12 @@
         panel.classList.remove("show");
         panel.setAttribute("aria-hidden", "true");
       });
+      document.querySelector("#toolResultPopup")?.classList.remove("show");
+      document.querySelector("#toolResultPopup")?.setAttribute("aria-hidden", "true");
       setEvidenceBag(false);
       globalOverlay.classList.remove("show");
+      document.body.classList.remove("tool-cursor-active");
+      document.querySelector("#selectedToolCursor")?.classList.remove("show");
     }
 
     ["#openMapFromField", "#openMapFromRoom", "#openMapFromMudeokRoom", "#openMapFromInterrogation"].forEach((selector) => {
@@ -969,6 +1184,13 @@
     document.querySelectorAll(".open-tool-panel").forEach((button) => {
       button.addEventListener("click", () => openGlobalPanel("toolPanel"));
     });
+    document.addEventListener("keydown", (event) => {
+      const target = event.target;
+      const isTyping = target?.matches?.("input, textarea, select, [contenteditable='true']");
+      if (event.key !== "Tab" || event.altKey || event.ctrlKey || event.metaKey || isTyping) return;
+      event.preventDefault();
+      openGlobalPanel("toolPanel");
+    });
     ["#openNoteFromField", "#openNoteFromRoom", "#openNoteFromMudeokRoom"].forEach((selector) => {
       document.querySelector(selector)?.addEventListener("click", () => openGlobalPanel("fieldNotePanel"));
     });
@@ -976,6 +1198,7 @@
       button.addEventListener("click", () => openGlobalPanel("fieldNotePanel"));
     });
     document.querySelectorAll(".global-close").forEach((button) => button.addEventListener("click", closeGlobalPanel));
+    on("#closeToolResult", "click", closeToolResultPopup);
     globalOverlay.addEventListener("click", closeGlobalPanel);
     document.querySelectorAll("[data-map-go]").forEach((button) => {
       button.addEventListener("pointerdown", () => button.classList.add("pressing"));

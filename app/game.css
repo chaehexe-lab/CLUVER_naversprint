@@ -149,6 +149,13 @@
       display: none;
       opacity: .76;
       filter: drop-shadow(0 5px 9px rgba(0,0,0,.48)) saturate(.68) brightness(.78) contrast(.92);
+      transition: opacity .22s ease, transform .22s ease, filter .22s ease;
+    }
+
+    .evidence-prop.collected {
+      opacity: 0 !important;
+      transform: translate(-50%, -56%) rotate(var(--rot, 0deg)) scale(.72);
+      pointer-events: none;
     }
 
     #fieldOne .field-evidence-prop {
@@ -1212,6 +1219,29 @@
       animation: none;
     }
 
+    .evidence-hotspot {
+      cursor: pointer;
+    }
+
+    .evidence-hotspot::after {
+      inset: -7px;
+      border: 2px solid rgba(255, 224, 165, 0);
+      border-radius: 10px;
+      background: transparent;
+      box-shadow: none;
+      opacity: 0;
+      transition: opacity .16s ease, border-color .16s ease, box-shadow .16s ease;
+    }
+
+    .evidence-hotspot:not(.collected):hover::after,
+    .evidence-hotspot:not(.collected):focus-visible::after {
+      border-color: rgba(255, 224, 165, .9);
+      box-shadow:
+        0 0 0 1px rgba(111, 26, 23, .45),
+        0 0 24px rgba(217, 178, 104, .28);
+      opacity: 1;
+    }
+
     .screen.hint-active .evidence-hotspot:not(.collected)::before {
       inset: -15px;
       background:
@@ -1596,9 +1626,61 @@
       font-family: "NanumBareunJeongsin", "Noto Serif KR", "Batang", serif;
     }
 
+    .global-panel.bag-panel {
+      left: auto;
+      right: 2.2%;
+      width: clamp(250px, 27vw, 360px);
+      transform: translateY(-50%);
+      padding: 14px;
+    }
+
     .global-panel.tool-panel {
       width: min(1040px, 92vw);
       padding: 22px;
+    }
+
+    .global-panel.tool-result-panel {
+      z-index: 34;
+      top: 50%;
+      left: 50%;
+      right: auto;
+      bottom: auto;
+      width: min(560px, 86vw);
+      max-height: min(520px, 82%);
+      transform: translate(-50%, -50%);
+      padding: 28px 30px 30px;
+      border: 0;
+      border-radius: 4px;
+      color: #2f2118;
+      background:
+        radial-gradient(circle at 15% 14%, rgba(141, 77, 38, .2), transparent 32%),
+        linear-gradient(180deg, #e1c996, #ba925d 58%, #87613a);
+      box-shadow:
+        0 28px 110px rgba(0,0,0,.8),
+        inset 0 0 0 1px rgba(64, 33, 20, .44),
+        inset 0 0 30px rgba(42, 19, 11, .28);
+      font-family: "NanumBareunJeongsin", "Noto Serif KR", "Batang", serif;
+      text-align: left;
+    }
+
+    .global-panel.tool-result-panel h2 {
+      margin: 4px 0 14px;
+      color: #321a13;
+      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
+      font-size: clamp(28px, 3vw, 40px);
+      font-weight: 400;
+      letter-spacing: 0;
+    }
+
+    .global-panel.tool-result-panel p {
+      color: rgba(49, 31, 22, .82);
+      font-size: 26px;
+      line-height: 1.55;
+      word-break: keep-all;
+    }
+
+    .global-panel.tool-result-panel .button {
+      margin-top: 16px;
     }
 
     .global-panel-head {
@@ -1642,12 +1724,12 @@
       width: 100%;
       display: grid;
       grid-template-columns: 1fr;
-      gap: 8px;
+      gap: 6px;
       align-items: center;
       margin-top: 8px;
       border: 1px solid rgba(255,233,190,.12);
-      border-radius: 20px;
-      padding: 10px;
+      border-radius: 4px;
+      padding: 8px;
       color: var(--ink);
       background: radial-gradient(circle at 50% 18%, rgba(217,178,104,.13), rgba(0,0,0,.18) 62%);
       text-align: center;
@@ -1660,10 +1742,10 @@
 
     .bag-item img {
       width: 100%;
-      height: clamp(200px, 30vh, 330px);
+      height: clamp(82px, 13vh, 132px);
       display: grid;
       place-items: center;
-      border-radius: 16px;
+      border-radius: 4px;
       object-fit: contain;
       background: rgba(10, 7, 5, .52);
       box-shadow: inset 0 0 0 1px rgba(255,233,190,.12), inset 0 0 38px rgba(0,0,0,.38);
@@ -1672,7 +1754,7 @@
     }
 
     .bag-item span {
-      font-size: 21px;
+      font-size: 16px;
       line-height: 1.35;
       color: rgba(247,236,216,.78);
     }
@@ -1681,7 +1763,7 @@
       display: block;
       margin-bottom: 2px;
       color: rgba(247,236,216,.94);
-      font-size: 20px;
+      font-size: 17px;
     }
 
     .bag-item.empty {
@@ -1702,8 +1784,8 @@
 
     .bag-panel-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 14px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
       margin-top: 10px;
     }
 
@@ -1723,9 +1805,9 @@
 
     .tool-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-      gap: 10px;
-      margin-top: 12px;
+      grid-template-columns: repeat(auto-fit, minmax(118px, 1fr));
+      gap: 9px;
+      margin-top: 14px;
     }
 
     .tool-panel-kicker {
@@ -1738,17 +1820,18 @@
 
     .tool-workbench {
       display: grid;
-      grid-template-columns: minmax(190px, .72fr) minmax(0, 1.6fr);
-      gap: 16px;
+      grid-template-columns: 1fr;
+      gap: 12px;
       margin-top: 14px;
       align-items: stretch;
     }
 
     .tool-evidence-list {
       display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       align-content: start;
       gap: 9px;
-      max-height: 430px;
+      max-height: 160px;
       overflow: auto;
       padding: 10px;
       border: 1px solid rgba(79, 42, 25, .2);
@@ -1802,32 +1885,140 @@
     }
 
     .tool-preview {
-      min-height: 430px;
+      min-height: 390px;
       display: grid;
-      grid-template-columns: minmax(260px, 1fr) minmax(220px, .7fr);
+      grid-template-columns: minmax(270px, 1fr) minmax(220px, .72fr);
       gap: 14px;
       padding: 14px;
       border: 1px solid rgba(79, 42, 25, .22);
       background:
         radial-gradient(ellipse at 50% 16%, rgba(255, 238, 191, .18), transparent 48%),
         rgba(44, 24, 14, .12);
+      transition: border-color .16s ease, box-shadow .16s ease, background .18s ease;
     }
 
     .tool-preview-image {
+      position: relative;
       display: grid;
       place-items: center;
       min-height: 100%;
+      overflow: hidden;
+      user-select: none;
+      touch-action: none;
       background:
         radial-gradient(ellipse at center, rgba(22, 12, 8, .2), transparent 68%),
         rgba(255, 238, 191, .12);
       box-shadow: inset 0 0 0 1px rgba(64, 33, 20, .2);
     }
 
+    .tool-preview-image::before {
+      content: "";
+      position: absolute;
+      z-index: 2;
+      left: var(--evidence-left, 0);
+      top: var(--evidence-top, 0);
+      width: var(--evidence-width, 100%);
+      height: var(--evidence-height, 100%);
+      pointer-events: none;
+      background:
+        radial-gradient(circle at var(--wipe-x, 50%) var(--wipe-y, 50%), transparent 0 0, rgba(0,0,0,.72) 1px 100%),
+        radial-gradient(ellipse at center, rgba(0,0,0,.12), rgba(0,0,0,.58) 72%);
+      opacity: .92;
+      transition: opacity .28s ease;
+    }
+
+    .tool-preview.swiping .tool-preview-image::before {
+      background:
+        radial-gradient(circle at var(--wipe-x, 50%) var(--wipe-y, 50%), transparent 0 var(--wipe-size, 76px), rgba(0,0,0,.22) calc(var(--wipe-size, 76px) + 28px), rgba(0,0,0,.76) calc(var(--wipe-size, 76px) + 72px)),
+        radial-gradient(ellipse at center, rgba(0,0,0,.12), rgba(0,0,0,.58) 72%);
+    }
+
+    .tool-preview-image::after {
+      content: "증거 위를 문질러 밝히기";
+      position: absolute;
+      z-index: 3;
+      left: 50%;
+      bottom: 14px;
+      transform: translateX(-50%);
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 230, 178, .34);
+      border-radius: 4px;
+      color: rgba(255, 242, 214, .9);
+      background: rgba(27, 15, 9, .62);
+      font-size: 18px;
+      line-height: 1;
+      pointer-events: none;
+    }
+
     .tool-preview-image img {
       width: 100%;
       max-height: 390px;
       object-fit: contain;
-      filter: drop-shadow(0 14px 22px rgba(42, 19, 11, .34));
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      filter:
+        brightness(.52)
+        contrast(1.12)
+        saturate(.72)
+        drop-shadow(0 22px 28px rgba(0,0,0,.7));
+      opacity: .78;
+      transition: filter .32s ease, opacity .32s ease;
+    }
+
+    .tool-preview.swiping {
+      border-color: rgba(217, 178, 104, .58);
+      box-shadow: inset 0 0 34px rgba(217,178,104,.18);
+    }
+
+    .tool-preview.wrong-tool {
+      border-color: rgba(143, 32, 27, .72);
+      box-shadow: inset 0 0 34px rgba(143,32,27,.18);
+    }
+
+    .tool-preview.revealed {
+      background:
+        radial-gradient(ellipse at 46% 46%, rgba(255, 233, 174, .25), transparent 54%),
+        rgba(44, 24, 14, .12);
+    }
+
+    .tool-preview.revealed .tool-preview-image img {
+      filter:
+        brightness(1.08)
+        contrast(1.04)
+        saturate(.98)
+        drop-shadow(0 12px 18px rgba(42, 19, 11, .35));
+      opacity: 1;
+    }
+
+    body.tool-cursor-active,
+    body.tool-cursor-active .tool-preview-image,
+    body.tool-cursor-active .tool-preview-image * {
+      cursor: none !important;
+    }
+
+    .tool-cursor {
+      position: fixed;
+      z-index: 100;
+      left: -999px;
+      top: -999px;
+      width: 62px;
+      height: 62px;
+      display: none;
+      object-fit: contain;
+      pointer-events: none;
+      filter:
+        drop-shadow(0 10px 14px rgba(0,0,0,.5))
+        drop-shadow(0 0 12px rgba(217,178,104,.32));
+      transform: translate(-8px, -8px) rotate(-7deg);
+    }
+
+    .tool-cursor.show {
+      display: block;
+    }
+
+    .tool-preview.revealed .tool-preview-image::before {
+      opacity: 0;
     }
 
     .tool-preview-copy {
@@ -1850,14 +2041,14 @@
     }
 
     .tool-card {
-      min-height: 140px;
+      min-height: 118px;
       display: grid;
-      grid-template-rows: 78px auto;
+      grid-template-rows: 58px auto;
       gap: 7px;
       align-items: center;
       justify-items: center;
       border: 1px solid rgba(255,233,190,.18);
-      border-radius: 16px;
+      border-radius: 4px;
       padding: 9px;
       color: var(--ink);
       background: rgba(0,0,0,.22);
@@ -1869,9 +2060,16 @@
       background: rgba(217,178,104,.14);
     }
 
+    .tool-card:hover,
+    .tool-card:focus-visible {
+      border-color: rgba(255, 224, 165, .86);
+      outline: 0;
+      box-shadow: 0 0 0 2px rgba(111, 26, 23, .18);
+    }
+
     .tool-card img {
-      max-width: 86px;
-      max-height: 78px;
+      max-width: 72px;
+      max-height: 58px;
       object-fit: contain;
       filter: drop-shadow(0 8px 14px rgba(0,0,0,.5));
     }
