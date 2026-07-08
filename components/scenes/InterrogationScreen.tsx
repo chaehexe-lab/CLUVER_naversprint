@@ -239,14 +239,14 @@ export default function InterrogationScreen() {
             닫기
           </button>
         </div>
-        <p>수집한 증거를 고르면 크게 펼쳐 볼 수 있습니다. 알맞은 도구를 사용하면 추가 단서가 수사노트에 기록됩니다.</p>
+        <p>도구를 먼저 고른 뒤 증거를 선택하면 추가 단서가 새로 드러나고 수사노트에 기록됩니다.</p>
         <div className="tool-workbench">
           <div className="tool-evidence-list" id="toolEvidenceList">
             <div className="evidence-empty">아직 분석할 증거가 없습니다.</div>
           </div>
           <section className="tool-preview" aria-live="polite">
             <div className="tool-preview-image">
-              <img id="toolPreviewImage" src="/samunmong/assets/evidence-wooden-tag.png" alt="" />
+              <img id="toolPreviewImage" src="/samunmong/assets/evidence-wooden-tag.png" alt="" draggable={false} />
             </div>
             <div className="tool-preview-copy">
               <span className="tool-panel-kicker">선택한 증거</span>
@@ -259,6 +259,14 @@ export default function InterrogationScreen() {
           </section>
         </div>
         <div className="tool-grid" id="toolGrid" />
+      </aside>
+      <aside className="global-panel tool-result-panel" id="toolResultPopup" aria-hidden="true" aria-live="polite">
+        <p className="tool-panel-kicker" id="toolResultKicker">도구 분석</p>
+        <h2 id="toolResultTitle">증거 분석 결과</h2>
+        <p id="toolResultText">새로운 정보가 드러났습니다.</p>
+        <button className="button primary" id="closeToolResult" type="button">
+          수사노트에 기록
+        </button>
       </aside>
       <InvestigationNote>
 
