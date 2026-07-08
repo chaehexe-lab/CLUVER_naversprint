@@ -36,9 +36,11 @@ export default function DreamSelectScreen() {
       </article>
       <aside className="dream-notice-dialog" id="dreamNoticeDialog" aria-hidden="true" role="dialog" aria-labelledby="dreamNoticeTitle">
         <div className="dream-notice-panel">
-          <div className="dream-notice-titlebar" aria-hidden="true">
+          <div className="dream-notice-titlebar">
             <span>DREAM_ALERT</span>
-            <span>×</span>
+            <button className="dream-notice-close" id="closeDreamNoticeX" type="button" aria-label="안내 닫기">
+              ×
+            </button>
           </div>
           <span className="dream-notice-seal" aria-hidden="true">!</span>
           <p className="dream-notice-kicker">SYSTEM MESSAGE</p>

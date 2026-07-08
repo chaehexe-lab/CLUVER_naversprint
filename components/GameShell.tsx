@@ -67,7 +67,7 @@ export default function GameShell({ initialScreen }: GameShellProps) {
   }, [initialScreen]);
 
   return (
-    <main className="game-shell">
+    <main className="game-shell" data-start-screen={initialScreen}>
       <TeamIntro disabled={skipIntro} />
       <MainScreen />
       <TutorialScreen />
