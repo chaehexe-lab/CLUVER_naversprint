@@ -252,11 +252,11 @@
     }
 
     const buttonGuideTextById = {
-      openMapFromInterrogation: "마을 지도: 조사 장소를 오갑니다.",
-      openNoteProp: "기록장: 수집한 증거와 심문 기록을 봅니다.",
-      toggleEvidenceBag: "보따리: 모은 증거를 꺼내 제시합니다.",
-      interrogationHint: "심문 힌트: 질문 방향을 떠올립니다.",
-      accuseButton: "범인 지목: 충분히 모았을 때 판결로 갑니다."
+      openMapFromInterrogation: "조사 장소를 오갑니다.",
+      openNoteProp: "수집한 증거와 심문 기록을 봅니다.",
+      toggleEvidenceBag: "모은 증거를 꺼내 제시합니다.",
+      interrogationHint: "질문 방향을 떠올립니다.",
+      accuseButton: "충분히 모았을 때 판결로 갑니다."
     };
 
     let buttonGuideHideTimer = null;
@@ -275,12 +275,12 @@
       if (!target) return "";
       if (target.dataset.guide) return target.dataset.guide;
       if (buttonGuideTextById[target.id]) return buttonGuideTextById[target.id];
-      if (target.matches(".map-chip")) return "마을 지도: 조사 장소를 오갑니다.";
-      if (target.matches(".bag-chip")) return "보따리: 모은 증거를 확인합니다.";
-      if (target.matches(".tool-chip")) return "수사 도구: 증거를 더 자세히 분석합니다.";
-      if (target.matches(".note-chip")) return "기록장: 단서와 심문 내용을 정리합니다.";
+      if (target.matches(".map-chip")) return "조사 장소를 오갑니다.";
+      if (target.matches(".bag-chip")) return "모은 증거를 확인합니다.";
+      if (target.matches(".tool-chip")) return "증거를 더 자세히 분석합니다.";
+      if (target.matches(".note-chip")) return "단서와 심문 내용을 정리합니다.";
       if (target.matches(".room-chip")) return target.getAttribute("aria-current") === "page" ? "현재 위치입니다." : "취조실로 이동합니다.";
-      if (target.matches(".scene-hint")) return "힌트: 남은 단서 위치를 잠깐 밝힙니다.";
+      if (target.matches(".scene-hint")) return "남은 단서 위치를 잠깐 밝힙니다.";
       if (target.matches(".map-pin-button")) return target.getAttribute("aria-label") || "해당 장소로 이동합니다.";
       if (target.matches(".close-button")) return target.getAttribute("aria-label") || "창을 닫습니다.";
       return target.getAttribute("aria-label") || target.title || target.textContent.trim();
