@@ -882,7 +882,7 @@
 
     .main-dialog {
       position: absolute;
-      z-index: 20;
+      z-index: 90;
       inset: 0;
       display: none;
       place-items: center;
@@ -908,6 +908,39 @@
     .setting-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: #a87862; }
     .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
     .dialog-actions button { min-width: 92px; }
+
+    .game-settings-button {
+      position: absolute;
+      z-index: 36;
+      top: 2.4%;
+      left: min(calc(2.4% + 190px), calc(100% - 62px));
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(217, 178, 104, .46);
+      border-radius: 4px;
+      color: #f7ecd8;
+      background:
+        linear-gradient(135deg, rgba(103, 28, 24, .58), rgba(24, 16, 11, .78)),
+        rgba(6, 4, 3, .68);
+      box-shadow: 0 14px 34px rgba(0,0,0,.38), inset 0 0 0 1px rgba(255,255,255,.04);
+      cursor: pointer;
+      font-size: 22px;
+      line-height: 1;
+      text-shadow: 0 2px 8px rgba(0,0,0,.82);
+    }
+
+    .game-settings-button:hover,
+    .game-settings-button:focus-visible {
+      border-color: rgba(255, 230, 182, .82);
+      box-shadow: 0 0 0 2px rgba(217, 178, 104, .18), 0 16px 38px rgba(0,0,0,.46);
+      outline: none;
+    }
+
+    .game-settings-button[hidden] {
+      display: none;
+    }
 
     #mainScreen.exited .plate { filter: brightness(.16) grayscale(.45); }
     .exit-message { margin: 0; color: rgba(244, 238, 232, .72); line-height: 1.6; }

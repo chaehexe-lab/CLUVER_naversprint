@@ -248,9 +248,12 @@
     function applySettings(settings) {
       document.body.classList.toggle("reduce-motion", settings.reduceMotion);
       document.body.classList.toggle("high-contrast", settings.highContrast);
-      document.querySelector("#volumeSetting").value = settings.volume;
-      document.querySelector("#motionSetting").checked = settings.reduceMotion;
-      document.querySelector("#contrastSetting").checked = settings.highContrast;
+      const volumeSetting = document.querySelector("#volumeSetting");
+      const motionSetting = document.querySelector("#motionSetting");
+      const contrastSetting = document.querySelector("#contrastSetting");
+      if (volumeSetting) volumeSetting.value = settings.volume;
+      if (motionSetting) motionSetting.checked = settings.reduceMotion;
+      if (contrastSetting) contrastSetting.checked = settings.highContrast;
       applyAudioVolume();
     }
 
@@ -580,7 +583,9 @@
       go(saved.screenId, "지난 꿈으로 돌아가는 중...");
       if (saved?.screenId === "briefingScreen") setTimeout(typeBriefing, 300);
     });
-    on("#openSettings", "click", () => settingsDialog?.classList.add("open"));
+    document.querySelectorAll("[data-open-settings='true']").forEach((button) => {
+      button.addEventListener("click", () => settingsDialog?.classList.add("open"));
+    });
     on("#volumeSetting", "input", () => {
       applyAudioVolume();
     });

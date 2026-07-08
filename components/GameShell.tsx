@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import BriefingScreen from "@/components/front/BriefingScreen";
 import ButtonGuideLayer from "@/components/ButtonGuideLayer";
 import DreamSelectScreen from "@/components/front/DreamSelectScreen";
+import GameSettingsOverlay from "@/components/GameSettingsOverlay";
 import MainScreen from "@/components/front/MainScreen";
 import TeamIntro from "@/components/front/TeamIntro";
 import TutorialScreen from "@/components/front/TutorialScreen";
@@ -83,6 +84,7 @@ export default function GameShell({ initialScreen }: GameShellProps) {
       <BackGateCourtyardScene />
       <InterrogationScreen />
       <LocationIndicator initialScreen={initialScreen} />
+      <GameSettingsOverlay />
       <ButtonGuideLayer />
     </main>
   );
