@@ -26,6 +26,13 @@ type InterrogateRequest = {
 const OPENAI_RESPONSES_ENDPOINT = "https://api.openai.com/v1/responses";
 const FOREIGN_TEXT_PATTERN = /[A-Za-z\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3040-\u30FF\u0400-\u04FF\u0600-\u06FF\u0900-\u097F]/;
 const ALIBI_QUESTION_PATTERN = /(알리바이|어제|사건\s*당일|그날|그\s*밤|그때|행적|어디 있었|뭐 했|무엇을 했)/;
+const CHUNWOL_DIRECT_PRESSURE_PATTERNS = [
+  { evidenceName: "찢어진 옷고름", pattern: /(범인|죽였|살해|목\s*졸|목을\s*졸|목\s*조른|옷고름|비단\s*끈|목끈)/ },
+  { evidenceName: "찢어진 약속 편지", pattern: /(창고|약속\s*편지|편지|쪽지|기다리시오|함께\s*떠납시다|돌쇠가\s*쓴)/ },
+  { evidenceName: "긁힌 팔 흔적", pattern: /(팔\s*상처|긁힌\s*팔|긁힌\s*자국|소매|팔을\s*긁|긁혔)/ },
+  { evidenceName: "돌쇠의 그림", pattern: /(돌쇠.*좋|돌쇠.*마음|그림|초상화|숨긴\s*그림)/ },
+  { evidenceName: "호패 조각", pattern: /(호패|분가루|고운\s*가루|누명|현장에\s*둔)/ }
+] as const;
 const QUESTION_CHAR_LIMIT = 60;
 const LONG_QUESTION_NOTICE = "질문이 길어서 전부 알아듣지는 못했지만, 앞부분에 대해 답하겠습니다.";
 
@@ -101,6 +108,12 @@ function inferEvidenceNamesFromText(text: string) {
   return evidenceCatalog
     .filter((item) => item.aliases.some((alias) => lowered.includes(alias.toLowerCase())) || lowered.includes(item.name.toLowerCase()))
     .map((item) => item.name);
+}
+
+function inferPersonaPressureEvidenceNames(persona: SuspectPersona, text: string) {
+  if (persona.id !== "chunwol") return [];
+
+  return CHUNWOL_DIRECT_PRESSURE_PATTERNS.flatMap(({ evidenceName, pattern }) => (pattern.test(text) ? [evidenceName] : []));
 }
 
 function getRelevantReactions(persona: SuspectPersona, evidenceNames: string[]) {
@@ -274,7 +287,8 @@ export async function POST(req: Request) {
   const presentedEvidence = resolveEvidenceNames([...(body.presentedEvidenceNames || []), ...(body.presentedEvidenceIds || [])]);
   const collectedEvidence = resolveEvidenceNames([...(body.collectedEvidenceNames || []), ...(body.collectedEvidenceIds || [])]);
   const inferredEvidence = inferEvidenceNamesFromText(question).filter((name) => !collectedEvidence.length || collectedEvidence.includes(name));
-  const usableEvidence = unique([...presentedEvidence, ...inferredEvidence]);
+  const personaPressureEvidence = inferPersonaPressureEvidenceNames(persona, question);
+  const usableEvidence = unique([...presentedEvidence, ...inferredEvidence, ...personaPressureEvidence]);
   const reactions = getRelevantReactions(persona, usableEvidence);
   const apiKey = process.env.OPENAI_API_KEY;
 
