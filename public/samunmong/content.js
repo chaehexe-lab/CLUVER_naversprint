@@ -36,7 +36,7 @@
       logic: "춘월이 돌쇠에게 마음을 숨기고 있었다면, 점순과 돌쇠의 도망 계획을 그냥 두지 못했을 가능성이 생긴다.",
       relatedSuspects: ["춘월", "돌쇠"],
       contradiction: "춘월이 돌쇠를 모른다고 하거나 관심이 없다고 말하면 그림의 보관 상태와 맞지 않는다.",
-      img: "/samunmong/assets/evidence-portrait.png",
+      img: "/samunmong/assets/evidence-portrait-v2.png",
       tool: "돋보기",
       toolResult: "돋보기로 보니 선이 섬세하고 여러 번 고쳐 그린 흔적이 있다.\n우연히 본 얼굴이라기엔 지나치게 정성스럽다. 춘월은 왜 이 그림을 숨겨 두었을까?"
     },

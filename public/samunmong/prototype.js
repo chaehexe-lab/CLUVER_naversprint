@@ -986,7 +986,7 @@
       },
       "돌쇠의 그림": {
         note: "최춘월의 방에서 발견된 숨겨둔 초상. 춘월이 돌쇠에게 마음을 두었는지 추적할 단서다.",
-        img: "/samunmong/assets/evidence-portrait.png",
+        img: "/samunmong/assets/evidence-portrait-v2.png",
         tool: "돋보기",
         toolResult: "돋보기로 보니 선이 섬세하고 여러 번 고쳐 그린 흔적이 있다.\n우연히 본 얼굴이라기엔 지나치게 정성스럽다. 춘월은 왜 이 그림을 숨겨 두었을까?"
       },

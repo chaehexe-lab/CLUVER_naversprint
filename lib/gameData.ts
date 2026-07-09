@@ -144,7 +144,7 @@ export const chunwolRoomScene = {
   ] satisfies SceneDockAction[],
   inspect: {
     id: "portraitInspect",
-    image: "/samunmong/assets/evidence-portrait.png",
+    image: "/samunmong/assets/evidence-portrait-v2.png",
     title: "돌쇠의 그림",
     text: "특정 도구를 이용해 자세히 알아봐야 할 것 같다.",
     buttonId: "collectPortrait",
