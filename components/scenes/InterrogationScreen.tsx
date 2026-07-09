@@ -142,6 +142,9 @@ export default function InterrogationScreen() {
         </section>
 
         <div className="hud suspect-reply" id="suspectReply" aria-live="polite" hidden>
+          <button className="suspect-reply-close" id="closeSuspectReply" type="button" aria-label="답변 닫기">
+            ×
+          </button>
           <span id="aiModeBadge">AI 대기</span>
           <p id="suspectReplyText">질문을 보내면 용의자가 답합니다.</p>
         </div>
