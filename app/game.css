@@ -1654,7 +1654,7 @@
 
     .briefing-copy {
       min-height: 92px;
-      font-size: clamp(17px, 1.8vw, 24px);
+      font-size: clamp(20px, calc(1.8vw + 3px), 27px);
       line-height: 1.56;
     }
 
