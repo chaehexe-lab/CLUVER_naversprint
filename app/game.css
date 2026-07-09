@@ -606,7 +606,7 @@
     .current-location-indicator {
       position: absolute;
       z-index: 26;
-      left: 2.3%;
+      left: calc(2.4% + 62px);
       top: 2.4%;
       min-width: 148px;
       max-width: min(260px, 42vw);
@@ -716,7 +716,7 @@
     }
 
     .location-indicator {
-      left: 2.4%;
+      left: calc(2.4% + 62px);
       top: 2.4%;
       z-index: 16;
       min-width: 158px;
@@ -913,7 +913,7 @@
       position: absolute;
       z-index: 36;
       top: 2.4%;
-      left: min(calc(2.4% + 190px), calc(100% - 62px));
+      left: 2.4%;
       width: 46px;
       height: 46px;
       display: grid;
