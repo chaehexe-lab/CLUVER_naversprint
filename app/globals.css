@@ -1,6 +1,14 @@
+:root {
+  --cursor-default: url("/test_image/pixellab-detective-s-magnifying-glass-1783517078454 (1).png") 16 16, auto;
+  --cursor-click: url("/test_image/pixellab-detective-s-magnifying-glass-1783517078454 (2).png") 16 16, pointer;
+  --cursor-input: url("/test_image/pixellab-detective-s-magnifying-glass-1783517078454 (3).png") 16 16, text;
+  --cursor-disabled: url("/test_image/pixellab-detective-s-magnifying-glass-1783517078454 (4).png") 16 16, not-allowed;
+}
+
 * {
   -ms-overflow-style: none;
   scrollbar-width: none;
+  cursor: var(--cursor-default);
 }
 
 *::-webkit-scrollbar {
@@ -558,4 +566,34 @@ body {
   .typewriter-lines p {
     white-space: normal;
   }
+}
+
+html body * {
+  cursor: var(--cursor-default) !important;
+}
+
+html body input,
+html body textarea,
+html body select,
+html body [contenteditable="true"] {
+  cursor: var(--cursor-input) !important;
+}
+
+:disabled,
+[disabled],
+[aria-disabled="true"],
+[data-dream-disabled="true"],
+.disabled,
+.main-menu-button:disabled {
+  cursor: var(--cursor-disabled) !important;
+}
+
+html:active body:active:not(.tool-cursor-active) *:active:not(:disabled):not([disabled]):not([aria-disabled="true"]):not([data-dream-disabled="true"]):not(.disabled) {
+  cursor: var(--cursor-click) !important;
+}
+
+body.tool-cursor-active,
+body.tool-cursor-active .tool-preview-image,
+body.tool-cursor-active .tool-preview-image * {
+  cursor: none !important;
 }
