@@ -1,12 +1,5 @@
 import { briefing } from "@/lib/gameData";
 
-const suspectTags = [
-  { name: "돌쇠", role: "머슴", image: "/samunmong/assets/suspects/dolsoe-seated.png" },
-  { name: "최춘월", role: "아씨", image: "/samunmong/assets/suspects/chunwol-seated.png" },
-  { name: "유문석", role: "양반", image: "/samunmong/assets/suspects/yoomunseok-seated.png" },
-  { name: "무덕", role: "하인", image: "/samunmong/assets/suspects/mudeok-seated.png" }
-] as const;
-
 export default function BriefingScreen() {
   return (
     <section className="screen briefing-screen" id="briefingScreen">
@@ -15,10 +8,6 @@ export default function BriefingScreen() {
         <h2>{briefing.title}</h2>
 
         <div className="briefing-step active" data-briefing-panel="0">
-          <div className="briefing-copy" id="briefingCopy" aria-live="polite" />
-        </div>
-
-        <div className="briefing-step" data-briefing-panel="1" aria-hidden="true">
           <p className="briefing-caption strong">점순이는 어떻게 숨졌는가</p>
           <div className="briefing-death-layout">
             <div className="briefing-evidence-stack">
@@ -39,29 +28,7 @@ export default function BriefingScreen() {
           </div>
         </div>
 
-        <div className="briefing-step" data-briefing-panel="2" aria-hidden="true">
-          <p className="briefing-caption strong">이 네 명의 혐의자들을 살펴야 합니다, 사또님.</p>
-          <div className="briefing-suspect-tags">
-            {suspectTags.map((suspect) => (
-              <section className="briefing-suspect-tag" data-suspect={suspect.name} key={suspect.name}>
-                <img src={suspect.image} alt="" draggable={false} />
-                <span className="hopae-string" aria-hidden="true" />
-                <div>
-                  <strong>{suspect.name}</strong>
-                  <span>{suspect.role}</span>
-                </div>
-              </section>
-            ))}
-          </div>
-        </div>
-
         <div className="briefing-actions">
-          <button className="briefing-nav" id="briefingPrev" type="button">
-            이전
-          </button>
-          <button className="briefing-nav primary" id="briefingNext" type="button">
-            다음
-          </button>
           <button className="button primary briefing-start" id="startCase" type="button">
             {briefing.startLabel}
           </button>
