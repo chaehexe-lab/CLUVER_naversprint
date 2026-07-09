@@ -3657,19 +3657,9 @@
     .accuse-prop { right: 2.6%; top: 17%; }
 
     .accuse-prop .sr-only {
-      clip: auto;
-      clip-path: none;
-      width: auto;
-      height: auto;
-      margin: 0;
-      overflow: visible;
-      white-space: nowrap;
-      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
       font-size: 12px;
       line-height: 1;
-      color: #f2e6d4;
-      text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,0,0,.86);
-      letter-spacing: .01em;
+      letter-spacing: 0;
     }
 
     .tool-prop:hover,
