@@ -136,11 +136,11 @@
       toolResult: "빛에 비추자 장부장 사이로 눌려 있던 빈 줄 하나가 드러난다."
     },
     "종이칼": {
-      note: "사랑방 책상에 놓인 종이칼. 문서 조각과 절단면을 비교할 수 있다.",
+      note: "사랑방 책상에 놓인 종이칼. 편지 조각과 절단면을 비교할 수 있다.",
       location: "유문석 사랑방",
       logic: "편지가 찢긴 것이 아니라 일부가 잘렸다면 계획적으로 문서를 숨긴 정황이 된다.",
       relatedSuspects: ["유문석", "춘월"],
-      contradiction: "문서를 모른다는 말과 칼끝의 종이 섬유가 충돌할 수 있다.",
+      contradiction: "편지를 모른다는 말과 칼끝의 종이 섬유가 충돌할 수 있다.",
       img: "/samunmong/assets/evidence-transparent/evidence-paper-knife.png",
       tool: "돋보기",
       toolResult: "칼끝에 아주 작은 종이 섬유가 붙어 있다."
@@ -216,7 +216,7 @@
       toolResult: "끊어진 단면이 칼로 잘린 부분과 거칠게 찢긴 부분으로 나뉜다."
     },
     "맞물리는 종이 조각": {
-      note: "다른 문서 조각과 맞물릴 수 있는 종이 조각.",
+      note: "다른 편지 조각과 맞물릴 수 있는 종이 조각.",
       location: "뒷문 마당",
       logic: "찢어진 문서 조각과 맞추면 점순을 유인한 약속 편지의 원문에 가까워진다.",
       relatedSuspects: ["돌쇠", "춘월"],
@@ -226,9 +226,19 @@
       toolResult: "빛 아래에서 가장자리를 맞춰 보니 찢어진 결이 자연스럽게 이어진다."
     },
     "찢어진 문서 조각": {
-      note: "찢겨 나간 문서의 일부. 숨긴 말이 남아 있을 수 있다.",
-      location: "유문석 집 앞, 뒷문 마당",
-      logic: "점순을 특정 장소로 부른 약속 편지의 일부일 수 있어, 누가 내용을 알고 있었는지 따져야 한다.",
+      note: "뒷문 마당에서 발견된 찢어진 문서 조각. 다른 종이 조각과 맞춰 확인해야 한다.",
+      location: "뒷문 마당",
+      logic: "맞물리는 종이 조각과 이어 보면 점순을 유인한 약속 편지가 일부 찢겨 이동했을 가능성이 생긴다.",
+      relatedSuspects: ["돌쇠", "춘월", "무덕"],
+      contradiction: "뒷문 쪽 문서 조각은 누군가 편지 조각을 들고 이동했거나 숨기려 했다는 정황이 된다.",
+      img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png",
+      tool: "촛불 비추기",
+      toolResult: "종이 뒷면에 흐릿한 먹 자국이 보인다."
+    },
+    "찢어진 약속 편지": {
+      note: "점순의 손에서 발견된 찢어진 약속 편지. '오늘 밤 창고에서 기다리시오, 함께 떠납시다'라는 문장이 남아 있다.",
+      location: "유문석 집 앞",
+      logic: "점순은 이 편지를 돌쇠가 보낸 쪽지라고 믿고 창고로 향했으나, 정중한 말투가 돌쇠의 평소 말투와 맞지 않는다.",
       relatedSuspects: ["돌쇠", "춘월", "무덕"],
       contradiction: "도망 보따리와 맞물리면 돌쇠의 계획을 누군가 이용했을 가능성이 생긴다.",
       img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png",

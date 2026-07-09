@@ -38,8 +38,12 @@ export const evidenceCatalog = [
     aliases: ["호패끈", "끊어진 끈", "끈", "잘린 끈"]
   },
   {
+    name: "찢어진 약속 편지",
+    aliases: ["찢어진 편지", "편지", "약속 편지", "쪽지", "창고 편지"]
+  },
+  {
     name: "찢어진 문서 조각",
-    aliases: ["찢어진 편지", "편지", "문서 조각", "약속 편지", "쪽지"]
+    aliases: ["문서 조각", "찢어진 문서", "뒷문 문서 조각", "편지 조각", "찢어진 종이"]
   },
   {
     name: "맞물리는 종이 조각",
@@ -132,7 +136,7 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "유문석의 물건이니 자신은 모른다고 말하며, 현장에 있었다면 유문석에게 물어야 한다고 의심을 돌린다."
       },
       {
-        evidenceNames: ["찢어진 문서 조각", "맞물리는 종이 조각", "먹가루", "종이칼"],
+        evidenceNames: ["찢어진 약속 편지", "찢어진 문서 조각", "맞물리는 종이 조각", "먹가루", "종이칼"],
         intentTags: ["letterForgery", "paperMatch", "writingTool"],
         responseGuide: "편지나 종이는 집안 어디에나 있는 것이라며 우연일 수 있다고 둘러댄다."
       },
@@ -157,7 +161,7 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "상처를 숨기려 하며 바느질이나 종이에 긁혔다고 변명한다."
       }
     ],
-    breakEvidenceNames: ["찢어진 문서 조각", "맞물리는 종이 조각", "손톱 밑 실타래", "긁힌 팔 흔적", "작은 발자국"],
+    breakEvidenceNames: ["찢어진 약속 편지", "찢어진 문서 조각", "맞물리는 종이 조각", "손톱 밑 실타래", "긁힌 팔 흔적", "작은 발자국"],
     finalBehavior: "결정적 증거가 쌓이면 처음엔 시대와 혼인을 탓하다가, 점순이 돌쇠를 빼앗아 갔다는 감정을 드러낸다."
   },
   {
@@ -180,7 +184,7 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "점순과 떠나려 했던 것은 인정하지만, 살해 계획은 아니었다고 말한다."
       },
       {
-        evidenceNames: ["찢어진 문서 조각", "맞물리는 종이 조각"],
+        evidenceNames: ["찢어진 약속 편지", "찢어진 문서 조각", "맞물리는 종이 조각"],
         intentTags: ["letterForgery", "handwritingMismatch"],
         responseGuide: "편지의 말투와 글씨가 자기 것이 아니라고 강하게 부정한다."
       },
@@ -266,7 +270,7 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "자신도 밖에 나간 적은 있지만 발자국이 자기 짚신과는 다르다고 겁먹어 말한다."
       },
       {
-        evidenceNames: ["도망 보따리", "찢어진 문서 조각"],
+        evidenceNames: ["도망 보따리", "찢어진 약속 편지"],
         intentTags: ["whoKnewEscapePlan", "toldChunwol"],
         responseGuide: "춘월 아씨가 점순의 밤 외출을 캐물었고, 자신이 얼결에 말했을 수 있다고 인정한다."
       },
