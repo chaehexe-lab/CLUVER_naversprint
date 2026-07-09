@@ -790,8 +790,6 @@
       }
     };
 
-    const defaultPromptLines = [...document.querySelectorAll(".prompt-line")].map((button) => button.textContent.trim());
-
     function escapeHtml(value) {
       return String(value ?? "")
         .replaceAll("&", "&amp;")
@@ -820,10 +818,7 @@
         lines.push("드러난 기록", entries);
       }
       if (data.logic) {
-        lines.push(`논리 근거: ${data.logic}`);
-      }
-      if (data.contradiction) {
-        lines.push(`대조할 모순: ${data.contradiction}`);
+        lines.push(data.logic);
       }
       return lines.filter(Boolean).join("\n\n");
     }
@@ -835,9 +830,8 @@
         `획득 장소: ${getEvidenceLocation(name)}`
       ];
 
-      if (data.logic) lines.push(`논리 근거: ${data.logic}`);
+      if (data.logic) lines.push(data.logic);
       if (data.relatedSuspects?.length) lines.push(`관련 인물: ${data.relatedSuspects.join(", ")}`);
-      if (data.questions?.length) lines.push(`심문 질문: ${data.questions.slice(0, 2).join(" / ")}`);
       if (analyzed && formatEvidenceEntries(name)) lines.push(`확인된 내용:\n${formatEvidenceEntries(name)}`);
       if (data.tool) lines.push(`추천 도구: ${data.tool}`);
 
@@ -846,27 +840,14 @@
 
     function evidenceCardHtml(name) {
       const data = evidenceData[name] || {};
-      const questions = Array.isArray(data.questions) ? data.questions : [];
       return `
         <img class="evidence-thumb" src="${escapeHtml(data.img || "/samunmong/assets/evidence-wooden-tag.png")}" alt="">
         <span class="evidence-card-copy">
           <strong>${escapeHtml(name)}</strong>
           <span class="evidence-location">획득: ${escapeHtml(getEvidenceLocation(name))}</span>
           <span>${escapeHtml(data.note || "현장에서 발견된 단서")}</span>
-          ${data.logic ? `<span class="evidence-logic">근거: ${escapeHtml(data.logic)}</span>` : ""}
-          ${questions[0] ? `<span class="evidence-question">질문: ${escapeHtml(questions[0])}</span>` : ""}
+          ${data.logic ? `<span class="evidence-logic">${escapeHtml(data.logic)}</span>` : ""}
         </span>`;
-    }
-
-    function updatePromptLinesForEvidence(name = "") {
-      const data = evidenceData[name] || {};
-      const questions = Array.isArray(data.questions) ? data.questions : [];
-      const prompts = questions.length ? questions : defaultPromptLines;
-
-      document.querySelectorAll(".prompt-line").forEach((button, index) => {
-        button.textContent = prompts[index] || defaultPromptLines[index] || "이 단서에 대해 물어본다";
-        button.dataset.evidencePrompt = questions.length ? name : "";
-      });
     }
 
     function addEvidenceToNote(name) {
@@ -1014,7 +995,6 @@
       button.classList.add("active");
       selectedEvidence = button.dataset.evidence;
       document.querySelector("#presentedEvidence").textContent = selectedEvidence;
-      updatePromptLinesForEvidence(selectedEvidence);
       setEvidenceBag(false);
       playSfx("buttonAlt", 0.62);
       showToast(`증거 제시: ${selectedEvidence}`);
