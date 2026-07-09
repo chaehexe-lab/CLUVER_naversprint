@@ -572,10 +572,6 @@ html body * {
   cursor: var(--cursor-default) !important;
 }
 
-html:active body:active *:active {
-  cursor: var(--cursor-click) !important;
-}
-
 input,
 textarea,
 select,
@@ -590,6 +586,10 @@ select,
 .disabled,
 .main-menu-button:disabled {
   cursor: var(--cursor-disabled) !important;
+}
+
+html:active body:active:not(.tool-cursor-active) *:active:not(:disabled):not([disabled]):not([aria-disabled="true"]):not([data-dream-disabled="true"]):not(.disabled) {
+  cursor: var(--cursor-click) !important;
 }
 
 body.tool-cursor-active,
