@@ -54,6 +54,7 @@ const resultBgmPath = `${soundBase}/bgm/joseon.mp3`;
 const buttonSfxPath = `${soundBase}/sfx/button.mp3`;
 const bgmStateKey = "samunmong-bgm-state";
 const joseonBgmKey = "joseon";
+const truthUnlockKey = "samunmong-truth-unlocked";
 const typeSfxPaths = [
   `${soundBase}/sfx/type-1.mp3`,
   `${soundBase}/sfx/type-2.mp3`,
@@ -98,6 +99,11 @@ function resetDreamProgress() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem("samunmong-demo-state");
   window.localStorage.removeItem("samunmong-collected-evidence");
+}
+
+function unlockTruthPage() {
+  if (typeof window === "undefined") return;
+  window.sessionStorage.setItem(truthUnlockKey, finalCulpritId);
 }
 
 function readAudioVolume() {
@@ -348,9 +354,15 @@ export default function ResultScreen() {
             <h1 id="resultTitle">{copy.title}</h1>
             <TypewriterLines lines={copy.lines} onType={playTypingSfx} />
             <div className="verdict-actions">
-              <Link className="wood-result-button" href="/?start=briefingScreen" onClick={resetDreamProgress}>
-                이번 꿈을 다시 꾸기
-              </Link>
+              {outcome === "success" && accusedSuspect.id === finalCulpritId ? (
+                <Link className="wood-result-button" href="/interpretation" onClick={unlockTruthPage}>
+                  해몽하기
+                </Link>
+              ) : (
+                <Link className="wood-result-button" href="/?start=briefingScreen" onClick={resetDreamProgress}>
+                  다시 조사하기
+                </Link>
+              )}
               <button className="wood-result-button primary" type="button" onClick={() => setShowExitPrompt(true)}>
                 꿈에서 나가기
               </button>

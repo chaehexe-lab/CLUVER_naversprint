@@ -597,3 +597,268 @@ body.tool-cursor-active .tool-preview-image,
 body.tool-cursor-active .tool-preview-image * {
   cursor: none !important;
 }
+
+.interpretation-screen {
+  position: relative;
+  min-height: 100vh;
+  padding: clamp(42px, 7vw, 96px) 20px;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(7, 5, 4, 0.72), rgba(7, 5, 4, 0.94)),
+    url("/samunmong/assets/final-accusation-bg.png") center / cover fixed;
+  color: #3a2416;
+  font-family: "NanumBareunJeongsin", "ChosunNm", serif;
+}
+
+.interpretation-screen::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 50% 12%, rgba(230, 198, 137, 0.13), transparent 24%),
+    repeating-linear-gradient(90deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 5px);
+  pointer-events: none;
+}
+
+.interpretation-loading {
+  display: grid;
+  place-items: center;
+  color: #ead8b3;
+  font-size: 20px;
+}
+
+.interpretation-moon {
+  position: absolute;
+  top: -90px;
+  left: 50%;
+  width: 330px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgba(244, 219, 164, 0.1);
+  box-shadow: 0 0 90px rgba(244, 219, 164, 0.12);
+  transform: translateX(-50%);
+}
+
+.interpretation-scroll {
+  position: relative;
+  width: min(1040px, calc(100vw - 40px));
+  margin: 0 auto;
+  padding: clamp(48px, 7vw, 88px) clamp(24px, 7vw, 90px);
+  border: 1px solid rgba(116, 69, 34, 0.52);
+  background:
+    linear-gradient(90deg, rgba(96, 52, 25, 0.1), transparent 8% 92%, rgba(96, 52, 25, 0.1)),
+    repeating-linear-gradient(0deg, rgba(95, 55, 31, 0.025) 0 1px, transparent 1px 7px),
+    #d9c092;
+  box-shadow: 0 36px 110px rgba(0, 0, 0, 0.78), inset 0 0 80px rgba(75, 39, 19, 0.18);
+}
+
+.interpretation-scroll::before,
+.interpretation-scroll::after {
+  content: "";
+  position: absolute;
+  left: -14px;
+  right: -14px;
+  height: 24px;
+  border-radius: 4px;
+  background: linear-gradient(#5b351e, #29180f 48%, #6f4226 54%, #301b10);
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.48);
+}
+
+.interpretation-scroll::before { top: -12px; }
+.interpretation-scroll::after { bottom: -12px; }
+
+.interpretation-header {
+  padding-bottom: 42px;
+  border-bottom: 1px solid rgba(93, 50, 27, 0.4);
+  text-align: center;
+}
+
+.interpretation-header p,
+.interpretation-section-title p {
+  margin: 0 0 8px;
+  color: #7e2821;
+  font-family: "ChosunNm", serif;
+  font-size: 16px;
+  letter-spacing: 0.24em;
+}
+
+.interpretation-header h1 {
+  margin: 0 0 16px;
+  color: #301c12;
+  font-family: "VitroPride", "ChosunNm", serif;
+  font-size: clamp(42px, 7vw, 76px);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.interpretation-header > span {
+  color: #77251f;
+  font-size: clamp(21px, 3vw, 30px);
+}
+
+.interpretation-story,
+.interpretation-motive,
+.interpretation-evidence {
+  padding-top: clamp(46px, 7vw, 76px);
+}
+
+.interpretation-section-title {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-bottom: 26px;
+}
+
+.interpretation-section-title > span {
+  width: 52px;
+  height: 52px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 2px solid rgba(126, 40, 33, 0.72);
+  color: #7e2821;
+  font-family: "ChilgokLjh", serif;
+  font-size: 26px;
+  transform: rotate(-3deg);
+}
+
+.interpretation-section-title h2 {
+  margin: 0;
+  color: #392216;
+  font-family: "ChilgokLjh", "ChosunNm", serif;
+  font-size: clamp(28px, 4vw, 42px);
+  font-weight: 400;
+}
+
+.interpretation-story > p,
+.interpretation-motive > p {
+  margin: 0 0 20px;
+  color: rgba(48, 29, 18, 0.91);
+  font-size: clamp(18px, 2.2vw, 22px);
+  line-height: 1.92;
+  word-break: keep-all;
+}
+
+.interpretation-motive blockquote {
+  margin: 8px 0 28px;
+  padding: 22px 28px;
+  border-left: 4px solid rgba(126, 40, 33, 0.72);
+  background: rgba(104, 54, 27, 0.08);
+  color: #64231e;
+  font-family: "ChilgokLjh", "ChosunNm", serif;
+  font-size: clamp(23px, 3vw, 32px);
+  line-height: 1.55;
+  word-break: keep-all;
+}
+
+.interpretation-evidence-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+.interpretation-evidence-grid article {
+  position: relative;
+  min-width: 0;
+  padding: 22px 20px 24px;
+  border: 1px solid rgba(91, 52, 29, 0.38);
+  background: rgba(239, 218, 175, 0.32);
+  box-shadow: inset 0 0 26px rgba(77, 40, 20, 0.08);
+  text-align: center;
+}
+
+.interpretation-evidence-number {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  color: #8a3028;
+  font-size: 14px;
+}
+
+.interpretation-evidence-grid img {
+  width: 100%;
+  height: 150px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 8px rgba(45, 24, 14, 0.3));
+}
+
+.interpretation-evidence-grid h3 {
+  margin: 10px 0;
+  color: #48281a;
+  font-family: "ChilgokLjh", "ChosunNm", serif;
+  font-size: 25px;
+  font-weight: 400;
+}
+
+.interpretation-evidence-grid p {
+  margin: 0;
+  color: rgba(51, 31, 19, 0.86);
+  font-size: 17px;
+  line-height: 1.65;
+  word-break: keep-all;
+}
+
+.interpretation-footer {
+  position: relative;
+  margin-top: clamp(54px, 8vw, 88px);
+  padding-top: 42px;
+  border-top: 1px solid rgba(93, 50, 27, 0.4);
+  text-align: center;
+}
+
+.interpretation-footer p {
+  margin: 5px 0;
+  color: #4b2c1b;
+  font-size: clamp(18px, 2.2vw, 22px);
+}
+
+.interpretation-footer .wood-result-button {
+  margin-top: 28px;
+  min-width: 240px;
+  min-height: 58px;
+  color: #f4dfb4;
+  font-size: 20px;
+}
+
+.interpretation-seal {
+  position: absolute;
+  right: 2%;
+  top: 28px;
+  width: 76px;
+  height: 76px;
+  display: grid;
+  place-items: center;
+  border: 4px double rgba(138, 43, 35, 0.68);
+  color: rgba(138, 43, 35, 0.72);
+  font-family: "ChilgokLjh", serif;
+  font-size: 25px;
+  transform: rotate(-8deg);
+}
+
+@media (max-width: 760px) {
+  .interpretation-screen {
+    padding: 24px 10px 44px;
+  }
+
+  .interpretation-scroll {
+    width: calc(100vw - 20px);
+    padding: 48px 22px 60px;
+  }
+
+  .interpretation-evidence-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .interpretation-evidence-grid img {
+    height: 180px;
+  }
+
+  .interpretation-section-title {
+    align-items: flex-start;
+  }
+
+  .interpretation-seal {
+    position: static;
+    margin: 0 auto 22px;
+  }
+}
