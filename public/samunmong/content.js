@@ -21,19 +21,19 @@
 
   evidenceData: {
     "호패 조각": {
-      note: "점순 옆에서 발견된 신분 단서. 일부 글자가 긁혀 있다.",
+      note: "점순 옆에서 발견된 신분 단서. 유문석의 물건처럼 보이지만 일부 글자가 긁혀 있다.",
       location: "유문석 집 앞",
-      logic: "현장에 놓인 호패가 정말 유문석의 것인지, 누가 일부러 떨어뜨렸는지 확인해야 한다.",
+      logic: "현장에 놓인 호패가 정말 유문석이 떨어뜨린 것인지, 누군가 유문석에게 누명을 씌우려고 가져다 둔 것인지 확인해야 한다.",
       relatedSuspects: ["유문석", "춘월"],
       contradiction: "유문석의 물건처럼 보이지만 긁힌 흔적과 끊어진 끈이 있으면 누군가가 가져가 꾸민 증거일 수 있다.",
       img: "/samunmong/assets/evidence-wooden-tag.png",
       tool: "먼지털이 붓",
-      toolResult: "먼지털이 붓으로 털자 긁힌 글자 홈 사이에 고운 분가루가 남아 있다.\n호패가 원래 있던 자리나 누가 만졌는지 다시 확인해 볼 필요가 있다."
+      toolResult: "먼지털이 붓으로 털자 긁힌 글자 홈 사이에 고운 분가루가 남아 있다.\n거칠게 굴러다닌 물건이라기보다, 누군가 손에 쥐고 옮긴 뒤 일부러 현장에 둔 듯하다."
     },
     "돌쇠의 그림": {
       note: "춘월의 방에서 발견된 초상화. 춘월과 돌쇠의 관계를 추적할 단서다.",
       location: "춘월의 방",
-      logic: "춘월이 돌쇠에게 관심을 숨기고 있었다면 점순과 돌쇠의 관계를 질투했을 가능성이 생긴다.",
+      logic: "춘월이 돌쇠에게 마음을 숨기고 있었다면, 점순과 돌쇠의 도망 계획을 그냥 두지 못했을 가능성이 생긴다.",
       relatedSuspects: ["춘월", "돌쇠"],
       contradiction: "춘월이 돌쇠를 모른다고 하거나 관심이 없다고 말하면 그림의 보관 상태와 맞지 않는다.",
       img: "/samunmong/assets/evidence-portrait.png",
@@ -48,18 +48,10 @@
       contradiction: "춘월이 방을 떠난 적 없다고 말하면 장신구 손상과 이동 경위를 다시 물을 수 있다.",
       img: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.png"
     },
-    "나무 상자": {
-      note: "사랑방에서 확인한 작은 나무 상자. 안에 무엇이 있었는지 확인해야 한다.",
-      location: "유문석 사랑방",
-      logic: "상자 안에 있던 물건이 사라졌다면 호패나 문서가 누군가에게 넘어간 경로를 추적할 수 있다.",
-      relatedSuspects: ["유문석", "무덕"],
-      contradiction: "상자 안의 빈자리와 호패 주머니가 함께 확인되면 유문석의 물건이 외부로 나간 정황이 된다.",
-      img: "/samunmong/assets/evidence-transparent/evidence-wooden-box-transparent.png"
-    },
     "무덕의 번진 일기": {
       note: "먹이 번져 읽기 어려운 일기. 숨긴 문장을 추적할 수 있다.",
       location: "무덕의 하인방",
-      logic: "날짜별 기록을 보면 점순이 혼난 일, 밤에 찾아온 사람, 춘월이 숨긴 그림을 차례로 확인할 수 있다.",
+      logic: "날짜별 기록을 보면 점순과 돌쇠의 도망 계획이 주변에 새어 나갔고, 춘월이 돌쇠에게 마음을 숨기고 있었다는 흐름을 확인할 수 있다.",
       relatedSuspects: ["무덕", "유문석", "춘월", "돌쇠"],
       contradiction: "무덕의 기록은 각 용의자의 진술을 날짜별로 대조하게 만드는 기준점이다.",
       entries: [
@@ -80,28 +72,12 @@
       img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-muddy-straw-shoes.png"
     },
     "찢어진 옷고름": {
-      note: "거칠게 끊어진 옷고름. 급한 몸싸움의 흔적일 수 있다.",
+      note: "무덕의 방에서 발견된 찢어진 옷고름. 하인 옷감보다 고급스럽고, 목을 조를 때 쓰였을 가능성이 있다.",
       location: "무덕의 하인방",
-      logic: "점순이 저항했거나 누군가 붙잡았다는 물리적 근거가 된다.",
+      logic: "춘월이 범행 뒤 무덕의 집 근처에 버린 옷고름을 무덕이 주워 방에 둔 정황으로 볼 수 있다. 살해 도구이자 춘월의 물건일 가능성을 함께 따져야 한다.",
       relatedSuspects: ["춘월", "무덕"],
-      contradiction: "누구도 접촉하지 않았다고 하면 손톱 밑 실타래와 함께 반박할 수 있다.",
+      contradiction: "무덕의 물건처럼 보이지만 재질과 향이 하인 옷보다 양반가 여인의 옷고름에 가깝다면, 무덕이 범인이라는 추정이 흔들린다.",
       img: "/samunmong/assets/mudeok-interaction/evidence-torn-collar-tie.png"
-    },
-    "손톱 밑 실타래": {
-      note: "작은 실타래 표본. 옷감이나 끈과 대조할 수 있다.",
-      location: "무덕의 하인방",
-      logic: "점순이 마지막 순간에 누군가의 옷을 붙잡았는지 확인하는 단서다.",
-      relatedSuspects: ["춘월"],
-      contradiction: "긁힌 팔 흔적이나 찢어진 옷고름과 맞물리면 접촉을 숨긴 진술이 무너진다.",
-      img: "/samunmong/assets/mudeok-interaction/evidence-fingernail-thread-sample.png"
-    },
-    "점순 목 검안 종이": {
-      note: "점순의 목 주변을 살핀 기록지. 날붙이 상처보다 목을 조른 듯한 압박 흔적이 남아 있다.",
-      location: "무덕의 하인방",
-      logic: "날카로운 상처보다 목 주변 압박 흔적을 중심으로 범행 방식을 다시 보게 만든다.",
-      relatedSuspects: ["무덕", "춘월"],
-      contradiction: "흉기를 단정하는 진술보다 몸싸움과 압박 흔적을 따져야 한다.",
-      img: "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png"
     },
     "빈 호패 주머니": {
       note: "호패가 빠진 주머니. 호패 조각과 함께 봐야 한다.",
@@ -119,22 +95,6 @@
       contradiction: "출입 기록이 비어 있거나 지워졌다면 누군가 동선을 숨긴 정황이 된다.",
       img: "/samunmong/assets/evidence-transparent/evidence-servant-ledger.png"
     },
-    "종이칼": {
-      note: "사랑방 책상에 놓인 종이칼. 편지 조각과 절단면을 비교할 수 있다.",
-      location: "유문석 사랑방",
-      logic: "편지가 찢긴 것이 아니라 일부가 잘렸다면 계획적으로 문서를 숨긴 정황이 된다.",
-      relatedSuspects: ["유문석", "춘월"],
-      contradiction: "편지를 모른다는 말과 칼끝의 종이 섬유가 충돌할 수 있다.",
-      img: "/samunmong/assets/evidence-transparent/evidence-paper-knife.png"
-    },
-    "먹가루": {
-      note: "책상 주변에 흩어진 먹가루. 문서가 급히 지워졌는지 확인할 수 있다.",
-      location: "유문석 사랑방",
-      logic: "글씨를 지우거나 문질러 없앤 사람이 있는지 확인하는 단서다.",
-      relatedSuspects: ["유문석", "춘월"],
-      contradiction: "춘월의 그림 아래 지워진 글귀와 연결하면 감춘 마음이나 이름을 추궁할 수 있다.",
-      img: "/samunmong/assets/evidence-transparent/evidence-ink-powder.png"
-    },
     "혼서 조각": {
       note: "혼례와 관련 있어 보이는 문서 조각.",
       location: "유문석 사랑방",
@@ -142,14 +102,6 @@
       relatedSuspects: ["춘월", "유문석"],
       contradiction: "춘월이 단순한 피해자라고만 말할 때, 혼인을 피할 다른 목적이 있었는지 묻는 근거가 된다.",
       img: "/samunmong/assets/evidence-transparent/evidence-marriage-letter.png"
-    },
-    "낡은 칼": {
-      note: "돌쇠 처소에서 확인한 오래된 칼. 직접 증거보다 사용 흔적을 조사해야 한다.",
-      location: "돌쇠 처소",
-      logic: "돌쇠에게도 의심스러운 물건이 있지만 상처 방식과 맞는지 따져야 한다.",
-      relatedSuspects: ["돌쇠"],
-      contradiction: "흉기처럼 보이지만 검안 종이와 맞지 않으면 돌쇠를 향한 미끼 단서일 수 있다.",
-      img: "/samunmong/assets/evidence-transparent/evidence-axe-knife.png"
     },
     "피 묻은 붕대": {
       note: "피로 보이는 얼룩이 남은 붕대. 상처의 흔적과 연결될 수 있다.",
@@ -183,36 +135,20 @@
       contradiction: "호패 조각과 따로 발견된 끈은 현장 조작 가능성을 키운다.",
       img: "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.png"
     },
-    "맞물리는 종이 조각": {
-      note: "다른 편지 조각과 맞물릴 수 있는 종이 조각.",
-      location: "뒷문 마당",
-      logic: "찢어진 문서 조각과 맞추면 점순을 유인한 약속 편지의 원문에 가까워진다.",
-      relatedSuspects: ["돌쇠", "춘월"],
-      contradiction: "점순이 돌쇠의 쪽지라고 믿었지만 실제 작성자가 따로 있었는지 묻는 근거다.",
-      img: "/samunmong/assets/evidence-transparent/evidence-matching-paper-scraps.png"
-    },
-    "찢어진 문서 조각": {
-      note: "뒷문 마당에서 발견된 찢어진 문서 조각. 다른 종이 조각과 맞춰 확인해야 한다.",
-      location: "뒷문 마당",
-      logic: "맞물리는 종이 조각과 이어 보면 점순을 유인한 약속 편지가 일부 찢겨 이동했을 가능성이 생긴다.",
-      relatedSuspects: ["돌쇠", "춘월", "무덕"],
-      contradiction: "뒷문 쪽 문서 조각은 누군가 편지 조각을 들고 이동했거나 숨기려 했다는 정황이 된다.",
-      img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png"
-    },
     "찢어진 약속 편지": {
-      note: "점순의 손에서 발견된 찢어진 약속 편지. '오늘 밤 창고에서 기다리시오, 함께 떠납시다'라는 문장이 남아 있다.",
+      note: "점순의 손에서 발견된 찢어진 약속 편지. '오늘 밤 창고에서 기다리시오, 함께 떠납시다'라는 정중한 문장이 남아 있다.",
       location: "유문석 집 앞",
-      logic: "점순은 이 편지를 돌쇠가 보낸 쪽지라고 믿고 창고로 향했으나, 정중한 말투가 돌쇠의 평소 말투와 맞지 않는다.",
+      logic: "점순은 돌쇠가 보낸 쪽지라고 믿고 창고로 향했지만, 말투가 돌쇠답지 않다. 누군가 돌쇠를 흉내 내 점순을 유인했을 가능성이 크다.",
       relatedSuspects: ["돌쇠", "춘월", "무덕"],
       contradiction: "도망 보따리와 맞물리면 돌쇠의 계획을 누군가 이용했을 가능성이 생긴다.",
       img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png"
     },
     "긁힌 팔 흔적": {
-      note: "심문 중 소매 아래에서 확인한 긁힌 흔적. 실오라기나 몸싸움 흔적과 대조할 수 있다.",
+      note: "심문 중 소매 아래에서 확인한 긁힌 흔적. 점순이 마지막 순간 저항하며 남긴 상처일 수 있다.",
       location: "취조실",
-      logic: "점순이 저항하며 남긴 흔적일 수 있어 손톱 밑 실타래와 연결된다.",
+      logic: "춘월이 점순과 가까이 있지 않았다고 주장한다면, 팔의 긁힌 흔적은 직접 접촉을 의심하게 만드는 단서가 된다.",
       relatedSuspects: ["춘월"],
-      contradiction: "춘월이 점순을 가까이 만난 적 없다고 하면 긁힌 팔과 실타래가 직접 반박 근거가 된다.",
+      contradiction: "춘월이 점순을 가까이 만난 적 없다고 하면, 긁힌 팔 흔적과 찢어진 옷고름이 진술을 흔든다.",
       img: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.png"
     }
   }
