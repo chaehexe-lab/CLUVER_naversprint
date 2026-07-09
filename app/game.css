@@ -3656,6 +3656,12 @@
     .hint-prop { right: 2.6%; top: 2.8%; }
     .accuse-prop { right: 2.6%; top: 17%; }
 
+    .accuse-prop .sr-only {
+      font-size: 12px;
+      line-height: 1;
+      letter-spacing: .01em;
+    }
+
     .tool-prop:hover,
     .tool-prop:focus-visible {
       transform: translateY(-3px);
