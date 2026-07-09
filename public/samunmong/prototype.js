@@ -140,19 +140,26 @@
     }
 
     function saveCollectedEvidence(name) {
-      const collected = new Set(readStored(collectedEvidenceKey, []));
+      const collected = new Set(readStoredNames(collectedEvidenceKey));
       collected.add(name);
       localStorage.setItem(collectedEvidenceKey, JSON.stringify([...collected]));
     }
 
     function saveAnalyzedEvidence(name) {
-      const analyzed = new Set(readStored(analyzedEvidenceKey, []));
+      const analyzed = new Set(readStoredNames(analyzedEvidenceKey));
       analyzed.add(name);
       localStorage.setItem(analyzedEvidenceKey, JSON.stringify([...analyzed]));
     }
 
     function hasAnalyzedEvidence(name) {
-      return readStored(analyzedEvidenceKey, []).includes(name);
+      return readStoredNames(analyzedEvidenceKey).includes(name);
+    }
+
+    function readStoredNames(key) {
+      const stored = readStored(key, []);
+      return Array.isArray(stored)
+        ? stored.filter((name) => typeof name === "string" && name.trim())
+        : [];
     }
 
     function getAudioLevel() {
@@ -1086,6 +1093,27 @@
       playSfx("bag", 0.7);
     }
 
+    function restoreSavedInvestigation() {
+      const collectedEvidence = readStoredNames(collectedEvidenceKey);
+      const analyzedEvidence = new Set(readStoredNames(analyzedEvidenceKey));
+
+      collectedEvidence.forEach((name) => {
+        addEvidenceToNote(name);
+        addEvidenceCardToInterrogation(name);
+        addEvidenceToToolPanel(name);
+        markEvidenceCollectedInScene(name);
+      });
+
+      analyzedEvidence.forEach((name) => {
+        const data = evidenceData[name];
+        if (!data) return;
+
+        addObservationToNote(`${name} 추가 분석`, data.toolResult || "도구로 추가 분석을 마쳤다.");
+        document.querySelectorAll(`[data-evidence-name="${name}"]`).forEach((item) => item.classList.add("analyzed"));
+        document.querySelectorAll(`#toolEvidenceList [data-evidence="${name}"]`).forEach((item) => item.classList.add("analyzed"));
+      });
+    }
+
     function setAnalysisTarget(name) {
       currentEvidenceForTool = name;
       document.querySelector("#analysisTarget").textContent = name;
@@ -1853,6 +1881,7 @@
 
     applyContentImages();
     renderTools();
+    restoreSavedInvestigation();
     setupButtonGuides();
     showInitialScreenFromSetup();
   

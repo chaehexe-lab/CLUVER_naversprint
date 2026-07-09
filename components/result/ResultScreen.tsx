@@ -98,6 +98,7 @@ function resetDreamProgress() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem("samunmong-demo-state");
   window.localStorage.removeItem("samunmong-collected-evidence");
+  window.localStorage.removeItem("samunmong-analyzed-evidence");
 }
 
 function readAudioVolume() {
