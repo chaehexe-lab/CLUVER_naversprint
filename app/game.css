@@ -5139,7 +5139,8 @@
     .evidence-location-tab,
     .evidence-location-head span,
     .note-turn-meta,
-    .note-bubble-meta {
+    .tool-prop span,
+    .note-bubble-meta{
       font-size: clamp(16px, 1.55vw, 21px);
       line-height: 1.38;
     }
