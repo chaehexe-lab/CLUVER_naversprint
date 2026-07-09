@@ -33,6 +33,29 @@
       return interrogationHistories.get(suspectId);
     }
 
+    function getLastSuspectAnswer(suspectId) {
+      return [...getInterrogationHistory(suspectId)]
+        .reverse()
+        .find((message) => message.role === "assistant")?.content || "";
+    }
+
+    function syncVisibleSuspectReply() {
+      const suspect = suspects[suspectIndex];
+      const reply = document.querySelector("#suspectReply");
+      const replyText = document.querySelector("#suspectReplyText");
+      if (!suspect || !reply || !replyText) return;
+
+      const lastAnswer = getLastSuspectAnswer(suspect.id);
+      if (!lastAnswer) {
+        reply.hidden = true;
+        replyText.textContent = "질문을 보내면 용의자가 답합니다.";
+        setAiMode(suspect.name);
+        return;
+      }
+
+      showSuspectReply(lastAnswer, suspect.name);
+    }
+
     let suspectIndex = 0;
     let activeNoteSuspectId = suspects[0]?.id || "dolsoe";
     let briefingStepIndex = 0;
@@ -1423,7 +1446,7 @@
       document.querySelector("#interrogationPlate").src = sleeveCheckedSuspects.has(suspect.id) ? suspect.sleeveScene : suspect.scene;
       activeNoteSuspectId = suspect.id;
       renderConversationNotes();
-      reply.hidden = true;
+      syncVisibleSuspectReply();
       showToast(`${suspect.name} 심문으로 전환`);
     }
 
@@ -1500,9 +1523,9 @@
       });
     }
 
-    function addConversationMessage(suspectId, sender, text, meta = "") {
+    function addConversationMessage(suspectId, sender, text, meta = "", shouldFocus = true) {
       getConversationNoteList(suspectId).push({ sender, text, meta });
-      activeNoteSuspectId = suspectId;
+      if (shouldFocus) activeNoteSuspectId = suspectId;
       renderConversationNotes();
     }
 
@@ -1683,10 +1706,12 @@
       setAiMode(mode);
     }
 
-    function addInterrogationAnswer(answer, source, warning) {
-      const suspect = suspects[suspectIndex].name;
-      addConversationMessage(suspects[suspectIndex].id, "suspect", answer);
-      showSuspectReply(answer, suspect);
+    function addInterrogationAnswer(suspect, answer, source, warning) {
+      const isCurrentSuspect = suspects[suspectIndex]?.id === suspect.id;
+      addConversationMessage(suspect.id, "suspect", answer, "", isCurrentSuspect);
+      if (suspects[suspectIndex]?.id === suspect.id) {
+        showSuspectReply(answer, suspect.name);
+      }
       if (source === "fallback" && warning) {
         showToast(warning);
       }
@@ -1721,14 +1746,17 @@
         }
 
         const answer = data.answer || "지금은 답하기 어렵습니다.";
-        addInterrogationAnswer(answer, data.source, data.warning);
         history.push({ role: "user", content: question }, { role: "assistant", content: answer });
         while (history.length > 8) history.shift();
-        setAiMode(suspect.name);
+        addInterrogationAnswer(suspect, answer, data.source, data.warning);
+        if (suspects[suspectIndex]?.id === suspect.id) {
+          setAiMode(suspect.name);
+        }
         showToast(data.source === "openai" ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
       } catch (error) {
-        const message = error instanceof Error ? error.message : "알 수 없는 오류";
-        showSuspectReply("지금은 답하기 어려워 보입니다.", "오류");
+        if (suspects[suspectIndex]?.id === suspect.id) {
+          showSuspectReply("지금은 답하기 어려워 보입니다.", "오류");
+        }
         showToast("AI 답변을 받지 못했습니다.");
       } finally {
         isAskingAi = false;
