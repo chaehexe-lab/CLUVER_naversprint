@@ -784,6 +784,7 @@
     let currentEvidenceForTool = "";
     let selectedToolForAnalysis = "";
     let swipeStartPoint = null;
+    const TOOL_NEEDED_HINT = "특정 도구를 이용해 자세히 알아봐야 할 것 같다.";
 
     const tools = {
       "돋보기": {
@@ -804,140 +805,100 @@
       "호패 조각": {
         note: "점순 옆에서 발견된 신분 단서. 양반 호패로 추정되지만 일부 글자가 긁혀 있다.",
         img: "/samunmong/assets/evidence-wooden-tag.png",
-        tool: "돋보기",
-        toolResult: "긁힌 글자 주변에 일부러 표면을 문지른 흔적이 보인다."
+        tool: "먼지털이 붓",
+        toolResult: "먼지털이 붓으로 털자 긁힌 글자 홈 사이에 고운 분가루가 남아 있다.\n호패가 원래 있던 자리나 누가 만졌는지 다시 확인해 볼 필요가 있다."
       },
       "돌쇠의 그림": {
         note: "최춘월의 방에서 발견된 숨겨둔 초상. 춘월과 돌쇠의 관계를 추적할 단서다.",
         img: "/samunmong/assets/evidence-portrait.png",
-        tool: "촛불 비추기",
-        toolResult: "빛을 비추자 그림 뒤쪽에 접착된 얇은 종이 흔적이 보인다."
+        tool: "돋보기",
+        toolResult: "돋보기로 보니 선이 섬세하고 여러 번 고쳐 그린 흔적이 있다.\n우연히 본 얼굴이라기엔 지나치게 정성스럽다. 춘월은 왜 이 그림을 숨겨 두었을까?"
       },
       "사라진 노리개": {
         note: "끊어진 장식과 급히 잡아챈 듯한 흔적이 남은 노리개. 누가 지녔는지 확인해야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.png",
-        tool: "돋보기",
-        toolResult: "작은 연결 고리에 억지로 잡아당긴 흔적이 보인다."
+        img: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.png"
       },
       "나무 상자": {
         note: "사랑방에서 확인한 작은 나무 상자. 안에 무엇이 있었는지 살펴야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-wooden-box-transparent.png",
-        tool: "돋보기",
-        toolResult: "틈새를 자세히 살피자 상자 안쪽에 종이 가루가 남아 있다."
+        img: "/samunmong/assets/evidence-transparent/evidence-wooden-box-transparent.png"
       },
       "무덕의 번진 일기": {
         note: "먹이 번져 읽기 어려운 일기. 도구로 얼룩을 확인하면 숨긴 문장을 더 추적할 수 있다.",
         img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.png",
         tool: "촛불 비추기",
-        toolResult: "빛을 비추자 번진 먹 아래로 최근에 젖은 듯한 얼룩 경계가 드러난다."
+        toolResult: "촛불을 비추자 번진 먹 아래 기록이 또렷해진다."
       },
       "진흙 묻은 짚신": {
         note: "문밖 젖은 길과 닮은 진흙이 묻은 짚신. 이동 경로를 비교할 단서다.",
-        img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-muddy-straw-shoes.png",
-        tool: "먼지털이 붓",
-        toolResult: "먼지를 털자 짚신 바닥의 젖은 흙이 또렷하게 드러난다."
+        img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-muddy-straw-shoes.png"
       },
       "찢어진 옷고름": {
         note: "거칠게 끊어진 옷고름. 몸싸움이나 급한 움직임을 의심하게 한다.",
-        img: "/samunmong/assets/mudeok-interaction/evidence-torn-collar-tie.png",
-        tool: "돋보기",
-        toolResult: "돋보기로 보니 실밥이 한 방향으로 잡아뜯긴 모양이다."
+        img: "/samunmong/assets/mudeok-interaction/evidence-torn-collar-tie.png"
       },
       "손톱 밑 실 샘플": {
         note: "작은 실오라기 샘플. 옷감이나 끈과 대조할 수 있다.",
-        img: "/samunmong/assets/mudeok-interaction/evidence-fingernail-thread-sample.png",
-        tool: "돋보기",
-        toolResult: "확대해 보니 옷고름의 실 결하고 비슷한 꼬임이 보인다."
+        img: "/samunmong/assets/mudeok-interaction/evidence-fingernail-thread-sample.png"
       },
       "점순 목 검안 종이": {
         note: "점순의 목 주변을 살핀 기록지. 날붙이 상처보다 목을 조른 듯한 압박 흔적이 남아 있다.",
-        img: "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png",
-        tool: "촛불 비추기",
-        toolResult: "빛을 비추자 목 둘레를 따라 눌린 선이 떠오른다. 사망 원인은 압박에 의한 질식으로 보인다."
+        img: "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png"
       },
       "빈 호패 주머니": {
         note: "호패가 빠진 듯한 빈 주머니. 주인과 호패 조각의 관계를 확인할 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-empty-hopae-holder.png",
-        tool: "돋보기",
-        toolResult: "안쪽 가장자리에서 끊어진 끈의 마찰 흔적이 보인다."
+        img: "/samunmong/assets/evidence-transparent/evidence-empty-hopae-holder.png"
       },
       "하인 장부": {
         note: "하인들의 출입과 심부름 기록이 적힌 장부. 장소 이동을 대조할 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-servant-ledger.png",
-        tool: "촛불 비추기",
-        toolResult: "빛에 비추자 장부장 사이로 눌려 있던 빈 줄 하나가 드러난다."
+        img: "/samunmong/assets/evidence-transparent/evidence-servant-ledger.png"
       },
       "종이칼": {
         note: "사랑방 책상에 놓인 종이칼. 편지 조각과 절단면을 비교할 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-paper-knife.png",
-        tool: "돋보기",
-        toolResult: "칼끝에 아주 작은 종이 섬유가 붙어 있다."
+        img: "/samunmong/assets/evidence-transparent/evidence-paper-knife.png"
       },
       "먹가루": {
         note: "책상 주변에 흩어진 먹가루. 문서가 급히 지워졌는지 확인할 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-ink-powder.png",
-        tool: "돋보기",
-        toolResult: "확대해 보니 가루가 문지른 자국을 따라 고르게 흩어져 있다."
+        img: "/samunmong/assets/evidence-transparent/evidence-ink-powder.png"
       },
       "혼서 조각": {
         note: "혼례와 관련 있어 보이는 문서 조각. 인물 관계를 다시 보게 만드는 단서다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-marriage-letter.png",
-        tool: "촛불 비추기",
-        toolResult: "빛에 비추자 접힌 자국 아래 희미한 붉은 인장이 보인다."
+        img: "/samunmong/assets/evidence-transparent/evidence-marriage-letter.png"
       },
       "도끼와 칼": {
         note: "돌쇠 처소에서 확인한 날붙이. 직접 결론보다 사용 흔적을 조사해야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-axe-knife.png",
-        tool: "돋보기",
-        toolResult: "날 가장자리에 오래된 얼룩과 새 얼룩이 섞인 듯한 흔적이 보인다."
+        img: "/samunmong/assets/evidence-transparent/evidence-axe-knife.png"
       },
       "피 묻은 붕대": {
         note: "피처럼 보이는 얼룩이 남은 붕대. 상처나 몸싸움 흔적과 연결될 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-bloodied-bandage.png",
-        tool: "돋보기",
-        toolResult: "얼룩 가장자리가 아직 짙고 불규칙하게 번진 흔적이 보인다."
+        img: "/samunmong/assets/evidence-transparent/evidence-bloodied-bandage.png"
       },
       "도망 보따리": {
         note: "급히 싼 듯한 보따리. 누군가 떠날 준비를 했는지 확인해야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-escape-bundle.png",
-        tool: "돋보기",
-        toolResult: "묶음 틈을 살피자 안쪽에 접힌 종이 조각이 끼어 있다."
+        img: "/samunmong/assets/evidence-transparent/evidence-escape-bundle.png"
       },
       "긁힌 팔 흔적": {
         note: "심문 중 소매 아래에서 확인한 긁힌 흔적. 실오라기나 몸싸움 흔적과 대조할 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.png",
-        tool: "돋보기",
-        toolResult: "상처 주변에 작은 섬유 먼지가 붙어 있는 듯하다."
+        img: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.png"
       },
       "작은 발자국": {
         note: "뒷문 마당에 남은 작은 발자국. 젖은 돌길의 이동 경로와 맞춰볼 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-small-footprints.png",
-        tool: "촛불 비추기",
-        toolResult: "촛불을 낮게 비추자 발자국의 폭과 앞코 모양이 드러났다. 남성의 짚신이 아니라 여성의 고급 신발 자국으로 보인다."
+        img: "/samunmong/assets/evidence-transparent/evidence-small-footprints.png"
       },
       "끊어진 호패끈": {
         note: "호패와 연결되었을 법한 끊어진 끈. 호패 조각과 함께 봐야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.png",
-        tool: "돋보기",
-        toolResult: "끊어진 단면이 칼로 잘린 듯 매끈한 부분과 거친 부분으로 나뉜다."
+        img: "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.png"
       },
       "맞물리는 종이 조각": {
         note: "다른 편지 조각과 맞물릴 수 있는 종이. 조각들을 맞춰 확인해야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-matching-paper-scraps.png",
-        tool: "촛불 비추기",
-        toolResult: "빛 아래에서 가장자리를 맞춰 보니 찢어진 결이 자연스럽게 이어진다."
+        img: "/samunmong/assets/evidence-transparent/evidence-matching-paper-scraps.png"
       },
       "찢어진 문서 조각": {
         note: "뒷문 마당에서 발견된 찢어진 문서 조각. 다른 종이 조각과 맞춰 확인해야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png",
-        tool: "촛불 비추기",
-        toolResult: "빛을 비추자 종이 뒷면에 흐릿한 먹 자국이 보인다."
+        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png"
       },
       "찢어진 약속 편지": {
         note: "점순의 손에서 발견된 찢어진 약속 편지. '오늘 밤 창고에서 기다리시오, 함께 떠납시다'라는 문장이 남아 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png",
-        tool: "촛불 비추기",
-        toolResult: "빛을 비추자 종이 뒷면에 흐릿한 먹 자국이 보인다."
+        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png"
       }
     };
 
@@ -958,7 +919,19 @@
       const entries = evidenceData[name]?.entries;
       if (!Array.isArray(entries) || !entries.length) return "";
 
-      return entries.map((entry) => `${entry.date}: ${entry.text}`).join("\n");
+      return entries
+        .map((entry) => {
+          const lines = String(entry.text || "")
+            .split(". ")
+            .map((part, index, list) => {
+              const sentence = index < list.length - 1 && !part.endsWith(".") ? `${part}.` : part;
+              return `  ${sentence.trim()}`;
+            })
+            .filter((line) => line.trim());
+
+          return `${entry.date}\n${lines.join("\n")}`;
+        })
+        .join("\n\n");
     }
 
     function getEvidenceAnalysisText(name) {
@@ -966,10 +939,7 @@
       const lines = [data.toolResult || "추가 분석 결과가 없습니다."];
       const entries = formatEvidenceEntries(name);
       if (entries) {
-        lines.push("드러난 기록", entries);
-      }
-      if (data.logic) {
-        lines.push(data.logic);
+        lines.push(entries);
       }
       return lines.filter(Boolean).join("\n\n");
     }
@@ -982,9 +952,7 @@
       ];
 
       if (data.logic) lines.push(data.logic);
-      if (data.relatedSuspects?.length) lines.push(`관련 인물: ${data.relatedSuspects.join(", ")}`);
       if (analyzed && formatEvidenceEntries(name)) lines.push(`확인된 내용:\n${formatEvidenceEntries(name)}`);
-      if (data.tool) lines.push(`추천 도구: ${data.tool}`);
 
       return lines.filter(Boolean).join("\n");
     }
@@ -995,6 +963,7 @@
         <img class="evidence-thumb" src="${escapeHtml(data.img || "/samunmong/assets/evidence-wooden-tag.png")}" alt="">
         <span class="evidence-card-copy">
           <strong>${escapeHtml(name)}</strong>
+          ${data.tool ? `<span class="evidence-tool-cue">${escapeHtml(TOOL_NEEDED_HINT)}</span>` : ""}
           <span class="evidence-location">획득: ${escapeHtml(getEvidenceLocation(name))}</span>
           <span>${escapeHtml(data.note || "현장에서 발견된 단서")}</span>
           ${data.logic ? `<span class="evidence-logic">${escapeHtml(data.logic)}</span>` : ""}
@@ -1040,16 +1009,18 @@
     function addEvidenceToToolPanel(name) {
       const list = document.querySelector("#toolEvidenceList");
       if (!list) return;
+      const data = evidenceData[name] || {};
+      if (!data.tool) return;
+
       list.querySelector(".evidence-empty")?.remove();
       const exists = [...list.children].some((item) => item.dataset.evidence === name);
       if (exists) return;
 
-      const data = evidenceData[name] || {};
       const button = document.createElement("button");
       button.className = `tool-evidence-option${hasAnalyzedEvidence(name) ? " analyzed" : ""}`;
       button.type = "button";
       button.dataset.evidence = name;
-      button.innerHTML = `<img src="${data.img || "/samunmong/assets/evidence-wooden-tag.png"}" alt=""><span><strong>${name}</strong>${data.tool ? "자세히 살펴보기" : "확인 완료"}</span>`;
+      button.innerHTML = `<img src="${data.img || "/samunmong/assets/evidence-wooden-tag.png"}" alt=""><span><strong>${name}</strong>${data.tool ? TOOL_NEEDED_HINT : "확인 완료"}</span>`;
       button.addEventListener("click", () => setAnalysisTarget(name));
       list.appendChild(button);
     }
@@ -1081,7 +1052,7 @@
       note.textContent = analyzed
         ? getEvidenceAnalysisText(name)
         : name
-          ? `${getEvidenceDetailText(name)}\n${data.tool ? "증거를 관찰하고 어울리는 도구를 직접 골라 보세요." : "추가 도구 분석은 필요하지 않습니다."}`
+          ? `${getEvidenceDetailText(name)}${data.tool ? `\n${TOOL_NEEDED_HINT}` : ""}`
         : "수집한 증거를 고르면 이곳에 크게 표시됩니다.";
       const preview = document.querySelector(".tool-preview");
       preview?.classList.remove("revealed", "wrong-tool");
@@ -1354,12 +1325,12 @@
         addEvidenceToBag(name);
         addEvidenceToNote(name);
       }
-      setAnalysisTarget(name);
+      if (data.tool) setAnalysisTarget(name);
 
       document.querySelector("#genericEvidenceImage").src = data.img || "/samunmong/assets/evidence-wooden-tag.png";
       document.querySelector("#genericEvidenceTitle").textContent = name;
-      document.querySelector("#genericEvidenceText").textContent = "";
-      document.querySelector("#genericEvidenceText").hidden = true;
+      document.querySelector("#genericEvidenceText").textContent = data.tool ? TOOL_NEEDED_HINT : "";
+      document.querySelector("#genericEvidenceText").hidden = !data.tool;
       document.querySelector("#genericEvidenceInspect").classList.add("show");
       clearTimeout(showInspect.timer);
     }
