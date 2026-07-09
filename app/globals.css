@@ -572,6 +572,10 @@ html body * {
   cursor: var(--cursor-default) !important;
 }
 
+html:active body:active *:active {
+  cursor: var(--cursor-click) !important;
+}
+
 a[href],
 button:not(:disabled),
 summary,
