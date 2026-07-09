@@ -126,10 +126,21 @@ function countBreakEvidence(persona: SuspectPersona, evidenceNames: string[]) {
 
 function buildSystemPrompt(persona: SuspectPersona, evidenceNames: string[], reactions: EvidenceReaction[]) {
   const pressureCount = countBreakEvidence(persona, evidenceNames);
-  const pressureGuide =
-    pressureCount >= Math.min(3, persona.breakEvidenceNames.length)
-      ? `결정적 증거가 많이 제시되었다. ${persona.finalBehavior}`
-      : "아직 완전히 무너질 단계는 아니다. 숨기는 내용은 직접 말하지 말고, 증거가 불리할수록 말끝을 흐린다.";
+  const pressureGuide = (() => {
+    if (pressureCount >= Math.min(2, persona.breakEvidenceNames.length)) {
+      return `결정적 증거가 여러 개 제시되었다. 먼저 당황해서 말을 고르지 못하고, 고정 알리바이와 충돌하는 지점을 일부 인정한다. ${persona.finalBehavior} 다만 범행 전말 전체를 한 번에 자백하지 말고, 다음에 확인할 단서나 인물을 암시한다.`;
+    }
+
+    if (pressureCount === 1) {
+      return "결정적 증거가 하나 제시되었다. 명백히 당황해야 한다. 바로 자백하지는 않되, 숨을 고르거나 말을 더듬고, 이전 주장 중 한 부분을 작게 수정한다. 플레이어가 추리 방향을 잡을 수 있도록 관련 장소, 시간, 인물 중 하나를 흘린다.";
+    }
+
+    if (reactions.length) {
+      return "직접 관련 증거가 제시되었다. 평소보다 방어적으로 흔들리고, 반응 지침에 나온 사실은 일부 인정한다. 단순 부정만 반복하지 말고 작은 모순이나 감정 동요를 드러낸다.";
+    }
+
+    return "아직 직접적인 증거 압박은 없다. 숨기는 내용은 먼저 말하지 말고, 고정 알리바이를 유지하며 조심스럽게 대답한다.";
+  })();
 
   return `너는 추리게임 '삼운몽: 세 개의 꿈'의 조선시대 사건 용의자 ${persona.name}이다.
 
@@ -176,7 +187,9 @@ ${pressureGuide}
 - 플레이어가 "이거", "이 물건", "이 증거"라고 말하면 제시된 증거를 가리키는 것으로 이해한다.
 - 알리바이를 반복해서 물어도 고정 알리바이의 장소와 행동을 유지한다.
 - 아직 제시되지 않은 결정적 진실이나 범행 전말은 먼저 말하지 않는다.
-- 증거가 부족하면 모호하게 답하고, 증거가 불리하면 방어적으로 흔들린다.`;
+- 증거가 부족하면 모호하게 답한다.
+- 관련 증거가 제시되면 그 증거 이름을 자연스럽게 언급하고, 무조건 부정만 하지 말고 당황, 침묵, 말 바꾸기, 작은 인정 중 하나를 반드시 보인다.
+- 결정적 증거가 제시되면 플레이어가 다음 질문을 떠올릴 수 있도록 새 단서 하나를 암시한다.`;
 }
 
 function extractOpenAIText(data: unknown) {
@@ -229,7 +242,12 @@ function fallbackAnswer(
   const guide = reactions[0]?.responseGuide;
   const evidenceText = evidenceNames[0] ? ` ${evidenceNames[0]} 말씀이십니까.` : "";
   const base = guide || (hasAlibiIntent(question) ? persona.fixedAlibi : persona.publicTruth);
-  const answer = `${evidenceText} ${base} 지금은 자세히 말씀드리기 어렵습니다.`;
+  const pressureCount = countBreakEvidence(persona, evidenceNames);
+  const pressureText =
+    pressureCount > 0
+      ? "그 증거라면 저도 함부로 모른다 할 수는 없겠습니다. 잠시만, 말이 좀 엉킨 것 같습니다."
+      : "지금은 자세히 말씀드리기 어렵습니다.";
+  const answer = `${evidenceText} ${base} ${pressureText}`;
 
   return {
     answer: applyLongQuestionNotice(answer, wasQuestionTruncated),
