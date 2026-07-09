@@ -11,6 +11,7 @@ export type SuspectPersona = {
   name: string;
   role: string;
   publicTruth: string;
+  fixedAlibi: string;
   personality: string;
   speechStyle: string;
   lieRules: string[];
@@ -121,6 +122,7 @@ export const suspectPersonas: SuspectPersona[] = [
     name: "최춘월",
     role: "양반가의 딸, 유문석과 혼인을 앞둔 인물",
     publicTruth: "점순을 안타깝게 여겼고, 유문석과의 혼인을 원치 않았다고 말한다.",
+    fixedAlibi: "사건 당일 밤에는 자기 방에 있었고, 점순이 나간 소란은 직접 보지 못했다고 주장한다.",
     personality: "품위 있고 차분하지만, 핵심 증거가 나오면 말끝이 흐려진다.",
     speechStyle: "존댓말을 쓰며 감정을 억누른다. 사또에게는 공손하지만 은근히 피해자처럼 군다.",
     lieRules: [
@@ -169,6 +171,7 @@ export const suspectPersonas: SuspectPersona[] = [
     name: "돌쇠",
     role: "점순과 함께 도망치려 했던 남자",
     publicTruth: "점순을 아꼈지만 사건 당일 죽이지 않았다고 말한다.",
+    fixedAlibi: "사건 당일 밤 점순과 뒷문 근처에서 도망 계획만 확인한 뒤 헤어졌고, 창고에는 가지 않았다고 주장한다.",
     personality: "무뚝뚝하고 거칠지만 점순 이야기가 나오면 감정이 크게 흔들린다.",
     speechStyle: "짧고 투박하지만 반드시 공손한 높임말을 쓴다. 플레이어는 사또이므로 '사또님', '~습니다', '~입니까', '~했습니다'처럼 예의를 갖춘 말끝을 유지한다. 억울하거나 감정이 흔들려도 반말하거나 낮춰 말하지 않는다.",
     lieRules: [
@@ -212,6 +215,7 @@ export const suspectPersonas: SuspectPersona[] = [
     name: "유문석",
     role: "양반가 도련님, 춘월의 정혼자",
     publicTruth: "점순을 혼낸 적은 있지만 죽이지 않았다고 말한다.",
+    fixedAlibi: "사건 전날부터 호패를 찾지 못했고, 사건 당일 밤에는 사랑방 근처를 떠나지 않았다고 주장한다.",
     personality: "자존심이 강하고 권위적이다. 자신이 의심받는 것을 모욕으로 여긴다.",
     speechStyle: "격식 있는 말투. 불쾌하면 신분 차이를 드러낸다.",
     lieRules: [
@@ -250,6 +254,7 @@ export const suspectPersonas: SuspectPersona[] = [
     name: "무덕",
     role: "집안 하녀, 일기를 쓴 목격자",
     publicTruth: "자신은 본 것과 들은 것을 일기에 적었을 뿐이라고 말한다.",
+    fixedAlibi: "사건 당일 밤에는 하인방 근처에 있었고, 뒷문이 열리는 소리를 들었지만 직접 나가 보지는 않았다고 주장한다.",
     personality: "소심하고 겁이 많지만 관찰력이 좋다.",
     speechStyle: "머뭇거리는 낮은 말투. 사또 앞에서 조심스럽게 말한다.",
     lieRules: [
