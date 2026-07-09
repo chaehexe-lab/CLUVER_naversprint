@@ -60,7 +60,7 @@ const typeSfxPaths = [
   `${soundBase}/sfx/type-2.mp3`,
   `${soundBase}/sfx/type-3.mp3`
 ] as const;
-const dreamLoadingDuration = 2600;
+const loadingDuration = 2600;
 
 const outcomeCopy = {
   success: {
@@ -290,7 +290,7 @@ export default function ResultScreen() {
   );
   const [showWarning, setShowWarning] = useState(false);
   const [showExitPrompt, setShowExitPrompt] = useState(false);
-  const [showDreamLoading, setShowDreamLoading] = useState(false);
+  const [showLoading, setShowLoading] = useState(false);
 
   const selectedSuspect = suspects.find((suspect) => suspect.id === selectedSuspectId) ?? suspects[0];
   const selectedIndex = suspects.findIndex((suspect) => suspect.id === selectedSuspect.id);
@@ -312,22 +312,22 @@ export default function ResultScreen() {
     }
   }
 
-  function withDreamLoading(action: () => void, delay = dreamLoadingDuration) {
-    setShowDreamLoading(true);
+  function withLoading(action: () => void, delay = loadingDuration) {
+    setShowLoading(true);
     window.setTimeout(action, delay);
   }
 
-  function navigateWithDreamLoading(path: string, beforeNavigate?: () => void) {
+  function navigateWithLoading(path: string, beforeNavigate?: () => void) {
     beforeNavigate?.();
-    withDreamLoading(() => {
+    withLoading(() => {
       window.location.href = path;
     });
   }
 
   function confirmAccusation(force = false) {
     if (!force && missingEvidence.length > 0) {
-      withDreamLoading(() => {
-        setShowDreamLoading(false);
+      withLoading(() => {
+        setShowLoading(false);
         setShowWarning(true);
       });
       return;
@@ -339,12 +339,12 @@ export default function ResultScreen() {
       suspectId: selectedSuspect.id,
       outcome
     });
-    navigateWithDreamLoading(`/result?${params.toString()}&accused=1`);
+    navigateWithLoading(`/result?${params.toString()}&accused=1`);
   }
 
   function openExitPrompt() {
-    withDreamLoading(() => {
-      setShowDreamLoading(false);
+    withLoading(() => {
+      setShowLoading(false);
       setShowExitPrompt(true);
     });
   }
@@ -382,11 +382,11 @@ export default function ResultScreen() {
             <h1 id="resultTitle">{copy.title}</h1>
             <TypewriterLines lines={copy.lines} onType={playTypingSfx} />
             <div className="verdict-actions">
-{outcome === "success" && accusedSuspect.id === finalCulpritId ? (
+              {outcome === "success" && accusedSuspect.id === finalCulpritId ? (
                 <button
                   className="wood-result-button"
                   type="button"
-                  onClick={() => navigateWithDreamLoading("/interpretation", unlockTruthPage)}
+                  onClick={() => navigateWithLoading("/interpretation", unlockTruthPage)}
                 >
                   해몽하기
                 </button>
@@ -394,7 +394,7 @@ export default function ResultScreen() {
                 <button
                   className="wood-result-button"
                   type="button"
-                  onClick={() => navigateWithDreamLoading("/?start=briefingScreen", returnToBriefingWithProgress)}
+                  onClick={() => navigateWithLoading("/?start=briefingScreen", returnToBriefingWithProgress)}
                 >
                   다시 조사하기
                 </button>
@@ -423,7 +423,7 @@ export default function ResultScreen() {
                 <button
                   className="button primary"
                   type="button"
-                  onClick={() => navigateWithDreamLoading("/?start=dreamScreen&dreamExit=1")}
+                  onClick={() => navigateWithLoading("/?start=dreamScreen&dreamExit=1")}
                 >
                   돌아가기
                 </button>
@@ -434,7 +434,7 @@ export default function ResultScreen() {
             </div>
           </aside>
         ) : null}
-        {showDreamLoading ? <div className="dream-loading-overlay" role="status" aria-label="몽땅 불러오는 중" /> : null}
+        {showLoading ? <div className="dream-loading-overlay" role="status" aria-label="이동 중">이동 중...</div> : null}
       </main>
     );
   }
@@ -507,7 +507,7 @@ export default function ResultScreen() {
           </section>
         </div>
       ) : null}
-      {showDreamLoading ? <div className="dream-loading-overlay" role="status" aria-label="몽땅 불러오는 중" /> : null}
+      {showLoading ? <div className="dream-loading-overlay" role="status" aria-label="이동 중">이동 중...</div> : null}
     </main>
   );
 }

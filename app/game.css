@@ -4858,13 +4858,13 @@
       z-index: 20;
       display: grid;
       place-items: center;
-      color: transparent;
-      background: rgba(7, 7, 8, .72);
+      color: white;
+      background: black;
       opacity: 0;
       pointer-events: none;
       transition: opacity .42s ease;
       font-family: "PFStardust", "VitroPride", "Noto Serif KR", serif;
-      font-size: 0;
+      font-size: clamp(21px, 3.4vw, 40px);
       font-weight: 400;
       letter-spacing: 0;
     }
@@ -4872,56 +4872,23 @@
     .fade.show { opacity: .96; }
     .fade.long { transition-duration: .58s; }
 
-    .fade.dream-loading::before,
-    .dream-loading-overlay::before {
-      content: "";
-      width: min(760px, 86vw);
-      aspect-ratio: 1983 / 793;
-      background: url("/samunmong/assets/ui/dream-loading-screen.png") center / contain no-repeat;
-      filter: drop-shadow(0 24px 44px rgba(0, 0, 0, .42));
-    }
-
-    .fade.dream-loading::after,
-    .dream-loading-overlay::after {
-      content: "";
-      position: absolute;
-      left: 50%;
-      top: calc(50% + clamp(38px, 7.4vw, 72px));
-      width: min(324px, 37vw);
-      height: clamp(12px, 1.28vw, 16px);
-      border-radius: 2px;
-      background: linear-gradient(90deg, #7fbec1, #9bd7d6);
-      box-shadow: 0 0 0 1px rgba(43, 90, 91, .16), 0 0 12px rgba(122, 201, 202, .32);
-      transform: translateX(-50%);
-      transform-origin: left center;
-      clip-path: inset(0 calc(100% - var(--dream-loading-fill, 100%)) 0 0);
-      transition: clip-path var(--dream-loading-duration, 2600ms) linear;
-    }
-
     .dream-loading-overlay {
       position: fixed;
       inset: 0;
       z-index: 120;
       display: grid;
       place-items: center;
-      background: rgba(7, 7, 8, .72);
+      color: white;
+      background: black;
+      font-family: "PFStardust", "VitroPride", "Noto Serif KR", serif;
+      font-size: clamp(21px, 3.4vw, 40px);
+      font-weight: 400;
       animation: dream-loading-fade .24s ease both;
-    }
-
-    .dream-loading-overlay::after {
-      clip-path: inset(0 100% 0 0);
-      transition: none;
-      animation: dream-loading-bar var(--dream-loading-duration, 2600ms) linear both;
     }
 
     @keyframes dream-loading-fade {
       from { opacity: 0; }
       to { opacity: .96; }
-    }
-
-    @keyframes dream-loading-bar {
-      from { clip-path: inset(0 100% 0 0); }
-      to { clip-path: inset(0 0 0 0); }
     }
 
     @media (prefers-reduced-motion: reduce) {

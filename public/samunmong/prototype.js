@@ -644,7 +644,7 @@
       setTimeout(startFieldGuide, 640);
     }
 
-    const dreamLoadingDuration = 2600;
+    const loadingDuration = 2600;
     const themeStartLoadingDuration = 4200;
     const themeStartMaxWait = 9000;
     const themeStartAssets = [
@@ -656,28 +656,13 @@
       "/samunmong/assets/suspects/mudeok-seated.png"
     ];
 
-    function setDreamLoadingProgress(progress) {
-      if (!fade) return;
-      const clamped = Math.max(0, Math.min(100, Math.round(progress)));
-      fade.style.setProperty("--dream-loading-fill", `${clamped}%`);
+    function showLoading(message = "이동 중...") {
+      fade?.classList.add("show");
+      if (fade) fade.textContent = message;
     }
 
-    function showDreamLoading(message = "몽(夢)땅 불러오는 중…", duration = dreamLoadingDuration, animate = true) {
-      fade?.classList.add("show", "dream-loading");
-      if (fade) {
-        fade.textContent = message;
-        fade.style.setProperty("--dream-loading-duration", `${duration}ms`);
-        setDreamLoadingProgress(0);
-        if (animate) {
-          requestAnimationFrame(() => setDreamLoadingProgress(100));
-        }
-      }
-    }
-
-    function hideDreamLoading() {
-      fade?.classList.remove("show", "dream-loading");
-      fade?.style.removeProperty("--dream-loading-duration");
-      fade?.style.removeProperty("--dream-loading-fill");
+    function hideLoading() {
+      fade?.classList.remove("show");
     }
 
     function preloadImage(src) {
@@ -698,50 +683,36 @@
       });
     }
 
-    function preloadImages(sources, onProgress) {
+    function preloadImages(sources) {
       const uniqueSources = [...new Set(sources.filter(Boolean))];
-      if (!uniqueSources.length) {
-        onProgress?.(100);
-        return Promise.resolve();
-      }
-
-      let loaded = 0;
-      onProgress?.(6);
-      return Promise.all(
-        uniqueSources.map((src) =>
-          preloadImage(src).then(() => {
-            loaded += 1;
-            onProgress?.(6 + (loaded / uniqueSources.length) * 94);
-          })
-        )
-      );
+      if (!uniqueSources.length) return Promise.resolve();
+      return Promise.all(uniqueSources.map((src) => preloadImage(src)));
     }
 
     function goAfterPreload(id, assets, options = {}) {
       stopBriefingTyping();
       document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
       playSfx(options.sfx || "move", options.volume ?? 0.82);
-      showDreamLoading("몽(夢)땅 불러오는 중…", options.progressDuration || 180, false);
+      showLoading(options.message || "이동 중...");
 
       const startedAt = Date.now();
       let done = false;
       const finish = () => {
         if (done) return;
         done = true;
-        setDreamLoadingProgress(100);
         const elapsed = Date.now() - startedAt;
         const delay = Math.max(0, (options.minDuration || 0) - elapsed);
         setTimeout(() => {
           screens.forEach((screen) => screen.classList.toggle("active", screen.id === id));
           updateCurrentLocation(id);
           saveProgress(id);
-          hideDreamLoading();
+          hideLoading();
           updateBgmForScreen(id);
           options.after?.();
         }, delay + 180);
       };
 
-      preloadImages(assets, setDreamLoadingProgress).then(finish);
+      preloadImages(assets).then(finish);
       setTimeout(finish, options.maxWait || themeStartMaxWait);
     }
 
@@ -749,28 +720,19 @@
       stopBriefingTyping();
       document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
       playSfx("move", 0.82);
-      const duration = options.dreamLoading ? options.duration || dreamLoadingDuration : 260;
-      if (options.dreamLoading) {
-        showDreamLoading("몽(夢)땅 불러오는 중…", duration);
-      } else {
-        fade?.classList.add("show");
-        if (fade) fade.textContent = message;
-      }
+      const duration = options.loading ? options.duration || loadingDuration : 260;
+      showLoading(message);
       setTimeout(() => {
         screens.forEach((screen) => screen.classList.toggle("active", screen.id === id));
         updateCurrentLocation(id);
         saveProgress(id);
-        if (options.dreamLoading) {
-          hideDreamLoading();
-        } else {
-          fade?.classList.remove("show");
-        }
+        hideLoading();
         updateBgmForScreen(id);
         if (id === "fieldOne") maybeStartFieldGuide();
       }, duration);
     }
 
-    function goRush(id, message = "사건 현장으로 진입 중...") {
+    function goRush(id, message = "현장으로 이동 중...") {
       stopBriefingTyping();
       document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
       playSfx("briefingNext", 0.9);
@@ -854,10 +816,10 @@
 
       playSfx("dream", 0.85);
       writeBgmState(currentBgm || bgmForScreen(getActiveScreenId()), bgmTracks[currentBgm || bgmForScreen(getActiveScreenId())]);
-      showDreamLoading();
+      showLoading("이동 중...");
       setTimeout(() => {
         window.location.href = `/result?${params.toString()}`;
-      }, dreamLoadingDuration);
+      }, loadingDuration);
     }
 
     const settingsDialog = document.querySelector("#settingsDialog");
@@ -929,8 +891,8 @@
       showToast("게임을 종료했습니다. 창을 닫아도 진행 위치가 보존됩니다.");
       window.close();
     });
-    on("#skipTutorial", "click", () => go("dreamScreen", "이동 중...", { dreamLoading: true }));
-    on("#nextTutorial", "click", () => go("dreamScreen", "이동 중...", { dreamLoading: true }));
+    on("#skipTutorial", "click", () => go("dreamScreen", "이동 중...", { loading: true }));
+    on("#nextTutorial", "click", () => go("dreamScreen", "이동 중...", { loading: true }));
     on("#closeDreamNotice", "click", closeDreamNotice);
     on("#closeDreamNoticeX", "click", closeDreamNotice);
     document.querySelectorAll("[data-dream-disabled='true']").forEach((button) => {
@@ -965,7 +927,7 @@
       } else {
         sessionStorage.setItem(fieldGuidePendingKey, "1");
       }
-      goRush("fieldOne", "사건 현장으로 진입 중...");
+      goRush("fieldOne", "현장으로 이동 중...");
     });
     on("#nextFieldGuide", "click", () => {
       if (fieldGuideStep === "map-click") {
