@@ -3714,6 +3714,7 @@
       color: #f2e6d4;
       font-size: clamp(16px, 1.55vw, 21px);
       transform: translateX(-50%);
+      white-space: nowrap;
     }
 
     .map-prop::before {
