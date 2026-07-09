@@ -56,7 +56,7 @@ export const dreamOptions: DreamOption[] = [
 
 export const briefing = {
   title: "조선시대 살인사건",
-  startLabel: "현장으로 이동"
+  startLabel: "수사 시작"
 } as const;
 
 const investigationDock = [

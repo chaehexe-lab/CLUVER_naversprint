@@ -106,7 +106,17 @@
 - **Purpose:** 사건의 시작점을 보여주고, 플레이어가 직접 수사에 참여한다고 느끼게 한다.
 - **Why I chose this design:** 어두운 현장과 작은 단서는 포인트 앤 클릭 추리 게임의 기본 행동을 자연스럽게 유도한다.
 - **Connected pages or mechanisms:** 증거 인벤토리, 취조실, 모순 기록.
-- **Decision status:** Confirmed for visual direction. 현장에서도 취조실과 같은 대화 기록장을 열어볼 수 있다.
+- **Decision status:** Confirmed for visual direction. 현장에서도 취조실과 같은 대화 기록장을 열어볼 수 있다. 첫 현장에 실제로 들어간 뒤 지도와 하단 도구 버튼의 역할을 안내한다.
+
+### 첫 현장 조작 안내
+
+- **Role in the flow:** 첫 현장 진입 직후, 실제 구현된 현장 화면 위에서 지도와 도구 버튼의 역할을 안내한다.
+- **User action:** 하이라이트된 `마을 지도` 버튼을 직접 눌러 지도를 펼치고, 현재 위치 하이라이트를 확인한 뒤 보따리/도구/기록장/취조실 설명을 본다.
+- **Included elements:** 실제 첫 현장 화면, 하이라이트된 마을 지도 버튼, 펼쳐진 지도와 현재 위치 표시, 하단 메뉴 버튼 역할 설명.
+- **Purpose:** 플레이어가 별도 튜토리얼 화면이 아니라 실제 현장에서 직접 눌러 보며 어디에 있는지와 무엇을 눌러야 하는지 이해하게 한다.
+- **Why I chose this design:** 첫 현장을 그대로 보여주면 몰입감이 유지되고, 실제 버튼을 눌러 보게 하면 이후 조사 루프를 더 자연스럽게 익힐 수 있다.
+- **Connected pages or mechanisms:** 조선 사건 현장, 조선 마을 지도 화면, 증거 인벤토리, 대화 기록장, 취조실.
+- **Decision status:** User-approved direction. 용의자 호패 카드는 사건 브리핑에 남기고, 지도/버튼 역할 안내는 첫 현장에서 진행한다.
 
 ### 조선 마을 지도 화면
 

@@ -5,6 +5,14 @@
     const toast = document.querySelector("#toast");
     const briefingCopy = document.querySelector("#briefingCopy");
     const startCaseButton = document.querySelector("#startCase");
+    const briefingCard = document.querySelector(".briefing-card");
+    const briefingPrevButton = document.querySelector("#briefingPrev");
+    const briefingNextButton = document.querySelector("#briefingNext");
+    const briefingPanels = [...document.querySelectorAll("[data-briefing-panel]")];
+    const fieldGuide = document.querySelector("#fieldOnboarding");
+    const fieldGuidePanels = [...document.querySelectorAll("[data-field-guide-panel]")];
+    const fieldGuideNextButton = document.querySelector("#nextFieldGuide");
+    const fieldGuideSkipButton = document.querySelector("#skipFieldGuide");
     let selectedEvidence = "";
     let isAskingAi = false;
     const interrogationHistories = new Map();
@@ -27,13 +35,18 @@
 
     let suspectIndex = 0;
     let activeNoteSuspectId = suspects[0]?.id || "dolsoe";
+    let briefingStepIndex = 0;
+    let isBriefingTyped = false;
     const conversationNotes = new Map();
     const sleeveCheckedSuspects = new Set();
     const saveKey = "samunmong-demo-state";
     const collectedEvidenceKey = "samunmong-collected-evidence";
     const analyzedEvidenceKey = "samunmong-analyzed-evidence";
+    const fieldGuidePendingKey = "samunmong-field-guide-pending";
     const settingsKey = "samunmong-demo-settings";
     const bgmStateKey = "samunmong-bgm-state";
+    let fieldGuideStep = "";
+    let fieldGuideMapTimer = 0;
     const locationMeta = {
       tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
       dreamScreen: { name: "꿈 선택", x: "18%", y: "18%" },
@@ -247,6 +260,37 @@
       clearInterval(typeBriefing.timer);
     }
 
+    function updateBriefingStep() {
+      const lastIndex = Math.max(0, briefingPanels.length - 1);
+      briefingStepIndex = Math.max(0, Math.min(lastIndex, briefingStepIndex));
+      briefingCard?.setAttribute("data-briefing-step", String(briefingStepIndex));
+
+      briefingPanels.forEach((panel) => {
+        const isActive = Number(panel.dataset.briefingPanel) === briefingStepIndex;
+        panel.classList.toggle("active", isActive);
+        panel.setAttribute("aria-hidden", String(!isActive));
+      });
+
+      if (briefingPrevButton) {
+        briefingPrevButton.disabled = briefingStepIndex === 0;
+      }
+      if (briefingNextButton) {
+        briefingNextButton.hidden = briefingStepIndex === lastIndex;
+        briefingNextButton.disabled = briefingStepIndex === 0 && !isBriefingTyped;
+      }
+      if (startCaseButton) {
+        startCaseButton.hidden = briefingStepIndex !== lastIndex;
+        startCaseButton.classList.toggle("ready", briefingStepIndex === lastIndex);
+      }
+    }
+
+    function startBriefingSequence() {
+      briefingStepIndex = 0;
+      isBriefingTyped = false;
+      updateBriefingStep();
+      typeBriefing();
+    }
+
     function applySettings(settings) {
       document.body.classList.toggle("reduce-motion", settings.reduceMotion);
       document.body.classList.toggle("high-contrast", settings.highContrast);
@@ -449,6 +493,74 @@
       updateCurrentLocation(screenId);
     });
 
+    const fieldGuideTargets = {
+      "map-click": ["#openMapFromField"],
+      "map-open": ["#mapPanel .map-pin-button.current", "#mapPanel .map-label.current"],
+      tools: ["#openBagFromField", "#fieldOne .open-tool-panel", "#openNoteFromField", "#fieldOne .room-chip"]
+    };
+
+    function clearFieldGuideHighlights() {
+      document.querySelectorAll(".field-guide-highlight").forEach((item) => item.classList.remove("field-guide-highlight"));
+      document.querySelector("#mapPanel")?.classList.remove("field-guide-map-focus");
+    }
+
+    function setFieldGuideStep(step) {
+      fieldGuideStep = step;
+      clearFieldGuideHighlights();
+
+      if (!fieldGuide || !step) {
+        if (fieldGuide) fieldGuide.hidden = true;
+        return;
+      }
+
+      fieldGuide.hidden = false;
+      fieldGuide.dataset.guideStep = step;
+      fieldGuidePanels.forEach((panel) => {
+        const isActive = panel.dataset.fieldGuidePanel === step;
+        panel.classList.toggle("active", isActive);
+        panel.setAttribute("aria-hidden", String(!isActive));
+      });
+
+      (fieldGuideTargets[step] || []).forEach((selector) => {
+        document.querySelectorAll(selector).forEach((item) => item.classList.add("field-guide-highlight"));
+      });
+
+      if (step === "map-open") {
+        document.querySelector("#mapPanel")?.classList.add("field-guide-map-focus");
+      }
+
+      if (fieldGuideNextButton) {
+        fieldGuideNextButton.hidden = false;
+        fieldGuideNextButton.textContent = step === "tools" ? "알겠습니다" : "다음";
+      }
+    }
+
+    function advanceFieldGuideAfterMap() {
+      if (fieldGuideStep !== "map-open") return;
+      setFieldGuideStep("tools");
+    }
+
+    function isFieldGuideBlockingControls() {
+      return Boolean(fieldGuide && !fieldGuide.hidden && fieldGuideStep === "tools");
+    }
+
+    function startFieldGuide() {
+      if (getActiveScreenId() !== "fieldOne") return;
+      sessionStorage.removeItem(fieldGuidePendingKey);
+      setFieldGuideStep("map-click");
+    }
+
+    function closeFieldGuide() {
+      sessionStorage.removeItem(fieldGuidePendingKey);
+      setFieldGuideStep("");
+      clearFieldGuideHighlights();
+    }
+
+    function maybeStartFieldGuide() {
+      if (sessionStorage.getItem(fieldGuidePendingKey) !== "1") return;
+      setTimeout(startFieldGuide, 640);
+    }
+
     function go(id, message = "이동 중...") {
       stopBriefingTyping();
       document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
@@ -461,6 +573,7 @@
         saveProgress(id);
         fade?.classList.remove("show");
         updateBgmForScreen(id);
+        if (id === "fieldOne") maybeStartFieldGuide();
       }, 260);
     }
 
@@ -484,6 +597,7 @@
         updateCurrentLocation(id);
         saveProgress(id);
         updateBgmForScreen(id);
+        if (id === "fieldOne") maybeStartFieldGuide();
       }, 520);
       setTimeout(() => fade?.classList.remove("long"), 980);
     }
@@ -492,7 +606,8 @@
       if (!briefingCopy) return;
       briefingCopy.textContent = "";
       briefingCopy.classList.remove("done");
-      startCaseButton?.classList.remove("ready");
+      isBriefingTyped = false;
+      updateBriefingStep();
       let index = 0;
       const speed = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 32;
 
@@ -507,7 +622,8 @@
         if (index > briefingText.length) {
           clearInterval(typeBriefing.timer);
           briefingCopy.classList.add("done");
-          startCaseButton?.classList.add("ready");
+          isBriefingTyped = true;
+          updateBriefingStep();
         }
       }, speed || 1);
     }
@@ -523,7 +639,7 @@
       screens.forEach((screen) => screen.classList.toggle("active", screen.id === startScreen));
 
       if (startScreen === "briefingScreen") {
-        typeBriefing();
+        startBriefingSequence();
       } else if (startScreen === "dreamScreen" && entryParams.get("dreamExit") === "1") {
         showDreamNotice(
           "꿈은 아직 끝나지 않았습니다",
@@ -574,6 +690,7 @@
       localStorage.removeItem(saveKey);
       localStorage.removeItem(collectedEvidenceKey);
       localStorage.removeItem(analyzedEvidenceKey);
+      sessionStorage.removeItem(fieldGuidePendingKey);
       updateContinueButtonState();
       go("tutorialScreen");
     });
@@ -583,7 +700,7 @@
       if (!valid) return;
 
       go(saved.screenId, "지난 꿈으로 돌아가는 중...");
-      if (saved?.screenId === "briefingScreen") setTimeout(typeBriefing, 300);
+      if (saved?.screenId === "briefingScreen") setTimeout(startBriefingSequence, 300);
     });
     document.querySelectorAll("[data-open-settings='true']").forEach((button) => {
       button.addEventListener("click", () => settingsDialog?.classList.add("open"));
@@ -626,11 +743,37 @@
     on("#chooseJoseon", "click", () => {
       playSfx("dream", 0.9);
       go("briefingScreen");
-      setTimeout(typeBriefing, 300);
+      setTimeout(startBriefingSequence, 300);
     });
-    on("#startCase", "click", () => goRush("fieldOne", "사건 현장으로 진입 중..."));
+    on("#briefingPrev", "click", () => {
+      briefingStepIndex -= 1;
+      updateBriefingStep();
+    });
+    on("#briefingNext", "click", () => {
+      if (briefingStepIndex === 0 && !isBriefingTyped) return;
+      briefingStepIndex += 1;
+      updateBriefingStep();
+    });
+    on("#startCase", "click", () => {
+      sessionStorage.setItem(fieldGuidePendingKey, "1");
+      goRush("fieldOne", "사건 현장으로 진입 중...");
+    });
+    on("#nextFieldGuide", "click", () => {
+      if (fieldGuideStep === "map-click") {
+        openGlobalPanel("mapPanel");
+        return;
+      }
+      if (fieldGuideStep === "map-open") {
+        closeGlobalPanel();
+        return;
+      }
+      closeFieldGuide();
+    });
     document.querySelectorAll("[data-go]").forEach((button) => {
-      button.addEventListener("click", () => go(button.dataset.go));
+      button.addEventListener("click", () => {
+        if (isFieldGuideBlockingControls()) return;
+        go(button.dataset.go);
+      });
     });
     on("#accuseButton", "click", openResultPage);
 
@@ -706,11 +849,11 @@
         tool: "돋보기",
         toolResult: "확대해 보니 옷고름의 실 결하고 비슷한 꼬임이 보인다."
       },
-      "점순 목 검사 종이": {
-        note: "점순의 목 주변을 살핀 기록지. 직접적인 결론 대신 흔적의 위치만 남겨져 있다.",
+      "점순 목 검안 종이": {
+        note: "점순의 목 주변을 살핀 기록지. 날붙이 상처보다 목을 조른 듯한 압박 흔적이 남아 있다.",
         img: "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png",
         tool: "촛불 비추기",
-        toolResult: "빛을 비추자 종이 위에 눌린 선이 희미하게 떠오른다."
+        toolResult: "빛을 비추자 목 둘레를 따라 눌린 선이 떠오른다. 사망 원인은 압박에 의한 질식으로 보인다."
       },
       "빈 호패 주머니": {
         note: "호패가 빠진 듯한 빈 주머니. 주인과 호패 조각의 관계를 확인할 수 있다.",
@@ -1385,6 +1528,7 @@
     const evidenceBagPop = document.querySelector("#evidenceBagPop");
     const toggleEvidenceBag = document.querySelector("#toggleEvidenceBag");
     function setEvidenceBag(open) {
+      if (open && isFieldGuideBlockingControls()) return;
       evidenceBagPop.classList.toggle("open", open);
       evidenceBagPop.setAttribute("aria-hidden", String(!open));
       document.querySelectorAll("#toggleEvidenceBag, .bag-chip, .open-bag-panel").forEach((button) => {
@@ -1400,6 +1544,7 @@
     const globalPanels = [...document.querySelectorAll(".global-panel")];
 
     function openGlobalPanel(id) {
+      if (id !== "mapPanel" && isFieldGuideBlockingControls()) return;
       hideInspectPanels();
       setEvidenceBag(false);
 
@@ -1415,10 +1560,19 @@
         playSfx("buttonAlt", 0.62);
         renderConversationNotes();
       }
+      if (id === "mapPanel" && (fieldGuideStep === "map-click" || fieldGuide?.dataset.guideStep === "map-click")) {
+        clearTimeout(fieldGuideMapTimer);
+        fieldGuideMapTimer = window.setTimeout(() => {
+          const isMapStillOpen = document.querySelector("#mapPanel")?.classList.contains("show");
+          if (isMapStillOpen && fieldGuideStep === "map-click") setFieldGuideStep("map-open");
+        }, 120);
+      }
       updateToolCursor();
     }
 
     function closeGlobalPanel() {
+      const wasGuideMapOpen = ["map-click", "map-open"].includes(fieldGuideStep) && document.querySelector("#mapPanel")?.classList.contains("show");
+      clearTimeout(fieldGuideMapTimer);
       globalPanels.forEach((panel) => {
         panel.classList.remove("show");
         panel.setAttribute("aria-hidden", "true");
@@ -1429,6 +1583,7 @@
       globalOverlay.classList.remove("show");
       document.body.classList.remove("tool-cursor-active");
       document.querySelector("#selectedToolCursor")?.classList.remove("show");
+      if (wasGuideMapOpen) setFieldGuideStep("tools");
     }
 
     ["#openMapFromField", "#openMapFromRoom", "#openMapFromMudeokRoom", "#openMapFromInterrogation"].forEach((selector) => {
@@ -1450,6 +1605,7 @@
       const target = event.target;
       const isTyping = target?.matches?.("input, textarea, select, [contenteditable='true']");
       if (event.key !== "Tab" || event.altKey || event.ctrlKey || event.metaKey || isTyping) return;
+      if (isFieldGuideBlockingControls()) return;
       event.preventDefault();
       openGlobalPanel("toolPanel");
     });
@@ -1471,6 +1627,10 @@
         const target = button.dataset.mapGo;
         button.classList.add("pressing");
         playSfx("move", 0.82);
+        if (["map-click", "map-open"].includes(fieldGuideStep)) {
+          closeGlobalPanel();
+          return;
+        }
         closeGlobalPanel();
         go(target, "마을 지도에서 이동 중...");
       });
