@@ -970,6 +970,72 @@
         </span>`;
     }
 
+    function getEvidenceLocationSection(list, location) {
+      const sectionId = `bag-section-${location.replace(/\s+/g, "-")}`;
+      let section = list.querySelector(`[data-evidence-location-section="${location}"]`);
+      if (section) return section.querySelector(".evidence-location-grid");
+
+      section = document.createElement("section");
+      section.className = "evidence-location-section";
+      section.dataset.evidenceLocationSection = location;
+      section.id = sectionId;
+      section.innerHTML = `
+        <div class="evidence-location-head">
+          <strong>${escapeHtml(location)}</strong>
+          <span>0</span>
+        </div>
+        <div class="evidence-location-grid"></div>
+      `;
+      list.appendChild(section);
+      addEvidenceLocationTab(location);
+      setActiveEvidenceLocation(getActiveEvidenceLocation() || location);
+      return section.querySelector(".evidence-location-grid");
+    }
+
+    function getActiveEvidenceLocation() {
+      return document.querySelector("#evidenceLocationTabs .active")?.dataset.evidenceLocation || "";
+    }
+
+    function addEvidenceLocationTab(location) {
+      const tabs = document.querySelector("#evidenceLocationTabs");
+      if (!tabs || tabs.querySelector(`[data-evidence-location="${location}"]`)) return;
+
+      const button = document.createElement("button");
+      button.className = "evidence-location-tab";
+      button.type = "button";
+      button.dataset.evidenceLocation = location;
+      button.textContent = location;
+      button.addEventListener("click", () => {
+        playSfx("buttonAlt", 0.48);
+        setActiveEvidenceLocation(location);
+      });
+      tabs.appendChild(button);
+    }
+
+    function setActiveEvidenceLocation(location) {
+      const tabs = document.querySelector("#evidenceLocationTabs");
+      if (!tabs || !location) return;
+
+      tabs.querySelectorAll(".evidence-location-tab").forEach((button) => {
+        const isActive = button.dataset.evidenceLocation === location;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+      document.querySelectorAll("#evidenceList .evidence-location-section").forEach((section) => {
+        section.classList.toggle("active", section.dataset.evidenceLocationSection === location);
+      });
+    }
+
+    function updateEvidenceLocationCounts() {
+      document.querySelectorAll("#evidenceList .evidence-location-section").forEach((section) => {
+        const count = section.querySelectorAll(".evidence[data-evidence]").length;
+        const location = section.dataset.evidenceLocationSection;
+        section.querySelector(".evidence-location-head span").textContent = `${count}점`;
+        const tab = document.querySelector(`#evidenceLocationTabs [data-evidence-location="${location}"]`);
+        if (tab) tab.textContent = `${location} · ${count}점`;
+      });
+    }
+
     function addEvidenceToNote(name) {
       return;
     }
@@ -1070,16 +1136,22 @@
       const existing = [...list.querySelectorAll(".evidence")].find((item) => item.dataset.evidence === name);
       if (existing) {
         existing.classList.remove("hidden");
+        updateEvidenceLocationCounts();
         return;
       }
 
+      const location = getEvidenceLocation(name);
+      const sectionGrid = getEvidenceLocationSection(list, location);
       const button = document.createElement("button");
       button.className = "evidence evidence-card";
       button.type = "button";
       button.dataset.evidence = name;
+      button.dataset.location = location;
       button.innerHTML = evidenceCardHtml(name);
       button.addEventListener("click", () => selectEvidence(button));
-      list.appendChild(button);
+      sectionGrid.appendChild(button);
+      updateEvidenceLocationCounts();
+      setActiveEvidenceLocation(location);
     }
 
     function selectEvidence(button) {
