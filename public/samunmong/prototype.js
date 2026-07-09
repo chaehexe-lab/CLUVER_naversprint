@@ -441,6 +441,7 @@
       if (target.matches(".bag-chip")) return "모은 증거를 확인합니다.";
       if (target.matches(".tool-chip")) return "증거를 더 자세히 분석합니다.";
       if (target.matches(".note-chip")) return "등장인물과 나눈 대화를 기록합니다.";
+      if (target.matches(".journal-chip")) return "처음 사건 일지를 다시 봅니다.";
       if (target.matches(".room-chip")) return target.getAttribute("aria-current") === "page" ? "현재 위치입니다." : "취조실로 이동합니다.";
       if (target.matches(".scene-hint")) return "남은 단서 위치를 잠깐 밝힙니다.";
       if (target.matches(".map-pin-button")) return target.getAttribute("aria-label") || "해당 장소로 이동합니다.";
@@ -943,7 +944,11 @@
     document.querySelectorAll("[data-go]").forEach((button) => {
       button.addEventListener("click", () => {
         if (isFieldGuideBlockingControls()) return;
-        go(button.dataset.go);
+        const target = button.dataset.go;
+        go(target, target === "briefingScreen" ? "사건 일지를 펼치는 중..." : "이동 중...");
+        if (target === "briefingScreen") {
+          setTimeout(startBriefingSequence, 340);
+        }
       });
     });
     on("#accuseButton", "click", openResultPage);
@@ -985,7 +990,7 @@
         tool: "돋보기",
         toolResult: "돋보기로 보니 선이 섬세하고 여러 번 고쳐 그린 흔적이 있다.\n우연히 본 얼굴이라기엔 지나치게 정성스럽다. 춘월은 왜 이 그림을 숨겨 두었을까?"
       },
-      "사라진 노리개": {
+      "헐거워진 노리개": {
         note: "끊어진 장식과 급히 잡아챈 듯한 흔적이 남은 노리개. 누가 지녔는지 확인해야 한다.",
         img: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.png"
       },

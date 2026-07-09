@@ -85,6 +85,13 @@ const investigationDock = [
     label: "기록장"
   },
   {
+    className: "journal-chip",
+    ariaLabel: "사건 일지 다시 보기",
+    image: "/samunmong/assets/labels/transparent/tool-investigation-note.png",
+    label: "사건 일지",
+    goTo: "briefingScreen"
+  },
+  {
     className: "room-chip",
     ariaLabel: "취조실로 이동",
     image: "/samunmong/assets/labels/transparent/tool-interrogation-room.png",
@@ -107,7 +114,8 @@ export const fieldOneScene = {
     { id: "openBagFromField", ...investigationDock[1], className: "bag-chip" },
     investigationDock[2],
     { id: "openNoteFromField", ...investigationDock[3], className: "note-chip" },
-    investigationDock[4]
+    investigationDock[4],
+    investigationDock[5]
   ] satisfies SceneDockAction[],
   inspect: {
     id: "hopaeInspect",
@@ -123,7 +131,7 @@ export const chunwolRoomScene = {
   alt: "춘월의 방과 초상화 그림 증거",
   props: [] as SceneProp[],
   hotspots: [
-    { evidenceName: "사라진 노리개", ariaLabel: "사라진 노리개 조사", x: "56.0%", y: "76.0%", w: "7.6%", h: "6.8%", clipPath: "ellipse(46% 38% at 50% 54%)", radius: "999px", rot: "-8deg" },
+    { evidenceName: "헐거워진 노리개", ariaLabel: "헐거워진 노리개 조사", x: "56.0%", y: "76.0%", w: "7.6%", h: "6.8%", clipPath: "ellipse(46% 38% at 50% 54%)", radius: "999px", rot: "-8deg" },
     { id: "portraitHotspot", className: "portrait-glow", ariaLabel: "돌쇠의 그림 조사", x: "63.0%", y: "59.8%", w: "8.0%", h: "20.5%", clipPath: "polygon(18% 4%, 92% 16%, 81% 98%, 8% 84%)", radius: "8px", rot: "4deg" }
   ] satisfies SceneHotspot[],
   dock: [
@@ -131,7 +139,8 @@ export const chunwolRoomScene = {
     { id: "openBagFromRoom", ...investigationDock[1], className: "bag-chip" },
     investigationDock[2],
     { id: "openNoteFromRoom", ...investigationDock[3], className: "note-chip" },
-    investigationDock[4]
+    investigationDock[4],
+    investigationDock[5]
   ] satisfies SceneDockAction[],
   inspect: {
     id: "portraitInspect",
@@ -158,7 +167,8 @@ export const mudeokServantRoomScene = {
     { id: "openBagFromMudeokRoom", ...investigationDock[1], className: "bag-chip" },
     investigationDock[2],
     { id: "openNoteFromMudeokRoom", ...investigationDock[3], className: "note-chip" },
-    investigationDock[4]
+    investigationDock[4],
+    investigationDock[5]
   ] satisfies SceneDockAction[]
 } as const;
 
