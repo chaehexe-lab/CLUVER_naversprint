@@ -199,6 +199,7 @@ export default function InterrogationScreen() {
               ×
             </button>
           </div>
+          <div className="evidence-location-tabs" id="evidenceLocationTabs" aria-label="증거 장소 선택" />
           <div className="evidence-list evidence-grid" id="evidenceList">
             <div className="evidence-empty" id="emptyInterrogationEvidence">
               보따리에 담긴 증거가 없습니다.
