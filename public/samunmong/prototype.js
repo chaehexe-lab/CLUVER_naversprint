@@ -1423,6 +1423,7 @@
       document.querySelector("#interrogationPlate").src = sleeveCheckedSuspects.has(suspect.id) ? suspect.sleeveScene : suspect.scene;
       activeNoteSuspectId = suspect.id;
       renderConversationNotes();
+      reply.hidden = true;
       showToast(`${suspect.name} 심문으로 전환`);
     }
 
