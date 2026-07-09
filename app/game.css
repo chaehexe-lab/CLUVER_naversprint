@@ -4006,7 +4006,7 @@
 
     .question-box {
       display: grid;
-      grid-template-columns: auto 1fr auto;
+      grid-template-columns: auto auto 1fr auto;
       gap: 8px;
       align-items: end;
     }
@@ -4018,6 +4018,14 @@
 
     .inquiry-bar .presented-mini {
       text-shadow: 0 2px 8px rgba(0,0,0,.9);
+    }
+
+    .inquiry-bar .question-limit-mini {
+      color: rgba(255, 235, 194, .86);
+      font-size: 14px;
+      line-height: 1.2;
+      text-shadow: 0 2px 8px rgba(0,0,0,.9);
+      white-space: nowrap;
     }
 
     .inquiry-bar input {

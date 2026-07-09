@@ -111,6 +111,14 @@
       contradiction: "상처를 숨기면 소매 확인이나 현장 몸싸움 흔적과 비교할 수 있다.",
       img: "/samunmong/assets/evidence-transparent/evidence-bloodied-bandage.png"
     },
+    "돌쇠의 팔 상처": {
+      note: "심문 중 돌쇠의 소매 아래에서 확인한 상처. 붕대를 감았던 흔적과 함께 봐야 한다.",
+      location: "취조실",
+      logic: "돌쇠가 언제 어디서 다쳤는지 확인하면, 점순과 헤어진 뒤의 행적을 더 따져볼 수 있다.",
+      relatedSuspects: ["돌쇠"],
+      contradiction: "돌쇠가 다친 시점을 흐리면 피 묻은 붕대와 밤 이동 진술을 함께 압박할 수 있다.",
+      img: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.png"
+    },
     "도망 보따리": {
       note: "급히 싼 보따리. 누군가 떠날 준비를 했는지 확인해야 한다.",
       location: "돌쇠 처소",

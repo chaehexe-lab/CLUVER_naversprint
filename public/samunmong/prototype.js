@@ -66,10 +66,12 @@
     const collectedEvidenceKey = "samunmong-collected-evidence";
     const analyzedEvidenceKey = "samunmong-analyzed-evidence";
     const conversationNotesKey = "samunmong-conversation-notes";
+    const interrogationQuestionCountKey = "samunmong-interrogation-question-count";
     const fieldGuidePendingKey = "samunmong-field-guide-pending";
     const fieldGuideSeenKey = "samunmong-field-guide-seen";
     const settingsKey = "samunmong-demo-settings";
     const bgmStateKey = "samunmong-bgm-state";
+    const interrogationQuestionLimit = 50;
     let fieldGuideStep = "";
     let fieldGuideMapTimer = 0;
     const locationMeta = {
@@ -208,6 +210,41 @@
       return Array.isArray(stored)
         ? stored.filter((name) => typeof name === "string" && name.trim())
         : [];
+    }
+
+    function readInterrogationQuestionCount() {
+      const count = Number(localStorage.getItem(interrogationQuestionCountKey) || 0);
+      return Number.isFinite(count) ? Math.max(0, count) : 0;
+    }
+
+    function getRemainingInterrogationQuestions() {
+      return Math.max(0, interrogationQuestionLimit - readInterrogationQuestionCount());
+    }
+
+    function updateInterrogationQuestionLimitUI() {
+      const remaining = getRemainingInterrogationQuestions();
+      const status = document.querySelector("#questionLimitStatus");
+      const input = document.querySelector("#questionInput");
+      const askButton = document.querySelector("#askButton");
+      const exhausted = remaining <= 0;
+
+      if (status) {
+        status.textContent = `남은 질문: ${remaining}회`;
+      }
+      if (input) {
+        input.disabled = exhausted;
+        input.placeholder = exhausted ? "취조 가능한 질문 횟수를 모두 사용했습니다." : "용의자에게 질문을 입력하세요. 필요하면 증거를 함께 제시할 수 있습니다.";
+      }
+      if (askButton && !isAskingAi) {
+        askButton.disabled = exhausted;
+        askButton.textContent = exhausted ? "종료" : "질문";
+      }
+    }
+
+    function recordInterrogationQuestion() {
+      const nextCount = Math.min(interrogationQuestionLimit, readInterrogationQuestionCount() + 1);
+      localStorage.setItem(interrogationQuestionCountKey, String(nextCount));
+      updateInterrogationQuestionLimitUI();
     }
 
     function getAudioLevel() {
@@ -828,6 +865,7 @@
     const defaultSettings = { volume: 70, reduceMotion: false, highContrast: false };
     applySettings({ ...defaultSettings, ...readStored(settingsKey, {}) });
     updateContinueButtonState();
+    updateInterrogationQuestionLimitUI();
     updateBgmForScreen();
     startAutoplayRetries();
     window.addEventListener("focus", tryAutoplayBgm);
@@ -851,10 +889,12 @@
       localStorage.removeItem(collectedEvidenceKey);
       localStorage.removeItem(analyzedEvidenceKey);
       localStorage.removeItem(conversationNotesKey);
+      localStorage.removeItem(interrogationQuestionCountKey);
       localStorage.removeItem(fieldGuideSeenKey);
       sessionStorage.removeItem(fieldGuidePendingKey);
       conversationNotes.clear();
       updateContinueButtonState();
+      updateInterrogationQuestionLimitUI();
       go("tutorialScreen");
     });
     on("#continueDream", "click", () => {
@@ -1023,6 +1063,10 @@
       "피 묻은 붕대": {
         note: "피처럼 보이는 얼룩이 남은 붕대. 상처나 몸싸움 흔적과 연결될 수 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-bloodied-bandage.png"
+      },
+      "돌쇠의 팔 상처": {
+        note: "심문 중 돌쇠의 소매 아래에서 확인한 상처. 붕대를 감았던 흔적과 함께 봐야 한다.",
+        img: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.png"
       },
       "도망 보따리": {
         note: "급히 싼 듯한 보따리. 점순과 돌쇠가 떠나려 했고, 그 사실이 누군가의 감정을 건드렸는지 확인해야 한다.",
@@ -1964,8 +2008,7 @@
         showToast("AI 답변을 받지 못했습니다.");
       } finally {
         isAskingAi = false;
-        askButton.disabled = false;
-        askButton.textContent = "질문";
+        updateInterrogationQuestionLimitUI();
       }
     }
 
@@ -1975,7 +2018,14 @@
         showToast("질문을 입력하거나 위의 문장을 눌러줘");
         return;
       }
+      if (getRemainingInterrogationQuestions() <= 0) {
+        showSuspectReply("더는 대답하지 않으려 한다.", "침묵");
+        showToast("취조 가능한 질문 횟수를 모두 사용했습니다.");
+        updateInterrogationQuestionLimitUI();
+        return;
+      }
       playSfx("ask", 0.82);
+      recordInterrogationQuestion();
       addInterrogationSummary(question);
       if (/소매/.test(question) && /(걷|올리|보|확인|드러|살펴)/.test(question)) {
         const suspect = suspects[suspectIndex];
@@ -1987,6 +2037,12 @@
           addObservationToNote("소매 확인", `${suspect.name}의 소매 아래에서 긁힌 듯한 흔적을 확인했다.`);
           setAnalysisTarget("긁힌 팔 흔적");
           showToast("소매 밑에서 긁힌 팔 흔적을 발견했습니다.");
+        } else if (suspect.id === "dolsoe") {
+          addEvidenceToBag("돌쇠의 팔 상처");
+          addEvidenceToNote("돌쇠의 팔 상처");
+          addObservationToNote("소매 확인", `${suspect.name}의 소매 아래에서 붕대를 감았던 듯한 팔 상처를 확인했다.`);
+          setAnalysisTarget("돌쇠의 팔 상처");
+          showToast("돌쇠의 팔 상처를 증거로 기록했습니다.");
         } else {
           addObservationToNote("소매 확인", `${suspect.name}의 소매 아래를 확인했지만 뚜렷한 상처는 보이지 않았다.`);
           showToast(`${suspect.name}의 소매 아래를 확인했습니다.`);

@@ -134,6 +134,9 @@ export default function InterrogationScreen() {
             <span className="presented-mini">
               제시할 증거: <strong id="presentedEvidence">없음</strong>
             </span>
+            <span className="question-limit-mini" id="questionLimitStatus" aria-live="polite">
+              남은 질문: 50회
+            </span>
             <input id="questionInput" type="text" placeholder="용의자에게 질문을 입력하세요. 필요하면 증거를 함께 제시할 수 있습니다." />
             <button className="ask" id="askButton" type="button">
               질문
