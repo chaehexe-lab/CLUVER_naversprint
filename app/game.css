@@ -3632,7 +3632,7 @@
       background: transparent;
       filter: drop-shadow(0 8px 13px rgba(0,0,0,.66));
       font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
-      font-size: 12px;
+      font-size: clamp(16px, 1.55vw, 21px);
       line-height: 1;
       letter-spacing: .01em;
       text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,0,0,.86);
@@ -3712,7 +3712,7 @@
       left: 50%;
       bottom: 1px;
       color: #f2e6d4;
-      font-size: 12px;
+      font-size: clamp(16px, 1.55vw, 21px);
       transform: translateX(-50%);
     }
 
