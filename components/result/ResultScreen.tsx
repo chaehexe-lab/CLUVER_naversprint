@@ -356,8 +356,7 @@ export default function ResultScreen() {
           <article className="verdict-message">
             <p className="verdict-kicker">{copy.kicker}</p>
             <h1 id="resultTitle">{copy.title}</h1>
-            <TypewriterLines lines={copy.lines} onType={playTypingSfx}resetDreamProgress
-              returnToBriefingWithProgress/>
+            <TypewriterLines lines={copy.lines} onType={playTypingSfx} />
             <div className="verdict-actions">
               {outcome === "success" && accusedSuspect.id === finalCulpritId ? (
                 <Link className="wood-result-button" href="/interpretation" onClick={unlockTruthPage}>
