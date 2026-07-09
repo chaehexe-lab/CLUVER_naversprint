@@ -2515,7 +2515,7 @@
       left: 50%;
       top: 12%;
       z-index: 64;
-      width: min(680px, 84vw);
+      width: min(550px, 84vw);
       padding: 22px 26px 24px;
       border-color: rgba(217,178,104,.5);
       border-radius: 18px;
