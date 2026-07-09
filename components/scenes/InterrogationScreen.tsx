@@ -150,34 +150,24 @@ export default function InterrogationScreen() {
 
         {/* 사이드 서랍형 기록장 패널 */}
         <InvestigationNote>
-          <aside className="note-drawer investigation-note-panel" id="noteDrawer" aria-hidden="true">
+          <aside className="note-drawer investigation-note-panel conversation-note" id="noteDrawer" aria-hidden="true">
             <button className="close-button note-close" id="closeNote" type="button" aria-label="기록장 닫기">
               ×
             </button>
-            <p className="note-kicker">조사 기록</p>
+            <p className="note-kicker">대화 기록</p>
             <h2>기록장</h2>
-            <p className="note-lead">심문 중 확인한 내용과 증거를 정리합니다.</p>
-            <div className="note-section">
-              <h3>현재 사건</h3>
-              <ul>
-                <li>사건명: 조선시대 살인사건</li>
-                <li>목표: 점순이 쓰러진 이유와 호패 조각의 주인 확인</li>
-                <li>
-                  현재 심문 대상: <span id="noteSuspect">돌쇠</span>
-                </li>
-              </ul>
+            <p className="note-lead">등장인물별로 나눈 질문과 답변을 대화처럼 확인합니다.</p>
+            <div className="note-suspect-tabs" data-note-tabs aria-label="기록할 등장인물 선택">
+              <button className="note-suspect-tab active" type="button" data-suspect-id="dolsoe">돌쇠</button>
+              <button className="note-suspect-tab" type="button" data-suspect-id="chunwol">최춘월</button>
+              <button className="note-suspect-tab" type="button" data-suspect-id="yoomunseok">유문석</button>
+              <button className="note-suspect-tab" type="button" data-suspect-id="mudeok">무덕</button>
             </div>
-            <div className="note-section">
-              <h3>수집한 증거</h3>
-              <ul id="collectedEvidenceNote">
-                <li id="emptyEvidenceNote">아직 수집한 증거가 없습니다.</li>
-              </ul>
-            </div>
-            <div className="note-section">
-              <h3>심문 요약</h3>
-              <ul id="interrogationSummary">
-                <li id="emptyInterrogationSummary">아직 기록한 심문 내용이 없습니다.</li>
-              </ul>
+            <p className="note-conversation-meta">
+              현재 기록: <span className="note-current-suspect" id="noteSuspect">돌쇠</span>
+            </p>
+            <div className="conversation-log" id="interrogationSummary" data-note-log aria-live="polite">
+              <p className="conversation-empty">아직 이 인물과 나눈 대화가 없습니다.</p>
             </div>
           </aside>
         </InvestigationNote>
@@ -227,7 +217,7 @@ export default function InterrogationScreen() {
             닫기
           </button>
         </div>
-        <p>도구를 먼저 고른 뒤 증거를 선택하면 추가 단서가 새로 드러나고 기록장에 기록됩니다.</p>
+        <p>도구를 먼저 고른 뒤 증거를 선택하면 추가 단서를 확인할 수 있습니다.</p>
         <div className="tool-workbench">
           <div className="tool-evidence-list" id="toolEvidenceList">
             <div className="evidence-empty">아직 분석할 증거가 없습니다.</div>
@@ -254,26 +244,34 @@ export default function InterrogationScreen() {
         <h2 id="toolResultTitle">증거 분석 결과</h2>
         <p id="toolResultText">새로운 정보가 드러났습니다.</p>
         <button className="button primary" id="closeToolResult" type="button">
-          기록장에 기록
+          확인
         </button>
       </aside>
 
-      {/* 전역 기록장 패널 */}
       <InvestigationNote>
-        <aside className="global-panel investigation-note-panel" id="fieldNotePanel" aria-hidden="true">
+        <aside className="global-panel investigation-note-panel conversation-note" id="fieldNotePanel" aria-hidden="true">
           <div className="global-panel-head">
             <div>
-              <p className="note-kicker">조사 기록</p>
+              <p className="note-kicker">대화 기록</p>
               <h2>기록장</h2>
             </div>
             <button className="close-button note-close global-close" type="button" aria-label="기록장 닫기">
               ×
             </button>
           </div>
-          <p className="note-lead">현장에서 확인한 단서와 사실 지점을 정리합니다.</p>
-          <ul id="fieldNoteList">
-            <li id="emptyFieldNote">아직 기록한 단서가 없습니다.</li>
-          </ul>
+          <p className="note-lead">등장인물별로 나눈 질문과 답변을 대화처럼 확인합니다.</p>
+          <div className="note-suspect-tabs" data-note-tabs aria-label="기록할 등장인물 선택">
+            <button className="note-suspect-tab active" type="button" data-suspect-id="dolsoe">돌쇠</button>
+            <button className="note-suspect-tab" type="button" data-suspect-id="chunwol">최춘월</button>
+            <button className="note-suspect-tab" type="button" data-suspect-id="yoomunseok">유문석</button>
+            <button className="note-suspect-tab" type="button" data-suspect-id="mudeok">무덕</button>
+          </div>
+          <p className="note-conversation-meta">
+            현재 기록: <span className="note-current-suspect">돌쇠</span>
+          </p>
+          <div className="conversation-log" data-note-log aria-live="polite">
+            <p className="conversation-empty">아직 이 인물과 나눈 대화가 없습니다.</p>
+          </div>
         </aside>
       </InvestigationNote>
 

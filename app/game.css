@@ -3774,6 +3774,149 @@
       font-weight: 700;
     }
 
+    .conversation-note.note-drawer,
+    .conversation-note.global-panel.investigation-note-panel {
+      overflow: hidden;
+      padding-bottom: 32px;
+    }
+
+    .conversation-note .note-lead,
+    .global-panel.conversation-note.investigation-note-panel .note-lead {
+      max-width: calc(100% - 92px);
+      margin-bottom: 12px;
+      font-size: clamp(18px, 2.1vw, 24px);
+    }
+
+    .note-suspect-tabs {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin: 10px 0 10px;
+      padding: 7px;
+      border: 1px solid rgba(89, 46, 26, .24);
+      border-radius: 16px;
+      background: rgba(64, 32, 18, .12);
+    }
+
+    .note-suspect-tab {
+      min-height: 38px;
+      border: 1px solid rgba(78, 40, 24, .26);
+      border-radius: 12px;
+      color: rgba(58, 35, 23, .78);
+      background: rgba(255, 239, 199, .24);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.18);
+      font-family: "NanumBareunJeongsin", "Noto Serif KR", serif;
+      font-size: clamp(15px, 1.8vw, 21px);
+      transition: transform .16s ease, background .16s ease, color .16s ease;
+    }
+
+    .note-suspect-tab:hover,
+    .note-suspect-tab:focus-visible {
+      transform: translateY(-1px);
+      background: rgba(255, 239, 199, .38);
+    }
+
+    .note-suspect-tab.active {
+      color: #fff4dc;
+      background: linear-gradient(180deg, rgba(111, 40, 31, .9), rgba(60, 25, 18, .94));
+      box-shadow:
+        inset 0 0 0 1px rgba(224, 159, 99, .32),
+        0 6px 14px rgba(68, 25, 16, .18);
+    }
+
+    .conversation-note .note-conversation-meta,
+    .global-panel.conversation-note.investigation-note-panel .note-conversation-meta {
+      position: relative;
+      z-index: 1;
+      max-width: 100%;
+      margin: 0 0 8px;
+      color: rgba(66, 39, 24, .74);
+      font-size: clamp(16px, 1.8vw, 21px);
+    }
+
+    .conversation-log {
+      position: relative;
+      z-index: 1;
+      height: min(378px, 42vh);
+      margin-top: 8px;
+      padding: 16px 14px;
+      overflow-y: auto;
+      border: 1px solid rgba(85, 47, 28, .22);
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 14% 8%, rgba(255, 245, 217, .2), transparent 32%),
+        linear-gradient(180deg, rgba(64, 32, 18, .13), rgba(255, 242, 205, .1));
+      box-shadow: inset 0 0 18px rgba(70, 35, 18, .12);
+      scrollbar-color: rgba(91, 48, 29, .45) rgba(255, 238, 191, .16);
+    }
+
+    .conversation-empty {
+      display: grid;
+      min-height: 100%;
+      place-items: center;
+      margin: 0;
+      color: rgba(58, 35, 23, .58);
+      font-size: clamp(18px, 2vw, 24px);
+      text-align: center;
+    }
+
+    .conversation-message {
+      display: flex;
+      flex-direction: column;
+      width: fit-content;
+      max-width: min(82%, 420px);
+      margin: 0 0 12px;
+      padding: 10px 13px 9px;
+      border-radius: 18px;
+      color: #2f2118;
+      box-shadow: 0 6px 14px rgba(55, 28, 18, .14);
+      word-break: keep-all;
+    }
+
+    .conversation-message.player {
+      margin-left: auto;
+      border-bottom-right-radius: 5px;
+      background: linear-gradient(180deg, rgba(116, 50, 39, .92), rgba(73, 31, 24, .94));
+      color: #fff3db;
+    }
+
+    .conversation-message.suspect {
+      margin-right: auto;
+      border-bottom-left-radius: 5px;
+      background: rgba(255, 240, 203, .72);
+      box-shadow:
+        inset 0 0 0 1px rgba(96, 48, 27, .14),
+        0 6px 14px rgba(55, 28, 18, .12);
+    }
+
+    .conversation-speaker {
+      margin-bottom: 4px;
+      color: inherit;
+      font-family: "ChilgokLjh", "NanumBareunJeongsin", serif;
+      font-size: clamp(14px, 1.55vw, 18px);
+      opacity: .78;
+    }
+
+    .conversation-text,
+    .conversation-note .conversation-text,
+    .global-panel.conversation-note.investigation-note-panel .conversation-text {
+      max-width: 100%;
+      margin: 0;
+      color: inherit;
+      font-size: clamp(17px, 2vw, 23px);
+      line-height: 1.42;
+    }
+
+    .conversation-meta {
+      margin-top: 6px;
+      color: inherit;
+      font-size: clamp(13px, 1.45vw, 17px);
+      opacity: .7;
+      font-weight: 400;
+    }
+
     .note-close {
       position: absolute;
       top: 22px;

@@ -26,6 +26,8 @@
     }
 
     let suspectIndex = 0;
+    let activeNoteSuspectId = suspects[0]?.id || "dolsoe";
+    const conversationNotes = new Map();
     const sleeveCheckedSuspects = new Set();
     const saveKey = "samunmong-demo-state";
     const collectedEvidenceKey = "samunmong-collected-evidence";
@@ -291,7 +293,7 @@
 
     const buttonGuideTextById = {
       openMapFromInterrogation: "조사 장소를 오갑니다.",
-      openNoteProp: "수집한 증거와 심문 기록을 봅니다.",
+      openNoteProp: "등장인물과 나눈 대화를 기록합니다.",
       toggleEvidenceBag: "모은 증거를 꺼내 제시합니다.",
       interrogationHint: "질문 방향을 떠올립니다.",
       accuseButton: "충분히 모았을 때 판결로 갑니다."
@@ -316,7 +318,7 @@
       if (target.matches(".map-chip")) return "조사 장소를 오갑니다.";
       if (target.matches(".bag-chip")) return "모은 증거를 확인합니다.";
       if (target.matches(".tool-chip")) return "증거를 더 자세히 분석합니다.";
-      if (target.matches(".note-chip")) return "단서와 심문 내용을 정리합니다.";
+      if (target.matches(".note-chip")) return "등장인물과 나눈 대화를 기록합니다.";
       if (target.matches(".room-chip")) return target.getAttribute("aria-current") === "page" ? "현재 위치입니다." : "취조실로 이동합니다.";
       if (target.matches(".scene-hint")) return "남은 단서 위치를 잠깐 밝힙니다.";
       if (target.matches(".map-pin-button")) return target.getAttribute("aria-label") || "해당 장소로 이동합니다.";
@@ -851,25 +853,7 @@
     }
 
     function addEvidenceToNote(name) {
-      const list = document.querySelector("#collectedEvidenceNote");
-      document.querySelector("#emptyEvidenceNote")?.remove();
-      const exists = [...list.children].some((item) => item.dataset.evidence === name);
-      if (!exists) {
-        const item = document.createElement("li");
-        item.dataset.evidence = name;
-        item.textContent = `${name} / 획득: ${getEvidenceLocation(name)} - ${evidenceData[name]?.logic || evidenceData[name]?.note || "현장에서 발견된 단서"}`;
-        list.appendChild(item);
-      }
-
-      const fieldList = document.querySelector("#fieldNoteList");
-      document.querySelector("#emptyFieldNote")?.remove();
-      const fieldExists = [...fieldList.children].some((item) => item.dataset.evidence === name);
-      if (!fieldExists) {
-        const item = document.createElement("li");
-        item.dataset.evidence = name;
-        item.textContent = `${name} / 획득: ${getEvidenceLocation(name)} - ${evidenceData[name]?.logic || evidenceData[name]?.note || "현장에서 발견된 단서"}`;
-        fieldList.appendChild(item);
-      }
+      return;
     }
 
     function markEvidenceCollectedInScene(name) {
@@ -885,19 +869,7 @@
     }
 
     function addObservationToNote(name, text) {
-      const noteText = `${name}: ${text}`;
-      const lists = [document.querySelector("#collectedEvidenceNote"), document.querySelector("#fieldNoteList")];
-      document.querySelector("#emptyEvidenceNote")?.remove();
-      document.querySelector("#emptyFieldNote")?.remove();
-      lists.forEach((list) => {
-        const exists = [...list.children].some((item) => item.dataset.evidence === name);
-        if (!exists) {
-          const item = document.createElement("li");
-          item.dataset.evidence = name;
-          item.textContent = noteText;
-          list.appendChild(item);
-        }
-      });
+      return;
     }
 
     function addEvidenceToBag(name) {
@@ -1297,9 +1269,10 @@
     function updateSuspect() {
       const suspect = suspects[suspectIndex];
       document.querySelector("#suspectName").textContent = suspect.name;
-      document.querySelector("#noteSuspect").textContent = suspect.name;
       document.querySelector("#suspectStage").dataset.suspect = suspect.id;
       document.querySelector("#interrogationPlate").src = sleeveCheckedSuspects.has(suspect.id) ? suspect.sleeveScene : suspect.scene;
+      activeNoteSuspectId = suspect.id;
+      renderConversationNotes();
       showToast(`${suspect.name} 심문으로 전환`);
     }
 
@@ -1314,7 +1287,79 @@
 
     const noteDrawer = document.querySelector("#noteDrawer");
     const overlay = document.querySelector("#overlay");
+    function getConversationNoteList(suspectId) {
+      if (!conversationNotes.has(suspectId)) {
+        conversationNotes.set(suspectId, []);
+      }
+      return conversationNotes.get(suspectId);
+    }
+
+    function getSuspectById(suspectId) {
+      return suspects.find((item) => item.id === suspectId) || suspects[0];
+    }
+
+    function renderConversationNotes() {
+      const activeSuspect = getSuspectById(activeNoteSuspectId);
+      const messages = getConversationNoteList(activeSuspect.id);
+
+      document.querySelectorAll(".note-current-suspect").forEach((item) => {
+        item.textContent = activeSuspect.name;
+      });
+
+      document.querySelectorAll(".note-suspect-tab").forEach((button) => {
+        const isActive = button.dataset.suspectId === activeSuspect.id;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+
+      document.querySelectorAll("[data-note-log]").forEach((log) => {
+        log.replaceChildren();
+
+        if (!messages.length) {
+          const empty = document.createElement("p");
+          empty.className = "conversation-empty";
+          empty.textContent = "아직 이 인물과 나눈 대화가 없습니다.";
+          log.appendChild(empty);
+          return;
+        }
+
+        messages.forEach((message) => {
+          const bubble = document.createElement("article");
+          bubble.className = `conversation-message ${message.sender}`;
+
+          const name = document.createElement("strong");
+          name.className = "conversation-speaker";
+          name.textContent = message.sender === "player" ? "사또" : activeSuspect.name;
+
+          const text = document.createElement("p");
+          text.className = "conversation-text";
+          text.textContent = message.text;
+
+          bubble.append(name, text);
+          if (message.meta) {
+            const meta = document.createElement("span");
+            meta.className = "conversation-meta";
+            meta.textContent = message.meta;
+            bubble.appendChild(meta);
+          }
+          log.appendChild(bubble);
+        });
+
+        log.scrollTop = log.scrollHeight;
+      });
+    }
+
+    function addConversationMessage(suspectId, sender, text, meta = "") {
+      getConversationNoteList(suspectId).push({ sender, text, meta });
+      activeNoteSuspectId = suspectId;
+      renderConversationNotes();
+    }
+
     function setNote(open) {
+      if (open) {
+        activeNoteSuspectId = suspects[suspectIndex].id;
+        renderConversationNotes();
+      }
       noteDrawer.classList.toggle("open", open);
       overlay.classList.toggle("show", open);
       noteDrawer.setAttribute("aria-hidden", String(!open));
@@ -1322,6 +1367,13 @@
     document.querySelector("#openNoteProp").addEventListener("click", () => setNote(true));
     document.querySelector("#closeNote").addEventListener("click", () => setNote(false));
     overlay.addEventListener("click", () => setNote(false));
+    document.querySelectorAll(".note-suspect-tab").forEach((button) => {
+      button.addEventListener("click", () => {
+        activeNoteSuspectId = button.dataset.suspectId || activeNoteSuspectId;
+        playSfx("buttonAlt", 0.48);
+        renderConversationNotes();
+      });
+    });
 
     const evidenceBagPop = document.querySelector("#evidenceBagPop");
     const toggleEvidenceBag = document.querySelector("#toggleEvidenceBag");
@@ -1352,6 +1404,10 @@
       globalOverlay.classList.add("show");
       if (id === "mapPanel") playSfx("map", 0.78);
       if (id === "toolPanel") playSfx("buttonAlt", 0.62);
+      if (id === "fieldNotePanel") {
+        playSfx("buttonAlt", 0.62);
+        renderConversationNotes();
+      }
       updateToolCursor();
     }
 
@@ -1431,13 +1487,9 @@
     });
 
     function addInterrogationSummary(question) {
-      const list = document.querySelector("#interrogationSummary");
-      document.querySelector("#emptyInterrogationSummary")?.remove();
-      const item = document.createElement("li");
-      const suspect = suspects[suspectIndex].name;
+      const suspect = suspects[suspectIndex];
       const evidence = selectedEvidence || "증거 제시 없음";
-      item.textContent = `${suspect} 심문 질문: "${question}" / 제시 증거: ${evidence}`;
-      list.appendChild(item);
+      addConversationMessage(suspect.id, "player", question, `제시 증거: ${evidence}`);
     }
 
     function getCollectedEvidenceNames() {
@@ -1464,12 +1516,8 @@
     }
 
     function addInterrogationAnswer(answer, source, warning) {
-      const list = document.querySelector("#interrogationSummary");
-      document.querySelector("#emptyInterrogationSummary")?.remove();
       const suspect = suspects[suspectIndex].name;
-      const item = document.createElement("li");
-      item.textContent = `${suspect} 심문 답변: "${answer}"`;
-      list.appendChild(item);
+      addConversationMessage(suspects[suspectIndex].id, "suspect", answer);
       showSuspectReply(answer, suspect);
       if (source === "fallback" && warning) {
         showToast(warning);
