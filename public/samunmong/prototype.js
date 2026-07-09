@@ -818,10 +818,7 @@
         lines.push("드러난 기록", entries);
       }
       if (data.logic) {
-        lines.push(`논리 근거: ${data.logic}`);
-      }
-      if (data.contradiction) {
-        lines.push(`대조할 모순: ${data.contradiction}`);
+        lines.push(data.logic);
       }
       return lines.filter(Boolean).join("\n\n");
     }
@@ -833,7 +830,7 @@
         `획득 장소: ${getEvidenceLocation(name)}`
       ];
 
-      if (data.logic) lines.push(`논리 근거: ${data.logic}`);
+      if (data.logic) lines.push(data.logic);
       if (data.relatedSuspects?.length) lines.push(`관련 인물: ${data.relatedSuspects.join(", ")}`);
       if (analyzed && formatEvidenceEntries(name)) lines.push(`확인된 내용:\n${formatEvidenceEntries(name)}`);
       if (data.tool) lines.push(`추천 도구: ${data.tool}`);
@@ -849,7 +846,7 @@
           <strong>${escapeHtml(name)}</strong>
           <span class="evidence-location">획득: ${escapeHtml(getEvidenceLocation(name))}</span>
           <span>${escapeHtml(data.note || "현장에서 발견된 단서")}</span>
-          ${data.logic ? `<span class="evidence-logic">근거: ${escapeHtml(data.logic)}</span>` : ""}
+          ${data.logic ? `<span class="evidence-logic">${escapeHtml(data.logic)}</span>` : ""}
         </span>`;
     }
 
