@@ -3665,10 +3665,11 @@
       overflow: visible;
       white-space: nowrap;
       font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
-      font-size: 12px
+      font-size: 12px;
       line-height: 1;
       color: #f2e6d4;
       text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,0,0,.86);
+      letter-spacing: .01em;
     }
 
     .tool-prop:hover,
