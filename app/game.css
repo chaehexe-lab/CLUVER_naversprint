@@ -2369,7 +2369,7 @@
       background: transparent;
       color: #f2e6d4;
       font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
-      font-size: 12px;
+      font-size: clamp(16px, 1.55vw, 21px);
       letter-spacing: 0;
       cursor: pointer;
       text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,0,0,.9);
@@ -3657,7 +3657,7 @@
     .accuse-prop { right: 2.6%; top: 17%; }
 
     .accuse-prop .sr-only {
-      font-size: 12px;
+      font-size: clamp(16px, 1.55vw, 21px);
       line-height: 1;
       letter-spacing: 0;
     }
