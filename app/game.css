@@ -2475,9 +2475,9 @@
     }
 
     .scene-dock .room-chip { left: calc(2.2% + 92px); bottom: 3%; }
-    .scene-dock .note-chip { right: calc(2.4% + 192px); bottom: 3%; }
+    .scene-dock .note-chip { right: 2.4%; bottom: 25%; }
     .scene-dock .map-chip { left: 2.2%; bottom: 3%; }
-    .scene-dock .bag-chip { right: calc(2.4% + 96px); bottom: 3%; }
+    .scene-dock .bag-chip { right: 2.4%; bottom: 14%; }
     .scene-dock .tool-chip { right: 2.4%; bottom: 3%; }
 
     .field-onboarding {
