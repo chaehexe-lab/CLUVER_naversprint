@@ -95,10 +95,14 @@ function readCollectedEvidence() {
   }
 }
 
-function resetDreamProgress() {
+function returnToBriefingWithProgress() {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem("samunmong-demo-state");
-  window.localStorage.removeItem("samunmong-collected-evidence");
+  window.localStorage.setItem(
+    "samunmong-demo-state",
+    JSON.stringify({ screenId: "briefingScreen", savedAt: Date.now() })
+  );
+  window.localStorage.setItem("samunmong-field-guide-seen", "1");
+  window.sessionStorage.removeItem("samunmong-field-guide-pending");
 }
 
 function unlockTruthPage() {
@@ -352,14 +356,15 @@ export default function ResultScreen() {
           <article className="verdict-message">
             <p className="verdict-kicker">{copy.kicker}</p>
             <h1 id="resultTitle">{copy.title}</h1>
-            <TypewriterLines lines={copy.lines} onType={playTypingSfx} />
+            <TypewriterLines lines={copy.lines} onType={playTypingSfx}resetDreamProgress
+              returnToBriefingWithProgress/>
             <div className="verdict-actions">
               {outcome === "success" && accusedSuspect.id === finalCulpritId ? (
                 <Link className="wood-result-button" href="/interpretation" onClick={unlockTruthPage}>
                   해몽하기
                 </Link>
               ) : (
-                <Link className="wood-result-button" href="/?start=briefingScreen" onClick={resetDreamProgress}>
+                <Link className="wood-result-button" href="/?start=briefingScreen" onClick={returnToBriefingWithProgress}>
                   다시 조사하기
                 </Link>
               )}

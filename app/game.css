@@ -2515,7 +2515,7 @@
       left: 50%;
       top: 12%;
       z-index: 64;
-      width: min(680px, 84vw);
+      width: min(550px, 84vw);
       padding: 22px 26px 24px;
       border-color: rgba(217,178,104,.5);
       border-radius: 18px;
@@ -3665,10 +3665,11 @@
       overflow: visible;
       white-space: nowrap;
       font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
-      font-size: clamp(29px, 3.1vw, 40px);
+      font-size: 12px;
       line-height: 1;
       color: #f2e6d4;
       text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,0,0,.86);
+      letter-spacing: .01em;
     }
 
     .tool-prop:hover,
@@ -4042,13 +4043,13 @@
     }
 
     .suspect-reply {
-      left: 50%;
+      left: 62%;
       bottom: 27%;
       z-index: 8;
       width: min(460px, 46vw);
       display: grid;
       gap: 5px;
-      padding: 12px 14px;
+      padding: 13px 42px 13px 16px;
       border-color: rgba(255,233,190,.2);
       border-radius: 4px;
       color: rgba(247,236,216,.92);
@@ -4056,7 +4057,7 @@
       box-shadow: 0 18px 40px rgba(0,0,0,.34), inset 0 0 0 1px rgba(255,233,190,.05);
       text-shadow: 0 2px 8px rgba(0,0,0,.92);
       transform: translateX(-50%);
-      pointer-events: none;
+      pointer-events: auto;
     }
 
     .suspect-reply[hidden] {
@@ -4067,6 +4068,31 @@
       color: rgba(217,178,104,.82);
       font-size: 10px;
       font-weight: 900;
+    }
+
+    .suspect-reply-close {
+      position: absolute;
+      top: 7px;
+      right: 8px;
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(255,233,190,.18);
+      border-radius: 999px;
+      color: rgba(247,236,216,.9);
+      background: rgba(0,0,0,.3);
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+    }
+
+    .suspect-reply-close:hover,
+    .suspect-reply-close:focus-visible {
+      color: #fff;
+      background: rgba(104, 39, 29, .62);
+      outline: 1px solid rgba(217,178,104,.5);
+      outline-offset: 2px;
     }
 
     .suspect-reply p {
@@ -4986,6 +5012,13 @@
       width: min(860px, 100%);
     }
 
+    .briefing-evidence-stack {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: end;
+      gap: clamp(10px, 1.5vw, 18px);
+    }
+
     .briefing-evidence-photo {
       position: relative;
       margin: 0;
@@ -5000,6 +5033,15 @@
       max-height: 285px;
       object-fit: contain;
       filter: brightness(1.22) contrast(1.14) saturate(1.08) drop-shadow(0 14px 16px rgba(42, 23, 12, .18));
+    }
+
+    .briefing-evidence-photo-small {
+      padding-bottom: 28px;
+      transform: rotate(3deg);
+    }
+
+    .briefing-evidence-photo-small img {
+      max-height: 275px;
     }
 
     .briefing-evidence-photo figcaption {
@@ -5110,6 +5152,10 @@
         grid-template-columns: 1fr;
       }
 
+      .briefing-evidence-stack {
+        grid-template-columns: 1fr;
+      }
+
       .briefing-death-copy {
         border-left: 0;
         border-top: 2px solid rgba(105, 46, 28, .28);
@@ -5189,6 +5235,9 @@
     .evidence-bag-pop li,
     .evidence-card span,
     .tool-card span,
+    .conversation-text,
+    .conversation-meta,
+    .suspect-reply p,
     .note-bubble,
     .note-turn-meta,
     .note-bubble-meta,
@@ -5198,6 +5247,7 @@
       overflow-wrap: normal;
       line-break: strict;
       text-wrap: pretty;
+      white-space: pre-line;
     }
 
     .accuse-prop .sr-only {
