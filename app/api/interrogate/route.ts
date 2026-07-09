@@ -26,6 +26,8 @@ type InterrogateRequest = {
 const OPENAI_RESPONSES_ENDPOINT = "https://api.openai.com/v1/responses";
 const FOREIGN_TEXT_PATTERN = /[A-Za-z\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3040-\u30FF\u0400-\u04FF\u0600-\u06FF\u0900-\u097F]/;
 const ALIBI_QUESTION_PATTERN = /(알리바이|어제|사건\s*당일|그날|그\s*밤|그때|행적|어디 있었|뭐 했|무엇을 했)/;
+const QUESTION_CHAR_LIMIT = 60;
+const LONG_QUESTION_NOTICE = "질문이 길어서 전부 알아듣지는 못했지만, 앞부분에 대해 답하겠습니다.";
 
 function unique(values: string[]) {
   return [...new Set(values.filter(Boolean))];
@@ -39,6 +41,26 @@ function hasAlibiIntent(text: string) {
   return ALIBI_QUESTION_PATTERN.test(text);
 }
 
+function limitByCharacters(text: string, limit: number) {
+  return Array.from(text).slice(0, limit).join("");
+}
+
+function normalizeQuestion(rawQuestion: string) {
+  const originalQuestion = rawQuestion.trim();
+  const effectiveQuestion = limitByCharacters(originalQuestion, QUESTION_CHAR_LIMIT);
+
+  return {
+    originalQuestion,
+    effectiveQuestion,
+    wasTruncated: Array.from(originalQuestion).length > QUESTION_CHAR_LIMIT
+  };
+}
+
+function applyLongQuestionNotice(answer: string, wasTruncated: boolean) {
+  if (!wasTruncated || answer.includes(LONG_QUESTION_NOTICE)) return answer;
+  return `${LONG_QUESTION_NOTICE}\n\n${answer}`;
+}
+
 function sanitizeConversationHistory(history: unknown): ChatMessage[] {
   if (!Array.isArray(history)) return [];
 
@@ -50,7 +72,7 @@ function sanitizeConversationHistory(history: unknown): ChatMessage[] {
       const rawContent = (message as Partial<ChatMessage>).content;
       if ((role !== "user" && role !== "assistant") || typeof rawContent !== "string") return [];
 
-      const content = rawContent.trim().slice(0, 600);
+      const content = limitByCharacters(rawContent.trim(), role === "user" ? QUESTION_CHAR_LIMIT : 600);
       if (!content || (role === "assistant" && hasForeignText(content))) return [];
 
       return [{ role, content }];
@@ -196,13 +218,21 @@ async function requestOpenAIAnswer(apiKey: string, messages: OpenAIMessage[]): P
   return { ok: true, answer: extractOpenAIText(data) };
 }
 
-function fallbackAnswer(persona: SuspectPersona, evidenceNames: string[], reactions: EvidenceReaction[], reason: string, question = "") {
+function fallbackAnswer(
+  persona: SuspectPersona,
+  evidenceNames: string[],
+  reactions: EvidenceReaction[],
+  reason: string,
+  question = "",
+  wasQuestionTruncated = false
+) {
   const guide = reactions[0]?.responseGuide;
   const evidenceText = evidenceNames[0] ? ` ${evidenceNames[0]} 말씀이십니까.` : "";
   const base = guide || (hasAlibiIntent(question) ? persona.fixedAlibi : persona.publicTruth);
+  const answer = `${evidenceText} ${base} 지금은 자세히 말씀드리기 어렵습니다.`;
 
   return {
-    answer: `${evidenceText} ${base} 지금은 자세히 말씀드리기 어렵습니다.`,
+    answer: applyLongQuestionNotice(answer, wasQuestionTruncated),
     source: "fallback",
     warning: reason
   };
@@ -210,16 +240,17 @@ function fallbackAnswer(persona: SuspectPersona, evidenceNames: string[], reacti
 
 export async function POST(req: Request) {
   const body = (await req.json()) as InterrogateRequest;
-  const question = (body.userMessage || body.question || "").trim();
+  const questionState = normalizeQuestion(body.userMessage || body.question || "");
+  const question = questionState.effectiveQuestion;
   const persona = suspectPersonas.find((item) => item.id === body.suspectId) || suspectPersonas[0];
 
-  if (!question) {
+  if (!questionState.originalQuestion) {
     return Response.json({ error: "질문이 비어 있습니다." }, { status: 400 });
   }
 
   const specialAnswer = getSuspectSpecialAnswer(question);
   if (specialAnswer) {
-    return Response.json({ answer: specialAnswer, source: "special" });
+    return Response.json({ answer: applyLongQuestionNotice(specialAnswer, questionState.wasTruncated), source: "special" });
   }
 
   const presentedEvidence = resolveEvidenceNames([...(body.presentedEvidenceNames || []), ...(body.presentedEvidenceIds || [])]);
@@ -230,12 +261,17 @@ export async function POST(req: Request) {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
-    return Response.json(fallbackAnswer(persona, usableEvidence, reactions, "OPENAI_API_KEY가 설정되지 않아 임시 답변을 반환했습니다.", question));
+    return Response.json(
+      fallbackAnswer(persona, usableEvidence, reactions, "OPENAI_API_KEY가 설정되지 않아 임시 답변을 반환했습니다.", question, questionState.wasTruncated)
+    );
   }
 
   const systemPrompt = buildSystemPrompt(persona, usableEvidence, reactions);
+  const questionGuide = questionState.wasTruncated
+    ? `\n\n현재 질문 처리:\n- 플레이어의 질문이 길어서 앞 ${QUESTION_CHAR_LIMIT}자만 전달되었다.\n- 답변 첫 부분에 "${LONG_QUESTION_NOTICE}"라는 뜻의 안내를 자연스럽게 포함한다.\n- 전달된 앞부분 질문에 대해서만 답하고, 뒤에 더 있었을 내용은 추측하지 않는다.`
+    : "";
   const messages: OpenAIMessage[] = [
-    { role: "developer", content: systemPrompt },
+    { role: "developer", content: `${systemPrompt}${questionGuide}` },
     ...sanitizeConversationHistory(body.conversationHistory),
     { role: "user", content: question }
   ];
@@ -243,7 +279,7 @@ export async function POST(req: Request) {
   try {
     const firstAnswer = await requestOpenAIAnswer(apiKey, messages);
     if (!firstAnswer.ok) {
-      return Response.json(fallbackAnswer(persona, usableEvidence, reactions, firstAnswer.error, question), { status: 200 });
+      return Response.json(fallbackAnswer(persona, usableEvidence, reactions, firstAnswer.error, question, questionState.wasTruncated), { status: 200 });
     }
 
     let answer = firstAnswer.answer;
@@ -252,7 +288,7 @@ export async function POST(req: Request) {
       const repairMessages: OpenAIMessage[] = [
         {
           role: "developer",
-          content: `${systemPrompt}
+          content: `${systemPrompt}${questionGuide}
 
 출력 검수 규칙:
 - 답변에는 한글, 숫자, 공백, 일반 문장부호만 사용한다.
@@ -266,18 +302,21 @@ export async function POST(req: Request) {
     }
 
     if (!answer || hasForeignText(answer)) {
-      return Response.json(fallbackAnswer(persona, usableEvidence, reactions, "외국어가 섞인 응답을 걸러 임시 답변을 반환했습니다.", question), {
-        status: 200
-      });
+      return Response.json(
+        fallbackAnswer(persona, usableEvidence, reactions, "외국어가 섞인 응답을 걸러 임시 답변을 반환했습니다.", question, questionState.wasTruncated),
+        {
+          status: 200
+        }
+      );
     }
 
     return Response.json({
-      answer,
+      answer: applyLongQuestionNotice(answer, questionState.wasTruncated),
       source: "openai",
       usedEvidenceNames: usableEvidence
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "알 수 없는 오류";
-    return Response.json(fallbackAnswer(persona, usableEvidence, reactions, `OpenAI API 오류: ${message}`, question), { status: 200 });
+    return Response.json(fallbackAnswer(persona, usableEvidence, reactions, `OpenAI API 오류: ${message}`, question, questionState.wasTruncated), { status: 200 });
   }
 }
