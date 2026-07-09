@@ -712,7 +712,7 @@
     }
 
     function showInitialScreenFromSetup() {
-      const startScreen = entryParams.get("start");
+      const startScreen = entryParams.get("start") || document.querySelector(".game-shell")?.dataset.startScreen;
       const allowedScreens = new Set(["tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne", "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters", "backGateCourtyard", "interrogationScreen"]);
 
       if (!allowedScreens.has(startScreen)) {

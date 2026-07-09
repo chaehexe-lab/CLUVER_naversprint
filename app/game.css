@@ -5241,4 +5241,12 @@
       text-wrap: pretty;
       white-space: pre-line;
     }
+    @media (max-width: 900px), (max-height: 600px) {
+      .briefing-card,
+      .briefing-card[data-briefing-step="1"],
+      .briefing-card[data-briefing-step="2"] {
+        width: min(1080px, 140%);
+        transform: translate(-50%, -50%) scale(.6);
+      }
+    }
   
