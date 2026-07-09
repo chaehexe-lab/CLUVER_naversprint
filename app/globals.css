@@ -572,10 +572,10 @@ html body * {
   cursor: var(--cursor-default) !important;
 }
 
-input,
-textarea,
-select,
-[contenteditable="true"] {
+html body input,
+html body textarea,
+html body select,
+html body [contenteditable="true"] {
   cursor: var(--cursor-input) !important;
 }
 
