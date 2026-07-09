@@ -985,17 +985,17 @@
         toolResult: "먼지털이 붓으로 털자 긁힌 글자 홈 사이에 고운 분가루가 남아 있다.\n거칠게 굴러다닌 물건이라기보다, 누군가 손에 쥐고 옮긴 뒤 일부러 현장에 둔 듯하다."
       },
       "돌쇠의 그림": {
-        note: "최춘월의 방에서 발견된 숨겨둔 초상. 춘월이 돌쇠에게 마음을 두었는지 추적할 단서다.",
+        note: "최춘월의 방에서 발견된 숨겨둔 초상. 오래 숨긴 마음과 집착을 추적할 단서다.",
         img: "/samunmong/assets/evidence-portrait-v2.png",
         tool: "돋보기",
-        toolResult: "돋보기로 보니 선이 섬세하고 여러 번 고쳐 그린 흔적이 있다.\n우연히 본 얼굴이라기엔 지나치게 정성스럽다. 춘월은 왜 이 그림을 숨겨 두었을까?"
+        toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있다.\n그림 가장자리에는 지운 글씨 자국이 남아 있고, ‘떠나지 마라’로 보이는 획이 희미하다.\n우연한 초상이라기보다 오래 눌러 둔 마음에 가깝다."
       },
       "헐거워진 노리개": {
         note: "끊어진 장식과 급히 잡아챈 듯한 흔적이 남은 노리개. 누가 지녔는지 확인해야 한다.",
         img: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.png"
       },
       "무덕의 번진 일기": {
-        note: "먹이 번져 읽기 어려운 일기. 점순과 돌쇠의 도망 계획이 주변에 새어 나갔는지 추적할 수 있다.",
+        note: "먹이 번져 읽기 어려운 일기. 점순과 돌쇠의 도망 계획이 춘월에게 닿은 경로를 추적할 수 있다.",
         img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.png",
         tool: "촛불 비추기",
         toolResult: "촛불을 비추자 번진 먹 아래 기록이 또렷해진다."
@@ -1017,7 +1017,7 @@
         img: "/samunmong/assets/evidence-transparent/evidence-servant-ledger.png"
       },
       "혼서 조각": {
-        note: "혼례와 관련 있어 보이는 문서 조각. 인물 관계를 다시 보게 만드는 단서다.",
+        note: "춘월의 혼인을 재촉하는 문서 조각. 춘월이 자기 삶을 통제하지 못하던 처지를 보여 준다.",
         img: "/samunmong/assets/evidence-transparent/evidence-marriage-letter.png"
       },
       "피 묻은 붕대": {
@@ -1025,7 +1025,7 @@
         img: "/samunmong/assets/evidence-transparent/evidence-bloodied-bandage.png"
       },
       "도망 보따리": {
-        note: "급히 싼 듯한 보따리. 누군가 떠날 준비를 했는지 확인해야 한다.",
+        note: "급히 싼 듯한 보따리. 점순과 돌쇠가 떠나려 했고, 그 사실이 누군가의 감정을 건드렸는지 확인해야 한다.",
         img: "/samunmong/assets/evidence-transparent/evidence-escape-bundle.png"
       },
       "긁힌 팔 흔적": {
@@ -1929,7 +1929,7 @@
       isAskingAi = true;
       askButton.disabled = true;
       askButton.textContent = "답변 중";
-      showSuspectReply("...", "답변 중");
+      showSuspectReply("답을 고르는 중", "답변 중");
 
       try {
         const response = await fetch("/api/interrogate/", {

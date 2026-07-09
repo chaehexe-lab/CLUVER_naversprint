@@ -156,7 +156,7 @@
 - **Purpose:** 대화 질문이 단순 텍스트 응답을 넘어서 시각적 증거 발견으로 이어지게 한다.
 - **Why I chose this design:** 질문 결과가 장면 전환으로 보이면 플레이어가 심문을 적극적으로 시도하게 된다.
 - **Connected pages or mechanisms:** 취조실, 증거 인벤토리, 모순 기록.
-- **Decision status:** Confirmed for direction. `긁힌 팔 흔적`은 돌쇠의 소매 아래에서만 수집되는 방향.
+- **Decision status:** Confirmed for direction. `긁힌 팔 흔적`은 춘월의 소매 아래에서 결정적으로 수집되는 방향.
 
 ### 증거 인벤토리
 
@@ -167,6 +167,15 @@
 - **Why I chose this design:** 수집한 단서를 다시 읽고 증언과 비교할 수 있어야 범인 지목이 설득력을 가진다.
 - **Connected pages or mechanisms:** 사건 현장, 취조실, 범인 지목.
 - **Decision status:** Confirmed for direction.
+
+### 춘월의 동기 강화
+
+- **Role in the flow:** 춘월이 점순을 죽였다는 판단이 단순한 범행 증거뿐 아니라 감정과 상황의 흐름으로 납득되게 한다.
+- **User decision:** 춘월의 직접 증거보다 동기 설득력이 부족하므로, 동기 단서를 강화한다.
+- **Included elements:** 돌쇠 초상화, 혼서 조각, 무덕의 번진 일기, 도망 보따리, 해몽 화면의 최종 진상 문구.
+- **Core motive:** 춘월은 원치 않는 혼인을 앞두고 자기 삶을 통제하지 못했고, 돌쇠를 향한 오래 숨긴 마음과 점순·돌쇠의 도망 계획이 충돌하면서 점순을 빼앗는 존재로 받아들였다.
+- **Evidence direction:** 돌쇠 초상화는 단순 호감이 아니라 집착의 흔적으로, 혼서 조각은 통제할 수 없는 처지의 압박으로, 무덕의 일기는 도망 계획이 춘월에게 알려지는 통로로 작동한다.
+- **Decision status:** User-approved direction. 범행을 정당화하지 않되, “왜 점순을 향했는지”가 플레이 중에 더 선명하게 드러나야 한다.
 
 ### 범인 지목 결과 화면
 
