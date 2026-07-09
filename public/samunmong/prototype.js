@@ -644,28 +644,139 @@
       setTimeout(startFieldGuide, 640);
     }
 
-    function go(id, message = "이동 중...") {
+    const dreamLoadingDuration = 2600;
+    const themeStartLoadingDuration = 4200;
+    const themeStartMaxWait = 9000;
+    const themeStartAssets = [
+      "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png",
+      "/samunmong/assets/mudeok-interaction/evidence-jeomsun-hand-exam-paper.png",
+      "/samunmong/assets/suspects/dolsoe-seated.png",
+      "/samunmong/assets/suspects/chunwol-seated.png",
+      "/samunmong/assets/suspects/yoomunseok-seated.png",
+      "/samunmong/assets/suspects/mudeok-seated.png"
+    ];
+
+    function setDreamLoadingProgress(progress) {
+      if (!fade) return;
+      const clamped = Math.max(0, Math.min(100, Math.round(progress)));
+      fade.style.setProperty("--dream-loading-fill", `${clamped}%`);
+    }
+
+    function showDreamLoading(message = "몽(夢)땅 불러오는 중…", duration = dreamLoadingDuration, animate = true) {
+      fade?.classList.add("show", "dream-loading");
+      if (fade) {
+        fade.textContent = message;
+        fade.style.setProperty("--dream-loading-duration", `${duration}ms`);
+        setDreamLoadingProgress(0);
+        if (animate) {
+          requestAnimationFrame(() => setDreamLoadingProgress(100));
+        }
+      }
+    }
+
+    function hideDreamLoading() {
+      fade?.classList.remove("show", "dream-loading");
+      fade?.style.removeProperty("--dream-loading-duration");
+      fade?.style.removeProperty("--dream-loading-fill");
+    }
+
+    function preloadImage(src) {
+      return new Promise((resolve) => {
+        if (!src) {
+          resolve(src);
+          return;
+        }
+
+        const image = new Image();
+        image.onload = () => resolve(src);
+        image.onerror = () => resolve(src);
+        image.src = src;
+
+        if (image.complete) {
+          resolve(src);
+        }
+      });
+    }
+
+    function preloadImages(sources, onProgress) {
+      const uniqueSources = [...new Set(sources.filter(Boolean))];
+      if (!uniqueSources.length) {
+        onProgress?.(100);
+        return Promise.resolve();
+      }
+
+      let loaded = 0;
+      onProgress?.(6);
+      return Promise.all(
+        uniqueSources.map((src) =>
+          preloadImage(src).then(() => {
+            loaded += 1;
+            onProgress?.(6 + (loaded / uniqueSources.length) * 94);
+          })
+        )
+      );
+    }
+
+    function goAfterPreload(id, assets, options = {}) {
+      stopBriefingTyping();
+      document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
+      playSfx(options.sfx || "move", options.volume ?? 0.82);
+      showDreamLoading("몽(夢)땅 불러오는 중…", options.progressDuration || 180, false);
+
+      const startedAt = Date.now();
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        setDreamLoadingProgress(100);
+        const elapsed = Date.now() - startedAt;
+        const delay = Math.max(0, (options.minDuration || 0) - elapsed);
+        setTimeout(() => {
+          screens.forEach((screen) => screen.classList.toggle("active", screen.id === id));
+          updateCurrentLocation(id);
+          saveProgress(id);
+          hideDreamLoading();
+          updateBgmForScreen(id);
+          options.after?.();
+        }, delay + 180);
+      };
+
+      preloadImages(assets, setDreamLoadingProgress).then(finish);
+      setTimeout(finish, options.maxWait || themeStartMaxWait);
+    }
+
+    function go(id, message = "이동 중...", options = {}) {
       stopBriefingTyping();
       document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
       playSfx("move", 0.82);
-      fade?.classList.add("show");
-      if (fade) fade.textContent = message;
+      const duration = options.dreamLoading ? options.duration || dreamLoadingDuration : 260;
+      if (options.dreamLoading) {
+        showDreamLoading("몽(夢)땅 불러오는 중…", duration);
+      } else {
+        fade?.classList.add("show");
+        if (fade) fade.textContent = message;
+      }
       setTimeout(() => {
         screens.forEach((screen) => screen.classList.toggle("active", screen.id === id));
         updateCurrentLocation(id);
         saveProgress(id);
-        fade?.classList.remove("show");
+        if (options.dreamLoading) {
+          hideDreamLoading();
+        } else {
+          fade?.classList.remove("show");
+        }
         updateBgmForScreen(id);
         if (id === "fieldOne") maybeStartFieldGuide();
-      }, 260);
+      }, duration);
     }
 
     function goRush(id, message = "사건 현장으로 진입 중...") {
       stopBriefingTyping();
       document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
       playSfx("briefingNext", 0.9);
-      fade?.classList.add("show", "long");
+      fade?.classList.add("show");
       if (fade) fade.textContent = message;
+      fade?.classList.add("long");
       setTimeout(() => {
         screens.forEach((screen) => {
           const isActive = screen.id === id;
@@ -743,7 +854,10 @@
 
       playSfx("dream", 0.85);
       writeBgmState(currentBgm || bgmForScreen(getActiveScreenId()), bgmTracks[currentBgm || bgmForScreen(getActiveScreenId())]);
-      window.location.href = `/result?${params.toString()}`;
+      showDreamLoading();
+      setTimeout(() => {
+        window.location.href = `/result?${params.toString()}`;
+      }, dreamLoadingDuration);
     }
 
     const settingsDialog = document.querySelector("#settingsDialog");
@@ -815,8 +929,8 @@
       showToast("게임을 종료했습니다. 창을 닫아도 진행 위치가 보존됩니다.");
       window.close();
     });
-    on("#skipTutorial", "click", () => go("dreamScreen"));
-    on("#nextTutorial", "click", () => go("dreamScreen"));
+    on("#skipTutorial", "click", () => go("dreamScreen", "이동 중...", { dreamLoading: true }));
+    on("#nextTutorial", "click", () => go("dreamScreen", "이동 중...", { dreamLoading: true }));
     on("#closeDreamNotice", "click", closeDreamNotice);
     on("#closeDreamNoticeX", "click", closeDreamNotice);
     document.querySelectorAll("[data-dream-disabled='true']").forEach((button) => {
@@ -828,9 +942,13 @@
       });
     });
     on("#chooseJoseon", "click", () => {
-      playSfx("dream", 0.9);
-      go("briefingScreen");
-      setTimeout(startBriefingSequence, 300);
+      goAfterPreload("briefingScreen", themeStartAssets, {
+        sfx: "dream",
+        volume: 0.9,
+        minDuration: themeStartLoadingDuration,
+        maxWait: themeStartMaxWait,
+        after: startBriefingSequence
+      });
     });
     on("#briefingPrev", "click", () => {
       briefingStepIndex -= 1;

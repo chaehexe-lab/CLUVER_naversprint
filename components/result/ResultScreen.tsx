@@ -60,6 +60,7 @@ const typeSfxPaths = [
   `${soundBase}/sfx/type-2.mp3`,
   `${soundBase}/sfx/type-3.mp3`
 ] as const;
+const dreamLoadingDuration = 2600;
 
 const outcomeCopy = {
   success: {
@@ -289,6 +290,7 @@ export default function ResultScreen() {
   );
   const [showWarning, setShowWarning] = useState(false);
   const [showExitPrompt, setShowExitPrompt] = useState(false);
+  const [showDreamLoading, setShowDreamLoading] = useState(false);
 
   const selectedSuspect = suspects.find((suspect) => suspect.id === selectedSuspectId) ?? suspects[0];
   const selectedIndex = suspects.findIndex((suspect) => suspect.id === selectedSuspect.id);
@@ -310,9 +312,24 @@ export default function ResultScreen() {
     }
   }
 
+  function withDreamLoading(action: () => void, delay = dreamLoadingDuration) {
+    setShowDreamLoading(true);
+    window.setTimeout(action, delay);
+  }
+
+  function navigateWithDreamLoading(path: string, beforeNavigate?: () => void) {
+    beforeNavigate?.();
+    withDreamLoading(() => {
+      window.location.href = path;
+    });
+  }
+
   function confirmAccusation(force = false) {
     if (!force && missingEvidence.length > 0) {
-      setShowWarning(true);
+      withDreamLoading(() => {
+        setShowDreamLoading(false);
+        setShowWarning(true);
+      });
       return;
     }
 
@@ -322,7 +339,14 @@ export default function ResultScreen() {
       suspectId: selectedSuspect.id,
       outcome
     });
-    window.location.href = `/result?${params.toString()}&accused=1`;
+    navigateWithDreamLoading(`/result?${params.toString()}&accused=1`);
+  }
+
+  function openExitPrompt() {
+    withDreamLoading(() => {
+      setShowDreamLoading(false);
+      setShowExitPrompt(true);
+    });
   }
 
   if (searchParams.get("accused") === "1") {
@@ -358,16 +382,24 @@ export default function ResultScreen() {
             <h1 id="resultTitle">{copy.title}</h1>
             <TypewriterLines lines={copy.lines} onType={playTypingSfx} />
             <div className="verdict-actions">
-              {outcome === "success" && accusedSuspect.id === finalCulpritId ? (
-                <Link className="wood-result-button" href="/interpretation" onClick={unlockTruthPage}>
+{outcome === "success" && accusedSuspect.id === finalCulpritId ? (
+                <button
+                  className="wood-result-button"
+                  type="button"
+                  onClick={() => navigateWithDreamLoading("/interpretation", unlockTruthPage)}
+                >
                   해몽하기
-                </Link>
+                </button>
               ) : (
-                <Link className="wood-result-button" href="/?start=briefingScreen" onClick={returnToBriefingWithProgress}>
+                <button
+                  className="wood-result-button"
+                  type="button"
+                  onClick={() => navigateWithDreamLoading("/?start=briefingScreen", returnToBriefingWithProgress)}
+                >
                   다시 조사하기
-                </Link>
+                </button>
               )}
-              <button className="wood-result-button primary" type="button" onClick={() => setShowExitPrompt(true)}>
+              <button className="wood-result-button primary" type="button" onClick={openExitPrompt}>
                 꿈에서 나가기
               </button>
             </div>
@@ -388,9 +420,13 @@ export default function ResultScreen() {
               <h2 id="resultExitTitle">꿈은 아직 끝나지 않았습니다.</h2>
               <p>테마 선택으로 돌아가시겠습니까?</p>
               <div className="dream-notice-actions">
-                <Link className="button primary" href="/?start=dreamScreen">
+                <button
+                  className="button primary"
+                  type="button"
+                  onClick={() => navigateWithDreamLoading("/?start=dreamScreen&dreamExit=1")}
+                >
                   돌아가기
-                </Link>
+                </button>
                 <button className="button" type="button" onClick={() => setShowExitPrompt(false)}>
                   머무르기
                 </button>
@@ -398,6 +434,7 @@ export default function ResultScreen() {
             </div>
           </aside>
         ) : null}
+        {showDreamLoading ? <div className="dream-loading-overlay" role="status" aria-label="몽땅 불러오는 중" /> : null}
       </main>
     );
   }
@@ -470,6 +507,7 @@ export default function ResultScreen() {
           </section>
         </div>
       ) : null}
+      {showDreamLoading ? <div className="dream-loading-overlay" role="status" aria-label="몽땅 불러오는 중" /> : null}
     </main>
   );
 }
