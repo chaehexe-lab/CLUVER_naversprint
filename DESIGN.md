@@ -102,11 +102,11 @@
 
 - **Role in the flow:** 플레이어가 단서를 직접 찾는 조사 화면.
 - **User action:** 화면 속 단서를 클릭해 증거를 수집한다.
-- **Included elements:** 어두운 한옥 골목, 젖은 돌길, 쓰러진 인물, 편지, 장신구, 발자국, 혈흔, 등불.
+- **Included elements:** 어두운 한옥 골목, 젖은 돌길, 쓰러진 인물, 편지, 장신구, 발자국, 혈흔, 등불, 증거 보따리, 대화 기록장 버튼.
 - **Purpose:** 사건의 시작점을 보여주고, 플레이어가 직접 수사에 참여한다고 느끼게 한다.
 - **Why I chose this design:** 어두운 현장과 작은 단서는 포인트 앤 클릭 추리 게임의 기본 행동을 자연스럽게 유도한다.
 - **Connected pages or mechanisms:** 증거 인벤토리, 취조실, 모순 기록.
-- **Decision status:** Confirmed for visual direction / Unresolved for exact clue placement.
+- **Decision status:** Confirmed for visual direction. 현장에서도 취조실과 같은 대화 기록장을 열어볼 수 있다.
 
 ### 조선 마을 지도 화면
 
@@ -132,11 +132,11 @@
 
 - **Role in the flow:** 용의자와 대화하고 진술을 확보하는 화면.
 - **User action:** 용의자를 선택하고 질문한다. 필요한 경우 증거를 제시한다.
-- **Included elements:** 어두운 취조실 배경, 용의자 중심 배치, 질문 입력/추천 질문, 대화 기록, 증거 제시 영역.
+- **Included elements:** 어두운 취조실 배경, 용의자 중심 배치, 질문 입력/추천 질문, 등장인물별 카카오톡식 대화 기록장, 증거 제시 영역.
 - **Purpose:** 현장 조사에서 얻은 증거를 진술과 대조해 모순을 찾게 한다.
 - **Why I chose this design:** 사건 현장과 취조실을 왕복하게 만들면 추리의 리듬이 생긴다. 플레이어는 단서를 얻고, 질문하고, 다시 현장을 확인하는 반복을 하게 된다.
 - **Connected pages or mechanisms:** 증거 인벤토리, 모순 기록, 범인 지목.
-- **Decision status:** Confirmed for loop / Unresolved for exact AI dialogue behavior.
+- **Decision status:** Confirmed for loop. 기록장은 등장인물 4명별로 넘겨 볼 수 있는 질문/답변 대화 기록 용도로 사용하며, 현장에서도 같은 기록장을 볼 수 있다.
 
 ### 소매 확인 장면
 
