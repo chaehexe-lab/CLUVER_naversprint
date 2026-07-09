@@ -106,14 +106,14 @@
       toolResult: "찢어진 옷고름의 섬유와 비슷한 꼬임이 보인다."
     },
     "점순 목 검안 종이": {
-      note: "점순의 목 주변을 살핀 기록지. 직접적인 결론은 없지만 중요한 단서다.",
+      note: "점순의 목 주변을 살핀 기록지. 날붙이 상처보다 목을 조른 듯한 압박 흔적이 남아 있다.",
       location: "무덕의 하인방",
       logic: "날카로운 상처보다 목 주변 압박 흔적을 중심으로 범행 방식을 다시 보게 만든다.",
       relatedSuspects: ["무덕", "춘월"],
       contradiction: "흉기를 단정하는 진술보다 몸싸움과 압박 흔적을 따져야 한다.",
       img: "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png",
       tool: "촛불 비추기",
-      toolResult: "종이 위에 눌린 선이 희미하게 드러난다."
+      toolResult: "목 둘레를 따라 눌린 선이 떠오른다. 사망 원인은 압박에 의한 질식으로 보인다."
     },
     "빈 호패 주머니": {
       note: "호패가 빠진 주머니. 호패 조각과 함께 봐야 한다.",
