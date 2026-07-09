@@ -784,8 +784,14 @@
         tool: "촛불 비추기",
         toolResult: "빛 아래에서 가장자리를 맞춰 보니 찢어진 결이 자연스럽게 이어진다."
       },
-      "찢어진 편지 조각": {
-        note: "찢겨 나간 편지의 일부. 누군가 숨기려 했던 말이 남아 있을 수 있다.",
+      "찢어진 문서 조각": {
+        note: "뒷문 마당에서 발견된 찢어진 문서 조각. 다른 종이 조각과 맞춰 확인해야 한다.",
+        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png",
+        tool: "촛불 비추기",
+        toolResult: "빛을 비추자 종이 뒷면에 흐릿한 먹 자국이 보인다."
+      },
+      "찢어진 약속 편지": {
+        note: "점순의 손에서 발견된 찢어진 약속 편지. '오늘 밤 창고에서 기다리시오, 함께 떠납시다'라는 문장이 남아 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png",
         tool: "촛불 비추기",
         toolResult: "빛을 비추자 종이 뒷면에 흐릿한 먹 자국이 보인다."
@@ -1209,7 +1215,8 @@
 
       document.querySelector("#genericEvidenceImage").src = data.img || "/samunmong/assets/evidence-wooden-tag.png";
       document.querySelector("#genericEvidenceTitle").textContent = name;
-      document.querySelector("#genericEvidenceText").textContent = `${getEvidenceDetailText(name, hasAnalyzedEvidence(name))}\n${data.tool ? "수사 도구로 더 자세히 살펴볼 수 있습니다." : "도구 없이 확인 가능한 단서입니다."}`;
+      document.querySelector("#genericEvidenceText").textContent = "";
+      document.querySelector("#genericEvidenceText").hidden = true;
       document.querySelector("#genericEvidenceInspect").classList.add("show");
       clearTimeout(showInspect.timer);
     }

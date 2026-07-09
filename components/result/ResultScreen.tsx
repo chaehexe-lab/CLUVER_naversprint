@@ -45,7 +45,7 @@ const requiredEvidence = [
   "돌쇠의 그림",
   "긁힌 팔 흔적",
   "작은 발자국",
-  "찢어진 문서 조각"
+  "찢어진 약속 편지"
 ] as const;
 
 const correctSuspectId = process.env.NEXT_PUBLIC_SAMUNMONG_CULPRIT_ID || finalCulpritId;
