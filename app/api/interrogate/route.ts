@@ -31,6 +31,7 @@ const CHUNWOL_DIRECT_PRESSURE_PATTERNS = [
   { evidenceName: "찢어진 약속 편지", pattern: /(창고|약속\s*편지|편지|쪽지|기다리시오|함께\s*떠납시다|돌쇠가\s*쓴)/ },
   { evidenceName: "긁힌 팔 흔적", pattern: /(팔\s*상처|긁힌\s*팔|긁힌\s*자국|소매|팔을\s*긁|긁혔)/ },
   { evidenceName: "돌쇠의 그림", pattern: /(돌쇠.*좋|돌쇠.*마음|그림|초상화|숨긴\s*그림)/ },
+  { evidenceName: "도망 보따리", pattern: /(도망|떠나|떠났|떠나려|함께\s*가|함께\s*떠|점순.*돌쇠|돌쇠.*점순|밤\s*외출)/ },
   { evidenceName: "호패 조각", pattern: /(호패|분가루|고운\s*가루|누명|현장에\s*둔)/ }
 ] as const;
 const QUESTION_CHAR_LIMIT = 60;
