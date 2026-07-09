@@ -5190,9 +5190,4 @@
       line-break: strict;
       text-wrap: pretty;
     }
-
-    .accuse-prop .sr-only {
-      font-size: clamp(29px, 3.1vw, 40px);
-      line-height: 1;
-    }
   
