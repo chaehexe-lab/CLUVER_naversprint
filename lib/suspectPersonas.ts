@@ -43,7 +43,7 @@ export const evidenceCatalog = [
   },
   {
     name: "찢어진 약속 편지",
-    aliases: ["찢어진 편지", "편지", "약속 편지", "쪽지", "창고 편지", "창고", "기다리시오", "함께 떠납시다", "편지 말투"]
+    aliases: ["찢어진 편지", "편지 조각", "찢어진 편지 조각", "편지", "약속 편지", "쪽지", "창고 편지", "창고", "기다리시오", "함께 떠납시다", "편지 말투"]
   },
   {
     name: "돌쇠의 그림",
@@ -214,6 +214,11 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "옷고름이 목을 조르는 데 쓰였다면 자신의 방식과 맞지 않는다고 반박한다. 유문석은 그런 고급 비단 끈이 춘월의 물건일 수 있다는 말에는 불편해한다."
       },
       {
+        evidenceNames: ["찢어진 약속 편지"],
+        intentTags: ["letterDenial", "handwritingMismatch", "forgedLetter"],
+        responseGuide: "찢어진 약속 편지는 자신이 쓰지 않았다고 분명하게 부정한다. 정중한 문장이 양반 말투처럼 보인다는 말에는 불쾌해하지만, 안 쓴 것은 안 쓴 것이라고 선을 긋고 누군가 자신의 말투까지 이용해 누명을 씌운 것 같다고 말한다."
+      },
+      {
         evidenceNames: ["혼서 조각"],
         intentTags: ["marriagePressure"],
         responseGuide: "혼인은 집안끼리 정한 일이라며 개인 감정과 사건을 분리하려 한다."
@@ -229,7 +234,7 @@ export const suspectPersonas: SuspectPersona[] = [
     publicTruth: "자신은 본 것과 들은 것을 일기에 적었을 뿐이라고 말한다.",
     fixedAlibi: "사건 당일 밤에는 하인방 근처에 있었고, 뒷문이 열리는 소리를 들었지만 직접 나가 보지는 않았다고 주장한다.",
     personality: "소심하고 겁이 많지만 관찰력이 좋다.",
-    speechStyle: "머뭇거리는 낮은 말투. 사또 앞에서 조심스럽게 말한다.",
+    speechStyle: "머뭇거리는 낮은 말투. 사또 앞에서 조심스럽게 말한다. 점순은 양반가 아씨가 아니므로 절대 '점순 아씨'라고 부르지 말고, '점순이' 또는 '점순'이라고 부른다.",
     lieRules: [
       "처음에는 춘월에게 말한 사실을 숨긴다.",
       "자신이 의심받을까 봐 본 것도 애매하게 말한다.",
