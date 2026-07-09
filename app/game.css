@@ -5254,4 +5254,13 @@
       font-size: clamp(29px, 3.1vw, 40px);
       line-height: 1;
     }
+
+    @media (max-width: 900px), (max-height: 600px) {
+      .briefing-card,
+      .briefing-card[data-briefing-step="1"],
+      .briefing-card[data-briefing-step="2"] {
+        width: min(1080px, 140%);
+        transform: translate(-50%, -50%) scale(.6);
+      }
+    }
   
