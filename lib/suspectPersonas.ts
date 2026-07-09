@@ -143,12 +143,12 @@ export const suspectPersonas: SuspectPersona[] = [
       {
         evidenceNames: ["찢어진 약속 편지", "찢어진 문서 조각", "맞물리는 종이 조각", "먹가루", "종이칼"],
         intentTags: ["letterForgery", "paperMatch", "writingTool"],
-        responseGuide: "편지나 종이는 집안 어디에나 있는 것이라며 우연일 수 있다고 둘러댄다."
+        responseGuide: "처음엔 편지나 종이는 집안 어디에나 있다고 둘러대지만, 종이 결이 맞는다는 말에는 당황한다. 서찰을 본 적은 없다고 버티되, 자기 방이나 사랑방의 종이와 비교해 보라는 식으로 말이 흔들린다."
       },
       {
         evidenceNames: ["돌쇠의 그림"],
         intentTags: ["dolsoeAffection", "hiddenPortrait"],
-        responseGuide: "그림은 단지 지나가다 본 얼굴을 그린 것뿐이라며 돌쇠에 대한 마음을 부정한다."
+        responseGuide: "그림을 보는 순간 말이 멎는다. 돌쇠를 마음에 둔 것은 끝까지 부정하려 하지만, 왜 숨겨 두었냐는 압박에는 혼인을 원치 않았다는 감정을 조금 드러낸다."
       },
       {
         evidenceNames: ["혼서 조각"],
@@ -163,11 +163,11 @@ export const suspectPersonas: SuspectPersona[] = [
       {
         evidenceNames: ["손톱 밑 실타래", "긁힌 팔 흔적", "찢어진 옷고름"],
         intentTags: ["victimResistance", "sleeveCheck", "bodyEvidence"],
-        responseGuide: "상처를 숨기려 하며 바느질이나 종이에 긁혔다고 변명한다."
+        responseGuide: "팔이나 실타래 이야기가 나오면 즉시 소매를 의식하며 당황한다. 바느질이나 종이에 긁혔다고 변명하되, 상처 난 시점과 점순의 저항 흔적을 묻는 말에는 대답이 끊긴다."
       }
     ],
     breakEvidenceNames: ["찢어진 약속 편지", "찢어진 문서 조각", "맞물리는 종이 조각", "손톱 밑 실타래", "긁힌 팔 흔적", "작은 발자국"],
-    finalBehavior: "결정적 증거가 쌓이면 처음엔 시대와 혼인을 탓하다가, 점순이 돌쇠를 빼앗아 갔다는 감정을 드러낸다."
+    finalBehavior: "결정적 증거가 쌓이면 처음엔 시대와 혼인을 탓하다가, 점순이 돌쇠를 빼앗아 갔다는 감정을 드러낸다. 완전한 자백 전에도 방, 서찰, 팔의 상처를 더 살피라는 단서가 나오게 한다."
   },
   {
     id: "dolsoe",
@@ -187,12 +187,12 @@ export const suspectPersonas: SuspectPersona[] = [
       {
         evidenceNames: ["도망 보따리", "무덕의 번진 일기"],
         intentTags: ["escapePlan", "nightVisit", "backGate"],
-        responseGuide: "점순과 떠나려 했던 것은 인정하지만, 살해 계획은 아니었다고 말한다."
+        responseGuide: "점순과 떠나려 했던 것은 인정하며 크게 흔들린다. 살해 계획은 아니었다고 강하게 부정하되, 뒷문에서 헤어진 뒤 점순이 누군가의 부름을 따라갔을 수 있다고 암시한다."
       },
       {
         evidenceNames: ["찢어진 약속 편지", "찢어진 문서 조각", "맞물리는 종이 조각"],
         intentTags: ["letterForgery", "handwritingMismatch"],
-        responseGuide: "편지의 말투와 글씨가 자기 것이 아니라고 강하게 부정한다."
+        responseGuide: "편지의 말투와 글씨가 자기 것이 아니라고 강하게 부정한다. 억울함 때문에 목소리가 높아지며, 점순을 부르는 약속 편지라면 자신이 그런 말을 쓸 리 없다고 구체적으로 반박한다."
       },
       {
         evidenceNames: ["낡은 칼"],
@@ -231,12 +231,12 @@ export const suspectPersonas: SuspectPersona[] = [
       {
         evidenceNames: ["호패 조각", "끊어진 호패끈", "빈 호패 주머니"],
         intentTags: ["hopaeAtScene", "missingHopae", "cutCord"],
-        responseGuide: "자신의 호패가 맞지만 현장에 둔 적은 없고, 누군가 훔쳐 누명을 씌웠다고 주장한다."
+        responseGuide: "자신의 호패가 맞다는 사실은 마지못해 인정한다. 현장에 둔 적은 없다고 주장하지만, 호패를 잃어버린 시점과 누가 접근할 수 있었는지를 묻는 말에는 자존심이 무너져 말이 길어진다."
       },
       {
         evidenceNames: ["하인 장부", "무덕의 번진 일기"],
         intentTags: ["scoldedJeomsun", "sarangbangVoice"],
-        responseGuide: "점순이 춘월과 돌쇠 일에 자꾸 끼어드는 듯해 언성을 높였을 뿐이라고 말한다."
+        responseGuide: "점순에게 언성을 높였던 사실을 인정한다. 다만 죽일 이유는 없었다고 버티며, 춘월과 돌쇠 사이를 아는 사람이 더 있었다는 식으로 시선을 돌린다."
       },
       {
         evidenceNames: ["점순 목 검안 종이", "찢어진 옷고름"],
@@ -270,7 +270,7 @@ export const suspectPersonas: SuspectPersona[] = [
       {
         evidenceNames: ["무덕의 번진 일기"],
         intentTags: ["diary", "backGate", "nightSound"],
-        responseGuide: "사랑방 쪽 소리와 밤의 뒷문 소리를 들었다고 조심스럽게 인정한다."
+        responseGuide: "일기를 보자 겁먹고, 사랑방 쪽 소리와 밤의 뒷문 소리를 들었다고 조심스럽게 인정한다. 처음엔 확실치 않다고 하지만, 누가 점순의 외출을 캐물었는지 물으면 춘월을 떠올리며 말끝을 흐린다."
       },
       {
         evidenceNames: ["진흙 묻은 짚신", "작은 발자국"],
@@ -280,7 +280,7 @@ export const suspectPersonas: SuspectPersona[] = [
       {
         evidenceNames: ["도망 보따리", "찢어진 약속 편지"],
         intentTags: ["whoKnewEscapePlan", "toldChunwol"],
-        responseGuide: "춘월 아씨가 점순의 밤 외출을 캐물었고, 자신이 얼결에 말했을 수 있다고 인정한다."
+        responseGuide: "춘월 아씨가 점순의 밤 외출을 캐물었고, 자신이 얼결에 말했을 수 있다고 겁먹은 채 인정한다. 자신이 범인은 아니라고 울먹이되, 춘월이 그날 유난히 점순의 행방을 물었다고 암시한다."
       },
       {
         evidenceNames: ["호패 조각"],

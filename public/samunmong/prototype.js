@@ -17,7 +17,7 @@
     let isAskingAi = false;
     const interrogationHistories = new Map();
     const entryParams = new URLSearchParams(window.location.search);
-    const briefingText = "“사또님, 관아 근처에서 사람이 쓰러진 채 발견되었습니다.”\n\n당신은 이 꿈에서 고을의 사또입니다. 현장을 조사하고, 증거를 모아 용의자를 심문해야 합니다.";
+    const briefingText = sentenceBreakText("“사또님, 관아 근처에서 사람이 쓰러진 채 발견되었습니다.”\n\n당신은 이 꿈에서 고을의 사또입니다. 현장을 조사하고, 증거를 모아 용의자를 심문해야 합니다.");
     const suspects = window.SAMUNMONG_CONTENT?.suspects || [
       { name: "돌쇠", id: "dolsoe", scene: "/samunmong/assets/scene-interrogation-dolsoe.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-dolsoe-sleeve.png?v=sleeve-20260707" },
       { name: "최춘월", id: "chunwol", scene: "/samunmong/assets/scene-interrogation-chunwol.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-chunwol-sleeve.png?v=sleeve-20260707" },
@@ -65,7 +65,9 @@
     const saveKey = "samunmong-demo-state";
     const collectedEvidenceKey = "samunmong-collected-evidence";
     const analyzedEvidenceKey = "samunmong-analyzed-evidence";
+    const conversationNotesKey = "samunmong-conversation-notes";
     const fieldGuidePendingKey = "samunmong-field-guide-pending";
+    const fieldGuideSeenKey = "samunmong-field-guide-seen";
     const settingsKey = "samunmong-demo-settings";
     const bgmStateKey = "samunmong-bgm-state";
     let fieldGuideStep = "";
@@ -143,6 +145,52 @@
       const collected = new Set(readStoredNames(collectedEvidenceKey));
       collected.add(name);
       localStorage.setItem(collectedEvidenceKey, JSON.stringify([...collected]));
+    }
+
+    function hasSeenFieldGuide() {
+      return localStorage.getItem(fieldGuideSeenKey) === "1";
+    }
+
+    function markFieldGuideSeen() {
+      localStorage.setItem(fieldGuideSeenKey, "1");
+      sessionStorage.removeItem(fieldGuidePendingKey);
+    }
+
+    function readConversationNotes() {
+      const stored = readStored(conversationNotesKey, {});
+      if (!stored || typeof stored !== "object" || Array.isArray(stored)) return {};
+      return stored;
+    }
+
+    function saveConversationNotes() {
+      const entries = {};
+      conversationNotes.forEach((messages, suspectId) => {
+        entries[suspectId] = messages
+          .filter((message) => message && typeof message.text === "string")
+          .map((message) => ({
+            sender: message.sender === "player" ? "player" : "suspect",
+            text: message.text,
+            meta: typeof message.meta === "string" ? message.meta : ""
+          }));
+      });
+      localStorage.setItem(conversationNotesKey, JSON.stringify(entries));
+    }
+
+    function restoreConversationNotes() {
+      const stored = readConversationNotes();
+      Object.entries(stored).forEach(([suspectId, messages]) => {
+        if (!Array.isArray(messages)) return;
+        conversationNotes.set(
+          suspectId,
+          messages
+            .filter((message) => message && typeof message.text === "string")
+            .map((message) => ({
+              sender: message.sender === "player" ? "player" : "suspect",
+              text: message.text,
+              meta: typeof message.meta === "string" ? message.meta : ""
+            }))
+        );
+      });
     }
 
     function saveAnalyzedEvidence(name) {
@@ -334,7 +382,7 @@
     }
 
     function showToast(message) {
-      toast.textContent = message;
+      toast.textContent = sentenceBreakText(message);
       toast.classList.add("show");
       clearTimeout(showToast.timer);
       showToast.timer = setTimeout(() => toast.classList.remove("show"), 1900);
@@ -354,7 +402,7 @@
       }
 
       if (titleEl) titleEl.textContent = title;
-      if (copyEl) copyEl.textContent = copy;
+      if (copyEl) copyEl.textContent = sentenceBreakText(copy);
       dialog.classList.add("open");
       dialog.setAttribute("aria-hidden", "false");
     }
@@ -577,16 +625,21 @@
     function startFieldGuide() {
       if (getActiveScreenId() !== "fieldOne") return;
       sessionStorage.removeItem(fieldGuidePendingKey);
+      localStorage.setItem(fieldGuideSeenKey, "1");
       setFieldGuideStep("map-click");
     }
 
     function closeFieldGuide() {
-      sessionStorage.removeItem(fieldGuidePendingKey);
+      markFieldGuideSeen();
       setFieldGuideStep("");
       clearFieldGuideHighlights();
     }
 
     function maybeStartFieldGuide() {
+      if (hasSeenFieldGuide()) {
+        sessionStorage.removeItem(fieldGuidePendingKey);
+        return;
+      }
       if (sessionStorage.getItem(fieldGuidePendingKey) !== "1") return;
       setTimeout(startFieldGuide, 640);
     }
@@ -720,7 +773,10 @@
       localStorage.removeItem(saveKey);
       localStorage.removeItem(collectedEvidenceKey);
       localStorage.removeItem(analyzedEvidenceKey);
+      localStorage.removeItem(conversationNotesKey);
+      localStorage.removeItem(fieldGuideSeenKey);
       sessionStorage.removeItem(fieldGuidePendingKey);
+      conversationNotes.clear();
       updateContinueButtonState();
       go("tutorialScreen");
     });
@@ -729,6 +785,7 @@
       const valid = isValidSavedProgress(saved);
       if (!valid) return;
 
+      markFieldGuideSeen();
       go(saved.screenId, "지난 꿈으로 돌아가는 중...");
       if (saved?.screenId === "briefingScreen") setTimeout(startBriefingSequence, 300);
     });
@@ -785,7 +842,11 @@
       updateBriefingStep();
     });
     on("#startCase", "click", () => {
-      sessionStorage.setItem(fieldGuidePendingKey, "1");
+      if (hasSeenFieldGuide()) {
+        sessionStorage.removeItem(fieldGuidePendingKey);
+      } else {
+        sessionStorage.setItem(fieldGuidePendingKey, "1");
+      }
       goRush("fieldOne", "사건 현장으로 진입 중...");
     });
     on("#nextFieldGuide", "click", () => {
@@ -941,6 +1002,18 @@
         .replaceAll("'", "&#39;");
     }
 
+    function sentenceBreakText(value) {
+      return String(value ?? "")
+        .replace(/\r\n/g, "\n")
+        .replace(/([.!?])\s+(?=[“"'‘’]?[\p{Script=Hangul}0-9])/gu, "$1\n")
+        .replace(/\n{3,}/g, "\n\n")
+        .trim();
+    }
+
+    function sentenceBreakHtml(value) {
+      return escapeHtml(sentenceBreakText(value));
+    }
+
     function getEvidenceLocation(name) {
       return evidenceData[name]?.location || "획득 장소 미상";
     }
@@ -966,7 +1039,7 @@
 
     function getEvidenceAnalysisText(name) {
       const data = evidenceData[name] || {};
-      const lines = [data.toolResult || "추가 분석 결과가 없습니다."];
+      const lines = [sentenceBreakText(data.toolResult || "추가 분석 결과가 없습니다.")];
       const entries = formatEvidenceEntries(name);
       if (entries) {
         lines.push(entries);
@@ -977,11 +1050,11 @@
     function getEvidenceDetailText(name, analyzed = false) {
       const data = evidenceData[name] || {};
       const lines = [
-        data.note || "현장에서 발견한 단서입니다.",
+        sentenceBreakText(data.note || "현장에서 발견한 단서입니다."),
         `획득 장소: ${getEvidenceLocation(name)}`
       ];
 
-      if (data.logic) lines.push(data.logic);
+      if (data.logic) lines.push(sentenceBreakText(data.logic));
       if (analyzed && formatEvidenceEntries(name)) lines.push(`확인된 내용:\n${formatEvidenceEntries(name)}`);
 
       return lines.filter(Boolean).join("\n");
@@ -995,8 +1068,8 @@
           <strong>${escapeHtml(name)}</strong>
           ${data.tool ? `<span class="evidence-tool-cue">${escapeHtml(TOOL_NEEDED_HINT)}</span>` : ""}
           <span class="evidence-location">획득: ${escapeHtml(getEvidenceLocation(name))}</span>
-          <span>${escapeHtml(data.note || "현장에서 발견된 단서")}</span>
-          ${data.logic ? `<span class="evidence-logic">${escapeHtml(data.logic)}</span>` : ""}
+          <span>${sentenceBreakHtml(data.note || "현장에서 발견된 단서")}</span>
+          ${data.logic ? `<span class="evidence-logic">${sentenceBreakHtml(data.logic)}</span>` : ""}
         </span>`;
     }
 
@@ -1137,7 +1210,7 @@
       button.className = `tool-evidence-option${hasAnalyzedEvidence(name) ? " analyzed" : ""}`;
       button.type = "button";
       button.dataset.evidence = name;
-      button.innerHTML = `<img src="${data.img || "/samunmong/assets/evidence-wooden-tag.png"}" alt=""><span><strong>${name}</strong>${data.tool ? TOOL_NEEDED_HINT : "확인 완료"}</span>`;
+      button.innerHTML = `<img src="${escapeHtml(data.img || "/samunmong/assets/evidence-wooden-tag.png")}" alt=""><span><strong>${escapeHtml(name)}</strong>${sentenceBreakHtml(data.tool ? TOOL_NEEDED_HINT : "확인 완료")}</span>`;
       button.addEventListener("click", () => setAnalysisTarget(name));
       list.appendChild(button);
     }
@@ -1169,7 +1242,7 @@
       note.textContent = analyzed
         ? getEvidenceAnalysisText(name)
         : name
-          ? `${getEvidenceDetailText(name)}${data.tool ? `\n${TOOL_NEEDED_HINT}` : ""}`
+          ? sentenceBreakText(`${getEvidenceDetailText(name)}${data.tool ? `\n${TOOL_NEEDED_HINT}` : ""}`)
         : "수집한 증거를 고르면 이곳에 크게 표시됩니다.";
       const preview = document.querySelector(".tool-preview");
       preview?.classList.remove("revealed", "wrong-tool");
@@ -1223,7 +1296,7 @@
         button.className = "tool-card";
         button.type = "button";
         button.dataset.tool = name;
-        button.innerHTML = `<img src="${tool.img}" alt=""><span><strong>${name}</strong>${tool.note}</span>`;
+        button.innerHTML = `<img src="${escapeHtml(tool.img)}" alt=""><span><strong>${escapeHtml(name)}</strong>${sentenceBreakHtml(tool.note)}</span>`;
         button.addEventListener("click", () => {
           selectedToolForAnalysis = name;
           updateToolCursor();
@@ -1298,7 +1371,7 @@
 
       document.querySelector("#toolResultKicker").textContent = `${toolName} 분석`;
       document.querySelector("#toolResultTitle").textContent = evidenceName;
-      document.querySelector("#toolResultText").textContent = resultText;
+      document.querySelector("#toolResultText").textContent = sentenceBreakText(resultText);
       panel.classList.add("show");
       panel.setAttribute("aria-hidden", "false");
       globalOverlay.classList.add("show");
@@ -1340,7 +1413,7 @@
       document.querySelectorAll(`#toolEvidenceList [data-evidence="${currentEvidenceForTool}"]`).forEach((item) => item.classList.add("analyzed"));
       document.querySelector(".tool-preview")?.classList.add("revealed");
       const previewNote = document.querySelector("#toolPreviewNote");
-      if (previewNote) previewNote.textContent = resultText;
+      if (previewNote) previewNote.textContent = sentenceBreakText(resultText);
       showToolResultPopup(currentEvidenceForTool, toolName, resultText);
       showToast(`${toolName}로 ${currentEvidenceForTool}을 분석했습니다.`);
     }
@@ -1452,7 +1525,7 @@
 
       document.querySelector("#genericEvidenceImage").src = data.img || "/samunmong/assets/evidence-wooden-tag.png";
       document.querySelector("#genericEvidenceTitle").textContent = name;
-      document.querySelector("#genericEvidenceText").textContent = data.tool ? TOOL_NEEDED_HINT : "";
+      document.querySelector("#genericEvidenceText").textContent = data.tool ? sentenceBreakText(TOOL_NEEDED_HINT) : "";
       document.querySelector("#genericEvidenceText").hidden = !data.tool;
       document.querySelector("#genericEvidenceInspect").classList.add("show");
       clearTimeout(showInspect.timer);
@@ -1514,7 +1587,7 @@
       const suspect = suspects[suspectIndex];
       document.querySelector("#suspectName").textContent = suspect.name;
       document.querySelector("#suspectStage").dataset.suspect = suspect.id;
-      document.querySelector("#interrogationPlate").src = sleeveCheckedSuspects.has(suspect.id) ? suspect.sleeveScene : suspect.scene;
+      document.querySelector("#interrogationPlate").src = suspect.scene;
       activeNoteSuspectId = suspect.id;
       renderConversationNotes();
       syncVisibleSuspectReply();
@@ -1578,13 +1651,13 @@
 
           const text = document.createElement("p");
           text.className = "conversation-text";
-          text.textContent = message.text;
+          text.textContent = sentenceBreakText(message.text);
 
           bubble.append(name, text);
           if (message.meta) {
             const meta = document.createElement("span");
             meta.className = "conversation-meta";
-            meta.textContent = message.meta;
+            meta.textContent = sentenceBreakText(message.meta);
             bubble.appendChild(meta);
           }
           log.appendChild(bubble);
@@ -1597,6 +1670,7 @@
     function addConversationMessage(suspectId, sender, text, meta = "", shouldFocus = true) {
       getConversationNoteList(suspectId).push({ sender, text, meta });
       if (shouldFocus) activeNoteSuspectId = suspectId;
+      saveConversationNotes();
       renderConversationNotes();
     }
 
@@ -1773,9 +1847,15 @@
       const replyText = document.querySelector("#suspectReplyText");
       if (!reply || !replyText) return;
       reply.hidden = false;
-      replyText.textContent = text;
+      replyText.textContent = sentenceBreakText(text);
       setAiMode(mode);
     }
+
+    document.querySelector("#closeSuspectReply")?.addEventListener("click", () => {
+      const reply = document.querySelector("#suspectReply");
+      if (reply) reply.hidden = true;
+      playSfx("buttonAlt", 0.42);
+    });
 
     function addInterrogationAnswer(suspect, answer, source, warning) {
       const isCurrentSuspect = suspects[suspectIndex]?.id === suspect.id;
@@ -1859,7 +1939,9 @@
           showToast(`${suspect.name}의 소매 아래를 확인했습니다.`);
         }
       } else {
-        showToast(`${suspects[suspectIndex].name}에게 질문을 던졌습니다.`);
+        const suspect = suspects[suspectIndex];
+        document.querySelector("#interrogationPlate").src = suspect.scene;
+        showToast(`${suspect.name}에게 질문을 던졌습니다.`);
       }
       document.querySelector("#questionInput").value = "";
       await requestAiAnswer(question);
@@ -1881,7 +1963,9 @@
 
     applyContentImages();
     renderTools();
+    restoreConversationNotes();
     restoreSavedInvestigation();
+    renderConversationNotes();
     setupButtonGuides();
     showInitialScreenFromSetup();
   

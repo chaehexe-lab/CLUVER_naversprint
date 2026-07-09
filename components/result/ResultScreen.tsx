@@ -94,11 +94,14 @@ function readCollectedEvidence() {
   }
 }
 
-function resetDreamProgress() {
+function returnToBriefingWithProgress() {
   if (typeof window === "undefined") return;
-  window.localStorage.removeItem("samunmong-demo-state");
-  window.localStorage.removeItem("samunmong-collected-evidence");
-  window.localStorage.removeItem("samunmong-analyzed-evidence");
+  window.localStorage.setItem(
+    "samunmong-demo-state",
+    JSON.stringify({ screenId: "briefingScreen", savedAt: Date.now() })
+  );
+  window.localStorage.setItem("samunmong-field-guide-seen", "1");
+  window.sessionStorage.removeItem("samunmong-field-guide-pending");
 }
 
 function readAudioVolume() {
@@ -349,7 +352,7 @@ export default function ResultScreen() {
             <h1 id="resultTitle">{copy.title}</h1>
             <TypewriterLines lines={copy.lines} onType={playTypingSfx} />
             <div className="verdict-actions">
-              <Link className="wood-result-button" href="/?start=briefingScreen" onClick={resetDreamProgress}>
+              <Link className="wood-result-button" href="/?start=briefingScreen" onClick={returnToBriefingWithProgress}>
                 이번 꿈을 다시 꾸기
               </Link>
               <button className="wood-result-button primary" type="button" onClick={() => setShowExitPrompt(true)}>
