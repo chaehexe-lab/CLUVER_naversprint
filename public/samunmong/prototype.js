@@ -894,13 +894,13 @@
 
     const evidenceData = window.SAMUNMONG_CONTENT?.evidenceData || {
       "호패 조각": {
-        note: "점순 옆에서 발견된 신분 단서. 양반 호패로 추정되지만 일부 글자가 긁혀 있다.",
+        note: "점순 옆에서 발견된 신분 단서. 유문석의 물건처럼 보이지만 일부 글자가 긁혀 있다.",
         img: "/samunmong/assets/evidence-wooden-tag.png",
         tool: "먼지털이 붓",
-        toolResult: "먼지털이 붓으로 털자 긁힌 글자 홈 사이에 고운 분가루가 남아 있다.\n호패가 원래 있던 자리나 누가 만졌는지 다시 확인해 볼 필요가 있다."
+        toolResult: "먼지털이 붓으로 털자 긁힌 글자 홈 사이에 고운 분가루가 남아 있다.\n거칠게 굴러다닌 물건이라기보다, 누군가 손에 쥐고 옮긴 뒤 일부러 현장에 둔 듯하다."
       },
       "돌쇠의 그림": {
-        note: "최춘월의 방에서 발견된 숨겨둔 초상. 춘월과 돌쇠의 관계를 추적할 단서다.",
+        note: "최춘월의 방에서 발견된 숨겨둔 초상. 춘월이 돌쇠에게 마음을 두었는지 추적할 단서다.",
         img: "/samunmong/assets/evidence-portrait.png",
         tool: "돋보기",
         toolResult: "돋보기로 보니 선이 섬세하고 여러 번 고쳐 그린 흔적이 있다.\n우연히 본 얼굴이라기엔 지나치게 정성스럽다. 춘월은 왜 이 그림을 숨겨 두었을까?"
@@ -909,12 +909,8 @@
         note: "끊어진 장식과 급히 잡아챈 듯한 흔적이 남은 노리개. 누가 지녔는지 확인해야 한다.",
         img: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.png"
       },
-      "나무 상자": {
-        note: "사랑방에서 확인한 작은 나무 상자. 안에 무엇이 있었는지 살펴야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-wooden-box-transparent.png"
-      },
       "무덕의 번진 일기": {
-        note: "먹이 번져 읽기 어려운 일기. 도구로 얼룩을 확인하면 숨긴 문장을 더 추적할 수 있다.",
+        note: "먹이 번져 읽기 어려운 일기. 점순과 돌쇠의 도망 계획이 주변에 새어 나갔는지 추적할 수 있다.",
         img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.png",
         tool: "촛불 비추기",
         toolResult: "촛불을 비추자 번진 먹 아래 기록이 또렷해진다."
@@ -924,16 +920,8 @@
         img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-muddy-straw-shoes.png"
       },
       "찢어진 옷고름": {
-        note: "거칠게 끊어진 옷고름. 몸싸움이나 급한 움직임을 의심하게 한다.",
+        note: "무덕의 방에서 발견된 찢어진 옷고름. 하인 옷감보다 고급스럽고, 목을 조를 때 쓰였을 가능성이 있다.",
         img: "/samunmong/assets/mudeok-interaction/evidence-torn-collar-tie.png"
-      },
-      "손톱 밑 실 샘플": {
-        note: "작은 실오라기 샘플. 옷감이나 끈과 대조할 수 있다.",
-        img: "/samunmong/assets/mudeok-interaction/evidence-fingernail-thread-sample.png"
-      },
-      "점순 목 검안 종이": {
-        note: "점순의 목 주변을 살핀 기록지. 날붙이 상처보다 목을 조른 듯한 압박 흔적이 남아 있다.",
-        img: "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png"
       },
       "빈 호패 주머니": {
         note: "호패가 빠진 듯한 빈 주머니. 주인과 호패 조각의 관계를 확인할 수 있다.",
@@ -943,21 +931,9 @@
         note: "하인들의 출입과 심부름 기록이 적힌 장부. 장소 이동을 대조할 수 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-servant-ledger.png"
       },
-      "종이칼": {
-        note: "사랑방 책상에 놓인 종이칼. 편지 조각과 절단면을 비교할 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-paper-knife.png"
-      },
-      "먹가루": {
-        note: "책상 주변에 흩어진 먹가루. 문서가 급히 지워졌는지 확인할 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-ink-powder.png"
-      },
       "혼서 조각": {
         note: "혼례와 관련 있어 보이는 문서 조각. 인물 관계를 다시 보게 만드는 단서다.",
         img: "/samunmong/assets/evidence-transparent/evidence-marriage-letter.png"
-      },
-      "도끼와 칼": {
-        note: "돌쇠 처소에서 확인한 날붙이. 직접 결론보다 사용 흔적을 조사해야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-axe-knife.png"
       },
       "피 묻은 붕대": {
         note: "피처럼 보이는 얼룩이 남은 붕대. 상처나 몸싸움 흔적과 연결될 수 있다.",
@@ -968,7 +944,7 @@
         img: "/samunmong/assets/evidence-transparent/evidence-escape-bundle.png"
       },
       "긁힌 팔 흔적": {
-        note: "심문 중 소매 아래에서 확인한 긁힌 흔적. 실오라기나 몸싸움 흔적과 대조할 수 있다.",
+        note: "심문 중 소매 아래에서 확인한 긁힌 흔적. 점순이 마지막 순간 저항하며 남긴 상처일 수 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.png"
       },
       "작은 발자국": {
@@ -979,16 +955,8 @@
         note: "호패와 연결되었을 법한 끊어진 끈. 호패 조각과 함께 봐야 한다.",
         img: "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.png"
       },
-      "맞물리는 종이 조각": {
-        note: "다른 편지 조각과 맞물릴 수 있는 종이. 조각들을 맞춰 확인해야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-matching-paper-scraps.png"
-      },
-      "찢어진 문서 조각": {
-        note: "뒷문 마당에서 발견된 찢어진 문서 조각. 다른 종이 조각과 맞춰 확인해야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png"
-      },
       "찢어진 약속 편지": {
-        note: "점순의 손에서 발견된 찢어진 약속 편지. '오늘 밤 창고에서 기다리시오, 함께 떠납시다'라는 문장이 남아 있다.",
+        note: "점순의 손에서 발견된 찢어진 약속 편지. 정중한 말투가 돌쇠의 평소 말투와 맞지 않는다.",
         img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png"
       }
     };

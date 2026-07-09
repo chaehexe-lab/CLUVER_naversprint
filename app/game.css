@@ -2369,7 +2369,7 @@
       background: transparent;
       color: #f2e6d4;
       font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
-      font-size: 12px;
+      font-size: clamp(16px, 1.55vw, 21px);
       letter-spacing: 0;
       cursor: pointer;
       text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,0,0,.9);
@@ -3632,7 +3632,7 @@
       background: transparent;
       filter: drop-shadow(0 8px 13px rgba(0,0,0,.66));
       font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
-      font-size: 12px;
+      font-size: clamp(16px, 1.55vw, 21px);
       line-height: 1;
       letter-spacing: .01em;
       text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,0,0,.86);
@@ -3657,19 +3657,9 @@
     .accuse-prop { right: 2.6%; top: 17%; }
 
     .accuse-prop .sr-only {
-      clip: auto;
-      clip-path: none;
-      width: auto;
-      height: auto;
-      margin: 0;
-      overflow: visible;
-      white-space: nowrap;
-      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
-      font-size: 12px;
+      font-size: clamp(16px, 1.55vw, 21px);
       line-height: 1;
-      color: #f2e6d4;
-      text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,0,0,.86);
-      letter-spacing: .01em;
+      letter-spacing: 0;
     }
 
     .tool-prop:hover,
@@ -3722,8 +3712,9 @@
       left: 50%;
       bottom: 1px;
       color: #f2e6d4;
-      font-size: 12px;
+      font-size: clamp(16px, 1.55vw, 21px);
       transform: translateX(-50%);
+      white-space: nowrap;
     }
 
     .map-prop::before {
@@ -5194,7 +5185,8 @@
     .evidence-location-tab,
     .evidence-location-head span,
     .note-turn-meta,
-    .note-bubble-meta {
+    .tool-prop span,
+    .note-bubble-meta{
       font-size: clamp(16px, 1.55vw, 21px);
       line-height: 1.38;
     }
@@ -5249,12 +5241,6 @@
       text-wrap: pretty;
       white-space: pre-line;
     }
-
-    .accuse-prop .sr-only {
-      font-size: clamp(29px, 3.1vw, 40px);
-      line-height: 1;
-    }
-
     @media (max-width: 900px), (max-height: 600px) {
       .briefing-card,
       .briefing-card[data-briefing-step="1"],

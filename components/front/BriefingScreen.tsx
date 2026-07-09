@@ -23,8 +23,8 @@ export default function BriefingScreen() {
           <div className="briefing-death-layout">
             <div className="briefing-evidence-stack">
               <figure className="briefing-evidence-photo">
-                <img src="/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png" alt="점순 목 검안 종이" draggable={false} />
-                <figcaption>증거: 점순 목 검안 종이</figcaption>
+                <img src="/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png" alt="점순 초기 검안 기록" draggable={false} />
+                <figcaption>기록: 초기 검안 기록</figcaption>
               </figure>
               <figure className="briefing-evidence-photo briefing-evidence-photo-small">
                 <img src="/samunmong/assets/mudeok-interaction/evidence-jeomsun-hand-exam-paper.png" alt="점순이 손끝 밑 살점 검안 종이" draggable={false} />

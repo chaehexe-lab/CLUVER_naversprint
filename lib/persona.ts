@@ -76,7 +76,7 @@ export const characterPersonas: CharacterPersona[] = [
       "돌쇠와 함께 도망치기로 약속했다.",
       "사건 전날 밤 뒷문으로 나가 돌쇠와 계획을 확인했다.",
       "창고로 부른 편지를 돌쇠가 쓴 것으로 믿었다.",
-      "마지막 순간 목끈이나 옷고름을 붙잡고 버티며, 손톱 밑에 검은 실오라기와 흔적을 남겼다."
+      "마지막 순간 옷고름으로 목이 졸리자 버티며 범인의 팔에 긁힌 흔적을 남겼다."
     ],
     alibiOrClaim: "사건 당일 밤, 찢어진 약속 편지를 따라 창고로 향했다.",
     evidenceLinks: [
@@ -87,28 +87,10 @@ export const characterPersonas: CharacterPersona[] = [
         truth: "점순은 편지를 믿고 나갔지만, 편지는 돌쇠가 아니라 춘월이 쓴 미끼였다."
       },
       {
-        evidenceId: "flesh-under-nails",
-        evidenceName: "손톱 밑 살점",
-        playerInference: "점순이 마지막에 누군가와 몸싸움을 벌였다.",
-        truth: "점순이 저항하며 긁은 상대는 팔에 상처가 남은 춘월이다."
-      },
-      {
-        evidenceId: "autopsy-record",
-        evidenceName: "검안 기록",
-        playerInference: "낙상이나 날붙이로 죽은 사건인지 먼저 확인해야 한다.",
-        truth: "등잔과 확대경으로 보면 목 주변의 희미한 압박 흔적이 드러나, 단순 사고나 칼부림이 아니라 목이 졸린 사건임을 알 수 있다."
-      },
-      {
         evidenceId: "torn-clothes-tie",
-        evidenceName: "찢긴 옷고름/목끈",
+        evidenceName: "찢어진 옷고름",
         playerInference: "피해자가 붙잡혔거나 목이 눌렸을 가능성이 있다.",
-        truth: "섬유가 낡아 끊어진 것이 아니라 강한 압박 뒤 찢긴 흔적이다."
-      },
-      {
-        evidenceId: "fingernail-black-thread",
-        evidenceName: "손톱 밑 검은 실오라기",
-        playerInference: "점순이 마지막에 검은 천이나 끈을 붙잡았을 수 있다.",
-        truth: "흙이 아니라 검은 섬유와 먹가루가 섞인 흔적으로, 춘월 주변 증거와 대조해야 한다."
+        truth: "섬유가 낡아 끊어진 것이 아니라 강한 압박 뒤 찢긴 흔적이다. 하인 옷감보다 고급스러운 비단이라 춘월의 물건일 가능성이 있다."
       },
       {
         evidenceId: "flower-norigae",
@@ -128,7 +110,7 @@ export const characterPersonas: CharacterPersona[] = [
       },
       {
         trigger: "death-cause",
-        line: "말은 남기지 못했으나, 목의 그림자와 손끝의 실이 대신 남았습니다."
+        line: "말은 남기지 못했으나, 목의 그림자와 찢어진 옷고름이 대신 남았습니다."
       }
     ]
   },
@@ -186,12 +168,6 @@ export const characterPersonas: CharacterPersona[] = [
         playerInference: "점순의 이름 옆 표시가 유문석의 감시나 처벌 동기처럼 보인다.",
         truth: "유문석에게 동기가 있어 보이게 하는 권력 관계 단서지만, 살인의 직접 증거는 아니다."
       },
-      {
-        evidenceId: "ink-powder",
-        evidenceName: "먹가루",
-        playerInference: "사랑방의 먹가루가 편지와 호패 조작에 쓰였을 수 있다.",
-        truth: "먹가루는 편지와 호패를 잇는 비교 단서이며, 유문석의 공간이 조작에 이용되었을 가능성을 보여 준다."
-      }
     ],
     dialogueSamples: [
       {
@@ -232,7 +208,6 @@ export const characterPersonas: CharacterPersona[] = [
       "6월 30일 밤 점순을 몰래 만났다.",
       "점순과 함께 도망치기로 했다.",
       "손에 베인 상처가 있어 초반 의심을 받는다.",
-      "도끼와 장작칼은 주변에 있지만 점순의 사망 원인과 맞지 않는다.",
       "글씨 연습지는 약속 편지의 단정한 필체와 다르다."
     ],
     alibiOrClaim: "점순과 뒷문 근처에서 도망 계획만 확인한 뒤 헤어졌다고 말한다.",
@@ -260,12 +235,6 @@ export const characterPersonas: CharacterPersona[] = [
         evidenceName: "돌쇠의 도망 보따리",
         playerInference: "돌쇠가 점순과 도망칠 준비를 했고 사건에 깊이 얽혀 있다.",
         truth: "오래 준비한 도피 흔적이며, 갑작스러운 살인 준비와는 결이 다르다."
-      },
-      {
-        evidenceId: "axe",
-        evidenceName: "도끼/장작칼",
-        playerInference: "돌쇠 주변의 날붙이가 살해 도구였을 수 있다.",
-        truth: "혈흔이나 섬유가 없고 검안 기록의 압박 흔적과도 맞지 않아 직접 흉기 가능성이 낮다."
       },
       {
         evidenceId: "bloodstained-cloth",
@@ -308,7 +277,7 @@ export const characterPersonas: CharacterPersona[] = [
     ageRange: "스물여섯 안팎",
     socialPosition: "유문석 집안의 아씨",
     publicFace: "단정하고 침착하며, 집안일을 조용히 살피는 인물로 보인다.",
-    privateTruth: "점순과 돌쇠의 도망 계획을 알고 있었다. 돌쇠인 척 편지를 써 점순을 창고로 유인하고, 목끈이나 옷고름으로 제압한 뒤 유문석의 호패를 현장에 남겨 누명을 씌웠다.",
+    privateTruth: "점순과 돌쇠의 도망 계획을 알고 있었다. 돌쇠인 척 편지를 써 점순을 창고로 유인하고, 자신의 옷고름으로 목을 졸라 살해한 뒤 유문석의 호패를 현장에 남겨 누명을 씌웠다.",
     motive: "강제 혼인 정황 속에서 돌쇠에게 품은 감정과 집안 질서에 대한 집착이 뒤섞였다. 점순이 돌쇠와 떠나려 하자 관계와 체면이 모두 무너진다고 여겼다.",
     relationshipToVictim: "집안의 윗사람과 몸종",
     speechStyle: "차분하고 예의 바르지만 문장이 지나치게 정돈되어 있다. 감정을 숨길수록 더 공손해진다.",
@@ -320,6 +289,7 @@ export const characterPersonas: CharacterPersona[] = [
       "돌쇠의 말투를 흉내 내지 못해 정중한 약속 편지를 남겼다.",
       "유문석의 호패를 미리 가져갔다.",
       "호패끈을 날카로운 것으로 잘라 현장에 떨어뜨렸다.",
+      "범행에 쓴 옷고름을 무덕의 집 근처에 버렸고, 무덕이 그것을 주워 방에 두었다.",
       "점순과 몸싸움을 벌이다 팔에 긁힌 자국이 생겼다.",
       "춘월의 방에는 돌쇠 초상화와 혼인 서찰이 있어 감정과 압박의 동기를 함께 드러낸다.",
       "뒷문 마당의 작은 발자국은 무덕의 짚신이 아니라 고급 여성 신발 흔적에 가깝다."
@@ -347,8 +317,14 @@ export const characterPersonas: CharacterPersona[] = [
       {
         evidenceId: "scratch-on-arm",
         evidenceName: "춘월의 팔 긁힌 자국",
-        playerInference: "점순의 손톱 밑 살점과 대조해야 한다.",
+        playerInference: "점순이 마지막 순간 저항하며 남긴 흔적일 수 있다.",
         truth: "점순이 마지막으로 저항한 상대가 춘월임을 드러내는 결정적 단서다."
+      },
+      {
+        evidenceId: "torn-clothes-tie",
+        evidenceName: "찢어진 옷고름",
+        playerInference: "무덕의 방에 있으므로 무덕의 물건처럼 보인다.",
+        truth: "춘월이 점순의 목을 조르는 데 쓴 뒤 버린 옷고름을 무덕이 주워 방에 둔 것이다. 고급 비단 재질과 향이 춘월의 물건임을 암시한다."
       },
       {
         evidenceId: "dolsoe-portrait",
@@ -368,18 +344,6 @@ export const characterPersonas: CharacterPersona[] = [
         playerInference: "무덕이 밤에 밖을 돌아다녔거나 어린 하인의 발자국일 수 있다.",
         truth: "먼지를 털고 확대하면 고급 여성 신발의 얕은 발자국으로 보이며, 춘월의 이동 동선을 가리킨다."
       },
-      {
-        evidenceId: "document-knife",
-        evidenceName: "문서용 칼",
-        playerInference: "사랑방의 작은 칼이 호패끈과 편지 절단에 쓰였을 수 있다.",
-        truth: "칼날의 종이 섬유나 끈 섬유를 확인하면 편지 조작과 호패끈 절단을 연결할 수 있다."
-      },
-      {
-        evidenceId: "wooden-box",
-        evidenceName: "나무 상자",
-        playerInference: "춘월이 숨겨 둔 물건이 있을 수 있다.",
-        truth: "숨겨진 칸이나 먼지 차이를 통해 편지지 조각, 초상화 같은 사적 증거를 감춘 정황을 만든다."
-      }
     ],
     dialogueSamples: [
       {
@@ -457,6 +421,12 @@ export const characterPersonas: CharacterPersona[] = [
         evidenceName: "작은 발자국",
         playerInference: "무덕의 짚신 흔적일 수 있다.",
         truth: "고급 여성 신발 흔적에 가까워 무덕의 짚신과 맞지 않는다."
+      },
+      {
+        evidenceId: "torn-clothes-tie",
+        evidenceName: "찢어진 옷고름",
+        playerInference: "무덕의 방에 있었으므로 무덕이 범인일 수 있다.",
+        truth: "무덕은 집 근처에 버려진 옷고름을 주워 방에 두었다. 겁이 나 숨겼을 뿐, 재질은 하녀 물건보다 양반가 여인의 옷고름에 가깝다."
       }
     ],
     dialogueSamples: [
@@ -496,9 +466,9 @@ export const caseTimeline = [
   },
   {
     date: "사건 당일 밤",
-    event: "점순이 '오늘 밤 창고에서 기다리시오, 함께 떠납시다'라는 편지를 믿고 창고로 향하고, 목끈이나 옷고름으로 제압당한다.",
+    event: "점순이 '오늘 밤 창고에서 기다리시오, 함께 떠납시다'라는 편지를 믿고 창고로 향하고, 춘월의 옷고름으로 목이 졸린다.",
     exposedSuspicion: "돌쇠가 점순을 창고로 불렀다고 보인다.",
-    hiddenTruth: "편지는 춘월이 돌쇠인 척 쓴 것이며, 검안 기록과 찢긴 옷고름/목끈이 사망 원인을 드러낸다."
+    hiddenTruth: "편지는 춘월이 돌쇠인 척 쓴 것이며, 찢어진 옷고름과 춘월의 팔 상처가 살해 방식과 접촉 흔적을 드러낸다."
   },
   {
     date: "시신 발견 후",
