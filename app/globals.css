@@ -576,27 +576,6 @@ html:active body:active *:active {
   cursor: var(--cursor-click) !important;
 }
 
-a[href],
-button:not(:disabled),
-summary,
-label,
-[role="button"],
-[role="link"],
-[onclick],
-.accusation-suspect,
-.wood-result-button,
-.main-menu-button:not(:disabled),
-.evidence-hotspot,
-.inspect-close,
-.map-pin-button,
-.room-prop:not(.current-room-prop),
-.tool-button,
-.tool-tab,
-.scene-label,
-.evidence-action {
-  cursor: var(--cursor-click) !important;
-}
-
 input,
 textarea,
 select,
