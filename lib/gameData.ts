@@ -112,8 +112,8 @@ export const fieldOneScene = {
   inspect: {
     id: "hopaeInspect",
     image: "/samunmong/assets/evidence-wooden-tag.png",
-    title: "호패 조각 발견",
-    text: "신분을 밝히는 호패로 추정되는 나무 조각을 발견했다. 일부 글자가 긁혀 있어 주인을 바로 알 수 없다."
+    title: "호패 조각",
+    text: "특정 도구를 이용해 자세히 알아봐야 할 것 같다."
   }
 } as const;
 
@@ -136,8 +136,8 @@ export const chunwolRoomScene = {
   inspect: {
     id: "portraitInspect",
     image: "/samunmong/assets/evidence-portrait.png",
-    title: "돌쇠의 그림 발견",
-    text: "춘월의 방에서 돌쇠를 그린 듯한 초상화를 발견했다. 그림의 보관 상태가 지나치게 조심스럽다.",
+    title: "돌쇠의 그림",
+    text: "특정 도구를 이용해 자세히 알아봐야 할 것 같다.",
     buttonId: "collectPortrait",
     buttonLabel: "보따리에 넣기"
   }
