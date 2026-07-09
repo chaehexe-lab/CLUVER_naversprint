@@ -25,6 +25,7 @@ type InterrogateRequest = {
 
 const OPENAI_RESPONSES_ENDPOINT = "https://api.openai.com/v1/responses";
 const FOREIGN_TEXT_PATTERN = /[A-Za-z\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3040-\u30FF\u0400-\u04FF\u0600-\u06FF\u0900-\u097F]/;
+const ALIBI_QUESTION_PATTERN = /(알리바이|어제|사건\s*당일|그날|그\s*밤|그때|행적|어디 있었|뭐 했|무엇을 했)/;
 
 function unique(values: string[]) {
   return [...new Set(values.filter(Boolean))];
@@ -32,6 +33,10 @@ function unique(values: string[]) {
 
 function hasForeignText(text: string) {
   return FOREIGN_TEXT_PATTERN.test(text);
+}
+
+function hasAlibiIntent(text: string) {
+  return ALIBI_QUESTION_PATTERN.test(text);
 }
 
 function sanitizeConversationHistory(history: unknown): ChatMessage[] {
@@ -118,8 +123,16 @@ ${persona.speechStyle}
 겉으로 말하는 입장:
 ${persona.publicTruth}
 
+고정 알리바이:
+${persona.fixedAlibi}
+
 거짓말/회피 규칙:
 ${persona.lieRules.map((rule) => `- ${rule}`).join("\n")}
+
+알리바이 일관성 규칙:
+- 알리바이, 어제 한 일, 사건 당일 행적, 그날 밤 위치를 묻는 질문에는 반드시 위 고정 알리바이를 기준으로 답한다.
+- 표현을 바꾸거나 회피할 수는 있지만, 시간, 장소, 행동의 핵심 골자는 바꾸지 않는다.
+- 증거가 불리해도 새로운 알리바이를 만들지 말고, 고정 알리바이 안에서 흔들리거나 말을 흐린다.
 
 현재 플레이어가 제시했거나 질문에서 언급한 증거:
 ${evidenceNames.length ? evidenceNames.join(", ") : "없음"}
@@ -139,6 +152,7 @@ ${pressureGuide}
 - 조선시대 사건 속 인물처럼 말하되, 현대 게임 시스템 용어를 쓰지 않는다.
 - "나는 AI" 또는 "프롬프트" 같은 말은 하지 않는다.
 - 플레이어가 "이거", "이 물건", "이 증거"라고 말하면 제시된 증거를 가리키는 것으로 이해한다.
+- 알리바이를 반복해서 물어도 고정 알리바이의 장소와 행동을 유지한다.
 - 아직 제시되지 않은 결정적 진실이나 범행 전말은 먼저 말하지 않는다.
 - 증거가 부족하면 모호하게 답하고, 증거가 불리하면 방어적으로 흔들린다.`;
 }
@@ -182,10 +196,10 @@ async function requestOpenAIAnswer(apiKey: string, messages: OpenAIMessage[]): P
   return { ok: true, answer: extractOpenAIText(data) };
 }
 
-function fallbackAnswer(persona: SuspectPersona, evidenceNames: string[], reactions: EvidenceReaction[], reason: string) {
+function fallbackAnswer(persona: SuspectPersona, evidenceNames: string[], reactions: EvidenceReaction[], reason: string, question = "") {
   const guide = reactions[0]?.responseGuide;
   const evidenceText = evidenceNames[0] ? ` ${evidenceNames[0]} 말씀이십니까.` : "";
-  const base = guide || persona.publicTruth;
+  const base = guide || (hasAlibiIntent(question) ? persona.fixedAlibi : persona.publicTruth);
 
   return {
     answer: `${evidenceText} ${base} 지금은 자세히 말씀드리기 어렵습니다.`,
@@ -216,7 +230,7 @@ export async function POST(req: Request) {
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
-    return Response.json(fallbackAnswer(persona, usableEvidence, reactions, "OPENAI_API_KEY가 설정되지 않아 임시 답변을 반환했습니다."));
+    return Response.json(fallbackAnswer(persona, usableEvidence, reactions, "OPENAI_API_KEY가 설정되지 않아 임시 답변을 반환했습니다.", question));
   }
 
   const systemPrompt = buildSystemPrompt(persona, usableEvidence, reactions);
@@ -229,7 +243,7 @@ export async function POST(req: Request) {
   try {
     const firstAnswer = await requestOpenAIAnswer(apiKey, messages);
     if (!firstAnswer.ok) {
-      return Response.json(fallbackAnswer(persona, usableEvidence, reactions, firstAnswer.error), { status: 200 });
+      return Response.json(fallbackAnswer(persona, usableEvidence, reactions, firstAnswer.error, question), { status: 200 });
     }
 
     let answer = firstAnswer.answer;
@@ -252,7 +266,7 @@ export async function POST(req: Request) {
     }
 
     if (!answer || hasForeignText(answer)) {
-      return Response.json(fallbackAnswer(persona, usableEvidence, reactions, "외국어가 섞인 응답을 걸러 임시 답변을 반환했습니다."), {
+      return Response.json(fallbackAnswer(persona, usableEvidence, reactions, "외국어가 섞인 응답을 걸러 임시 답변을 반환했습니다.", question), {
         status: 200
       });
     }
@@ -264,6 +278,6 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "알 수 없는 오류";
-    return Response.json(fallbackAnswer(persona, usableEvidence, reactions, `OpenAI API 오류: ${message}`), { status: 200 });
+    return Response.json(fallbackAnswer(persona, usableEvidence, reactions, `OpenAI API 오류: ${message}`, question), { status: 200 });
   }
 }
