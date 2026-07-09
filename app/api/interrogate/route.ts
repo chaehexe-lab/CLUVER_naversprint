@@ -26,6 +26,7 @@ type InterrogateRequest = {
 const OPENAI_RESPONSES_ENDPOINT = "https://api.openai.com/v1/responses";
 const FOREIGN_TEXT_PATTERN = /[A-Za-z\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3040-\u30FF\u0400-\u04FF\u0600-\u06FF\u0900-\u097F]/;
 const ALIBI_QUESTION_PATTERN = /(알리바이|어제|사건\s*당일|그날|그\s*밤|그때|행적|어디 있었|뭐 했|무엇을 했)/;
+const CASE_SUBJECT_PATTERN = /(피해자|사망자|점순|죽|살해|사건|시신|목\s*졸|목을\s*졸|편지|호패|옷고름|도망|돌쇠|춘월|유문석|무덕)/;
 const CHUNWOL_DIRECT_PRESSURE_PATTERNS = [
   { evidenceName: "찢어진 옷고름", pattern: /(범인|죽였|살해|목\s*졸|목을\s*졸|목\s*조른|옷고름|비단\s*끈|목끈)/ },
   { evidenceName: "찢어진 약속 편지", pattern: /(창고|약속\s*편지|편지|쪽지|기다리시오|함께\s*떠납시다|돌쇠가\s*쓴)/ },
@@ -47,6 +48,10 @@ function hasForeignText(text: string) {
 
 function hasAlibiIntent(text: string) {
   return ALIBI_QUESTION_PATTERN.test(text);
+}
+
+function hasCaseSubjectIntent(text: string) {
+  return CASE_SUBJECT_PATTERN.test(text);
 }
 
 function limitByCharacters(text: string, limit: number) {
@@ -181,6 +186,11 @@ ${persona.lieRules.map((rule) => `- ${rule}`).join("\n")}
 - 표현을 바꾸거나 회피할 수는 있지만, 시간, 장소, 행동의 핵심 골자는 바꾸지 않는다.
 - 증거가 불리해도 새로운 알리바이를 만들지 말고, 고정 알리바이 안에서 흔들리거나 말을 흐린다.
 
+질문 맥락 확인 규칙:
+- 플레이어가 피해자, 사망자, 점순, 살해, 죽음, 사건 등 사건 대상을 직접 말하지 않은 질문에서는 먼저 점순의 이름이나 사망 사실을 꺼내지 않는다.
+- 질문 대상이 모호하면 "누구를 말씀하시는 겁니까"처럼 조심스럽게 확인하거나, 자신이 들은 범위 안에서만 일반적으로 답한다.
+- 플레이어가 누가 죽었는지 묻거나 점순을 언급한 뒤에는 점순 관련 답변을 해도 된다.
+
 현재 플레이어가 제시했거나 질문에서 언급한 증거:
 ${evidenceNames.length ? evidenceNames.join(", ") : "없음"}
 
@@ -255,7 +265,7 @@ function fallbackAnswer(
 ) {
   const guide = reactions[0]?.responseGuide;
   const evidenceText = evidenceNames[0] ? ` ${evidenceNames[0]} 말씀이십니까.` : "";
-  const base = guide || (hasAlibiIntent(question) ? persona.fixedAlibi : persona.publicTruth);
+  const base = guide || (hasAlibiIntent(question) ? persona.fixedAlibi : hasCaseSubjectIntent(question) ? persona.publicTruth : "누구를 두고 물으시는지 먼저 말씀해 주십시오.");
   const pressureCount = countBreakEvidence(persona, evidenceNames);
   const pressureText =
     pressureCount > 0

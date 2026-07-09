@@ -71,7 +71,11 @@ export const evidenceCatalog = [
   },
   {
     name: "긁힌 팔 흔적",
-    aliases: ["긁힌 팔", "상처", "소매", "팔 상처", "팔의 상처", "긁힌 자국", "팔을 긁", "긁혔"]
+    aliases: ["긁힌 팔", "춘월 팔 상처", "춘월 상처", "춘월 소매", "긁힌 자국", "팔을 긁", "긁혔"]
+  },
+  {
+    name: "돌쇠의 팔 상처",
+    aliases: ["돌쇠 팔 상처", "돌쇠 상처", "돌쇠 소매", "팔 상처", "다친 팔", "붕대 자국"]
   },
   {
     name: "빈 호패 주머니",
@@ -176,9 +180,9 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "편지의 말투와 글씨가 자기 것이 아니라고 강하게 부정한다. 억울함 때문에 목소리가 높아지며, 점순을 부르는 약속 편지라면 자신이 그런 말을 쓸 리 없다고 구체적으로 반박한다."
       },
       {
-        evidenceNames: ["피 묻은 붕대"],
+        evidenceNames: ["피 묻은 붕대", "돌쇠의 팔 상처"],
         intentTags: ["bloodEvidence", "handWound"],
-        responseGuide: "붕대의 피는 자기 손을 다쳐 감싼 것이라고 설명한다."
+        responseGuide: "붕대와 팔 상처는 자기 손과 팔을 다쳐 감싼 흔적이라고 설명한다. 점순을 해친 흔적은 아니며, 일을 하다 다친 것이라고 둘러대지만 정확한 시점은 조금 흐린다."
       },
       {
         evidenceNames: ["호패 조각"],
