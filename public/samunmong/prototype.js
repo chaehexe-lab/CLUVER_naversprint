@@ -375,8 +375,15 @@
       clearInterval(typeBriefing.timer);
     }
 
+    function setBriefingMode(mode = "full") {
+      const journalMode = mode === "deathOnly";
+      briefingCard?.classList.toggle("journal-mode", journalMode);
+      briefingCard?.setAttribute("data-briefing-mode", journalMode ? "deathOnly" : "full");
+    }
+
     function updateBriefingStep() {
       const lastIndex = Math.max(0, briefingPanels.length - 1);
+      const journalMode = briefingCard?.dataset.briefingMode === "deathOnly";
       briefingStepIndex = Math.max(0, Math.min(lastIndex, briefingStepIndex));
       briefingCard?.setAttribute("data-briefing-step", String(briefingStepIndex));
 
@@ -387,23 +394,34 @@
       });
 
       if (briefingPrevButton) {
+        briefingPrevButton.hidden = journalMode;
         briefingPrevButton.disabled = briefingStepIndex === 0;
       }
       if (briefingNextButton) {
-        briefingNextButton.hidden = briefingStepIndex === lastIndex;
-        briefingNextButton.disabled = briefingStepIndex === 0 && !isBriefingTyped;
+        briefingNextButton.hidden = journalMode || briefingStepIndex === lastIndex;
+        briefingNextButton.disabled = !journalMode && briefingStepIndex === 0 && !isBriefingTyped;
       }
       if (startCaseButton) {
-        startCaseButton.hidden = briefingStepIndex !== lastIndex;
-        startCaseButton.classList.toggle("ready", briefingStepIndex === lastIndex);
+        startCaseButton.hidden = !journalMode && briefingStepIndex !== lastIndex;
+        startCaseButton.classList.toggle("ready", journalMode || briefingStepIndex === lastIndex);
       }
     }
 
-    function startBriefingSequence() {
-      briefingStepIndex = 0;
-      isBriefingTyped = false;
+    function startBriefingSequence(mode = "full") {
+      const journalMode = mode === "deathOnly";
+      setBriefingMode(mode);
+      briefingStepIndex = journalMode ? Math.min(1, Math.max(0, briefingPanels.length - 1)) : 0;
+      isBriefingTyped = journalMode;
       updateBriefingStep();
-      typeBriefing();
+      if (journalMode) {
+        stopBriefingTyping();
+        if (briefingCopy) {
+          briefingCopy.textContent = "";
+          briefingCopy.classList.add("done");
+        }
+      } else {
+        typeBriefing();
+      }
     }
 
     function applySettings(settings) {
@@ -950,7 +968,7 @@
         volume: 0.9,
         minDuration: themeStartLoadingDuration,
         maxWait: themeStartMaxWait,
-        after: startBriefingSequence
+        after: () => startBriefingSequence("full")
       });
     });
     on("#briefingPrev", "click", () => {
@@ -985,9 +1003,10 @@
       button.addEventListener("click", () => {
         if (isFieldGuideBlockingControls()) return;
         const target = button.dataset.go;
-        go(target, target === "briefingScreen" ? "사건 일지를 펼치는 중..." : "이동 중...");
+        const isJournalBriefing = target === "briefingScreen";
+        go(target, isJournalBriefing ? "사건 일지를 펼치는 중..." : "이동 중...");
         if (target === "briefingScreen") {
-          setTimeout(startBriefingSequence, 340);
+          setTimeout(() => startBriefingSequence("deathOnly"), 340);
         }
       });
     });

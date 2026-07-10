@@ -1909,6 +1909,7 @@
       display: none;
     }
 
+    .briefing-card[data-briefing-step="0"] #startCase,
     .briefing-card[data-briefing-step="1"] #briefingNext {
       display: none;
     }
@@ -4973,8 +4974,18 @@
       display: inline-grid;
     }
 
+    .briefing-card[data-briefing-step="0"] #startCase,
     .briefing-card[data-briefing-step="1"] #startCase {
       display: none;
+    }
+
+    .briefing-card.journal-mode #briefingPrev,
+    .briefing-card.journal-mode #briefingNext {
+      display: none;
+    }
+
+    .briefing-card.journal-mode #startCase {
+      display: inline-grid;
     }
 
     .briefing-card[data-briefing-step="0"],
