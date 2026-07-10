@@ -8,6 +8,7 @@
     const briefingCard = document.querySelector(".briefing-card");
     const briefingPrevButton = document.querySelector("#briefingPrev");
     const briefingNextButton = document.querySelector("#briefingNext");
+    const startCaseLabel = startCaseButton?.textContent?.trim() || "수사 시작";
     const briefingPanels = [...document.querySelectorAll("[data-briefing-panel]")];
     const fieldGuide = document.querySelector("#fieldOnboarding");
     const fieldGuidePanels = [...document.querySelectorAll("[data-field-guide-panel]")];
@@ -74,6 +75,7 @@
     const interrogationQuestionLimit = 50;
     let fieldGuideStep = "";
     let fieldGuideMapTimer = 0;
+    let briefingReturnScreenId = "fieldOne";
 
     const locationMeta = {
       tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
@@ -380,6 +382,9 @@
       const journalMode = mode === "deathOnly";
       briefingCard?.classList.toggle("journal-mode", journalMode);
       briefingCard?.setAttribute("data-briefing-mode", journalMode ? "deathOnly" : "full");
+      if (startCaseButton) {
+        startCaseButton.textContent = journalMode ? "닫기" : startCaseLabel;
+      }
     }
 
     function updateBriefingStep() {
@@ -982,6 +987,14 @@
       updateBriefingStep();
     });
     on("#startCase", "click", () => {
+      if (briefingCard?.dataset.briefingMode === "deathOnly") {
+        const returnScreen = screens.some((screen) => screen.id === briefingReturnScreenId)
+          ? briefingReturnScreenId
+          : "fieldOne";
+        go(returnScreen, "사건 일지를 덮는 중...");
+        return;
+      }
+
       if (hasSeenFieldGuide()) {
         sessionStorage.removeItem(fieldGuidePendingKey);
       } else {
@@ -1005,6 +1018,9 @@
         if (isFieldGuideBlockingControls()) return;
         const target = button.dataset.go;
         const isJournalBriefing = target === "briefingScreen";
+        if (isJournalBriefing) {
+          briefingReturnScreenId = getActiveScreenId() || "fieldOne";
+        }
         go(target, isJournalBriefing ? "사건 일지를 펼치는 중..." : "이동 중...");
         if (target === "briefingScreen") {
           setTimeout(() => startBriefingSequence("deathOnly"), 340);
