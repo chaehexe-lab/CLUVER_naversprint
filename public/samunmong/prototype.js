@@ -74,6 +74,7 @@
     const interrogationQuestionLimit = 50;
     let fieldGuideStep = "";
     let fieldGuideMapTimer = 0;
+
     const locationMeta = {
       tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
       dreamScreen: { name: "꿈 선택", x: "18%", y: "18%" },

@@ -97,6 +97,10 @@ export default function InterrogationScreen() {
             <img src="/samunmong/assets/labels/transparent/tool-note-short.png" alt="" />
             <span className="sr-only">기록장</span>
           </button>
+          <button className="scene-chip journal-chip" data-go="briefingScreen" type="button" aria-label="사건 일지 다시 보기">
+            <img src="/samunmong/assets/ui-generated/tool-case-journal.png" alt="" />
+            <span className="sr-only">사건 일지</span>
+          </button>
           <button
             className="scene-chip bag-chip"
             id="toggleEvidenceBag"
@@ -131,12 +135,14 @@ export default function InterrogationScreen() {
             ))}
           </div>
           <div className="question-box">
-            <span className="presented-mini">
-              제시할 증거: <strong id="presentedEvidence">없음</strong>
-            </span>
-            <span className="question-limit-mini" id="questionLimitStatus" aria-live="polite">
-              남은 질문: 50회
-            </span>
+            <div className="question-meta">
+              <span className="presented-mini">
+                제시할 증거: <strong id="presentedEvidence">없음</strong>
+              </span>
+              <span className="question-limit-mini" id="questionLimitStatus" aria-live="polite">
+                남은 질문: 50회
+              </span>
+            </div>
             <input id="questionInput" type="text" placeholder="용의자에게 질문을 입력하세요. 필요하면 증거를 함께 제시할 수 있습니다." />
             <button className="ask" id="askButton" type="button">
               질문

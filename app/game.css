@@ -2698,6 +2698,12 @@
       background: url("/samunmong/assets/ui-generated/tool-note.png") center / contain no-repeat;
     }
 
+    .scene-chip.journal-chip::before {
+      width: 54px;
+      height: 54px;
+      background: url("/samunmong/assets/ui-generated/tool-case-journal.png") center / contain no-repeat;
+    }
+
     .scene-chip.room-chip::before {
       --tool-rot: 3deg;
       width: 44px;
@@ -3924,11 +3930,20 @@
       text-shadow: 0 2px 8px rgba(0,0,0,.9);
     }
 
-    .presented-mini {
+    .question-meta {
+      align-self: stretch;
+      min-width: 112px;
+      display: grid;
+      align-content: center;
+      gap: 3px;
+    }
+
+    .presented-mini,
+    .question-limit-mini {
       align-self: center;
-      min-width: 92px;
       color: var(--muted);
-      font-size: 10px;
+      font-size: 11px;
+      line-height: 1.25;
       white-space: nowrap;
     }
 
@@ -4005,7 +4020,7 @@
 
     .question-box {
       display: grid;
-      grid-template-columns: auto auto 1fr auto;
+      grid-template-columns: auto 1fr auto;
       gap: 8px;
       align-items: end;
     }
@@ -4015,16 +4030,9 @@
       background: transparent;
     }
 
-    .inquiry-bar .presented-mini {
-      text-shadow: 0 2px 8px rgba(0,0,0,.9);
-    }
-
+    .inquiry-bar .presented-mini,
     .inquiry-bar .question-limit-mini {
-      color: rgba(255, 235, 194, .86);
-      font-size: 14px;
-      line-height: 1.2;
       text-shadow: 0 2px 8px rgba(0,0,0,.9);
-      white-space: nowrap;
     }
 
     .inquiry-bar input {
@@ -4863,7 +4871,7 @@
     .fade {
       position: absolute;
       inset: 0;
-      z-index: 20;
+      z-index: 140;
       display: grid;
       place-items: center;
       color: white;
@@ -4877,7 +4885,7 @@
       letter-spacing: 0;
     }
 
-    .fade.show { opacity: .96; }
+    .fade.show { opacity: 1; }
     .fade.long { transition-duration: .58s; }
 
     .dream-loading-overlay {
@@ -4896,7 +4904,7 @@
 
     @keyframes dream-loading-fade {
       from { opacity: 0; }
-      to { opacity: .96; }
+      to { opacity: 1; }
     }
 
     @media (prefers-reduced-motion: reduce) {
