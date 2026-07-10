@@ -1483,7 +1483,6 @@
       display: grid;
       align-content: center;
       gap: 12px;
-      color: #d8cec2;
       font-family: "NanumBareunJeongsin", "Noto Serif KR", "Batang", serif;
       font-size: clamp(19px, 2.1vw, 27px);
       line-height: 1.65;
