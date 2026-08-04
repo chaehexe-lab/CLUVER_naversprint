@@ -1144,19 +1144,34 @@
     const themeStartAssets = isMagicTheme ? magicThemeStartAssets : joseonThemeStartAssets;
     const magicLoadingArtwork =
       "url('/samunmong/assets/magic-school/loading/magic-transition-bg.png') center / cover no-repeat, #050403";
+    const magicThemeLoadingScreens = new Set([
+      "briefingScreen",
+      "magicAlchemyLab",
+      "magicCleaningCloset",
+      "magicLibrary",
+      "magicRecordCrystalRoom",
+      "magicDormHallway",
+      "interrogationScreen"
+    ]);
 
-    function setLoadingArtwork() {
+    function shouldUseMagicLoading(targetScreenId) {
+      if (!isMagicTheme) return false;
+      const currentScreenId = getActiveScreenId();
+      return magicThemeLoadingScreens.has(targetScreenId) || magicThemeLoadingScreens.has(currentScreenId);
+    }
+
+    function setLoadingArtwork(targetScreenId) {
       if (!fade) return;
       fade.classList.remove("magic-rune-transition");
-      if (isMagicTheme) {
+      if (shouldUseMagicLoading(targetScreenId)) {
         fade.style.background = magicLoadingArtwork;
       } else {
         fade.style.removeProperty("background");
       }
     }
 
-    function showLoading(message = "이동 중...") {
-      setLoadingArtwork();
+    function showLoading(message = "이동 중...", targetScreenId) {
+      setLoadingArtwork(targetScreenId);
       fade?.classList.add("show");
       if (fade) fade.textContent = message;
     }
@@ -1195,7 +1210,7 @@
       stopBriefingTyping();
       document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
       playSfx(options.sfx || "move", options.volume ?? 0.82);
-      showLoading(options.message || "이동 중...");
+      showLoading(options.message || "이동 중...", id);
 
       const startedAt = Date.now();
       let done = false;
@@ -1223,7 +1238,7 @@
       document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
       playSfx("move", 0.82);
       const duration = options.loading ? options.duration || loadingDuration : 260;
-      showLoading(message);
+      showLoading(message, id);
       setTimeout(() => {
         screens.forEach((screen) => screen.classList.toggle("active", screen.id === id));
         updateCurrentLocation(id);
@@ -1238,7 +1253,7 @@
       stopBriefingTyping();
       document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
       playSfx("briefingNext", 0.9);
-      setLoadingArtwork();
+      setLoadingArtwork(id);
       fade?.classList.add("show");
       if (fade) fade.textContent = message;
       fade?.classList.add("long");
@@ -1253,6 +1268,7 @@
           }
         });
         fade?.classList.remove("show");
+        fade?.style.removeProperty("background");
         updateCurrentLocation(id);
         saveProgress(id);
         updateBgmForScreen(id);
