@@ -5,6 +5,7 @@ import { screenLocationLabels, type ScreenLocationId } from "@/lib/gameState";
 
 type LocationIndicatorProps = {
   initialScreen?: string;
+  initialTheme?: "magicSchool";
 };
 
 const LOCATION_KICKER = "\uD604\uC7AC \uC704\uCE58";
@@ -18,10 +19,13 @@ function getActiveScreenId() {
   return document.querySelector(".screen.active")?.id;
 }
 
-export default function LocationIndicator({ initialScreen }: LocationIndicatorProps) {
+export default function LocationIndicator({ initialScreen, initialTheme }: LocationIndicatorProps) {
   const [activeScreen, setActiveScreen] = useState<string>(initialScreen ?? "mainScreen");
-  const currentLocation =
-    isKnownLocation(activeScreen) && !HIDDEN_LOCATION_SCREENS.has(activeScreen) ? screenLocationLabels[activeScreen] : null;
+  const currentLocation = isKnownLocation(activeScreen) && !HIDDEN_LOCATION_SCREENS.has(activeScreen)
+    ? initialTheme === "magicSchool" && activeScreen === "interrogationScreen"
+      ? "교무 조사실"
+      : screenLocationLabels[activeScreen]
+    : null;
 
   useEffect(() => {
     const syncActiveScreen = () => {

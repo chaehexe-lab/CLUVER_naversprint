@@ -14,8 +14,10 @@ import ChunwolRoomScene from "@/components/scenes/ChunwolRoomScene";
 import DolsoeQuartersScene from "@/components/scenes/DolsoeQuartersScene";
 import FieldOneScene from "@/components/scenes/FieldOneScene";
 import InterrogationScreen from "@/components/scenes/InterrogationScreen";
+import MagicSchoolScene from "@/components/scenes/MagicSchoolScene";
 import MudeokServantRoomScene from "@/components/scenes/MudeokServantRoomScene";
 import YoomunseokSarangbangScene from "@/components/scenes/YoomunseokSarangbangScene";
+import { magicSchoolScenes } from "@/lib/gameData";
 import { STARTABLE_SCREENS } from "@/lib/gameState";
 
 const CONTENT_SCRIPT = "/samunmong/content.js";
@@ -23,6 +25,7 @@ const PROTOTYPE_SCRIPT = "/samunmong/prototype.js";
 
 type GameShellProps = {
   initialScreen?: string;
+  initialTheme?: "magicSchool";
 };
 
 function ensureRequestedStartScreen(initialScreen?: string) {
@@ -36,12 +39,34 @@ function ensureRequestedStartScreen(initialScreen?: string) {
   window.dispatchEvent(new CustomEvent("samunmong:screen-change", { detail: { screenId: startScreen } }));
 }
 
-export default function GameShell({ initialScreen }: GameShellProps) {
+export default function GameShell({ initialScreen, initialTheme }: GameShellProps) {
   const skipIntro = Boolean(initialScreen);
+
+  useEffect(() => {
+    const syncGameScale = () => {
+      const viewport = document.querySelector<HTMLElement>(".game-viewport");
+      if (!viewport) return;
+
+      const baseWidth = 1600;
+      const baseHeight = 900;
+      const scale = Math.min(window.innerWidth / baseWidth, window.innerHeight / baseHeight, 1);
+      viewport.style.setProperty("--game-scale", String(scale));
+    };
+
+    syncGameScale();
+    window.addEventListener("resize", syncGameScale);
+
+    return () => {
+      window.removeEventListener("resize", syncGameScale);
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
     const loadedScripts: HTMLScriptElement[] = [];
+    if (initialTheme === "magicSchool" || initialScreen?.startsWith("magic")) {
+      window.localStorage.setItem("samunmong-current-theme", "magicSchool");
+    }
 
     const loadScript = (src: string) =>
       new Promise<void>((resolve, reject) => {
@@ -67,25 +92,30 @@ export default function GameShell({ initialScreen }: GameShellProps) {
       cancelled = true;
       loadedScripts.forEach((script) => script.remove());
     };
-  }, [initialScreen]);
+  }, [initialScreen, initialTheme]);
 
   return (
-    <main className="game-shell" data-start-screen={initialScreen}>
-      <TeamIntro disabled={skipIntro} />
-      <MainScreen />
-      <TutorialScreen />
-      <DreamSelectScreen />
-      <BriefingScreen />
-      <FieldOneScene />
-      <ChunwolRoomScene />
-      <MudeokServantRoomScene />
-      <YoomunseokSarangbangScene />
-      <DolsoeQuartersScene />
-      <BackGateCourtyardScene />
-      <InterrogationScreen />
-      <LocationIndicator initialScreen={initialScreen} />
-      <GameSettingsOverlay />
-      <ButtonGuideLayer />
-    </main>
+    <div className="game-viewport">
+      <main className="game-shell" data-start-screen={initialScreen} data-initial-theme={initialTheme}>
+        <TeamIntro disabled={skipIntro} />
+        <MainScreen />
+        <TutorialScreen />
+        <DreamSelectScreen />
+        <BriefingScreen />
+        <FieldOneScene />
+        <ChunwolRoomScene />
+        <MudeokServantRoomScene />
+        <YoomunseokSarangbangScene />
+        <DolsoeQuartersScene />
+        <BackGateCourtyardScene />
+        {magicSchoolScenes.map((scene) => (
+          <MagicSchoolScene scene={scene} key={scene.id} />
+        ))}
+        <InterrogationScreen initialTheme={initialTheme} />
+        <LocationIndicator initialScreen={initialScreen} initialTheme={initialTheme} />
+        <GameSettingsOverlay />
+        <ButtonGuideLayer />
+      </main>
+    </div>
   );
 }

@@ -55,29 +55,38 @@ function mapPinStyle(item: { x: string; y: string }): PinStyle {
   };
 }
 
-export default function InterrogationScreen() {
+export default function InterrogationScreen({ initialTheme }: { initialTheme?: "magicSchool" }) {
+  const isMagicTheme = initialTheme === "magicSchool";
+  const initialPlate = isMagicTheme
+    ? "/samunmong/assets/magic-school/interrogation/office-empty.png"
+    : "/samunmong/assets/main-screen-v2.png";
+  const initialSuspect = isMagicTheme ? "gandalf" : "";
+  const initialSprite = isMagicTheme ? "/samunmong/assets/magic-school/interrogation/gandalf-sprite.png" : "";
+  const initialName = isMagicTheme ? "건달프" : "";
+
   return (
     <>
       <section className="screen use-text-ui" id="interrogationScreen">
         <img
           className="plate"
           id="interrogationPlate"
-          src="/samunmong/assets/scene-interrogation-dolsoe.png?v=scene-20260707"
-          alt="붉은 빛이 깔린 조선시대 취조실"
+          src={initialPlate}
+          alt="취조실"
         />
         <div className="shade" />
 
-        <div className="suspect-stage" id="suspectStage" data-suspect="dolsoe" aria-hidden="true">
+        <div className="suspect-stage" id="suspectStage" data-suspect={initialSuspect} aria-hidden="true">
           <img
             className="suspect-sprite"
             id="suspectSprite"
-            src="/samunmong/assets/suspects/dolsoe-seated.png?v=uniform-20260706"
+            src={initialSprite}
             alt=""
           />
         </div>
+        <div className="interrogation-desk-foreground" aria-hidden="true" />
 
         <div className="hud suspect-name" id="suspectName">
-          돌쇠
+          {initialName}
         </div>
         <div className="suspect-switch">
           <button className="arrow" type="button" id="prevSuspect">
@@ -116,7 +125,8 @@ export default function InterrogationScreen() {
             <span className="sr-only">도구</span>
           </button>
           <button className="tool-prop hint-prop" id="interrogationHint" type="button" aria-label="심문 힌트">
-            힌트
+            <img src="/samunmong/assets/ui-generated/tool-hint.png" alt="" />
+            <span className="sr-only">힌트</span>
           </button>
           <AccuseSuspect>
             <button className="tool-prop accuse-prop" id="accuseButton" type="button" aria-label="범인 지목">
@@ -205,6 +215,11 @@ export default function InterrogationScreen() {
       {/* 현장과 취조실이 함께 사용하는 보따리 팝업 */}
       <EvidenceInventory>
         <aside className="hud evidence-bag-pop" id="evidenceBagPop" aria-hidden="true">
+          <div className="dimensional-pouch-aura" aria-hidden="true">
+            <span className="pouch-ring pouch-ring-outer" />
+            <span className="pouch-ring pouch-ring-middle" />
+            <span className="pouch-ring pouch-ring-core" />
+          </div>
           <div className="bag-pop-head">
             <strong>보따리</strong>
             <button className="close-button mini-close" id="closeEvidenceBag" type="button" aria-label="보따리 닫기">
@@ -221,6 +236,11 @@ export default function InterrogationScreen() {
       </EvidenceInventory>
 
       <aside className="global-panel tool-panel" id="toolPanel" aria-hidden="true">
+        <div className="arcane-panel-aura" aria-hidden="true">
+          <span />
+          <span />
+          <span />
+        </div>
         <div className="global-panel-head">
           <div>
             <p className="tool-panel-kicker">증거 분석</p>
@@ -253,6 +273,7 @@ export default function InterrogationScreen() {
       </aside>
 
       <aside className="global-panel tool-result-panel" id="toolResultPopup" aria-hidden="true" aria-live="polite">
+        <div className="arcane-result-sigil" aria-hidden="true" />
         <p className="tool-panel-kicker" id="toolResultKicker">도구 분석</p>
         <h2 id="toolResultTitle">증거 분석 결과</h2>
         <p id="toolResultText">새로운 정보가 드러났습니다.</p>

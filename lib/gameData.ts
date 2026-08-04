@@ -34,14 +34,14 @@ export const dreamOptions: DreamOption[] = [
     disabled: false
   },
   {
-    state: "LOCKED",
+    id: "chooseMagicSchool",
+    state: "PLAYABLE",
     kicker: "DREAM 02",
     title: "마법학교 방화사건",
     description: "불길은 꺼졌지만 주문을 건 이름은 아직 재 속에 남아 있습니다.",
     meta: "금서 · 마력 흔적 · 사라진 목격자",
     image: "/samunmong/assets/theme-magic-school.png",
-    disabled: true,
-    ariaLabel: "마법학교 방화사건은 아직 잠겨 있습니다"
+    disabled: false
   },
   {
     state: "LOCKED",
@@ -209,3 +209,93 @@ export const backGateCourtyardScene = {
   ] satisfies SceneHotspot[],
   dock: investigationDock
 } as const;
+
+const magicDock = [
+  {
+    className: "map-chip open-map-panel magic-chip",
+    ariaLabel: "학교 지도 열기",
+    image: "/samunmong/assets/magic-school/ui/icon-school-map.png",
+    label: "학교 지도"
+  },
+  {
+    className: "bag-chip open-bag-panel magic-chip",
+    ariaLabel: "마법 가방 열기",
+    image: "/samunmong/assets/magic-school/ui/icon-magic-bag.png",
+    label: "마법 가방"
+  },
+  {
+    className: "tool-chip open-tool-panel magic-chip",
+    ariaLabel: "마력 도구 열기",
+    image: "/samunmong/assets/magic-school/ui/icon-mana-tools.png",
+    label: "마력 도구"
+  },
+  {
+    className: "note-chip open-note-panel magic-chip",
+    ariaLabel: "수사 일지 열기",
+    image: "/samunmong/assets/magic-school/ui/icon-investigation-journal.png",
+    label: "수사 일지"
+  },
+  {
+    className: "room-chip magic-chip",
+    ariaLabel: "교무 조사실로 이동",
+    image: "/samunmong/assets/magic-school/ui/icon-staff-room.png",
+    label: "교무 조사실",
+    goTo: "interrogationScreen"
+  }
+] satisfies SceneDockAction[];
+
+export const magicSchoolScenes = [
+  {
+    id: "magicAlchemyLab",
+    image: "/samunmong/assets/magic-school/scenes/alchemy-lab.png",
+    alt: "불탄 제1 연금술 실습실",
+    props: [] as SceneProp[],
+    hotspots: [
+      { evidenceName: "부러진 지팡이", ariaLabel: "부러진 지팡이 조사", x: "58.2%", y: "76.0%", w: "13.5%", h: "8.8%", clipPath: "polygon(8% 48%, 90% 20%, 98% 56%, 16% 86%)", radius: "999px", rot: "-9deg" },
+      { evidenceName: "화염 감지 룬스톤", ariaLabel: "화염 감지 룬스톤 조사", x: "30.5%", y: "66.0%", w: "14.0%", h: "15.0%", clipPath: "ellipse(46% 42% at 50% 52%)", radius: "999px", rot: "0deg" },
+      { evidenceName: "기록의 수정구", ariaLabel: "기록의 수정구 조사", x: "75.2%", y: "78.4%", w: "10.5%", h: "11.5%", clipPath: "ellipse(44% 44% at 50% 50%)", radius: "999px", rot: "0deg" }
+    ] satisfies SceneHotspot[],
+    dock: magicDock
+  },
+  {
+    id: "magicCleaningCloset",
+    image: "/samunmong/assets/magic-school/scenes/cleaning-closet.png",
+    alt: "연금술 실습실 옆 청소도구함",
+    props: [] as SceneProp[],
+    hotspots: [
+      { evidenceName: "금지된 마법 담배 재", ariaLabel: "금지된 마법 담배 재 조사", x: "43.4%", y: "58.2%", w: "13.0%", h: "13.5%", clipPath: "ellipse(44% 36% at 50% 56%)", radius: "999px", rot: "0deg" }
+    ] satisfies SceneHotspot[],
+    dock: magicDock
+  },
+  {
+    id: "magicLibrary",
+    image: "/samunmong/assets/magic-school/scenes/library.png",
+    alt: "마법학교 도서관",
+    props: [] as SceneProp[],
+    hotspots: [
+      { evidenceName: "도서관 대출 기록부", ariaLabel: "도서관 대출 기록부 조사", x: "6.6%", y: "70.0%", w: "27.0%", h: "17.0%", clipPath: "polygon(3% 12%, 94% 8%, 98% 78%, 12% 96%)", radius: "12px", rot: "0deg" },
+      { evidenceName: "빙결 흔적이 남은 반납 도서", ariaLabel: "빙결 흔적이 남은 반납 도서 조사", x: "45.0%", y: "72.2%", w: "18.0%", h: "15.0%", clipPath: "polygon(8% 16%, 88% 4%, 98% 78%, 18% 96%)", radius: "10px", rot: "-4deg" }
+    ] satisfies SceneHotspot[],
+    dock: magicDock
+  },
+  {
+    id: "magicRecordCrystalRoom",
+    image: "/samunmong/assets/magic-school/scenes/record-crystal-room.png",
+    alt: "기록 수정구실",
+    props: [] as SceneProp[],
+    hotspots: [
+      { evidenceName: "조작된 기록 수정구", ariaLabel: "조작된 기록 수정구 조사", x: "39.4%", y: "25.0%", w: "24.0%", h: "34.0%", clipPath: "ellipse(47% 46% at 50% 50%)", radius: "999px", rot: "0deg" }
+    ] satisfies SceneHotspot[],
+    dock: magicDock
+  },
+  {
+    id: "magicDormHallway",
+    image: "/samunmong/assets/magic-school/scenes/dorm-hallway.png",
+    alt: "학생들 기숙사 복도",
+    props: [] as SceneProp[],
+    hotspots: [
+      { evidenceName: "버려진 지팡이 조각", ariaLabel: "버려진 지팡이 조각 조사", x: "48.0%", y: "80.0%", w: "14.0%", h: "7.0%", clipPath: "polygon(4% 48%, 96% 18%, 98% 58%, 12% 90%)", radius: "999px", rot: "-4deg" }
+    ] satisfies SceneHotspot[],
+    dock: magicDock
+  }
+] as const;

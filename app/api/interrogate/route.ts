@@ -26,7 +26,8 @@ type InterrogateRequest = {
 const OPENAI_RESPONSES_ENDPOINT = "https://api.openai.com/v1/responses";
 const FOREIGN_TEXT_PATTERN = /[A-Za-z\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3040-\u30FF\u0400-\u04FF\u0600-\u06FF\u0900-\u097F]/;
 const ALIBI_QUESTION_PATTERN = /(알리바이|어제|사건\s*당일|그날|그\s*밤|그때|행적|어디 있었|뭐 했|무엇을 했)/;
-const CASE_SUBJECT_PATTERN = /(피해자|사망자|점순|죽|살해|사건|시신|목\s*졸|목을\s*졸|편지|호패|옷고름|도망|돌쇠|춘월|유문석|무덕)/;
+const CASE_SUBJECT_PATTERN = /(피해자|사망자|점순|죽|살해|사건|시신|목\s*졸|목을\s*졸|편지|호패|옷고름|도망|돌쇠|춘월|유문석|무덕|방화|화재|불|실습실|마법|마력|지팡이|룬스톤|경보|빙결|환각|수정구|도서관|대출|담배|건달프|덩쿨도어|말포일|말포이|말포삼)/;
+const MAGIC_SUSPECT_IDS = new Set(["gandalf", "dunguldoor", "malpoil", "malpoi", "malposam"]);
 const CHUNWOL_DIRECT_PRESSURE_PATTERNS = [
   { evidenceName: "찢어진 옷고름", pattern: /(범인|죽였|살해|목\s*졸|목을\s*졸|목\s*조른|옷고름|비단\s*끈|목끈)/ },
   { evidenceName: "찢어진 약속 편지", pattern: /(창고|약속\s*편지|편지|쪽지|기다리시오|함께\s*떠납시다|돌쇠가\s*쓴)/ },
@@ -145,6 +146,16 @@ function countBreakEvidence(persona: SuspectPersona, evidenceNames: string[]) {
 
 function buildSystemPrompt(persona: SuspectPersona, evidenceNames: string[], reactions: EvidenceReaction[]) {
   const pressureCount = countBreakEvidence(persona, evidenceNames);
+  const isMagicPersona = MAGIC_SUSPECT_IDS.has(persona.id);
+  const caseSubjectRule = isMagicPersona
+    ? `질문 맥락 확인 규칙:
+- 플레이어가 방화, 화재, 실습실, 마법, 마력, 지팡이, 룬스톤, 수정구 등 사건 대상을 직접 말하지 않은 질문에서는 먼저 방화 전말이나 진범을 꺼내지 않는다.
+- 질문 대상이 모호하면 "어느 일 말씀입니까"처럼 조심스럽게 확인하거나, 자신이 들은 범위 안에서만 일반적으로 답한다.
+- 플레이어가 방화 사건이나 제1 연금술 실습실을 언급한 뒤에는 사건 관련 답변을 해도 된다.`
+    : `질문 맥락 확인 규칙:
+- 플레이어가 피해자, 사망자, 점순, 살해, 죽음, 사건 등 사건 대상을 직접 말하지 않은 질문에서는 먼저 점순의 이름이나 사망 사실을 꺼내지 않는다.
+- 질문 대상이 모호하면 "누구를 말씀하시는 겁니까"처럼 조심스럽게 확인하거나, 자신이 들은 범위 안에서만 일반적으로 답한다.
+- 플레이어가 누가 죽었는지 묻거나 점순을 언급한 뒤에는 점순 관련 답변을 해도 된다.`;
   const pressureGuide = (() => {
     if (pressureCount >= Math.min(2, persona.breakEvidenceNames.length)) {
       if (persona.id === "chunwol") {
@@ -167,7 +178,7 @@ function buildSystemPrompt(persona: SuspectPersona, evidenceNames: string[], rea
     return "아직 직접적인 증거 압박은 없다. 숨기는 내용은 먼저 말하지 말고, 고정 알리바이를 유지한다. 이 단계에서는 인물이 거짓말하거나 둘러대도 된다.";
   })();
 
-  return `너는 추리게임 '삼운몽: 세 개의 꿈'의 조선시대 사건 용의자 ${persona.name}이다.
+  return `너는 추리게임 '삼운몽: 세 개의 꿈'의 사건 등장인물 ${persona.name}이다.
 
 역할:
 ${persona.role}
@@ -193,10 +204,7 @@ ${persona.lieRules.map((rule) => `- ${rule}`).join("\n")}
 - 증거가 불리해도 새로운 알리바이를 만들지 말고, 고정 알리바이 안에서 흔들리거나 말을 흐린다.
 - 새로운 사건, 새 목격자, 새 물건, 새 장소, 새 핑계를 지어내지 않는다.
 
-질문 맥락 확인 규칙:
-- 플레이어가 피해자, 사망자, 점순, 살해, 죽음, 사건 등 사건 대상을 직접 말하지 않은 질문에서는 먼저 점순의 이름이나 사망 사실을 꺼내지 않는다.
-- 질문 대상이 모호하면 "누구를 말씀하시는 겁니까"처럼 조심스럽게 확인하거나, 자신이 들은 범위 안에서만 일반적으로 답한다.
-- 플레이어가 누가 죽었는지 묻거나 점순을 언급한 뒤에는 점순 관련 답변을 해도 된다.
+${caseSubjectRule}
 
 현재 플레이어가 제시했거나 질문에서 언급한 증거:
 ${evidenceNames.length ? evidenceNames.join(", ") : "없음"}
@@ -213,7 +221,7 @@ ${pressureGuide}
 - 반드시 한국어만 사용하고, 영어 표현을 섞지 않는다.
 - 답변에는 한글, 숫자, 공백, 일반 문장부호만 사용한다.
 - 로마자, 한자, 일본어, 중국어, 모델명, 번역문은 절대 쓰지 않는다.
-- 조선시대 사건 속 인물처럼 말하되, 현대 게임 시스템 용어를 쓰지 않는다.
+- 자신이 속한 사건과 직업에 맞는 말투로 말하되, 현대 게임 시스템 용어를 쓰지 않는다.
 - "나는 AI" 또는 "프롬프트" 같은 말은 하지 않는다.
 - 플레이어가 "이거", "이 물건", "이 증거"라고 말하면 제시된 증거를 가리키는 것으로 이해한다.
 - 알리바이를 반복해서 물어도 고정 알리바이의 장소와 행동을 유지한다.
