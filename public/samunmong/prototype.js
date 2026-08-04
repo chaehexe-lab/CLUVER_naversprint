@@ -714,7 +714,7 @@
       if (target.matches(".bag-chip")) return isMagicTheme ? "차원 주머니 속 증거를 불러옵니다." : "모은 증거를 확인합니다.";
       if (target.matches(".tool-chip")) return isMagicTheme ? "마력 감지로 잔류 흔적을 분석합니다." : "증거를 더 자세히 분석합니다.";
       if (target.matches(".note-chip")) return "등장인물과 나눈 대화를 기록합니다.";
-      if (target.matches(".journal-chip")) return isMagicTheme ? "기억 수정구로 사건의 잔상을 복원합니다." : "처음 사건 일지를 다시 봅니다.";
+      if (target.matches(".journal-chip")) return isMagicTheme ? "수사 일지에서 관계자별 기록을 확인합니다." : "처음 사건 일지를 다시 봅니다.";
       if (target.matches(".room-chip")) return target.getAttribute("aria-current") === "page" ? "현재 위치입니다." : "취조실로 이동합니다.";
       if (target.matches(".scene-hint")) return "남은 단서 위치를 잠깐 밝힙니다.";
       if (target.matches(".map-pin-button")) return target.getAttribute("aria-label") || "해당 장소로 이동합니다.";
@@ -981,11 +981,11 @@
       const journalChip = document.querySelector("#interrogationScreen .journal-chip img");
       if (journalChip) journalChip.src = "/samunmong/assets/magic-school/ui/icon-investigation-journal.png";
       const interrogationJournalChip = document.querySelector("#interrogationScreen .journal-chip");
-      interrogationJournalChip?.setAttribute("aria-label", "기억 수정구 열기");
+      interrogationJournalChip?.setAttribute("aria-label", "수사 일지 열기");
       const interrogationJournalLabel = interrogationJournalChip?.querySelector(".sr-only");
-      if (interrogationJournalLabel) interrogationJournalLabel.textContent = "기억 수정구";
+      if (interrogationJournalLabel) interrogationJournalLabel.textContent = "수사 일지";
       document.querySelectorAll(".magic-school-screen .journal-chip .magic-scene-chip-label").forEach((label) => {
-        label.textContent = "기억 수정구";
+        label.textContent = "수사 일지";
       });
       const accuseChip = document.querySelector("#accuseButton img");
       if (accuseChip) accuseChip.src = "/samunmong/assets/magic-school/ui/icon-final-accuse.png";

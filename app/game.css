@@ -9523,3 +9523,208 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .memor
     transform: translate(-50%, -50%) scale(1.05);
   }
 }
+
+/* Magic-school panel restore: journal, magic bag, and tools use one unified non-Joseon asset */
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel,
+html[data-samunmong-theme="magicSchool"] .note-drawer.investigation-note-panel,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel {
+  border: 0 !important;
+  border-radius: 18px !important;
+  color: #24170f !important;
+  background:
+    linear-gradient(rgba(255, 241, 211, .08), rgba(255, 241, 211, .08)),
+    url("/samunmong/assets/magic-school/ui/magic-common-panel.png") center / 100% 100% no-repeat !important;
+  box-shadow: 0 30px 88px rgba(0, 0, 0, .72) !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop .bag-pop-head,
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop .bag-pop-guide,
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop .evidence-location-tabs,
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop .evidence-grid,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .global-panel-head,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel > p,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-workbench,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-grid,
+html[data-samunmong-theme="magicSchool"] .note-drawer.investigation-note-panel .note-conversation-list,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel .note-conversation-list,
+html[data-samunmong-theme="magicSchool"] .note-drawer.investigation-note-panel .note-suspect-tabs,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel .note-suspect-tabs {
+  border-color: rgba(118, 78, 42, .26) !important;
+  background: rgba(255, 236, 194, .42) !important;
+  backdrop-filter: blur(3px);
+}
+
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop h2,
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop p,
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop li,
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop span,
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop strong,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel h2,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel p,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel li,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel span,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel strong,
+html[data-samunmong-theme="magicSchool"] .note-drawer.investigation-note-panel h2,
+html[data-samunmong-theme="magicSchool"] .note-drawer.investigation-note-panel p,
+html[data-samunmong-theme="magicSchool"] .note-drawer.investigation-note-panel li,
+html[data-samunmong-theme="magicSchool"] .note-drawer.investigation-note-panel span,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel h2,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel p,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel li,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel span {
+  color: #24170f !important;
+  text-shadow: 0 1px 0 rgba(255, 245, 219, .52) !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .arcane-panel-aura,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-result-panel .arcane-result-sigil {
+  display: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .global-panel-head,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel > p,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-workbench,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-grid,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-preview,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .analysis-target,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-evidence-list,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-evidence-option,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-card {
+  background: transparent !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-workbench,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-grid,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-preview,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .analysis-target,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-evidence-list {
+  border-color: rgba(118, 78, 42, .24) !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-card,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-evidence-option {
+  border-color: rgba(91, 58, 31, .28) !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-card::before,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-evidence-option::before,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-preview-image::before,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-preview-image::after {
+  content: none !important;
+  display: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-preview-image img,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-card img,
+html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel .tool-evidence-option img {
+  filter: drop-shadow(0 14px 16px rgba(0, 0, 0, .35)) !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop {
+  overflow: auto !important;
+  animation: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop::before,
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop::after,
+html[data-samunmong-theme="magicSchool"] .pouch-ring,
+html[data-samunmong-theme="magicSchool"] .pouch-ring-core {
+  content: none !important;
+  display: none !important;
+  animation: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop.open,
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop.closing {
+  animation: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop .evidence-card,
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop .evidence-card:nth-child(2n),
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop .evidence-card:nth-child(3n) {
+  animation: none !important;
+  transform: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop .evidence-card:hover,
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop .evidence-card:focus-visible {
+  transform: translateY(-4px) !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop .evidence-card.active {
+  background: rgba(255, 205, 113, .08) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 214, 142, .18) !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop .evidence-card .evidence-thumb {
+  filter: drop-shadow(0 16px 18px rgba(0, 0, 0, .46)) !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .note-drawer.investigation-note-panel,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel {
+  left: 50% !important;
+  top: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: min(680px, 86vw) !important;
+  max-height: min(720px, 84%) !important;
+  transform: translate(-50%, -50%) scale(.96) !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .note-drawer.investigation-note-panel.open,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel.show {
+  transform: translate(-50%, -50%) scale(1) !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .note-drawer .note-close,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel .note-close {
+  top: 22px !important;
+  right: 24px !important;
+  width: 34px !important;
+  height: 34px !important;
+  border: 1px solid rgba(111, 26, 23, .5) !important;
+  border-radius: 50% !important;
+  color: #6d211d !important;
+  background: rgba(255, 234, 183, .24) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 241, 199, .18) !important;
+  text-shadow: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .note-drawer .note-close::before,
+html[data-samunmong-theme="magicSchool"] .note-drawer .note-close::after,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel .note-close::before,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel .note-close::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 50% !important;
+  top: 50% !important;
+  width: 15px !important;
+  height: 2px !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: currentColor !important;
+  box-shadow: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .note-drawer .note-close::before,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel .note-close::before {
+  transform: translate(-50%, -50%) rotate(45deg) !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .note-drawer .note-close::after,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel .note-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg) !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .note-drawer .note-close:hover,
+html[data-samunmong-theme="magicSchool"] .note-drawer .note-close:focus-visible,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel .note-close:hover,
+html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel .note-close:focus-visible {
+  color: #3a1712 !important;
+  background: rgba(117, 38, 29, .18) !important;
+  outline: 2px solid rgba(111, 26, 23, .3) !important;
+  outline-offset: 2px !important;
+}
