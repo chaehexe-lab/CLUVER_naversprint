@@ -5,10 +5,30 @@
     const toast = document.querySelector("#toast");
     const briefingCopy = document.querySelector("#briefingCopy");
     const startCaseButton = document.querySelector("#startCase");
+    const startCaseLabelNode = document.querySelector("[data-start-case-label]");
     const briefingCard = document.querySelector(".briefing-card");
+    const briefingScreen = document.querySelector("#briefingScreen");
+    const memoryOrbTrigger = document.querySelector("#memoryOrbTrigger");
     const briefingPrevButton = document.querySelector("#briefingPrev");
     const briefingNextButton = document.querySelector("#briefingNext");
-    const startCaseLabel = startCaseButton?.textContent?.trim() || "수사 시작";
+    const magicRecordIntro = document.querySelector(".magic-record-intro");
+    const magicRecordTabs = [...document.querySelectorAll("[data-record-card-tab]")];
+    const magicStudentPages = [...document.querySelectorAll("[data-record-card]")];
+    const magicStudentPrevButton = document.querySelector("[data-student-prev]");
+    const magicStudentNextButton = document.querySelector("[data-student-next]");
+    const magicStudentPageIndicator = document.querySelector("[data-student-page-indicator]");
+    const memoryTraceSequence = document.querySelector(".memory-trace-sequence");
+    const memoryDrawZone = document.querySelector("[data-memory-draw-zone]");
+    const memoryDrawPath = document.querySelector("[data-memory-draw-path]");
+    const memoryTraceEvidenceNodes = [...document.querySelectorAll("[data-memory-evidence]")];
+    const memoryTraceInstruction = document.querySelector("[data-memory-trace-instruction]");
+    const memoryTraceCopy = document.querySelector("[data-memory-trace-copy]");
+    const memoryTraceContinue = document.querySelector("[data-memory-trace-continue]");
+    let startCaseLabel = startCaseButton?.textContent?.trim() || "수사 시작";
+    let magicStudentPageIndex = 0;
+    let memoryTraceComplete = false;
+    let memoryTraceTypingTimer = 0;
+    let memoryTracePoints = [];
     const briefingPanels = [...document.querySelectorAll("[data-briefing-panel]")];
     const fieldGuide = document.querySelector("#fieldOnboarding");
     const fieldGuidePanels = [...document.querySelectorAll("[data-field-guide-panel]")];
@@ -17,9 +37,42 @@
     let selectedEvidence = "";
     let isAskingAi = false;
     const interrogationHistories = new Map();
+
+    function setStartCaseLabel(label) {
+      if (!startCaseButton) return;
+      startCaseButton.setAttribute("aria-label", label);
+      if (startCaseLabelNode) {
+        startCaseLabelNode.textContent = label;
+      } else {
+        startCaseButton.textContent = label;
+      }
+    }
     const entryParams = new URLSearchParams(window.location.search);
-    const briefingText = sentenceBreakText("“사또님, 관아 근처에서 사람이 쓰러진 채 발견되었습니다.”\n\n당신은 이 꿈에서 고을의 사또입니다. 현장을 조사하고, 증거를 모아 용의자를 심문해야 합니다.");
-    const suspects = window.SAMUNMONG_CONTENT?.suspects || [
+    const themeKey = "samunmong-current-theme";
+    const requestedTheme = entryParams.get("theme");
+    const requestedStart = entryParams.get("start") || "";
+    const isMagicStart = requestedStart.startsWith("magic") || window.location.pathname.startsWith("/magic-");
+    if (requestedTheme === "magicSchool" || requestedTheme === "joseon") {
+      localStorage.setItem(themeKey, requestedTheme);
+    } else if (isMagicStart) {
+      localStorage.setItem(themeKey, "magicSchool");
+    }
+    const activeTheme = localStorage.getItem(themeKey) === "magicSchool" ? "magicSchool" : "joseon";
+    const isMagicTheme = activeTheme === "magicSchool";
+    if (isMagicTheme) startCaseLabel = "조사 시작";
+    document.documentElement.dataset.samunmongTheme = activeTheme;
+    const magicBriefingText = sentenceBreakText("“선생님, 제1 연금술 실습실이 밤새 불탔습니다.”\n\n당신은 이 꿈에서 갓 부임한 마법 교사입니다.\n마력의 시선으로 잔류 마법을 살피고, 학생과 교직원을 심문해 방화의 진범을 찾아야 합니다.");
+    const briefingText = isMagicTheme
+      ? magicBriefingText
+      : sentenceBreakText("“사또님, 관아 근처에서 사람이 쓰러진 채 발견되었습니다.”\n\n당신은 이 꿈에서 고을의 사또입니다. 현장을 조사하고, 증거를 모아 용의자를 심문해야 합니다.");
+    const magicSuspects = [
+      { name: "건달프", id: "gandalf", scene: "/samunmong/assets/magic-school/interrogation/office-empty.png", sprite: "/samunmong/assets/magic-school/interrogation/gandalf-sprite.png", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.png" },
+      { name: "덩쿨도어", id: "dunguldoor", scene: "/samunmong/assets/magic-school/interrogation/office-empty.png", sprite: "/samunmong/assets/magic-school/interrogation/dunguldoor-sprite.png", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.png" },
+      { name: "말포일", id: "malpoil", scene: "/samunmong/assets/magic-school/interrogation/office-empty.png", sprite: "/samunmong/assets/magic-school/interrogation/malpoil-sprite.png", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.png" },
+      { name: "말포이", id: "malpoi", scene: "/samunmong/assets/magic-school/interrogation/office-empty.png", sprite: "/samunmong/assets/magic-school/interrogation/malpoi-sprite.png", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.png" },
+      { name: "말포삼", id: "malposam", scene: "/samunmong/assets/magic-school/interrogation/office-empty.png", sprite: "/samunmong/assets/magic-school/interrogation/malposam-sprite.png", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.png" }
+    ];
+    const suspects = isMagicTheme ? magicSuspects : window.SAMUNMONG_CONTENT?.suspects || [
       { name: "돌쇠", id: "dolsoe", scene: "/samunmong/assets/scene-interrogation-dolsoe.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-dolsoe-sleeve.png?v=sleeve-20260707" },
       { name: "최춘월", id: "chunwol", scene: "/samunmong/assets/scene-interrogation-chunwol.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-chunwol-sleeve.png?v=sleeve-20260707" },
       { name: "유문석", id: "yoomunseok", scene: "/samunmong/assets/scene-interrogation-yoomunseok.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-yoomunseok-sleeve.png?v=sleeve-20260707" },
@@ -58,16 +111,18 @@
     }
 
     let suspectIndex = 0;
-    let activeNoteSuspectId = suspects[0]?.id || "dolsoe";
+    let activeNoteSuspectId = suspects[0]?.id || (isMagicTheme ? "gandalf" : "dolsoe");
     let briefingStepIndex = 0;
+    let briefingRestoreTimer = 0;
     let isBriefingTyped = false;
     const conversationNotes = new Map();
     const sleeveCheckedSuspects = new Set();
     const saveKey = "samunmong-demo-state";
-    const collectedEvidenceKey = "samunmong-collected-evidence";
-    const analyzedEvidenceKey = "samunmong-analyzed-evidence";
-    const conversationNotesKey = "samunmong-conversation-notes";
-    const interrogationQuestionCountKey = "samunmong-interrogation-question-count";
+    const themeStorageSuffix = isMagicTheme ? "magic-school" : "joseon";
+    const collectedEvidenceKey = `samunmong-collected-evidence-${themeStorageSuffix}`;
+    const analyzedEvidenceKey = `samunmong-analyzed-evidence-${themeStorageSuffix}`;
+    const conversationNotesKey = `samunmong-conversation-notes-${themeStorageSuffix}`;
+    const interrogationQuestionCountKey = `samunmong-interrogation-question-count-${themeStorageSuffix}`;
     const fieldGuidePendingKey = "samunmong-field-guide-pending";
     const fieldGuideSeenKey = "samunmong-field-guide-seen";
     const settingsKey = "samunmong-demo-settings";
@@ -77,7 +132,7 @@
     let fieldGuideMapTimer = 0;
     let briefingReturnScreenId = "fieldOne";
 
-    const locationMeta = {
+    const joseonLocationMeta = {
       tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
       dreamScreen: { name: "꿈 선택", x: "18%", y: "18%" },
       briefingScreen: { name: "사건 브리핑", x: "18%", y: "18%" },
@@ -89,6 +144,26 @@
       backGateCourtyard: { name: "뒷문 마당", x: "48%", y: "86%" },
       interrogationScreen: { name: "취조실", x: "73%", y: "78%" }
     };
+    const magicLocationMeta = {
+      tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
+      dreamScreen: { name: "꿈 선택", x: "18%", y: "18%" },
+      briefingScreen: { name: "사건 브리핑", x: "18%", y: "18%" },
+      magicAlchemyLab: { name: "제1 연금술 실습실", x: "23.4%", y: "27.6%" },
+      magicCleaningCloset: { name: "청소도구함", x: "44.0%", y: "27.2%" },
+      magicLibrary: { name: "도서관", x: "65.7%", y: "23.8%" },
+      magicRecordCrystalRoom: { name: "기록 수정구실", x: "78.4%", y: "47.4%" },
+      magicDormHallway: { name: "학생들 기숙사", x: "27.3%", y: "61.0%" },
+      interrogationScreen: { name: "교무 조사실", x: "70.3%", y: "73.6%" }
+    };
+    const locationMeta = isMagicTheme ? magicLocationMeta : joseonLocationMeta;
+    const magicMapPins = [
+      { goTo: "magicAlchemyLab", label: "제1 연금술 실습실로 이동", text: "제1 연금술 실습실", x: "23.4%", y: "27.6%", rot: "0deg" },
+      { goTo: "magicCleaningCloset", label: "청소도구함으로 이동", text: "청소도구함", x: "44.0%", y: "27.2%", rot: "0deg" },
+      { goTo: "magicLibrary", label: "도서관으로 이동", text: "도서관", x: "65.7%", y: "23.8%", rot: "0deg" },
+      { goTo: "magicRecordCrystalRoom", label: "기록 수정구실로 이동", text: "기록 수정구실", x: "78.4%", y: "47.4%", rot: "0deg" },
+      { goTo: "magicDormHallway", label: "학생들 기숙사로 이동", text: "학생들 기숙사", x: "27.3%", y: "61.0%", rot: "0deg" },
+      { goTo: "interrogationScreen", label: "교무 조사실로 이동", text: "교무 조사실", x: "70.3%", y: "73.6%", rot: "0deg" }
+    ];
     const soundBase = "/samunmong/sound";
     const bgmTracks = {
       main: document.querySelector("#mainBgm") || new Audio(`${soundBase}/bgm/main.mp3`),
@@ -376,21 +451,120 @@
 
     function stopBriefingTyping() {
       clearInterval(typeBriefing.timer);
+      clearTimeout(typeBriefing.decodeTimer);
+      clearTimeout(briefingRestoreTimer);
+    }
+
+    function finishBriefingTyping() {
+      clearInterval(typeBriefing.timer);
+      clearTimeout(typeBriefing.decodeTimer);
+      if (briefingCopy) {
+        briefingCopy.textContent = briefingText;
+        briefingCopy.classList.add("done");
+        briefingCopy.classList.remove("rune-decoding");
+      }
+      isBriefingTyped = true;
+      updateBriefingStep();
+    }
+
+    function makeRunePreview(text) {
+      const runes = ["ᚱ", "ᚢ", "ᚾ", "ᛖ", "ᛗ", "ᚨ", "ᚾ", "ᚨ", "ᛟ", "ᚲ"];
+      let runeIndex = 0;
+      return [...text].map((char) => {
+        if (char === "\n" || /\s/.test(char)) return char;
+        runeIndex += 1;
+        return runes[runeIndex % runes.length];
+      }).join("");
+    }
+
+    function resetMemoryTrace() {
+      memoryTraceComplete = false;
+      memoryTracePoints = [];
+      clearInterval(memoryTraceTypingTimer);
+      memoryTraceSequence?.setAttribute("data-memory-trace-state", "intro");
+      if (memoryDrawPath) memoryDrawPath.setAttribute("d", "");
+      memoryTraceEvidenceNodes.forEach((node) => node.classList.remove("revealed"));
+      if (memoryTraceInstruction) {
+        memoryTraceInstruction.textContent = "지팡이를 이용해 원을 그려 사건의 잔상을 확인하세요.";
+      }
+      if (memoryTraceCopy) memoryTraceCopy.textContent = "";
+      if (memoryTraceContinue) memoryTraceContinue.disabled = true;
+    }
+
+    function typeMemoryTraceStory() {
+      const story = [
+        "선생님께서 처음 이 학교에 부임하셨을 때...",
+        "제1 연금술 실습실에서 좋지 않은 사건이 발생했다고 합니다.",
+        "흩어진 잔상 속 단서들을 따라, 그 사건의 진실을 밝혀야 합니다."
+      ].join("\n\n");
+      let index = 0;
+      clearInterval(memoryTraceTypingTimer);
+      if (memoryTraceCopy) memoryTraceCopy.textContent = "";
+      if (memoryTraceContinue) memoryTraceContinue.disabled = true;
+      memoryTraceTypingTimer = window.setInterval(() => {
+        index += 1;
+        if (memoryTraceCopy) memoryTraceCopy.textContent = story.slice(0, index);
+        if (index >= story.length) {
+          clearInterval(memoryTraceTypingTimer);
+          if (memoryTraceContinue) memoryTraceContinue.disabled = false;
+        }
+      }, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 28);
+    }
+
+    function completeMemoryTrace() {
+      if (memoryTraceComplete) return;
+      memoryTraceComplete = true;
+      memoryTraceSequence?.setAttribute("data-memory-trace-state", "complete");
+      memoryTraceEvidenceNodes.forEach((node, index) => {
+        setTimeout(() => node.classList.add("revealed"), index * 180);
+      });
+      if (memoryTraceInstruction) {
+        memoryTraceInstruction.textContent = "잔상이 떠오르고 있습니다...";
+      }
+      setTimeout(typeMemoryTraceStory, 1150);
+    }
+
+    function updateMemoryDrawPath() {
+      if (!memoryDrawPath || memoryTracePoints.length < 2) return;
+      const d = memoryTracePoints.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
+      memoryDrawPath.setAttribute("d", d);
+    }
+
+    function getMemoryDrawPoint(event) {
+      const rect = memoryDrawZone?.getBoundingClientRect();
+      if (!rect) return null;
+      return {
+        x: ((event.clientX - rect.left) / rect.width) * 100,
+        y: ((event.clientY - rect.top) / rect.height) * 100
+      };
+    }
+
+    function isMemoryCircleComplete() {
+      if (memoryTracePoints.length < 28) return false;
+      const first = memoryTracePoints[0];
+      const last = memoryTracePoints[memoryTracePoints.length - 1];
+      const closeDistance = Math.hypot(first.x - last.x, first.y - last.y);
+      const xs = memoryTracePoints.map((point) => point.x);
+      const ys = memoryTracePoints.map((point) => point.y);
+      const width = Math.max(...xs) - Math.min(...xs);
+      const height = Math.max(...ys) - Math.min(...ys);
+      return closeDistance < 16 && width > 36 && height > 28;
     }
 
     function setBriefingMode(mode = "full") {
       const journalMode = mode === "deathOnly";
       briefingCard?.classList.toggle("journal-mode", journalMode);
       briefingCard?.setAttribute("data-briefing-mode", journalMode ? "deathOnly" : "full");
-      if (startCaseButton) {
-        startCaseButton.textContent = journalMode ? "닫기" : startCaseLabel;
-      }
+      setStartCaseLabel(journalMode ? "닫기" : startCaseLabel);
     }
 
     function updateBriefingStep() {
       const lastIndex = Math.max(0, briefingPanels.length - 1);
       const journalMode = briefingCard?.dataset.briefingMode === "deathOnly";
       briefingStepIndex = Math.max(0, Math.min(lastIndex, briefingStepIndex));
+      if (isMagicTheme && !journalMode && briefingStepIndex === 1) {
+        briefingStepIndex = 2;
+      }
       briefingCard?.setAttribute("data-briefing-step", String(briefingStepIndex));
 
       briefingPanels.forEach((panel) => {
@@ -405,7 +579,13 @@
       }
       if (briefingNextButton) {
         briefingNextButton.hidden = journalMode || briefingStepIndex === lastIndex;
-        briefingNextButton.disabled = !journalMode && briefingStepIndex === 0 && !isBriefingTyped;
+        briefingNextButton.disabled = !journalMode && briefingStepIndex === 0 && briefingScreen?.classList.contains("awaiting-memory-orb");
+        if (isMagicTheme && !journalMode && briefingStepIndex < lastIndex && !briefingScreen?.classList.contains("awaiting-memory-orb")) {
+          briefingNextButton.hidden = false;
+        }
+        if (isMagicTheme && !journalMode && briefingStepIndex === 0) {
+          briefingNextButton.hidden = true;
+        }
       }
       if (startCaseButton) {
         startCaseButton.hidden = !journalMode && briefingStepIndex !== lastIndex;
@@ -418,16 +598,48 @@
       setBriefingMode(mode);
       briefingStepIndex = journalMode ? Math.min(1, Math.max(0, briefingPanels.length - 1)) : 0;
       isBriefingTyped = journalMode;
+      stopBriefingTyping();
+      briefingScreen?.classList.remove("memory-restoring", "memory-restored");
+      briefingScreen?.classList.toggle("awaiting-memory-orb", isMagicTheme && !journalMode);
+      if (memoryOrbTrigger) {
+        memoryOrbTrigger.disabled = false;
+      }
       updateBriefingStep();
       if (journalMode) {
-        stopBriefingTyping();
         if (briefingCopy) {
           briefingCopy.textContent = "";
           briefingCopy.classList.add("done");
         }
+      } else if (isMagicTheme) {
+        if (briefingCopy) {
+          briefingCopy.textContent = "";
+          briefingCopy.classList.remove("done", "rune-decoding");
+        }
+        resetMemoryTrace();
       } else {
         typeBriefing();
       }
+    }
+
+    function beginMemoryRestoration() {
+      if (!isMagicTheme || briefingCard?.dataset.briefingMode === "deathOnly") return;
+      if (!briefingScreen?.classList.contains("awaiting-memory-orb")) return;
+      stopBriefingTyping();
+      memoryOrbTrigger?.setAttribute("disabled", "true");
+      briefingScreen.classList.remove("awaiting-memory-orb");
+      briefingScreen.classList.remove("memory-restored");
+      briefingScreen.classList.add("memory-restoring");
+      playSfx("briefingNext", 0.75);
+      briefingRestoreTimer = window.setTimeout(() => {
+        briefingScreen.classList.remove("memory-restoring");
+        briefingScreen.classList.remove("awaiting-memory-orb");
+        briefingScreen.classList.add("memory-restored");
+        if (isMagicTheme) {
+          finishBriefingTyping();
+        } else {
+          typeBriefing();
+        }
+      }, 2600);
     }
 
     function applySettings(settings) {
@@ -499,10 +711,10 @@
       if (target.dataset.guide) return target.dataset.guide;
       if (buttonGuideTextById[target.id]) return buttonGuideTextById[target.id];
       if (target.matches(".map-chip")) return "조사 장소를 오갑니다.";
-      if (target.matches(".bag-chip")) return "모은 증거를 확인합니다.";
-      if (target.matches(".tool-chip")) return "증거를 더 자세히 분석합니다.";
+      if (target.matches(".bag-chip")) return isMagicTheme ? "차원 주머니 속 증거를 불러옵니다." : "모은 증거를 확인합니다.";
+      if (target.matches(".tool-chip")) return isMagicTheme ? "마력 감지로 잔류 흔적을 분석합니다." : "증거를 더 자세히 분석합니다.";
       if (target.matches(".note-chip")) return "등장인물과 나눈 대화를 기록합니다.";
-      if (target.matches(".journal-chip")) return "처음 사건 일지를 다시 봅니다.";
+      if (target.matches(".journal-chip")) return isMagicTheme ? "기억 수정구로 사건의 잔상을 복원합니다." : "처음 사건 일지를 다시 봅니다.";
       if (target.matches(".room-chip")) return target.getAttribute("aria-current") === "page" ? "현재 위치입니다." : "취조실로 이동합니다.";
       if (target.matches(".scene-hint")) return "남은 단서 위치를 잠깐 밝힙니다.";
       if (target.matches(".map-pin-button")) return target.getAttribute("aria-label") || "해당 장소로 이동합니다.";
@@ -515,16 +727,57 @@
       if (!element || !target || !shell) return;
       const shellRect = shell.getBoundingClientRect();
       const targetRect = target.getBoundingClientRect();
-      const centerX = targetRect.left + targetRect.width / 2 - shellRect.left;
-      const targetTop = targetRect.top - shellRect.top;
-      const targetBottom = targetRect.bottom - shellRect.top;
-      const guideHalfWidth = Math.min(150, Math.max(96, shellRect.width * .36));
-      const left = Math.max(guideHalfWidth, Math.min(shellRect.width - guideHalfWidth, centerX));
-      const showBelow = targetTop < 130;
-      const top = showBelow ? targetBottom + 8 : targetTop - 8;
+      const scale = shellRect.width / (shell.offsetWidth || shellRect.width) || 1;
+      const shellWidth = shell.offsetWidth || shellRect.width;
+      const shellHeight = shell.offsetHeight || shellRect.height;
+      const targetLeft = (targetRect.left - shellRect.left) / scale;
+      const targetRight = (targetRect.right - shellRect.left) / scale;
+      const targetTop = (targetRect.top - shellRect.top) / scale;
+      const targetBottom = (targetRect.bottom - shellRect.top) / scale;
+      const centerX = targetLeft + (targetRight - targetLeft) / 2;
+      const centerY = targetTop + (targetBottom - targetTop) / 2;
+      const guideWidth = Math.min(300, Math.max(210, String(element.textContent || "").length * 13 + 44));
+      const guideHeight = Math.max(54, Math.min(112, Math.ceil(String(element.textContent || "").length / 15) * 22 + 22));
+      const margin = 18;
+      const gap = 18;
+      const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
+      const fitsRight = targetRight + gap + guideWidth <= shellWidth - margin;
+      const fitsLeft = targetLeft - gap - guideWidth >= margin;
+      const fitsBottom = targetBottom + gap + guideHeight <= shellHeight - margin;
+      const fitsTop = targetTop - gap - guideHeight >= margin;
+      let placement = "top";
+      let left = centerX;
+      let top = targetTop - gap;
+
+      if (targetRight > shellWidth * .68 && fitsLeft) {
+        placement = "left";
+        left = targetLeft - gap;
+        top = clamp(centerY, margin + guideHeight / 2, shellHeight - margin - guideHeight / 2);
+      } else if (targetLeft < shellWidth * .32 && fitsRight) {
+        placement = "right";
+        left = targetRight + gap;
+        top = clamp(centerY, margin + guideHeight / 2, shellHeight - margin - guideHeight / 2);
+      } else if (!fitsTop && fitsBottom) {
+        placement = "bottom";
+        left = clamp(centerX, margin + guideWidth / 2, shellWidth - margin - guideWidth / 2);
+        top = targetBottom + gap;
+      } else if (fitsTop) {
+        placement = "top";
+        left = clamp(centerX, margin + guideWidth / 2, shellWidth - margin - guideWidth / 2);
+        top = targetTop - gap;
+      } else if (fitsBottom) {
+        placement = "bottom";
+        left = clamp(centerX, margin + guideWidth / 2, shellWidth - margin - guideWidth / 2);
+        top = targetBottom + gap;
+      } else {
+        placement = "right";
+        left = clamp(targetRight + gap, margin + guideWidth / 2, shellWidth - margin - guideWidth / 2);
+        top = clamp(centerY, margin + guideHeight / 2, shellHeight - margin - guideHeight / 2);
+      }
+
       element.style.setProperty("--guide-left", `${left}px`);
       element.style.setProperty("--guide-top", `${top}px`);
-      element.dataset.placement = showBelow ? "bottom" : "top";
+      element.dataset.placement = placement;
     }
 
     function hideGuideElement(element) {
@@ -624,6 +877,167 @@
       });
     }
 
+    function applyMagicMap() {
+      if (!isMagicTheme) return;
+      const mapImage = document.querySelector("#mapPanel .map-board img");
+      if (mapImage) {
+        mapImage.src = "/samunmong/assets/magic-school/ui/school-map.png";
+        mapImage.alt = "마법학교 조사 장소가 표시된 학교 지도";
+      }
+
+      const labels = [...document.querySelectorAll(".map-label")];
+      const pins = [...document.querySelectorAll(".map-pin-button")];
+      magicMapPins.forEach((item, index) => {
+        const label = labels[index];
+        if (label) {
+          label.textContent = item.text;
+          label.dataset.locationScreen = item.goTo;
+          label.style.setProperty("--x", item.x);
+          label.style.setProperty("--y", `calc(${item.y} - 12%)`);
+          label.style.setProperty("--rot", item.rot);
+        }
+        const pin = pins[index];
+        if (pin) {
+          pin.dataset.mapGo = item.goTo;
+          pin.setAttribute("aria-label", item.label);
+          pin.style.setProperty("--x", item.x);
+          pin.style.setProperty("--y", item.y);
+        }
+      });
+
+      labels.slice(magicMapPins.length).forEach((label) => { label.hidden = true; });
+      pins.slice(magicMapPins.length).forEach((pin) => { pin.hidden = true; });
+    }
+
+    function applyMagicUiCopies() {
+      if (!isMagicTheme) return;
+
+      document.querySelector(".briefing-card h2").textContent = "마법학교 방화사건";
+      document.querySelector(".briefing-kicker").textContent = "기억 수정구";
+      setStartCaseLabel("조사 시작");
+      document.querySelector("[data-briefing-panel='1'] .briefing-caption").textContent = "실습실의 불은 어떻게 번졌는가";
+
+      const evidenceStack = document.querySelector(".briefing-evidence-stack");
+      if (evidenceStack) {
+        evidenceStack.innerHTML = `
+          <figure class="briefing-evidence-photo">
+            <img src="/samunmong/assets/magic-school/scenes/alchemy-lab.png" alt="불탄 제1 연금술 실습실" draggable="false" />
+            <figcaption>현장: 제1 연금술 실습실</figcaption>
+          </figure>
+          <figure class="briefing-evidence-photo briefing-evidence-photo-small">
+            <img src="/samunmong/assets/magic-school/evidence/evidence-sheet.png" alt="마법학교 방화 사건 증거품" draggable="false" />
+            <figcaption>단서: 잔류 마력 증거</figcaption>
+          </figure>
+        `;
+      }
+
+      const deathCopy = document.querySelector(".briefing-death-copy");
+      if (deathCopy) {
+        deathCopy.innerHTML = `
+          <p>선생님, 불길은 꺼졌지만 실습실에는 <strong>붉은 화염 마력</strong>과 <strong>하늘색 빙결 마력</strong>이 함께 남아 있습니다.</p>
+          <p>경보 룬스톤은 얼어붙었고, 기록 수정구에는 <strong>보라색 환각층</strong>이 덧씌워져 있었습니다.</p>
+          <p>범인은 먼저 경보와 기록을 무력화한 뒤 말포이에게 의심이 가도록 흔적을 남긴 듯합니다.</p>
+        `;
+      }
+
+      const suspectCaption = document.querySelector("[data-briefing-panel='2'] .briefing-caption");
+      if (suspectCaption) suspectCaption.textContent = "세 권의 기록 책을 차례로 펼쳐 보십시오, 선생님.";
+
+      const suspectGrid = document.querySelector(".briefing-suspect-tags");
+      if (suspectGrid && !magicRecordIntro) {
+        const roles = {
+          gandalf: "경비원",
+          dunguldoor: "학년부장",
+          malpoil: "모범생",
+          malpoi: "천재 학생",
+          malposam: "환각 마법 학생"
+        };
+        suspectGrid.innerHTML = magicSuspects.map((suspect) => `
+          <section class="briefing-suspect-tag magic-suspect-tag" data-suspect="${suspect.name}">
+            <img src="${suspect.sprite || suspect.scene}" alt="" draggable="false" />
+            <div>
+              <strong>${suspect.name}</strong>
+              <span>${roles[suspect.id]}</span>
+            </div>
+          </section>
+        `).join("");
+      }
+
+      const toolCopy = {
+        openMapFromInterrogation: ["학교 지도 열기", "학교 지도", "/samunmong/assets/magic-school/ui/icon-school-map.png"],
+        openNoteProp: ["수사 일지 보기", "수사 일지", "/samunmong/assets/magic-school/ui/icon-investigation-journal.png"],
+        toggleEvidenceBag: ["마법 가방 열기", "마법 가방", "/samunmong/assets/magic-school/ui/icon-magic-bag.png"]
+      };
+      Object.entries(toolCopy).forEach(([id, [ariaLabel, label, image]]) => {
+        const button = document.querySelector(`#${id}`);
+        button?.setAttribute("aria-label", ariaLabel);
+        const icon = button?.querySelector("img");
+        if (icon) icon.src = image;
+        const sr = button?.querySelector(".sr-only");
+        if (sr) sr.textContent = label;
+      });
+      const toolChip = document.querySelector("#interrogationScreen .tool-chip.open-tool-panel img");
+      if (toolChip) toolChip.src = "/samunmong/assets/magic-school/ui/icon-mana-tools.png";
+      const journalChip = document.querySelector("#interrogationScreen .journal-chip img");
+      if (journalChip) journalChip.src = "/samunmong/assets/magic-school/ui/icon-investigation-journal.png";
+      const interrogationJournalChip = document.querySelector("#interrogationScreen .journal-chip");
+      interrogationJournalChip?.setAttribute("aria-label", "기억 수정구 열기");
+      const interrogationJournalLabel = interrogationJournalChip?.querySelector(".sr-only");
+      if (interrogationJournalLabel) interrogationJournalLabel.textContent = "기억 수정구";
+      document.querySelectorAll(".magic-school-screen .journal-chip .magic-scene-chip-label").forEach((label) => {
+        label.textContent = "기억 수정구";
+      });
+      const accuseChip = document.querySelector("#accuseButton img");
+      if (accuseChip) accuseChip.src = "/samunmong/assets/magic-school/ui/icon-final-accuse.png";
+      const hintChip = document.querySelector("#interrogationHint img");
+      if (hintChip) hintChip.src = "/samunmong/assets/magic-school/ui/icon-mana-hint.png";
+      const hintLabel = document.querySelector("#interrogationHint .sr-only");
+      if (hintLabel) hintLabel.textContent = "마력 감지";
+      document.querySelector("#evidenceBagPop .bag-pop-head strong").textContent = "차원 주머니";
+      const bagGuide = document.querySelector("#evidenceBagPop .bag-pop-guide");
+      if (bagGuide) bagGuide.textContent = "차원 주머니에서 떠오른 증거를 선택해 심문에 제시합니다.";
+      const emptyBag = document.querySelector("#emptyInterrogationEvidence");
+      if (emptyBag) emptyBag.textContent = "차원 주머니에 떠오른 증거가 없습니다.";
+      document.querySelector("#toolPanel h2").textContent = "마력 도구";
+      document.querySelector("#toolPanel .tool-panel-kicker").textContent = "마력 분석";
+      const toolPanelLead = document.querySelector("#toolPanel > p");
+      if (toolPanelLead) toolPanelLead.textContent = "마력 도구를 먼저 고른 뒤 증거를 선택하면 잔류 마법의 의미를 확인할 수 있습니다.";
+      document.querySelectorAll(".investigation-note-panel h2").forEach((heading) => {
+        heading.textContent = "수사 일지";
+      });
+      document.querySelectorAll(".note-lead").forEach((lead) => {
+        lead.textContent = "관계자별 질문과 답변을 대화처럼 확인합니다.";
+      });
+      document.querySelectorAll(".note-current-suspect").forEach((item) => {
+        item.textContent = magicSuspects[0]?.name || "건달프";
+      });
+    }
+
+    function setMagicRecordTab(tabName) {
+      if (!magicRecordIntro) return;
+      magicRecordIntro.dataset.recordKind = tabName;
+      updateMagicStudentPage(Number(tabName) || 0);
+    }
+
+    function updateMagicStudentPage(nextIndex) {
+      if (!magicStudentPages.length) return;
+      const total = magicStudentPages.length;
+      magicStudentPageIndex = (nextIndex + total) % total;
+      magicStudentPages.forEach((page, index) => {
+        const isActive = index === magicStudentPageIndex;
+        page.classList.toggle("active", isActive);
+        page.setAttribute("aria-hidden", String(!isActive));
+      });
+      magicRecordTabs.forEach((tab, index) => {
+        const isActive = index === magicStudentPageIndex;
+        tab.classList.toggle("active", isActive);
+        tab.setAttribute("aria-selected", String(isActive));
+      });
+      if (magicStudentPageIndicator) {
+        magicStudentPageIndicator.textContent = `${magicStudentPageIndex + 1} / ${total}`;
+      }
+    }
+
     function getActiveScreenId() {
       return document.querySelector(".screen.active")?.id || "mainScreen";
     }
@@ -709,7 +1123,7 @@
     const loadingDuration = 2600;
     const themeStartLoadingDuration = 4200;
     const themeStartMaxWait = 9000;
-    const themeStartAssets = [
+    const joseonThemeStartAssets = [
       "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png",
       "/samunmong/assets/mudeok-interaction/evidence-jeomsun-hand-exam-paper.png",
       "/samunmong/assets/suspects/dolsoe-seated.png",
@@ -717,14 +1131,40 @@
       "/samunmong/assets/suspects/yoomunseok-seated.png",
       "/samunmong/assets/suspects/mudeok-seated.png"
     ];
+    const magicThemeStartAssets = [
+      "/samunmong/assets/magic-school/scenes/alchemy-lab.png",
+      "/samunmong/assets/magic-school/scenes/cleaning-closet.png",
+      "/samunmong/assets/magic-school/scenes/library.png",
+      "/samunmong/assets/magic-school/interrogation/gandalf.png",
+      "/samunmong/assets/magic-school/interrogation/dunguldoor.png",
+      "/samunmong/assets/magic-school/interrogation/malpoil.png",
+      "/samunmong/assets/magic-school/interrogation/malpoi.png",
+      "/samunmong/assets/magic-school/interrogation/malposam.png"
+    ];
+    const themeStartAssets = isMagicTheme ? magicThemeStartAssets : joseonThemeStartAssets;
+    const magicLoadingArtwork =
+      "url('/samunmong/assets/magic-school/loading/magic-transition-bg.png') center / cover no-repeat, #050403";
+
+    function setLoadingArtwork() {
+      if (!fade) return;
+      fade.classList.remove("magic-rune-transition");
+      if (isMagicTheme) {
+        fade.style.background = magicLoadingArtwork;
+      } else {
+        fade.style.removeProperty("background");
+      }
+    }
 
     function showLoading(message = "이동 중...") {
+      setLoadingArtwork();
       fade?.classList.add("show");
       if (fade) fade.textContent = message;
     }
 
     function hideLoading() {
       fade?.classList.remove("show");
+      fade?.classList.remove("magic-rune-transition");
+      fade?.style.removeProperty("background");
     }
 
     function preloadImage(src) {
@@ -798,6 +1238,7 @@
       stopBriefingTyping();
       document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
       playSfx("briefingNext", 0.9);
+      setLoadingArtwork();
       fade?.classList.add("show");
       if (fade) fade.textContent = message;
       fade?.classList.add("long");
@@ -824,13 +1265,17 @@
       if (!briefingCopy) return;
       briefingCopy.textContent = "";
       briefingCopy.classList.remove("done");
+      briefingCopy.classList.toggle("rune-decoding", isMagicTheme);
       isBriefingTyped = false;
       updateBriefingStep();
       let index = 0;
       const speed = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 32;
 
       clearInterval(typeBriefing.timer);
-      typeBriefing.timer = setInterval(() => {
+      clearTimeout(typeBriefing.decodeTimer);
+
+      const writeDecodedText = () => {
+        typeBriefing.timer = setInterval(() => {
         briefingCopy.textContent = briefingText.slice(0, index);
         if (briefingText[index] && !/\s/.test(briefingText[index]) && index % 3 === 0) {
           playTypeSfx();
@@ -840,15 +1285,27 @@
         if (index > briefingText.length) {
           clearInterval(typeBriefing.timer);
           briefingCopy.classList.add("done");
+          briefingCopy.classList.remove("rune-decoding");
           isBriefingTyped = true;
           updateBriefingStep();
         }
-      }, speed || 1);
+        }, speed || 1);
+      };
+
+      if (isMagicTheme) {
+        briefingCopy.textContent = makeRunePreview(briefingText);
+        typeBriefing.decodeTimer = window.setTimeout(() => {
+          briefingCopy.textContent = "";
+          writeDecodedText();
+        }, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 1 : 720);
+      } else {
+        writeDecodedText();
+      }
     }
 
     function showInitialScreenFromSetup() {
       const startScreen = entryParams.get("start") || document.querySelector(".game-shell")?.dataset.startScreen;
-      const allowedScreens = new Set(["tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne", "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters", "backGateCourtyard", "interrogationScreen"]);
+      const allowedScreens = new Set(["tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne", "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters", "backGateCourtyard", "magicAlchemyLab", "magicCleaningCloset", "magicLibrary", "magicRecordCrystalRoom", "magicDormHallway", "interrogationScreen"]);
 
       if (!allowedScreens.has(startScreen)) {
         return;
@@ -863,8 +1320,6 @@
           "꿈은 아직 끝나지 않았습니다",
           "첫 번째 꿈은 멀어졌지만, 남은 두 꿈은 아직 당신을 부르고 있습니다."
         );
-      } else {
-        showToast("선택한 설정으로 사건을 시작합니다.");
       }
     }
 
@@ -888,6 +1343,10 @@
     const exitDialog = document.querySelector("#exitDialog");
     const defaultSettings = { volume: 70, reduceMotion: false, highContrast: false };
     applySettings({ ...defaultSettings, ...readStored(settingsKey, {}) });
+    applyMagicMap();
+    applyMagicUiCopies();
+    setMagicRecordTab("0");
+    updateMagicStudentPage(0);
     updateContinueButtonState();
     updateInterrogationQuestionLimitUI();
     updateBgmForScreen();
@@ -969,7 +1428,12 @@
       });
     });
     on("#chooseJoseon", "click", () => {
-      goAfterPreload("briefingScreen", themeStartAssets, {
+      localStorage.setItem(themeKey, "joseon");
+      if (isMagicTheme) {
+        window.location.href = "/?start=briefingScreen&theme=joseon";
+        return;
+      }
+      goAfterPreload("briefingScreen", joseonThemeStartAssets, {
         sfx: "dream",
         volume: 0.9,
         minDuration: themeStartLoadingDuration,
@@ -977,30 +1441,97 @@
         after: () => startBriefingSequence("full")
       });
     });
-    on("#briefingPrev", "click", () => {
-      briefingStepIndex -= 1;
+    on("#chooseMagicSchool", "click", () => {
+      localStorage.setItem(themeKey, "magicSchool");
+      window.location.href = "/?start=briefingScreen&theme=magicSchool";
+    });
+    on("#memoryOrbTrigger", "click", beginMemoryRestoration);
+    document.addEventListener("click", (event) => {
+      const clickTarget = event.target instanceof Element ? event.target : event.target?.parentElement;
+      const recordTab = clickTarget?.closest("[data-record-card-tab]");
+      if (!recordTab) return;
+      setMagicRecordTab(recordTab.dataset.recordCardTab || "0");
+    });
+    magicStudentPrevButton?.addEventListener("click", () => updateMagicStudentPage(magicStudentPageIndex - 1));
+    magicStudentNextButton?.addEventListener("click", () => updateMagicStudentPage(magicStudentPageIndex + 1));
+
+    memoryDrawZone?.addEventListener("pointerdown", (event) => {
+      if (memoryTraceComplete) return;
+      event.preventDefault();
+      memoryTraceSequence?.setAttribute("data-memory-trace-state", "drawing");
+      memoryTracePoints = [];
+      const point = getMemoryDrawPoint(event);
+      if (point) memoryTracePoints.push(point);
+      updateMemoryDrawPath();
+      memoryDrawZone.setPointerCapture?.(event.pointerId);
+    });
+
+    memoryDrawZone?.addEventListener("pointermove", (event) => {
+      if (memoryTraceComplete || !memoryDrawZone.hasPointerCapture?.(event.pointerId)) return;
+      const point = getMemoryDrawPoint(event);
+      if (!point) return;
+      memoryTracePoints.push(point);
+      updateMemoryDrawPath();
+      if (isMemoryCircleComplete()) completeMemoryTrace();
+    });
+
+    memoryDrawZone?.addEventListener("pointerup", (event) => {
+      if (memoryDrawZone.hasPointerCapture?.(event.pointerId)) {
+        memoryDrawZone.releasePointerCapture(event.pointerId);
+      }
+      if (!memoryTraceComplete && isMemoryCircleComplete()) {
+        completeMemoryTrace();
+      }
+    });
+
+    memoryTraceContinue?.addEventListener("click", () => {
+      briefingStepIndex = 2;
       updateBriefingStep();
     });
-    on("#briefingNext", "click", () => {
-      if (briefingStepIndex === 0 && !isBriefingTyped) return;
-      briefingStepIndex += 1;
-      updateBriefingStep();
+
+    document.addEventListener("click", (event) => {
+      const clickTarget = event.target instanceof Element ? event.target : event.target?.parentElement;
+      if (clickTarget?.closest("[data-briefing-prev-zone]")) {
+        event.preventDefault();
+        briefingStepIndex = isMagicTheme && briefingStepIndex === 2 ? 0 : briefingStepIndex - 1;
+        updateBriefingStep();
+        return;
+      }
+      if (clickTarget?.closest("[data-briefing-next-zone]")) {
+        event.preventDefault();
+        briefingStepIndex = isMagicTheme && briefingStepIndex === 0 ? 2 : briefingStepIndex + 1;
+        updateBriefingStep();
+        return;
+      }
+      if (clickTarget?.closest("#briefingPrev")) {
+        briefingStepIndex = isMagicTheme && briefingStepIndex === 2 ? 0 : briefingStepIndex - 1;
+        updateBriefingStep();
+        return;
+      }
+      if (clickTarget?.closest("#briefingNext")) {
+        if (briefingStepIndex === 0 && !isBriefingTyped) {
+          finishBriefingTyping();
+          return;
+        }
+        briefingStepIndex = isMagicTheme && briefingStepIndex === 0 ? 2 : briefingStepIndex + 1;
+        updateBriefingStep();
+      }
     });
     on("#startCase", "click", () => {
       if (briefingCard?.dataset.briefingMode === "deathOnly") {
         const returnScreen = screens.some((screen) => screen.id === briefingReturnScreenId)
           ? briefingReturnScreenId
-          : "fieldOne";
+          : (isMagicTheme ? "magicAlchemyLab" : "fieldOne");
         go(returnScreen, "사건 일지를 덮는 중...");
         return;
       }
 
-      if (hasSeenFieldGuide()) {
+      if (isMagicTheme || hasSeenFieldGuide()) {
         sessionStorage.removeItem(fieldGuidePendingKey);
       } else {
         sessionStorage.setItem(fieldGuidePendingKey, "1");
       }
-      goRush("fieldOne", "현장으로 이동 중...");
+      goRush(isMagicTheme ? "magicAlchemyLab" : "fieldOne", isMagicTheme ? "실습실로 이동 중..." : "현장으로 이동 중...");
     });
     on("#nextFieldGuide", "click", () => {
       if (fieldGuideStep === "map-click") {
@@ -1038,7 +1569,104 @@
     let swipeStartPoint = null;
     const TOOL_NEEDED_HINT = "특정 도구를 이용해 자세히 알아봐야 할 것 같다.";
 
-    const tools = {
+    const magicTools = {
+      "마력의 시선": {
+        img: "/samunmong/assets/magic-school/ui/tool-mana-vision.png",
+        note: "증거 주변에 남은 마력을 색으로 드러냅니다."
+      },
+      "잔류 마력 렌즈": {
+        img: "/samunmong/assets/magic-school/ui/tool-residue-lens.png",
+        note: "책, 룬스톤, 수정구에 남은 미세한 마력 결을 확대합니다."
+      },
+      "룬 해독 펜": {
+        img: "/samunmong/assets/magic-school/ui/tool-rune-pen.png",
+        note: "보안 룬과 기록 수정구의 조작 흔적을 해독합니다."
+      }
+    };
+
+    const magicEvidenceData = {
+      "부러진 지팡이": {
+        note: "실습실 바닥에서 발견된 지팡이 조각. 붉은 화염 마력이 남아 있어 말포이를 범인처럼 보이게 한다.",
+        location: "제1 연금술 실습실",
+        logic: "말포이는 지팡이를 자주 부수는 학생이라 초반 의심을 받지만, 이 지팡이가 직접 버린 것인지 누가 주워 쓴 것인지 확인해야 한다.",
+        relatedSuspects: ["말포이", "말포일"],
+        img: "/samunmong/assets/magic-school/evidence-cutouts/broken-wand.png",
+        tool: "마력의 시선",
+        toolResult: "붉은 마력이 선명하지만, 손잡이 주변의 잔류 마력은 최근 사용자의 것과 섞여 있다.\n말포이의 지팡이처럼 보이지만 누군가 주워 다시 쓴 흔적이 있다."
+      },
+      "화염 감지 룬스톤": {
+        note: "화재를 알려야 할 룬스톤이 꺼져 있다. 표면에는 성에와 하늘색 빙결 마력이 남아 있다.",
+        location: "제1 연금술 실습실",
+        logic: "화재 경보가 울리지 않은 이유를 설명하는 수법 단서다. 섬세한 빙결 마법을 못 쓰는 말포이와 맞지 않는다.",
+        relatedSuspects: ["말포이", "말포일"],
+        img: "/samunmong/assets/magic-school/evidence-cutouts/fire-rune-stone.png",
+        tool: "룬 해독 펜",
+        toolResult: "룬의 공명선이 얼음 원소에 눌려 끊겨 있다.\n화재가 난 뒤 꺼진 것이 아니라, 불이 번지기 전에 먼저 무력화된 상태다."
+      },
+      "기록의 수정구": {
+        note: "복도 기록이 아무 일 없는 장면으로 덮여 있다. 보라색 환각 마력이 수정구 안쪽에서 흐른다.",
+        location: "제1 연금술 실습실",
+        logic: "누군가 현장 출입 기록을 환각으로 덮었다. 환각 마법을 다루는 말포삼과 연결된다.",
+        relatedSuspects: ["말포삼", "말포일"],
+        img: "/samunmong/assets/magic-school/evidence-cutouts/record-crystal.png",
+        tool: "룬 해독 펜",
+        toolResult: "기록 자체가 사라진 것이 아니라, 환각층이 위에 덧씌워져 있다.\n환각 마법을 건 사람과 지시한 사람을 따로 확인해야 한다."
+      },
+      "금지된 마법 담배 재": {
+        note: "청소도구함에서 발견된 초록 마력의 재와 환각 환타지아 잎. 덩쿨도어가 숨긴 알리바이 단서다.",
+        location: "청소도구함",
+        logic: "덩쿨도어는 현장 근처에 있었고 탄 냄새가 났지만, 실제로는 금지된 마법 담배를 피우고 있었다.",
+        relatedSuspects: ["덩쿨도어"],
+        img: "/samunmong/assets/magic-school/evidence-cutouts/magic-cigarette-ash.png",
+        tool: "마력의 시선",
+        toolResult: "초록 마력이 재 주변에만 둥글게 남아 있다.\n방화의 붉은 마력과 결이 달라, 덩쿨도어의 탄 냄새는 담배 쪽에 가깝다."
+      },
+      "도서관 대출 기록부": {
+        note: "말포일의 이름으로 보안 마법 책이 대출된 기록. 건달프의 도서관 힌트와 이어진다.",
+        location: "도서관",
+        logic: "말포일이 화염 감지 룬스톤의 약점을 미리 조사했다는 정황이다.",
+        relatedSuspects: ["말포일"],
+        img: "/samunmong/assets/magic-school/evidence-cutouts/library-loan-ledger.png",
+        tool: "잔류 마력 렌즈",
+        toolResult: "기록부의 해당 줄 주변에 말포일이 자주 쓰는 잉크와 같은 보라빛 먼지가 남아 있다.\n책을 빌린 사실을 단순한 우연으로 보기 어렵다."
+      },
+      "빙결 흔적이 남은 반납 도서": {
+        note: "보안 마법 책 표지에 룬스톤과 같은 하늘색 빙결 흔적이 남아 있다.",
+        location: "도서관",
+        logic: "말포일이 책 지식으로 룬스톤 무력화를 연습했다는 수법 단서다.",
+        relatedSuspects: ["말포일", "말포이"],
+        img: "/samunmong/assets/magic-school/evidence-cutouts/frost-returned-book.png",
+        tool: "잔류 마력 렌즈",
+        toolResult: "책 표지의 빙결 마력 결이 룬스톤 표면의 흔적과 거의 같다.\n이는 단순 독서가 아니라 실제 연습 흔적이다."
+      },
+      "조작된 기록 수정구": {
+        note: "기록 수정구실의 중심 수정구. 실습실의 수정구와 같은 보라색 환각층이 남아 있다.",
+        location: "기록 수정구실",
+        logic: "말포삼이 환각 마법을 걸었고, 누군가가 그에게 부탁했다는 사실로 이어진다.",
+        relatedSuspects: ["말포삼", "말포일"],
+        img: "/samunmong/assets/magic-school/evidence-cutouts/record-crystal.png",
+        tool: "룬 해독 펜",
+        toolResult: "수정구 조작 주문은 서툴지만 목적은 분명하다.\n직접 범행을 숨기려는 사람보다, 누군가의 부탁을 받고 덮은 흔적에 가깝다."
+      },
+      "버려진 지팡이 조각": {
+        note: "학생들 기숙사에서 발견된 버려진 지팡이 조각. 실습실 지팡이와 결이 이어진다.",
+        location: "학생들 기숙사",
+        logic: "말포이가 버린 지팡이를 누군가 주워 방화에 이용했을 가능성을 보여 준다.",
+        relatedSuspects: ["말포이", "말포일"],
+        img: "/samunmong/assets/magic-school/evidence-cutouts/discarded-wand-shard.png",
+        tool: "마력의 시선",
+        toolResult: "버려진 조각에는 말포이의 강한 마력 흔적이 남아 있지만, 실습실 지팡이에는 다른 손길의 잔류 마력이 덧씌워져 있다."
+      },
+      "말포삼의 자백": {
+        note: "말포삼이 말포일의 부탁으로 기록 수정구에 환각 마법을 걸었다고 털어놓은 진술.",
+        location: "교무 조사실",
+        logic: "수정구 조작의 실행자는 말포삼이지만, 지시자는 말포일이라는 결정타 증언이다.",
+        relatedSuspects: ["말포삼", "말포일"],
+        img: "/samunmong/assets/magic-school/evidence-cutouts/crystal-confession-vial.png"
+      }
+    };
+
+    const tools = isMagicTheme ? magicTools : {
       "돋보기": {
         img: "/samunmong/assets/mudeok-interaction/tool-magnifying-glass.png",
         note: "작은 글자, 긁힌 자국, 미세한 흔적을 확대합니다."
@@ -1053,7 +1681,7 @@
       }
     };
 
-    const evidenceData = window.SAMUNMONG_CONTENT?.evidenceData || {
+    const evidenceData = isMagicTheme ? magicEvidenceData : window.SAMUNMONG_CONTENT?.evidenceData || {
       "호패 조각": {
         note: "점순 옆에서 발견된 신분 단서. 유문석의 물건처럼 보이지만 일부 글자가 긁혀 있다.",
         img: "/samunmong/assets/evidence-wooden-tag.png",
@@ -1716,15 +2344,23 @@
       screen.appendChild(hint);
     });
 
-    function updateSuspect() {
+    function updateSuspect(shouldAnnounce = true) {
       const suspect = suspects[suspectIndex];
       document.querySelector("#suspectName").textContent = suspect.name;
       document.querySelector("#suspectStage").dataset.suspect = suspect.id;
       document.querySelector("#interrogationPlate").src = suspect.scene;
+      const suspectSprite = document.querySelector("#suspectSprite");
+      if (isMagicTheme && suspectSprite && suspect.sprite) {
+        suspectSprite.src = suspect.sprite;
+      } else if (suspectSprite) {
+        suspectSprite.src = suspect.sleeveScene || suspect.scene;
+      }
       activeNoteSuspectId = suspect.id;
       renderConversationNotes();
       syncVisibleSuspectReply();
-      showToast(`${suspect.name} 심문으로 전환`);
+      if (shouldAnnounce && getActiveScreenId() === "interrogationScreen") {
+        showToast(`${suspect.name} 심문으로 전환`);
+      }
     }
 
     document.querySelector("#prevSuspect").addEventListener("click", () => {
@@ -1780,7 +2416,7 @@
 
           const name = document.createElement("strong");
           name.className = "conversation-speaker";
-          name.textContent = message.sender === "player" ? "사또" : activeSuspect.name;
+          name.textContent = message.sender === "player" ? (isMagicTheme ? "선생님" : "사또") : activeSuspect.name;
 
           const text = document.createElement("p");
           text.className = "conversation-text";
@@ -1797,6 +2433,27 @@
         });
 
         log.scrollTop = log.scrollHeight;
+      });
+    }
+
+    function hydrateSuspectTabs() {
+      document.querySelectorAll("[data-note-tabs]").forEach((tabs) => {
+        tabs.replaceChildren();
+        suspects.forEach((suspect, index) => {
+          const button = document.createElement("button");
+          button.className = `note-suspect-tab${index === 0 ? " active" : ""}`;
+          button.type = "button";
+          button.dataset.suspectId = suspect.id;
+          button.textContent = suspect.name;
+          tabs.appendChild(button);
+        });
+      });
+      document.querySelectorAll(".note-suspect-tab").forEach((button) => {
+        button.addEventListener("click", () => {
+          activeNoteSuspectId = button.dataset.suspectId || activeNoteSuspectId;
+          playSfx("buttonAlt", 0.48);
+          renderConversationNotes();
+        });
       });
     }
 
@@ -1819,18 +2476,19 @@
     document.querySelector("#openNoteProp").addEventListener("click", () => setNote(true));
     document.querySelector("#closeNote").addEventListener("click", () => setNote(false));
     overlay.addEventListener("click", () => setNote(false));
-    document.querySelectorAll(".note-suspect-tab").forEach((button) => {
-      button.addEventListener("click", () => {
-        activeNoteSuspectId = button.dataset.suspectId || activeNoteSuspectId;
-        playSfx("buttonAlt", 0.48);
-        renderConversationNotes();
-      });
-    });
+    hydrateSuspectTabs();
+    updateSuspect(false);
+    renderConversationNotes();
 
     const evidenceBagPop = document.querySelector("#evidenceBagPop");
     const toggleEvidenceBag = document.querySelector("#toggleEvidenceBag");
     function setEvidenceBag(open) {
       if (open && isFieldGuideBlockingControls()) return;
+      if (open) evidenceBagPop.classList.remove("closing");
+      if (!open && evidenceBagPop.classList.contains("open")) {
+        evidenceBagPop.classList.add("closing");
+        setTimeout(() => evidenceBagPop.classList.remove("closing"), 360);
+      }
       evidenceBagPop.classList.toggle("open", open);
       evidenceBagPop.setAttribute("aria-hidden", String(!open));
       document.querySelectorAll("#toggleEvidenceBag, .bag-chip, .open-bag-panel").forEach((button) => {
@@ -1852,6 +2510,7 @@
 
       globalPanels.forEach((panel) => {
         const isOpen = panel.id === id;
+        if (isOpen) panel.classList.remove("closing");
         panel.classList.toggle("show", isOpen);
         panel.setAttribute("aria-hidden", String(!isOpen));
       });
@@ -1876,6 +2535,10 @@
       const wasGuideMapOpen = ["map-click", "map-open"].includes(fieldGuideStep) && document.querySelector("#mapPanel")?.classList.contains("show");
       clearTimeout(fieldGuideMapTimer);
       globalPanels.forEach((panel) => {
+        if (panel.classList.contains("show")) {
+          panel.classList.add("closing");
+          setTimeout(() => panel.classList.remove("closing"), 360);
+        }
         panel.classList.remove("show");
         panel.setAttribute("aria-hidden", "true");
       });
@@ -1934,7 +2597,7 @@
           return;
         }
         closeGlobalPanel();
-        go(target, "마을 지도에서 이동 중...");
+        go(target, isMagicTheme ? "학교 지도에서 이동 중..." : "마을 지도에서 이동 중...");
       });
     });
 
@@ -2001,6 +2664,19 @@
       }
     }
 
+    function maybeCollectInterrogationEvidence(suspect, answer, usedEvidenceNames = []) {
+      if (!isMagicTheme || suspect.id !== "malposam") return;
+      if (getCollectedEvidenceNames().includes("말포삼의 자백")) return;
+
+      const hasCrystalEvidence = usedEvidenceNames.some((name) => ["기록의 수정구", "조작된 기록 수정구", "말포삼의 자백"].includes(name));
+      const confessed = /말포일/.test(answer) && /(부탁|시켰|말했|환각|수정구)/.test(answer);
+      if (!hasCrystalEvidence || !confessed) return;
+
+      addEvidenceToBag("말포삼의 자백");
+      markEvidenceCollectedInScene("말포삼의 자백");
+      showToast("말포삼의 자백을 마법 가방에 기록했습니다.");
+    }
+
     async function requestAiAnswer(question) {
       if (isAskingAi) return;
       const askButton = document.querySelector("#askButton");
@@ -2033,6 +2709,7 @@
         history.push({ role: "user", content: question }, { role: "assistant", content: answer });
         while (history.length > 8) history.shift();
         addInterrogationAnswer(suspect, answer, data.source, data.warning);
+        maybeCollectInterrogationEvidence(suspect, answer, data.usedEvidenceNames);
         if (suspects[suspectIndex]?.id === suspect.id) {
           setAiMode(suspect.name);
         }
@@ -2067,6 +2744,7 @@
         const suspect = suspects[suspectIndex];
         sleeveCheckedSuspects.add(suspect.id);
         document.querySelector("#interrogationPlate").src = suspect.sleeveScene;
+        if (isMagicTheme && suspect.sprite) document.querySelector("#suspectSprite").src = suspect.sprite;
         if (suspect.id === "chunwol") {
           addEvidenceToBag("긁힌 팔 흔적");
           addEvidenceToNote("긁힌 팔 흔적");
@@ -2086,6 +2764,7 @@
       } else {
         const suspect = suspects[suspectIndex];
         document.querySelector("#interrogationPlate").src = suspect.scene;
+        if (isMagicTheme && suspect.sprite) document.querySelector("#suspectSprite").src = suspect.sprite;
         showToast(`${suspect.name}에게 질문을 던졌습니다.`);
       }
       document.querySelector("#questionInput").value = "";
@@ -2102,8 +2781,12 @@
     function applyContentImages() {
       const screenImages = window.SAMUNMONG_CONTENT?.screenImages || {};
       Object.entries(screenImages).forEach(([screenId, imageSrc]) => {
+        if (isMagicTheme && screenId === "interrogationScreen") return;
         document.querySelector(`#${screenId} .plate`)?.setAttribute("src", imageSrc);
       });
+      if (isMagicTheme) {
+        document.querySelector("#interrogationPlate")?.setAttribute("src", "/samunmong/assets/magic-school/interrogation/office-empty.png");
+      }
     }
 
     applyContentImages();

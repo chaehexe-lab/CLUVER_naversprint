@@ -1,0 +1,120 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="orbOuterGlass" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(372 270) rotate(57) scale(455)">
+      <stop stop-color="#FFFFFF" stop-opacity="0.92"/>
+      <stop offset="0.12" stop-color="#D7FBFF" stop-opacity="0.62"/>
+      <stop offset="0.35" stop-color="#7EEBFF" stop-opacity="0.35"/>
+      <stop offset="0.62" stop-color="#3A286E" stop-opacity="0.62"/>
+      <stop offset="0.86" stop-color="#090B1B" stop-opacity="0.88"/>
+      <stop offset="1" stop-color="#02030A" stop-opacity="0.96"/>
+    </radialGradient>
+    <radialGradient id="orbMemoryFog" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(520 485) rotate(93) scale(268)">
+      <stop stop-color="#F2FFFF" stop-opacity="0.95"/>
+      <stop offset="0.17" stop-color="#8FF6FF" stop-opacity="0.74"/>
+      <stop offset="0.4" stop-color="#7B58F2" stop-opacity="0.42"/>
+      <stop offset="0.66" stop-color="#2D1A55" stop-opacity="0.36"/>
+      <stop offset="1" stop-color="#03040D" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="fireMemoryGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(396 594) rotate(34) scale(130)">
+      <stop stop-color="#FFC173" stop-opacity="0.88"/>
+      <stop offset="0.5" stop-color="#D84B32" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#D84B32" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="arcaneRingStroke" x1="235" y1="223" x2="806" y2="790" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#54F0FF" stop-opacity="0.18"/>
+      <stop offset="0.24" stop-color="#EFFFFF" stop-opacity="0.72"/>
+      <stop offset="0.51" stop-color="#A890FF" stop-opacity="0.5"/>
+      <stop offset="0.78" stop-color="#F2C77B" stop-opacity="0.48"/>
+      <stop offset="1" stop-color="#54F0FF" stop-opacity="0.16"/>
+    </linearGradient>
+    <linearGradient id="holderMetal" x1="296" y1="704" x2="740" y2="906" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#311C34"/>
+      <stop offset="0.24" stop-color="#8A6A49"/>
+      <stop offset="0.5" stop-color="#E2C48A"/>
+      <stop offset="0.72" stop-color="#725334"/>
+      <stop offset="1" stop-color="#150E1E"/>
+    </linearGradient>
+    <linearGradient id="manaRibbon" x1="277" y1="496" x2="766" y2="496" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#57EEFF" stop-opacity="0"/>
+      <stop offset="0.24" stop-color="#95F8FF" stop-opacity="0.88"/>
+      <stop offset="0.48" stop-color="#FFFFFF"/>
+      <stop offset="0.72" stop-color="#9A7BFF" stop-opacity="0.78"/>
+      <stop offset="1" stop-color="#57EEFF" stop-opacity="0"/>
+    </linearGradient>
+    <filter id="wideGlow" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="18"/>
+    </filter>
+    <filter id="lineGlow" x="-30%" y="-30%" width="160%" height="160%" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="glassDepth" x="-20%" y="-20%" width="140%" height="140%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="30" stdDeviation="26" flood-color="#000000" flood-opacity="0.55"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="20" flood-color="#5EF0FF" flood-opacity="0.24"/>
+    </filter>
+    <clipPath id="orbClip">
+      <circle cx="512" cy="470" r="276"/>
+    </clipPath>
+  </defs>
+
+  <ellipse cx="512" cy="880" rx="278" ry="50" fill="#02030A" opacity="0.48" filter="url(#wideGlow)"/>
+  <circle cx="512" cy="470" r="392" fill="#50EFFF" opacity="0.08" filter="url(#wideGlow)"/>
+
+  <g opacity="0.82" filter="url(#lineGlow)">
+    <circle cx="512" cy="470" r="337" stroke="url(#arcaneRingStroke)" stroke-width="3" stroke-dasharray="26 20"/>
+    <circle cx="512" cy="470" r="304" stroke="#A990FF" stroke-opacity="0.2" stroke-width="2"/>
+    <path d="M512 128V184M512 756V812M170 470H226M798 470H854M270 228L310 268M714 672L754 712M754 228L714 268M310 672L270 712" stroke="#DFFFFF" stroke-opacity="0.42" stroke-width="4" stroke-linecap="round"/>
+  </g>
+
+  <g filter="url(#glassDepth)">
+    <circle cx="512" cy="470" r="276" fill="url(#orbOuterGlass)" stroke="#E8FFFF" stroke-opacity="0.72" stroke-width="5"/>
+    <circle cx="512" cy="470" r="214" fill="url(#orbMemoryFog)" opacity="0.95"/>
+  </g>
+
+  <g clip-path="url(#orbClip)">
+    <path d="M245 557C315 504 409 498 486 536C581 584 673 560 783 483V760H245V557Z" fill="#080A18" opacity="0.28"/>
+    <path d="M310 612C396 543 482 584 550 616C621 650 697 630 762 580" stroke="#75F4FF" stroke-opacity="0.28" stroke-width="12" stroke-linecap="round" filter="url(#lineGlow)"/>
+    <path d="M310 662C409 600 505 645 605 669C666 684 714 661 770 622" stroke="#A78AFF" stroke-opacity="0.22" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="395" cy="594" r="128" fill="url(#fireMemoryGlow)"/>
+    <path d="M352 612C346 578 377 558 383 528C411 559 416 593 402 628C427 604 430 571 421 540C466 577 476 635 434 671C398 703 360 674 352 612Z" fill="#FF8B52" opacity="0.62" filter="url(#lineGlow)"/>
+    <path d="M636 279L682 343M614 344L704 344M636 409L682 344" stroke="#DFFFFF" stroke-opacity="0.16" stroke-width="8" stroke-linecap="round"/>
+    <path d="M592 330H722V526C722 558 696 584 664 584H650C618 584 592 558 592 526V330Z" stroke="#C9FBFF" stroke-opacity="0.12" stroke-width="7"/>
+    <path d="M314 365H460M330 409H430M340 453H474" stroke="#F2FFFF" stroke-opacity="0.12" stroke-width="8" stroke-linecap="round"/>
+  </g>
+
+  <g filter="url(#lineGlow)">
+    <path d="M292 496C350 388 526 354 633 430C708 484 656 580 536 588C389 598 356 459 486 400C583 357 716 397 762 484" stroke="url(#manaRibbon)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M365 373C445 313 583 310 676 375" stroke="#A990FF" stroke-opacity="0.54" stroke-width="9" stroke-linecap="round"/>
+    <path d="M354 621C451 696 599 695 696 621" stroke="#FFC17A" stroke-opacity="0.32" stroke-width="7" stroke-linecap="round"/>
+  </g>
+
+  <path d="M350 273C414 204 552 180 648 232" stroke="#FFFFFF" stroke-opacity="0.8" stroke-width="24" stroke-linecap="round"/>
+  <path d="M303 430C284 356 327 282 397 244" stroke="#FFFFFF" stroke-opacity="0.32" stroke-width="10" stroke-linecap="round"/>
+  <path d="M681 310C724 353 746 414 738 477" stroke="#EFFFFF" stroke-opacity="0.2" stroke-width="8" stroke-linecap="round"/>
+
+  <g font-family="Georgia, 'Times New Roman', serif" fill="#DFFFFF" filter="url(#lineGlow)">
+    <text x="311" y="456" font-size="58" opacity="0.72">ᚱ</text>
+    <text x="656" y="396" font-size="62" opacity="0.7">ᛗ</text>
+    <text x="528" y="647" font-size="60" opacity="0.66">ᛟ</text>
+    <text x="430" y="348" font-size="34" opacity="0.42">ᚨ</text>
+    <text x="704" y="570" font-size="36" opacity="0.38">ᛖ</text>
+  </g>
+
+  <g filter="url(#lineGlow)">
+    <circle cx="304" cy="350" r="6" fill="#DFFFFF" opacity="0.86"/>
+    <circle cx="718" cy="322" r="5" fill="#9FF8FF" opacity="0.78"/>
+    <circle cx="754" cy="560" r="6" fill="#FFC17A" opacity="0.68"/>
+    <circle cx="390" cy="684" r="4" fill="#DFFFFF" opacity="0.62"/>
+    <circle cx="240" cy="506" r="4" fill="#86F6FF" opacity="0.7"/>
+    <circle cx="802" cy="468" r="4" fill="#A990FF" opacity="0.76"/>
+  </g>
+
+  <path d="M320 724C371 683 653 683 704 724L640 838H384L320 724Z" fill="url(#holderMetal)" stroke="#F1D99D" stroke-opacity="0.42" stroke-width="5"/>
+  <path d="M375 744C458 780 566 781 650 744" stroke="#FFF2C4" stroke-opacity="0.48" stroke-width="5" stroke-linecap="round"/>
+  <path d="M412 834H612" stroke="#8CF5FF" stroke-opacity="0.28" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="512" cy="724" r="35" fill="#060714" stroke="#E7D59A" stroke-opacity="0.42" stroke-width="5"/>
+  <circle cx="512" cy="724" r="14" fill="#8BF7FF" opacity="0.62" filter="url(#lineGlow)"/>
+</svg>

@@ -8,6 +8,11 @@ export const STARTABLE_SCREENS = new Set([
   "yoomunseokSarangbang",
   "dolsoeQuarters",
   "backGateCourtyard",
+  "magicAlchemyLab",
+  "magicCleaningCloset",
+  "magicLibrary",
+  "magicRecordCrystalRoom",
+  "magicDormHallway",
   "interrogationScreen"
 ]);
 
@@ -19,6 +24,11 @@ export const routeInitialScreens = {
   "/yoomunseok-sarangbang": "yoomunseokSarangbang",
   "/dolsoe-quarters": "dolsoeQuarters",
   "/back-gate-courtyard": "backGateCourtyard",
+  "/magic-alchemy-lab": "magicAlchemyLab",
+  "/magic-cleaning-closet": "magicCleaningCloset",
+  "/magic-library": "magicLibrary",
+  "/magic-record-crystal-room": "magicRecordCrystalRoom",
+  "/magic-dorm-hallway": "magicDormHallway",
   "/interrogation": "interrogationScreen",
   "/tutorial": "tutorialScreen",
   "/dream": "dreamScreen",
@@ -38,6 +48,11 @@ export const screenLocationLabels = {
   yoomunseokSarangbang: "\uC720\uBB38\uC11D \uC0AC\uB791\uBC29",
   dolsoeQuarters: "\uB3CC\uC1E0 \uCC98\uC18C",
   backGateCourtyard: "\uB4B7\uBB38 \uB9C8\uB2F9",
+  magicAlchemyLab: "제1 연금술 실습실",
+  magicCleaningCloset: "청소도구함",
+  magicLibrary: "도서관",
+  magicRecordCrystalRoom: "기록 수정구실",
+  magicDormHallway: "학생들 기숙사",
   interrogationScreen: "\uCDE8\uC870\uC2E4"
 } as const;
 
