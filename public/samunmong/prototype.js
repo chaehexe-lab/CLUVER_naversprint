@@ -4,7 +4,9 @@
       "mainScreen", "tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne",
       "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters",
       "backGateCourtyard", "magicAlchemyLab", "magicCleaningCloset", "magicLibrary",
-      "magicRecordCrystalRoom", "magicDormHallway", "interrogationScreen"
+      "magicRecordCrystalRoom", "magicDormHallway", "spaceAirlock", "spaceMedicalBay",
+      "spaceOxygenGenerator", "spaceDataCore", "spaceScienceLab", "spaceGalleyCorridor",
+      "spaceSuitPrep", "spaceObservation", "interrogationScreen"
     ]);
     const getScreens = () => [...document.querySelectorAll(".screen")];
     const fade = document.querySelector("#fade");
@@ -137,6 +139,19 @@
     const conversationNotes = new Map();
     const sleeveCheckedSuspects = new Set();
     const saveKey = "samunmong-demo-state";
+    const saveSlotsKey = "samunmong-save-slots";
+    const newDreamModeKey = "samunmong-new-dream-mode";
+    const themeId = isSpaceTheme ? "spaceStation" : isMagicTheme ? "magicSchool" : "joseon";
+    const themeLabels = {
+      joseon: "조선시대 살인사건",
+      magicSchool: "마법학교 방화사건",
+      spaceStation: "우주정거장 살인사건"
+    };
+    const themeSuffixes = {
+      joseon: "joseon",
+      magicSchool: "magic-school",
+      spaceStation: "space-station"
+    };
     const themeStorageSuffix = isSpaceTheme ? "space-station" : isMagicTheme ? "magic-school" : "joseon";
     const collectedEvidenceKey = `samunmong-collected-evidence-${themeStorageSuffix}`;
     const analyzedEvidenceKey = `samunmong-analyzed-evidence-${themeStorageSuffix}`;
@@ -245,11 +260,154 @@
       return knownScreenIds.has(saved?.screenId) && saved.screenId !== "mainScreen";
     }
 
+    function readSaveSlots() {
+      const slots = readStored(saveSlotsKey, {});
+      return slots && typeof slots === "object" && !Array.isArray(slots) ? slots : {};
+    }
+
+    function writeSaveSlots(slots) {
+      localStorage.setItem(saveSlotsKey, JSON.stringify(slots));
+    }
+
+    function normalizeThemeName(theme) {
+      return themeLabels[theme] ? theme : "joseon";
+    }
+
+    function getLegacySaveSlot() {
+      const legacy = readStored(saveKey, null);
+      if (!isValidSavedProgress(legacy)) return null;
+      const legacyTheme = normalizeThemeName(legacy.theme || localStorage.getItem(themeKey) || themeId);
+      return { ...legacy, theme: legacyTheme, savedAt: legacy.savedAt || Date.now() };
+    }
+
+    function getSaveSlot(theme) {
+      const normalizedTheme = normalizeThemeName(theme);
+      const slot = readSaveSlots()[normalizedTheme];
+      if (isValidSavedProgress(slot)) return { ...slot, theme: normalizedTheme };
+
+      const legacy = getLegacySaveSlot();
+      return legacy?.theme === normalizedTheme ? legacy : null;
+    }
+
+    function getValidSaveSlots() {
+      const slots = readSaveSlots();
+      const legacy = getLegacySaveSlot();
+      if (legacy && !slots[legacy.theme]) {
+        slots[legacy.theme] = legacy;
+        writeSaveSlots(slots);
+      }
+
+      return Object.entries(slots).filter(([theme, slot]) => themeLabels[theme] && isValidSavedProgress(slot));
+    }
+
+    function formatSavedAt(timestamp) {
+      if (!timestamp) return "저장 시각 없음";
+      try {
+        return new Intl.DateTimeFormat("ko-KR", {
+          month: "short",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit"
+        }).format(new Date(timestamp));
+      } catch {
+        return "저장됨";
+      }
+    }
+
+    function getLocationName(theme, screenId) {
+      const metaByTheme = { joseon: joseonLocationMeta, magicSchool: magicLocationMeta, spaceStation: spaceLocationMeta };
+      return metaByTheme[theme]?.[screenId]?.name || "이어가기 지점";
+    }
+
+    function renderSaveSlots() {
+      const slots = readSaveSlots();
+      const legacy = getLegacySaveSlot();
+      if (legacy && !slots[legacy.theme]) {
+        slots[legacy.theme] = legacy;
+        writeSaveSlots(slots);
+      }
+
+      document.querySelectorAll("[data-save-slot-theme]").forEach((button) => {
+        const slotTheme = normalizeThemeName(button.dataset.saveSlotTheme);
+        const slot = getSaveSlot(slotTheme);
+        const title = button.querySelector("strong");
+        const meta = button.querySelector("span");
+        if (title) title.textContent = themeLabels[slotTheme];
+
+        if (slot) {
+          button.disabled = false;
+          button.removeAttribute("aria-disabled");
+          button.title = `${themeLabels[slotTheme]} 이어가기`;
+          if (meta) meta.textContent = `${getLocationName(slotTheme, slot.screenId)} · ${formatSavedAt(slot.savedAt)}`;
+        } else {
+          button.disabled = true;
+          button.setAttribute("aria-disabled", "true");
+          button.title = "저장된 꿈이 없습니다";
+          if (meta) meta.textContent = "저장된 꿈이 없습니다";
+        }
+      });
+    }
+
+    function openSaveSlotDialog() {
+      renderSaveSlots();
+      const dialog = document.querySelector("#saveSlotDialog");
+      if (!dialog) {
+        const firstSlot = getValidSaveSlots()[0];
+        if (firstSlot) restoreSaveSlot(firstSlot[0], firstSlot[1]);
+        return;
+      }
+
+      dialog.classList.add("open");
+      dialog.setAttribute("aria-hidden", "false");
+    }
+
+    function closeSaveSlotDialog() {
+      const dialog = document.querySelector("#saveSlotDialog");
+      dialog?.classList.remove("open");
+      dialog?.setAttribute("aria-hidden", "true");
+    }
+
+    function restoreSaveSlot(slotTheme, slot) {
+      if (!isValidSavedProgress(slot)) return;
+      const normalizedTheme = normalizeThemeName(slotTheme || slot.theme);
+      markFieldGuideSeen();
+      localStorage.setItem(themeKey, normalizedTheme);
+      closeSaveSlotDialog();
+
+      const params = new URLSearchParams({ start: slot.screenId, theme: normalizedTheme });
+      window.location.href = `/?${params.toString()}`;
+    }
+
+    function clearThemeProgress(theme) {
+      const normalizedTheme = normalizeThemeName(theme);
+      const suffix = themeSuffixes[normalizedTheme] || themeSuffixes.joseon;
+      localStorage.removeItem(`samunmong-collected-evidence-${suffix}`);
+      localStorage.removeItem(`samunmong-analyzed-evidence-${suffix}`);
+      localStorage.removeItem(`samunmong-conversation-notes-${suffix}`);
+      localStorage.removeItem(`samunmong-interrogation-question-count-${suffix}`);
+      if (normalizedTheme === "joseon") localStorage.removeItem(fieldGuideSeenKey);
+
+      const slots = readSaveSlots();
+      delete slots[normalizedTheme];
+      writeSaveSlots(slots);
+
+      const legacy = readStored(saveKey, null);
+      if (legacy?.theme === normalizedTheme || (!legacy?.theme && normalizedTheme === themeId)) {
+        localStorage.removeItem(saveKey);
+      }
+    }
+
+    function consumeNewDreamMode(theme) {
+      if (sessionStorage.getItem(newDreamModeKey) !== "1") return;
+      clearThemeProgress(theme);
+      sessionStorage.removeItem(newDreamModeKey);
+    }
+
     function updateContinueButtonState() {
       const continueButton = document.querySelector("#continueDream");
       if (!continueButton) return;
 
-      const enabled = isValidSavedProgress();
+      const enabled = getValidSaveSlots().length > 0;
       continueButton.disabled = !enabled;
       continueButton.setAttribute("aria-disabled", String(!enabled));
       if (enabled) {
@@ -261,7 +419,12 @@
 
     function saveProgress(screenId) {
       if (screenId === "mainScreen") return;
-      localStorage.setItem(saveKey, JSON.stringify({ screenId, savedAt: Date.now() }));
+      const slot = { theme: themeId, screenId, savedAt: Date.now() };
+      const slots = readSaveSlots();
+      slots[themeId] = slot;
+      writeSaveSlots(slots);
+      localStorage.setItem(saveKey, JSON.stringify(slot));
+      renderSaveSlots();
       updateContinueButtonState();
     }
 
@@ -1563,6 +1726,7 @@
     applyMagicUiCopies();
     setMagicRecordTab("0");
     updateMagicStudentPage(0);
+    renderSaveSlots();
     updateContinueButtonState();
     updateInterrogationQuestionLimitUI();
     updateBgmForScreen();
@@ -1584,12 +1748,7 @@
     });
 
     on("#newDream", "click", () => {
-      localStorage.removeItem(saveKey);
-      localStorage.removeItem(collectedEvidenceKey);
-      localStorage.removeItem(analyzedEvidenceKey);
-      localStorage.removeItem(conversationNotesKey);
-      localStorage.removeItem(interrogationQuestionCountKey);
-      localStorage.removeItem(fieldGuideSeenKey);
+      sessionStorage.setItem(newDreamModeKey, "1");
       sessionStorage.removeItem(fieldGuidePendingKey);
       conversationNotes.clear();
       updateContinueButtonState();
@@ -1597,13 +1756,18 @@
       go("tutorialScreen");
     });
     on("#continueDream", "click", () => {
-      const saved = readStored(saveKey, null);
-      const valid = isValidSavedProgress(saved);
-      if (!valid) return;
-
-      markFieldGuideSeen();
-      go(saved.screenId, "지난 꿈으로 돌아가는 중...");
-      if (saved?.screenId === "briefingScreen") setTimeout(startBriefingSequence, 300);
+      if (!getValidSaveSlots().length) return;
+      openSaveSlotDialog();
+    });
+    on("#closeSaveSlotDialog", "click", closeSaveSlotDialog);
+    on("#closeSaveSlotDialogX", "click", closeSaveSlotDialog);
+    document.querySelectorAll("[data-save-slot-theme]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const slotTheme = normalizeThemeName(button.dataset.saveSlotTheme);
+        const slot = getSaveSlot(slotTheme);
+        if (!slot) return;
+        restoreSaveSlot(slotTheme, slot);
+      });
     });
     document.querySelectorAll("[data-open-settings='true']").forEach((button) => {
       button.addEventListener("click", () => settingsDialog?.classList.add("open"));
@@ -1644,6 +1808,7 @@
       });
     });
     on("#chooseJoseon", "click", () => {
+      consumeNewDreamMode("joseon");
       localStorage.setItem(themeKey, "joseon");
       if (activeTheme !== "joseon") {
         window.location.href = "/?start=briefingScreen&theme=joseon";
@@ -1658,10 +1823,12 @@
       });
     });
     on("#chooseMagicSchool", "click", () => {
+      consumeNewDreamMode("magicSchool");
       localStorage.setItem(themeKey, "magicSchool");
       window.location.href = "/?start=briefingScreen&theme=magicSchool";
     });
     on("#chooseSpaceStation", "click", () => {
+      consumeNewDreamMode("spaceStation");
       localStorage.setItem(themeKey, "spaceStation");
       window.location.href = "/?start=briefingScreen&theme=spaceStation";
     });

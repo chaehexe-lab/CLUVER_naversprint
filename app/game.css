@@ -1,4 +1,4 @@
-﻿
+
     :root {
       color-scheme: dark;
       --ink: #f7ecd8;
@@ -1445,6 +1445,60 @@
       line-height: 1;
       text-align: center;
       text-decoration: none;
+    }
+
+
+    .save-slot-panel {
+      width: min(680px, calc(100vw - 44px));
+    }
+
+    .save-slot-list {
+      grid-area: copy;
+      display: grid;
+      gap: 10px;
+      margin: 6px 0 10px;
+    }
+
+    .save-slot-item {
+      width: 100%;
+      display: grid;
+      gap: 4px;
+      padding: 12px 14px;
+      border: 3px solid #1e1e1e;
+      border-radius: 0;
+      color: #1e1e1e;
+      background: rgba(246, 246, 239, .88);
+      box-shadow: 4px 4px 0 rgba(0, 0, 0, .28);
+      text-align: left;
+      font-family: "VitroPride", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+    }
+
+    .save-slot-item strong {
+      font-size: 19px;
+      font-weight: 800;
+      letter-spacing: .01em;
+    }
+
+    .save-slot-item span {
+      color: rgba(34, 34, 34, .7);
+      font-size: 14px;
+      line-height: 1.35;
+    }
+
+    .save-slot-item:not(:disabled):hover,
+    .save-slot-item:not(:disabled):focus-visible {
+      color: #111;
+      background: #fffdf2;
+      box-shadow: 6px 6px 0 rgba(0, 0, 0, .36);
+      outline: none;
+      transform: translate(-1px, -1px);
+    }
+
+    .save-slot-item:disabled {
+      cursor: default;
+      opacity: .48;
+      filter: grayscale(.45);
+      box-shadow: none;
     }
 
     /* Pre-theme screens share the tutorial title's neutral display font. */

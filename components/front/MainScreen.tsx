@@ -1,4 +1,4 @@
-﻿import { mainMenu, screenImages } from "@/lib/gameData";
+import { mainMenu, screenImages } from "@/lib/gameData";
 import type { CSSProperties } from "react";
 
 type MenuButtonStyle = CSSProperties & {
@@ -28,6 +28,40 @@ export default function MainScreen({ active = false }: MainScreenProps) {
           {item.label}
         </button>
       ))}
+
+      <aside className="dream-notice-dialog save-slot-dialog" id="saveSlotDialog" aria-hidden="true" role="dialog" aria-labelledby="saveSlotTitle">
+        <div className="dream-notice-panel save-slot-panel">
+          <div className="dream-notice-titlebar">
+            <span>SAVE_FILE</span>
+            <button className="dream-notice-close" id="closeSaveSlotDialogX" type="button" aria-label="세이브 파일 닫기">
+              ×
+            </button>
+          </div>
+          <span className="dream-notice-seal" aria-hidden="true">▶</span>
+          <p className="dream-notice-kicker">DREAM ARCHIVE</p>
+          <h2 id="saveSlotTitle">이어갈 꿈을 고르십시오</h2>
+          <p id="saveSlotCopy">저장된 꿈을 선택하면 해당 사건의 마지막 위치로 돌아갑니다.</p>
+          <div className="save-slot-list" id="saveSlotList" aria-label="세이브 파일 목록">
+            <button className="save-slot-item" type="button" data-save-slot-theme="joseon" disabled>
+              <strong>조선시대 살인사건</strong>
+              <span>저장된 꿈이 없습니다</span>
+            </button>
+            <button className="save-slot-item" type="button" data-save-slot-theme="magicSchool" disabled>
+              <strong>마법학교 방화사건</strong>
+              <span>저장된 꿈이 없습니다</span>
+            </button>
+            <button className="save-slot-item" type="button" data-save-slot-theme="spaceStation" disabled>
+              <strong>우주정거장 살인사건</strong>
+              <span>저장된 꿈이 없습니다</span>
+            </button>
+          </div>
+          <div className="dream-notice-actions">
+            <button className="button primary" id="closeSaveSlotDialog" type="button">
+              닫기
+            </button>
+          </div>
+        </div>
+      </aside>
 
       <div className="main-dialog" id="exitDialog" role="dialog" aria-modal="true" aria-labelledby="exitTitle">
         <div className="main-dialog-panel">
