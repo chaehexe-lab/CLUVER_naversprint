@@ -56,7 +56,7 @@ export default function GameSettingsOverlay() {
       webkitExitFullscreen?: () => Promise<void> | void;
       webkitFullscreenElement?: Element;
     };
-    const fullscreenRoot = document.documentElement as HTMLElement & {
+    const fullscreenRoot = (document.querySelector(".game-viewport") || document.documentElement) as HTMLElement & {
       webkitRequestFullscreen?: () => Promise<void> | void;
     };
 
