@@ -273,10 +273,16 @@
       return themeLabels[theme] ? theme : "joseon";
     }
 
+    function inferThemeFromScreen(screenId, fallbackTheme = themeId) {
+      if (screenId?.startsWith("magic")) return "magicSchool";
+      if (screenId?.startsWith("space")) return "spaceStation";
+      return normalizeThemeName(fallbackTheme);
+    }
+
     function getLegacySaveSlot() {
       const legacy = readStored(saveKey, null);
       if (!isValidSavedProgress(legacy)) return null;
-      const legacyTheme = normalizeThemeName(legacy.theme || localStorage.getItem(themeKey) || themeId);
+      const legacyTheme = inferThemeFromScreen(legacy.screenId, legacy.theme || localStorage.getItem(themeKey) || themeId);
       return { ...legacy, theme: legacyTheme, savedAt: legacy.savedAt || Date.now() };
     }
 

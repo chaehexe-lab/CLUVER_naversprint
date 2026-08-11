@@ -17,6 +17,8 @@ export default async function Home({ searchParams }: HomeProps) {
     initialTheme = "spaceStation";
   } else if (theme === "magicSchool" || initialScreen?.startsWith("magic")) {
     initialTheme = "magicSchool";
+  } else if (initialScreen?.startsWith("space")) {
+    initialTheme = "spaceStation";
   }
 
   return <GameShell initialScreen={initialScreen} initialTheme={initialTheme} />;

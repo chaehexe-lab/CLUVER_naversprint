@@ -117,6 +117,8 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
       window.localStorage.setItem("samunmong-current-theme", initialTheme);
     } else if (initialScreen?.startsWith("magic")) {
       window.localStorage.setItem("samunmong-current-theme", "magicSchool");
+    } else if (initialScreen?.startsWith("space")) {
+      window.localStorage.setItem("samunmong-current-theme", "spaceStation");
     }
 
     const loadScript = (src: string) =>

@@ -20,6 +20,7 @@ export const STARTABLE_SCREENS = new Set([
   "spaceScienceLab",
   "spaceGalleyCorridor",
   "spaceSuitPrep",
+  "spaceObservation",
   "interrogationScreen"
 ]);
 
@@ -74,6 +75,7 @@ export const screenLocationLabels = {
   spaceScienceLab: "과학 실험실",
   spaceGalleyCorridor: "주방 복도",
   spaceSuitPrep: "외부 작업 준비실",
+  spaceObservation: "관측 구역",
   interrogationScreen: "\uCDE8\uC870\uC2E4"
 } as const;
 

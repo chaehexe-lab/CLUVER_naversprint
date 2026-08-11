@@ -115,6 +115,14 @@
     .game-shell[data-start-screen="magicLibrary"] #magicLibrary,
     .game-shell[data-start-screen="magicRecordCrystalRoom"] #magicRecordCrystalRoom,
     .game-shell[data-start-screen="magicDormHallway"] #magicDormHallway,
+    .game-shell[data-start-screen="spaceAirlock"] #spaceAirlock,
+    .game-shell[data-start-screen="spaceMedicalBay"] #spaceMedicalBay,
+    .game-shell[data-start-screen="spaceOxygenGenerator"] #spaceOxygenGenerator,
+    .game-shell[data-start-screen="spaceDataCore"] #spaceDataCore,
+    .game-shell[data-start-screen="spaceScienceLab"] #spaceScienceLab,
+    .game-shell[data-start-screen="spaceGalleyCorridor"] #spaceGalleyCorridor,
+    .game-shell[data-start-screen="spaceSuitPrep"] #spaceSuitPrep,
+    .game-shell[data-start-screen="spaceObservation"] #spaceObservation,
     .game-shell[data-start-screen="interrogationScreen"] #interrogationScreen {
       display: block;
     }
