@@ -236,6 +236,8 @@ export default function BriefingScreen({ initialTheme }: { initialTheme?: "magic
     return <SpaceStationBriefingScreen />;
   }
 
+  const isMagicTheme = initialTheme === "magicSchool";
+
   return (
     <section className="screen briefing-screen" id="briefingScreen">
       <div className="magic-memory-stage">
@@ -343,49 +345,51 @@ export default function BriefingScreen({ initialTheme }: { initialTheme?: "magic
             </div>
           </div>
 
-          <div className="briefing-step" data-briefing-panel="2" aria-hidden="true">
-            <p className="briefing-caption strong">세 권의 기록 책을 차례로 펼쳐 보십시오, 선생님.</p>
-            <div className="magic-record-intro" data-record-kind="card">
-              <nav className="magic-record-tabs" aria-label="관계자 기록 바로가기">
-                {magicRecordCards.map((record, index) => (
-                  <button
-                    className={`magic-record-tab${index === 0 ? " active" : ""}`}
-                    type="button"
-                    data-record-card-tab={index}
-                    key={record.name}
-                  >
-                    <span>{record.kind}</span>
-                    <br />
-                    <strong>{record.name}</strong>
-                  </button>
-                ))}
-              </nav>
+          {isMagicTheme ? (
+            <div className="briefing-step" data-briefing-panel="2" aria-hidden="true">
+              <p className="briefing-caption strong">세 권의 기록 책을 차례로 펼쳐 보십시오, 선생님.</p>
+              <div className="magic-record-intro" data-record-kind="card">
+                <nav className="magic-record-tabs" aria-label="관계자 기록 바로가기">
+                  {magicRecordCards.map((record, index) => (
+                    <button
+                      className={`magic-record-tab${index === 0 ? " active" : ""}`}
+                      type="button"
+                      data-record-card-tab={index}
+                      key={record.name}
+                    >
+                      <span>{record.kind}</span>
+                      <br />
+                      <strong>{record.name}</strong>
+                    </button>
+                  ))}
+                </nav>
 
-              <section className="magic-record-carousel" aria-label="관계자 기록 카드">
-                {magicRecordCards.map((record, index) => (
-                  <article
-                    className={`magic-record-card${index === 0 ? " active" : ""}`}
-                    data-record-card={index}
-                    key={record.name}
-                  >
-                    <img src={record.image} alt={`${record.name} ${record.kind}`} draggable={false} />
-                    {index === 0 ? (
-                      <div className="magic-book-click-zones" aria-label="기록 책 선택">
-                        <button type="button" data-record-card-tab="1" aria-label="학생기록부 펼치기" />
-                        <button type="button" data-record-card-tab="2" aria-label="경비근무일지 펼치기" />
-                        <button type="button" data-record-card-tab="3" aria-label="교직원 기록 펼치기" />
-                      </div>
-                    ) : null}
-                  </article>
-                ))}
-                <div className="magic-record-page-controls" aria-label="관계자 기록 넘기기">
-                  <button type="button" data-student-prev aria-label="이전 관계자 기록">‹</button>
-                  <span data-student-page-indicator>1 / 5</span>
-                  <button type="button" data-student-next aria-label="다음 관계자 기록">›</button>
-                </div>
-              </section>
+                <section className="magic-record-carousel" aria-label="관계자 기록 카드">
+                  {magicRecordCards.map((record, index) => (
+                    <article
+                      className={`magic-record-card${index === 0 ? " active" : ""}`}
+                      data-record-card={index}
+                      key={record.name}
+                    >
+                      <img src={record.image} alt={`${record.name} ${record.kind}`} draggable={false} />
+                      {index === 0 ? (
+                        <div className="magic-book-click-zones" aria-label="기록 책 선택">
+                          <button type="button" data-record-card-tab="1" aria-label="학생기록부 펼치기" />
+                          <button type="button" data-record-card-tab="2" aria-label="경비근무일지 펼치기" />
+                          <button type="button" data-record-card-tab="3" aria-label="교직원 기록 펼치기" />
+                        </div>
+                      ) : null}
+                    </article>
+                  ))}
+                  <div className="magic-record-page-controls" aria-label="관계자 기록 넘기기">
+                    <button type="button" data-student-prev aria-label="이전 관계자 기록">‹</button>
+                    <span data-student-page-indicator>1 / 5</span>
+                    <button type="button" data-student-next aria-label="다음 관계자 기록">›</button>
+                  </div>
+                </section>
+              </div>
             </div>
-          </div>
+          ) : null}
 
           <div className="briefing-actions">
             <button className="briefing-nav" id="briefingPrev" type="button">

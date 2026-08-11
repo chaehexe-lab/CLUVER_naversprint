@@ -8,6 +8,7 @@ function getActiveScreenId() {
 
 export default function GameSettingsOverlay() {
   const [activeScreen, setActiveScreen] = useState("mainScreen");
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const showGameSettingsButton = activeScreen !== "mainScreen";
 
   useEffect(() => {
@@ -33,6 +34,49 @@ export default function GameSettingsOverlay() {
     };
   }, []);
 
+
+  useEffect(() => {
+    const syncFullscreen = () => {
+      const fullscreenElement = document.fullscreenElement || (document as Document & { webkitFullscreenElement?: Element }).webkitFullscreenElement;
+      setIsFullscreen(Boolean(fullscreenElement));
+    };
+
+    syncFullscreen();
+    document.addEventListener("fullscreenchange", syncFullscreen);
+    document.addEventListener("webkitfullscreenchange", syncFullscreen);
+
+    return () => {
+      document.removeEventListener("fullscreenchange", syncFullscreen);
+      document.removeEventListener("webkitfullscreenchange", syncFullscreen);
+    };
+  }, []);
+
+  const toggleFullscreen = async () => {
+    const fullscreenDocument = document as Document & {
+      webkitExitFullscreen?: () => Promise<void> | void;
+      webkitFullscreenElement?: Element;
+    };
+    const fullscreenRoot = document.documentElement as HTMLElement & {
+      webkitRequestFullscreen?: () => Promise<void> | void;
+    };
+
+    try {
+      if (document.fullscreenElement || fullscreenDocument.webkitFullscreenElement) {
+        if (document.exitFullscreen) {
+          await document.exitFullscreen();
+        } else {
+          await fullscreenDocument.webkitExitFullscreen?.();
+        }
+      } else if (fullscreenRoot.requestFullscreen) {
+        await fullscreenRoot.requestFullscreen();
+      } else {
+        await fullscreenRoot.webkitRequestFullscreen?.();
+      }
+    } catch (error) {
+      console.error("전체화면 전환에 실패했습니다.", error);
+    }
+  };
+
   return (
     <>
       <button
@@ -44,6 +88,18 @@ export default function GameSettingsOverlay() {
         hidden={!showGameSettingsButton}
       >
         <span aria-hidden="true">⚙</span>
+      </button>
+
+      <button
+        className="game-settings-button"
+        id="toggleFullscreen"
+        type="button"
+        aria-label={isFullscreen ? "전체화면 종료" : "전체화면으로 보기"}
+        title={isFullscreen ? "전체화면 종료" : "전체화면"}
+        onClick={toggleFullscreen}
+        style={{ left: showGameSettingsButton ? "5.7%" : "2.4%" }}
+      >
+        <span aria-hidden="true">{isFullscreen ? "↙" : "⛶"}</span>
       </button>
 
       <div className="main-dialog" id="settingsDialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
