@@ -1077,6 +1077,10 @@
       font-weight: 400;
     }
 
+    #tutorialScreen .story-card .primary::before {
+      content: none;
+    }
+
     #tutorialScreen .story-card .primary:hover,
     #tutorialScreen .story-card .primary:focus-visible {
       border-color: rgba(237, 204, 139, .92);
