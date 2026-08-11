@@ -1,6 +1,12 @@
 ﻿(() => {
 
-    const screens = [...document.querySelectorAll(".screen")];
+    const knownScreenIds = new Set([
+      "mainScreen", "tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne",
+      "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters",
+      "backGateCourtyard", "magicAlchemyLab", "magicCleaningCloset", "magicLibrary",
+      "magicRecordCrystalRoom", "magicDormHallway", "interrogationScreen"
+    ]);
+    const getScreens = () => [...document.querySelectorAll(".screen")];
     const fade = document.querySelector("#fade");
     const toast = document.querySelector("#toast");
     const briefingCopy = document.querySelector("#briefingCopy");
@@ -31,10 +37,10 @@
     let memoryTraceTypingTimer = 0;
     let memoryTracePoints = [];
     const briefingPanels = [...document.querySelectorAll("[data-briefing-panel]")];
-    const fieldGuide = document.querySelector("#fieldOnboarding");
-    const fieldGuidePanels = [...document.querySelectorAll("[data-field-guide-panel]")];
-    const fieldGuideNextButton = document.querySelector("#nextFieldGuide");
-    const fieldGuideSkipButton = document.querySelector("#skipFieldGuide");
+    let fieldGuide = document.querySelector("#fieldOnboarding");
+    let fieldGuidePanels = [...document.querySelectorAll("[data-field-guide-panel]")];
+    let fieldGuideNextButton = document.querySelector("#nextFieldGuide");
+    let fieldGuideSkipButton = document.querySelector("#skipFieldGuide");
     let selectedEvidence = "";
     let isAskingAi = false;
     const interrogationHistories = new Map();
@@ -236,7 +242,7 @@
     }
 
     function isValidSavedProgress(saved = readStored(saveKey, null)) {
-      return screens.some((screen) => screen.id === saved?.screenId) && saved.screenId !== "mainScreen";
+      return knownScreenIds.has(saved?.screenId) && saved.screenId !== "mainScreen";
     }
 
     function updateContinueButtonState() {
@@ -1101,8 +1107,73 @@
       return document.querySelector(".screen.active")?.id || "mainScreen";
     }
 
+    function refreshFieldGuideNodes() {
+      fieldGuide = document.querySelector("#fieldOnboarding");
+      fieldGuidePanels = [...document.querySelectorAll("[data-field-guide-panel]")];
+      fieldGuideNextButton = document.querySelector("#nextFieldGuide");
+      fieldGuideSkipButton = document.querySelector("#skipFieldGuide");
+    }
+
+    function setupEvidenceScreen(screenId) {
+      const screen = document.getElementById(screenId);
+      if (!screen) return;
+
+      const evidenceHotspots = [...screen.querySelectorAll(".hotspot[data-evidence-name], #hopaeHotspot, #portraitHotspot")];
+      evidenceHotspots.forEach((hotspot) => hotspot.classList.add("evidence-hotspot"));
+      readStoredNames(collectedEvidenceKey).forEach((name) => {
+        screen.querySelectorAll(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((item) => item.classList.add("collected"));
+      });
+      readStoredNames(analyzedEvidenceKey).forEach((name) => {
+        screen.querySelectorAll(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((item) => item.classList.add("analyzed"));
+      });
+
+      if (!evidenceHotspots.length || screen.querySelector(".scene-hint")) return;
+      const hint = document.createElement("button");
+      hint.className = "scene-hint";
+      hint.type = "button";
+      hint.textContent = "힌트";
+      hint.setAttribute("aria-label", "이 장면의 증거 위치 힌트");
+      if (isSpaceTheme) {
+        hint.textContent = "";
+        const hintIcon = document.createElement("img");
+        hintIcon.src = "/assets/space-station/ui-icons-v3/hint-beacon.png";
+        hintIcon.alt = "";
+        hintIcon.draggable = false;
+        hintIcon.style.position = "absolute";
+        hintIcon.style.left = "50%";
+        hintIcon.style.top = "-2px";
+        hintIcon.style.width = "62px";
+        hintIcon.style.height = "62px";
+        hintIcon.style.objectFit = "contain";
+        hintIcon.style.transform = "translateX(-50%)";
+        hintIcon.style.zIndex = "1";
+        hint.appendChild(hintIcon);
+        const hintText = document.createElement("span");
+        hintText.textContent = "힌트";
+        hintText.style.position = "relative";
+        hintText.style.zIndex = "2";
+        hintText.style.alignSelf = "end";
+        hint.appendChild(hintText);
+      }
+      hint.addEventListener("click", () => {
+        const remainingEvidence = evidenceHotspots.filter((hotspot) => !hotspot.classList.contains("collected"));
+        if (!remainingEvidence.length) {
+          showToast("이 장면의 증거를 모두 찾았습니다.");
+          return;
+        }
+        screen.classList.remove("hint-active");
+        void screen.offsetWidth;
+        screen.classList.add("hint-active");
+        clearTimeout(screen.hintTimer);
+        screen.hintTimer = setTimeout(() => screen.classList.remove("hint-active"), 2500);
+      });
+      screen.appendChild(hint);
+    }
+
     window.addEventListener("samunmong:screen-change", (event) => {
       const screenId = event.detail?.screenId || getActiveScreenId();
+      refreshFieldGuideNodes();
+      setupEvidenceScreen(screenId);
       updateCurrentLocation(screenId);
     });
 
@@ -1312,6 +1383,30 @@
       return Promise.all(uniqueSources.map((src) => preloadImage(src)));
     }
 
+    function activateScreen(id, { rush = false } = {}) {
+      const request = new CustomEvent("samunmong:screen-request", {
+        cancelable: true,
+        detail: { screenId: id }
+      });
+      const handledByReact = !window.dispatchEvent(request);
+
+      if (!handledByReact) {
+        getScreens().forEach((screen) => screen.classList.toggle("active", screen.id === id));
+        window.dispatchEvent(new CustomEvent("samunmong:screen-change", { detail: { screenId: id } }));
+      }
+
+      if (rush) {
+        requestAnimationFrame(() => {
+          const screen = document.getElementById(id);
+          screen?.classList.remove("rush-in");
+          if (screen) {
+            void screen.offsetWidth;
+            screen.classList.add("rush-in");
+          }
+        });
+      }
+    }
+
     function goAfterPreload(id, assets, options = {}) {
       stopBriefingTyping();
       document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
@@ -1326,7 +1421,7 @@
         const elapsed = Date.now() - startedAt;
         const delay = Math.max(0, (options.minDuration || 0) - elapsed);
         setTimeout(() => {
-          screens.forEach((screen) => screen.classList.toggle("active", screen.id === id));
+          activateScreen(id);
           updateCurrentLocation(id);
           saveProgress(id);
           hideLoading();
@@ -1346,7 +1441,7 @@
       const duration = options.loading ? options.duration || loadingDuration : 260;
       showLoading(message, id);
       setTimeout(() => {
-        screens.forEach((screen) => screen.classList.toggle("active", screen.id === id));
+        activateScreen(id);
         updateCurrentLocation(id);
         saveProgress(id);
         hideLoading();
@@ -1364,15 +1459,7 @@
       if (fade) fade.textContent = message;
       fade?.classList.add("long");
       setTimeout(() => {
-        screens.forEach((screen) => {
-          const isActive = screen.id === id;
-          screen.classList.toggle("active", isActive);
-          screen.classList.remove("rush-in");
-          if (isActive) {
-            void screen.offsetWidth;
-            screen.classList.add("rush-in");
-          }
-        });
+        activateScreen(id, { rush: true });
         fade?.classList.remove("show");
         fade?.style.removeProperty("background");
         updateCurrentLocation(id);
@@ -1433,7 +1520,7 @@
         return;
       }
 
-      screens.forEach((screen) => screen.classList.toggle("active", screen.id === startScreen));
+      activateScreen(startScreen);
 
       if (startScreen === "briefingScreen") {
         startBriefingSequence();
@@ -1647,7 +1734,7 @@
     });
     on("#startCase", "click", () => {
       if (briefingCard?.dataset.briefingMode === "deathOnly") {
-        const returnScreen = screens.some((screen) => screen.id === briefingReturnScreenId)
+        const returnScreen = knownScreenIds.has(briefingReturnScreenId)
           ? briefingReturnScreenId
           : (isMagicTheme ? "magicAlchemyLab" : "fieldOne");
         go(returnScreen, "사건 일지를 덮는 중...");
@@ -1661,7 +1748,8 @@
       }
       goRush(isSpaceTheme ? "spaceAirlock" : isMagicTheme ? "magicAlchemyLab" : "fieldOne", isSpaceTheme ? "에어록으로 이동 중..." : isMagicTheme ? "실습실로 이동 중..." : "현장으로 이동 중...");
     });
-    on("#nextFieldGuide", "click", () => {
+    document.addEventListener("click", (event) => {
+      if (!(event.target instanceof Element) || !event.target.closest("#nextFieldGuide")) return;
       if (fieldGuideStep === "map-click") {
         openGlobalPanel("mapPanel");
         return;
@@ -1672,19 +1760,18 @@
       }
       closeFieldGuide();
     });
-    document.querySelectorAll("[data-go]").forEach((button) => {
-      button.addEventListener("click", () => {
-        if (isFieldGuideBlockingControls()) return;
-        const target = button.dataset.go;
-        const isJournalBriefing = target === "briefingScreen";
-        if (isJournalBriefing) {
-          briefingReturnScreenId = getActiveScreenId() || "fieldOne";
-        }
-        go(target, isJournalBriefing ? "사건 일지를 펼치는 중..." : "이동 중...");
-        if (target === "briefingScreen") {
-          setTimeout(() => startBriefingSequence("deathOnly"), 340);
-        }
-      });
+    document.addEventListener("click", (event) => {
+      const button = event.target instanceof Element ? event.target.closest("[data-go]") : null;
+      if (!button || isFieldGuideBlockingControls()) return;
+      const target = button.dataset.go;
+      const isJournalBriefing = target === "briefingScreen";
+      if (isJournalBriefing) {
+        briefingReturnScreenId = getActiveScreenId() || "fieldOne";
+      }
+      go(target, isJournalBriefing ? "사건 일지를 펼치는 중..." : "이동 중...");
+      if (target === "briefingScreen") {
+        setTimeout(() => startBriefingSequence("deathOnly"), 340);
+      }
     });
     on("#accuseButton", "click", openResultPage);
 
@@ -2458,12 +2545,6 @@
       addEvidenceToBag("호패 조각");
       addEvidenceToNote("호패 조각");
     }
-    document.querySelector("#hopaeHotspot").addEventListener("click", () => {
-      collectHopae();
-      showInspect("#hopaeInspect");
-    });
-    document.querySelector("#closeHopaeInspect")?.addEventListener("click", hideInspectPanels);
-
     function collectPortrait() {
       if (portraitCollected) {
         setAnalysisTarget("돌쇠의 그림");
@@ -2479,12 +2560,6 @@
       hideInspectPanels();
       showToast("돌쇠의 그림이 기록에 남았다. 감춰둔 시선에는 반드시 이유가 있다.");
     }
-    document.querySelector("#collectPortrait").addEventListener("click", collectPortrait);
-    document.querySelector("#portraitHotspot").addEventListener("click", () => {
-      collectPortrait();
-      document.querySelector("#collectPortrait").textContent = "보따리에서 분석하기";
-      showInspect("#portraitInspect");
-    });
     function showGenericEvidence(name, hotspot) {
       const data = evidenceData[name] || {};
       pendingEvidenceName = name;
@@ -2505,7 +2580,34 @@
       document.querySelector("#genericEvidenceInspect").classList.add("show");
       clearTimeout(showInspect.timer);
     }
-    document.querySelector("#closeGenericEvidenceInspect")?.addEventListener("click", hideInspectPanels);
+    document.addEventListener("click", (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target) return;
+
+      if (target.closest("#closeHopaeInspect, #closeGenericEvidenceInspect")) {
+        hideInspectPanels();
+        return;
+      }
+      if (target.closest("#collectPortrait")) {
+        collectPortrait();
+        return;
+      }
+
+      const hotspot = target.closest("[data-evidence-name]");
+      if (!hotspot) return;
+      if (hotspot.id === "hopaeHotspot") {
+        collectHopae();
+        showInspect("#hopaeInspect");
+        return;
+      }
+      if (hotspot.id === "portraitHotspot") {
+        collectPortrait();
+        document.querySelector("#collectPortrait").textContent = "보따리에서 분석하기";
+        showInspect("#portraitInspect");
+        return;
+      }
+      showGenericEvidence(hotspot.dataset.evidenceName, hotspot);
+    });
     document.addEventListener("pointermove", (event) => {
       updateToolAreaHover(event);
       moveToolCursor(event);
@@ -2530,55 +2632,7 @@
     });
     document.querySelector("#toolPreviewImage")?.addEventListener("dragstart", (event) => event.preventDefault());
     document.querySelector("#toolPreviewImage")?.addEventListener("load", syncEvidenceShadowBounds);
-    document.querySelectorAll("[data-evidence-name]").forEach((hotspot) => {
-      hotspot.addEventListener("click", () => showGenericEvidence(hotspot.dataset.evidenceName, hotspot));
-    });
-
-    document.querySelectorAll(".screen").forEach((screen) => {
-      const evidenceHotspots = [...screen.querySelectorAll(".hotspot[data-evidence-name], #hopaeHotspot, #portraitHotspot")];
-      if (!evidenceHotspots.length) return;
-      evidenceHotspots.forEach((hotspot) => hotspot.classList.add("evidence-hotspot"));
-      const hint = document.createElement("button");
-      hint.className = "scene-hint";
-      hint.type = "button";
-      hint.textContent = "힌트";
-      hint.setAttribute("aria-label", "이 장면의 증거 위치 힌트");
-      if (isSpaceTheme) {
-        hint.textContent = "";
-        const hintIcon = document.createElement("img");
-        hintIcon.src = "/assets/space-station/ui-icons-v3/hint-beacon.png";
-        hintIcon.alt = "";
-        hintIcon.draggable = false;
-        hintIcon.style.position = "absolute";
-        hintIcon.style.left = "50%";
-        hintIcon.style.top = "-2px";
-        hintIcon.style.width = "62px";
-        hintIcon.style.height = "62px";
-        hintIcon.style.objectFit = "contain";
-        hintIcon.style.transform = "translateX(-50%)";
-        hintIcon.style.zIndex = "1";
-        hint.appendChild(hintIcon);
-        const hintText = document.createElement("span");
-        hintText.textContent = "힌트";
-        hintText.style.position = "relative";
-        hintText.style.zIndex = "2";
-        hintText.style.alignSelf = "end";
-        hint.appendChild(hintText);
-      }
-      hint.addEventListener("click", () => {
-        const remainingEvidence = evidenceHotspots.filter((hotspot) => !hotspot.classList.contains("collected"));
-        if (!remainingEvidence.length) {
-          showToast("이 장면의 증거를 모두 찾았습니다.");
-          return;
-        }
-        screen.classList.remove("hint-active");
-        void screen.offsetWidth;
-        screen.classList.add("hint-active");
-        clearTimeout(screen.hintTimer);
-        screen.hintTimer = setTimeout(() => screen.classList.remove("hint-active"), 2500);
-      });
-      screen.appendChild(hint);
-    });
+    setupEvidenceScreen(getActiveScreenId());
 
     function updateSuspect(shouldAnnounce = true) {
       const suspect = suspects[suspectIndex];
@@ -2787,20 +2841,18 @@
       if (wasGuideMapOpen) setFieldGuideStep("tools");
     }
 
-    ["#openMapFromField", "#openMapFromRoom", "#openMapFromMudeokRoom", "#openMapFromInterrogation"].forEach((selector) => {
-      document.querySelector(selector)?.addEventListener("click", () => openGlobalPanel("mapPanel"));
-    });
-    document.querySelectorAll(".open-map-panel").forEach((button) => {
-      button.addEventListener("click", () => openGlobalPanel("mapPanel"));
-    });
-    ["#openBagFromField", "#openBagFromRoom", "#openBagFromMudeokRoom"].forEach((selector) => {
-      document.querySelector(selector)?.addEventListener("click", () => setEvidenceBag(true));
-    });
-    document.querySelectorAll(".open-bag-panel").forEach((button) => {
-      button.addEventListener("click", () => setEvidenceBag(true));
-    });
-    document.querySelectorAll(".open-tool-panel").forEach((button) => {
-      button.addEventListener("click", () => openGlobalPanel("toolPanel"));
+    document.addEventListener("click", (event) => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target) return;
+      if (target.closest(".open-map-panel, #openMapFromField, #openMapFromRoom, #openMapFromMudeokRoom, #openMapFromInterrogation")) {
+        openGlobalPanel("mapPanel");
+      } else if (target.closest(".open-bag-panel, #openBagFromField, #openBagFromRoom, #openBagFromMudeokRoom")) {
+        setEvidenceBag(true);
+      } else if (target.closest(".open-tool-panel")) {
+        openGlobalPanel("toolPanel");
+      } else if (target.closest(".open-note-panel, #openNoteFromField, #openNoteFromRoom, #openNoteFromMudeokRoom")) {
+        openGlobalPanel("fieldNotePanel");
+      }
     });
     document.addEventListener("keydown", (event) => {
       const target = event.target;
@@ -2809,12 +2861,6 @@
       if (isFieldGuideBlockingControls()) return;
       event.preventDefault();
       openGlobalPanel("toolPanel");
-    });
-    ["#openNoteFromField", "#openNoteFromRoom", "#openNoteFromMudeokRoom"].forEach((selector) => {
-      document.querySelector(selector)?.addEventListener("click", () => openGlobalPanel("fieldNotePanel"));
-    });
-    document.querySelectorAll(".open-note-panel").forEach((button) => {
-      button.addEventListener("click", () => openGlobalPanel("fieldNotePanel"));
     });
     document.querySelectorAll(".global-close").forEach((button) => button.addEventListener("click", closeGlobalPanel));
     on("#closeToolResult", "click", closeToolResultPopup);

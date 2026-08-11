@@ -9354,6 +9354,20 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen:not(.active) {
   pointer-events: none !important;
 }
 
+/* Magic-only briefing artwork must not affect the Joseon briefing layout. */
+html:not([data-samunmong-theme="magicSchool"]) .magic-memory-stage,
+html:not([data-samunmong-theme="magicSchool"]) .memory-restore-ritual,
+html:not([data-samunmong-theme="magicSchool"]) .magic-briefing-popup-frame,
+html:not([data-samunmong-theme="magicSchool"]) .memory-shard-nav,
+html:not([data-samunmong-theme="magicSchool"]) .memory-trace-sequence,
+html:not([data-samunmong-theme="magicSchool"]) .magic-record-intro {
+  display: none !important;
+}
+
+html:not([data-samunmong-theme="magicSchool"]) .briefing-card-content {
+  width: 100%;
+}
+
 /* Magic-school memory trace: image-framed scene + wand circle restoration */
 html[data-samunmong-theme="magicSchool"] .briefing-card[data-briefing-step="0"],
 html[data-samunmong-theme="magicSchool"] .briefing-screen:has(.briefing-card[data-briefing-step="0"]) .briefing-card {
