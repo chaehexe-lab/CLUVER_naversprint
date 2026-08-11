@@ -78,24 +78,24 @@
       ? magicBriefingText
       : sentenceBreakText("“사또님, 관아 근처에서 사람이 쓰러진 채 발견되었습니다.”\n\n당신은 이 꿈에서 고을의 사또입니다. 현장을 조사하고, 증거를 모아 용의자를 심문해야 합니다.");
     const magicSuspects = [
-      { name: "건달프", id: "gandalf", scene: "/samunmong/assets/magic-school/interrogation/office-empty.png", sprite: "/samunmong/assets/magic-school/interrogation/gandalf-sprite.png", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.png" },
-      { name: "덩쿨도어", id: "dunguldoor", scene: "/samunmong/assets/magic-school/interrogation/office-empty.png", sprite: "/samunmong/assets/magic-school/interrogation/dunguldoor-sprite.png", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.png" },
-      { name: "말포일", id: "malpoil", scene: "/samunmong/assets/magic-school/interrogation/office-empty.png", sprite: "/samunmong/assets/magic-school/interrogation/malpoil-sprite.png", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.png" },
-      { name: "말포이", id: "malpoi", scene: "/samunmong/assets/magic-school/interrogation/office-empty.png", sprite: "/samunmong/assets/magic-school/interrogation/malpoi-sprite.png", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.png" },
-      { name: "말포삼", id: "malposam", scene: "/samunmong/assets/magic-school/interrogation/office-empty.png", sprite: "/samunmong/assets/magic-school/interrogation/malposam-sprite.png", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.png" }
+      { name: "건달프", id: "gandalf", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/gandalf-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
+      { name: "덩쿨도어", id: "dunguldoor", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/dunguldoor-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
+      { name: "말포일", id: "malpoil", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malpoil-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
+      { name: "말포이", id: "malpoi", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malpoi-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
+      { name: "말포삼", id: "malposam", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malposam-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" }
     ];
     const spaceSuspects = [
-      { name: "해리", id: "harry", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.png", sprite: "/assets/space-station/characters/harry-upper-transparent.png", sleeveScene: "/assets/space-station/characters/harry-upper-transparent.png" },
-      { name: "메르스", id: "mers", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.png", sprite: "/assets/space-station/characters/mers-upper-aligned.png", sleeveScene: "/assets/space-station/characters/mers-upper-aligned.png" },
-      { name: "알라딘딘", id: "aladdindin", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.png", sprite: "/assets/space-station/characters/aladdindin-upper-aligned.png", sleeveScene: "/assets/space-station/characters/aladdindin-upper-aligned.png" },
-      { name: "안성줴줴이", id: "ansungjyejyei", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.png", sprite: "/assets/space-station/characters/ansungjyejyei-upper-aligned.png", sleeveScene: "/assets/space-station/characters/ansungjyejyei-upper-aligned.png" },
-      { name: "아인슈페너", id: "einspanner", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.png", sprite: "/assets/space-station/characters/einspanner-upper-aligned.png", sleeveScene: "/assets/space-station/characters/einspanner-upper-aligned.png" }
+      { name: "해리", id: "harry", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/harry-upper-transparent.webp", sleeveScene: "/assets/space-station/characters/harry-upper-transparent.webp" },
+      { name: "메르스", id: "mers", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/mers-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/mers-upper-aligned.webp" },
+      { name: "알라딘딘", id: "aladdindin", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/aladdindin-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/aladdindin-upper-aligned.webp" },
+      { name: "안성줴줴이", id: "ansungjyejyei", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/ansungjyejyei-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/ansungjyejyei-upper-aligned.webp" },
+      { name: "아인슈페너", id: "einspanner", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/einspanner-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/einspanner-upper-aligned.webp" }
     ];
     const suspects = isSpaceTheme ? spaceSuspects : isMagicTheme ? magicSuspects : window.SAMUNMONG_CONTENT?.suspects || [
-      { name: "돌쇠", id: "dolsoe", scene: "/samunmong/assets/scene-interrogation-dolsoe.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-dolsoe-sleeve.png?v=sleeve-20260707" },
-      { name: "최춘월", id: "chunwol", scene: "/samunmong/assets/scene-interrogation-chunwol.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-chunwol-sleeve.png?v=sleeve-20260707" },
-      { name: "유문석", id: "yoomunseok", scene: "/samunmong/assets/scene-interrogation-yoomunseok.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-yoomunseok-sleeve.png?v=sleeve-20260707" },
-      { name: "무덕", id: "mudeok", scene: "/samunmong/assets/scene-interrogation-mudeok.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-mudeok-sleeve.png?v=sleeve-20260707" }
+      { name: "돌쇠", id: "dolsoe", scene: "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-dolsoe-sleeve.webp?v=sleeve-20260707" },
+      { name: "최춘월", id: "chunwol", scene: "/samunmong/assets/scene-interrogation-chunwol.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-chunwol-sleeve.webp?v=sleeve-20260707" },
+      { name: "유문석", id: "yoomunseok", scene: "/samunmong/assets/scene-interrogation-yoomunseok.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-yoomunseok-sleeve.webp?v=sleeve-20260707" },
+      { name: "무덕", id: "mudeok", scene: "/samunmong/assets/scene-interrogation-mudeok.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-mudeok-sleeve.webp?v=sleeve-20260707" }
     ];
 
     function getInterrogationHistory(suspectId) {
@@ -925,13 +925,13 @@
       if (!isMagicTheme && !isSpaceTheme) return;
       const mapConfig = isSpaceTheme
         ? {
-          src: "/assets/space-station/maps/orbit-13-blueprint.png",
+          src: "/assets/space-station/maps/orbit-13-blueprint.webp",
           alt: "우주정거장 오르빗-13 조사 구역 도면",
           pins: spaceMapPins,
           labelOffset: "0%"
         }
         : {
-          src: "/samunmong/assets/magic-school/ui/school-map.png",
+          src: "/samunmong/assets/magic-school/ui/school-map.webp",
           alt: "마법학교 조사 장소가 표시된 학교 지도",
           pins: magicMapPins,
           labelOffset: "-12%"
@@ -986,11 +986,11 @@
       if (evidenceStack) {
         evidenceStack.innerHTML = `
           <figure class="briefing-evidence-photo">
-            <img src="/samunmong/assets/magic-school/scenes/alchemy-lab.png" alt="불탄 제1 연금술 실습실" draggable="false" />
+            <img src="/samunmong/assets/magic-school/scenes/alchemy-lab.webp" alt="불탄 제1 연금술 실습실" draggable="false" />
             <figcaption>현장: 제1 연금술 실습실</figcaption>
           </figure>
           <figure class="briefing-evidence-photo briefing-evidence-photo-small">
-            <img src="/samunmong/assets/magic-school/evidence/evidence-sheet.png" alt="마법학교 방화 사건 증거품" draggable="false" />
+            <img src="/samunmong/assets/magic-school/evidence/evidence-sheet.webp" alt="마법학교 방화 사건 증거품" draggable="false" />
             <figcaption>단서: 잔류 마력 증거</figcaption>
           </figure>
         `;
@@ -1029,9 +1029,9 @@
       }
 
       const toolCopy = {
-        openMapFromInterrogation: ["학교 지도 열기", "학교 지도", "/samunmong/assets/magic-school/ui/icon-school-map.png"],
-        openNoteProp: ["수사 일지 보기", "수사 일지", "/samunmong/assets/magic-school/ui/icon-investigation-journal.png"],
-        toggleEvidenceBag: ["마법 가방 열기", "마법 가방", "/samunmong/assets/magic-school/ui/icon-magic-bag.png"]
+        openMapFromInterrogation: ["학교 지도 열기", "학교 지도", "/samunmong/assets/magic-school/ui/icon-school-map.webp"],
+        openNoteProp: ["수사 일지 보기", "수사 일지", "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp"],
+        toggleEvidenceBag: ["마법 가방 열기", "마법 가방", "/samunmong/assets/magic-school/ui/icon-magic-bag.webp"]
       };
       Object.entries(toolCopy).forEach(([id, [ariaLabel, label, image]]) => {
         const button = document.querySelector(`#${id}`);
@@ -1042,9 +1042,9 @@
         if (sr) sr.textContent = label;
       });
       const toolChip = document.querySelector("#interrogationScreen .tool-chip.open-tool-panel img");
-      if (toolChip) toolChip.src = "/samunmong/assets/magic-school/ui/icon-mana-tools.png";
+      if (toolChip) toolChip.src = "/samunmong/assets/magic-school/ui/icon-mana-tools.webp";
       const journalChip = document.querySelector("#interrogationScreen .journal-chip img");
-      if (journalChip) journalChip.src = "/samunmong/assets/magic-school/ui/icon-investigation-journal.png";
+      if (journalChip) journalChip.src = "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp";
       const interrogationJournalChip = document.querySelector("#interrogationScreen .journal-chip");
       interrogationJournalChip?.setAttribute("aria-label", "수사 일지 열기");
       const interrogationJournalLabel = interrogationJournalChip?.querySelector(".sr-only");
@@ -1053,9 +1053,9 @@
         label.textContent = "수사 일지";
       });
       const accuseChip = document.querySelector("#accuseButton img");
-      if (accuseChip) accuseChip.src = "/samunmong/assets/magic-school/ui/icon-final-accuse.png";
+      if (accuseChip) accuseChip.src = "/samunmong/assets/magic-school/ui/icon-final-accuse.webp";
       const hintChip = document.querySelector("#interrogationHint img");
-      if (hintChip) hintChip.src = "/samunmong/assets/magic-school/ui/icon-mana-hint.png";
+      if (hintChip) hintChip.src = "/samunmong/assets/magic-school/ui/icon-mana-hint.webp";
       const hintLabel = document.querySelector("#interrogationHint .sr-only");
       if (hintLabel) hintLabel.textContent = "마력 감지";
       document.querySelector("#evidenceBagPop .bag-pop-head strong").textContent = "차원 주머니";
@@ -1136,7 +1136,7 @@
       if (isSpaceTheme) {
         hint.textContent = "";
         const hintIcon = document.createElement("img");
-        hintIcon.src = "/assets/space-station/ui-icons-v3/hint-beacon.png";
+        hintIcon.src = "/assets/space-station/ui-icons-v3/hint-beacon.webp";
         hintIcon.alt = "";
         hintIcon.draggable = false;
         hintIcon.style.position = "absolute";
@@ -1254,65 +1254,65 @@
     const themeStartLoadingDuration = 4200;
     const themeStartMaxWait = 9000;
     const joseonThemeStartAssets = [
-      "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png",
-      "/samunmong/assets/mudeok-interaction/evidence-jeomsun-hand-exam-paper.png",
-      "/samunmong/assets/suspects/dolsoe-seated.png",
-      "/samunmong/assets/suspects/chunwol-seated.png",
-      "/samunmong/assets/suspects/yoomunseok-seated.png",
-      "/samunmong/assets/suspects/mudeok-seated.png"
+      "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.webp",
+      "/samunmong/assets/mudeok-interaction/evidence-jeomsun-hand-exam-paper.webp",
+      "/samunmong/assets/suspects/dolsoe-seated.webp",
+      "/samunmong/assets/suspects/chunwol-seated.webp",
+      "/samunmong/assets/suspects/yoomunseok-seated.webp",
+      "/samunmong/assets/suspects/mudeok-seated.webp"
     ];
     const magicThemeStartAssets = [
-      "/samunmong/assets/magic-school/scenes/alchemy-lab.png",
-      "/samunmong/assets/magic-school/scenes/cleaning-closet.png",
-      "/samunmong/assets/magic-school/scenes/library.png",
-      "/samunmong/assets/magic-school/interrogation/gandalf.png",
-      "/samunmong/assets/magic-school/interrogation/dunguldoor.png",
-      "/samunmong/assets/magic-school/interrogation/malpoil.png",
-      "/samunmong/assets/magic-school/interrogation/malpoi.png",
-      "/samunmong/assets/magic-school/interrogation/malposam.png"
+      "/samunmong/assets/magic-school/scenes/alchemy-lab.webp",
+      "/samunmong/assets/magic-school/scenes/cleaning-closet.webp",
+      "/samunmong/assets/magic-school/scenes/library.webp",
+      "/samunmong/assets/magic-school/interrogation/gandalf.webp",
+      "/samunmong/assets/magic-school/interrogation/dunguldoor.webp",
+      "/samunmong/assets/magic-school/interrogation/malpoil.webp",
+      "/samunmong/assets/magic-school/interrogation/malpoi.webp",
+      "/samunmong/assets/magic-school/interrogation/malposam.webp"
     ];
     const spaceThemeStartAssets = [
-      "/assets/space-station/backgrounds/orbit-13-airlock.png",
-      "/assets/space-station/backgrounds/emergency-investigation-room-v2.png",
-      "/assets/space-station/backgrounds/medical-bay.png",
-      "/assets/space-station/backgrounds/oxygen-generator.png",
-      "/assets/space-station/backgrounds/data-core.png",
-      "/assets/space-station/backgrounds/suit-prep.png",
-      "/assets/space-station/backgrounds/science-lab.png",
-      "/assets/space-station/backgrounds/galley-corridor.png",
-      "/assets/space-station/panels/log-record-panel-v2.png",
-      "/assets/space-station/panels/evidence-vault-panel-v2.png",
-      "/assets/space-station/panels/scan-tools-panel-v2.png",
-      "/assets/space-station/maps/orbit-13-blueprint.png",
-      "/assets/space-station/ui-icons-v2/emergency-investigation-v2.png",
-      "/assets/space-station/ui-icons-v3/orbit-blueprint.png",
-      "/assets/space-station/ui-icons-v3/evidence-vault.png",
-      "/assets/space-station/ui-icons-v3/log-record.png",
-      "/assets/space-station/ui-icons-v3/scan-tool.png",
-      "/assets/space-station/ui-icons-v3/final-report.png",
-      "/assets/space-station/ui-icons-v3/accuse-target.png",
-      "/assets/space-station/ui-icons-v3/hint-beacon.png",
+      "/assets/space-station/backgrounds/orbit-13-airlock.webp",
+      "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp",
+      "/assets/space-station/backgrounds/medical-bay.webp",
+      "/assets/space-station/backgrounds/oxygen-generator.webp",
+      "/assets/space-station/backgrounds/data-core.webp",
+      "/assets/space-station/backgrounds/suit-prep.webp",
+      "/assets/space-station/backgrounds/science-lab.webp",
+      "/assets/space-station/backgrounds/galley-corridor.webp",
+      "/assets/space-station/panels/log-record-panel-v2.webp",
+      "/assets/space-station/panels/evidence-vault-panel-v2.webp",
+      "/assets/space-station/panels/scan-tools-panel-v2.webp",
+      "/assets/space-station/maps/orbit-13-blueprint.webp",
+      "/assets/space-station/ui-icons-v2/emergency-investigation-v2.webp",
+      "/assets/space-station/ui-icons-v3/orbit-blueprint.webp",
+      "/assets/space-station/ui-icons-v3/evidence-vault.webp",
+      "/assets/space-station/ui-icons-v3/log-record.webp",
+      "/assets/space-station/ui-icons-v3/scan-tool.webp",
+      "/assets/space-station/ui-icons-v3/final-report.webp",
+      "/assets/space-station/ui-icons-v3/accuse-target.webp",
+      "/assets/space-station/ui-icons-v3/hint-beacon.webp",
       "/assets/space-station/ui-buttons/space-next-button.svg",
-      "/assets/space-station/characters/harry-upper.png",
-      "/assets/space-station/characters/mers-upper.png",
-      "/assets/space-station/characters/aladdindin-upper.png",
-      "/assets/space-station/characters/ansungjyejyei-upper.png",
-      "/assets/space-station/characters/einspanner-upper.png",
-      "/assets/space-station/evidence/frozen-lever-gel.png",
-      "/assets/space-station/evidence/final-radio-log.png",
-      "/assets/space-station/evidence/disinfectant-cloth-glove.png",
-      "/assets/space-station/evidence/deleted-medical-record.png",
-      "/assets/space-station/evidence/damaged-pressure-sensor.png",
-      "/assets/space-station/evidence/access-keycard-chip.png",
-      "/assets/space-station/evidence/engineer-tool-clamp.png",
-      "/assets/space-station/evidence/coffee-tumbler.png",
-      "/assets/space-station/loading/space-transition-bg.png"
+      "/assets/space-station/characters/harry-upper.webp",
+      "/assets/space-station/characters/mers-upper.webp",
+      "/assets/space-station/characters/aladdindin-upper.webp",
+      "/assets/space-station/characters/ansungjyejyei-upper.webp",
+      "/assets/space-station/characters/einspanner-upper.webp",
+      "/assets/space-station/evidence/frozen-lever-gel.webp",
+      "/assets/space-station/evidence/final-radio-log.webp",
+      "/assets/space-station/evidence/disinfectant-cloth-glove.webp",
+      "/assets/space-station/evidence/deleted-medical-record.webp",
+      "/assets/space-station/evidence/damaged-pressure-sensor.webp",
+      "/assets/space-station/evidence/access-keycard-chip.webp",
+      "/assets/space-station/evidence/engineer-tool-clamp.webp",
+      "/assets/space-station/evidence/coffee-tumbler.webp",
+      "/assets/space-station/loading/space-transition-bg.webp"
     ];
     const themeStartAssets = isSpaceTheme ? spaceThemeStartAssets : isMagicTheme ? magicThemeStartAssets : joseonThemeStartAssets;
     const magicLoadingArtwork =
-      "url('/samunmong/assets/magic-school/loading/magic-transition-bg.png') center / cover no-repeat, #050403";
+      "url('/samunmong/assets/magic-school/loading/magic-transition-bg.webp') center / cover no-repeat, #050403";
     const spaceLoadingArtwork =
-      "url('/assets/space-station/loading/space-transition-bg.png') center / cover no-repeat, #030608";
+      "url('/assets/space-station/loading/space-transition-bg.webp') center / cover no-repeat, #030608";
     const magicThemeLoadingScreens = new Set([
       "briefingScreen",
       "magicAlchemyLab",
@@ -1791,15 +1791,15 @@
 
     const magicTools = {
       "마력의 시선": {
-        img: "/samunmong/assets/magic-school/ui/tool-mana-vision.png",
+        img: "/samunmong/assets/magic-school/ui/tool-mana-vision.webp",
         note: "증거 주변에 남은 마력을 색으로 드러냅니다."
       },
       "잔류 마력 렌즈": {
-        img: "/samunmong/assets/magic-school/ui/tool-residue-lens.png",
+        img: "/samunmong/assets/magic-school/ui/tool-residue-lens.webp",
         note: "책, 룬스톤, 수정구에 남은 미세한 마력 결을 확대합니다."
       },
       "룬 해독 펜": {
-        img: "/samunmong/assets/magic-school/ui/tool-rune-pen.png",
+        img: "/samunmong/assets/magic-school/ui/tool-rune-pen.webp",
         note: "보안 룬과 기록 수정구의 조작 흔적을 해독합니다."
       }
     };
@@ -1810,7 +1810,7 @@
         location: "제1 연금술 실습실",
         logic: "말포이는 지팡이를 자주 부수는 학생이라 초반 의심을 받지만, 이 지팡이가 직접 버린 것인지 누가 주워 쓴 것인지 확인해야 한다.",
         relatedSuspects: ["말포이", "말포일"],
-        img: "/samunmong/assets/magic-school/evidence-cutouts/broken-wand.png",
+        img: "/samunmong/assets/magic-school/evidence-cutouts/broken-wand.webp",
         tool: "마력의 시선",
         toolResult: "붉은 마력이 선명하지만, 손잡이 주변의 잔류 마력은 최근 사용자의 것과 섞여 있다.\n말포이의 지팡이처럼 보이지만 누군가 주워 다시 쓴 흔적이 있다."
       },
@@ -1819,7 +1819,7 @@
         location: "제1 연금술 실습실",
         logic: "화재 경보가 울리지 않은 이유를 설명하는 수법 단서다. 섬세한 빙결 마법을 못 쓰는 말포이와 맞지 않는다.",
         relatedSuspects: ["말포이", "말포일"],
-        img: "/samunmong/assets/magic-school/evidence-cutouts/fire-rune-stone.png",
+        img: "/samunmong/assets/magic-school/evidence-cutouts/fire-rune-stone.webp",
         tool: "룬 해독 펜",
         toolResult: "룬의 공명선이 얼음 원소에 눌려 끊겨 있다.\n화재가 난 뒤 꺼진 것이 아니라, 불이 번지기 전에 먼저 무력화된 상태다."
       },
@@ -1828,7 +1828,7 @@
         location: "제1 연금술 실습실",
         logic: "누군가 현장 출입 기록을 환각으로 덮었다. 환각 마법을 다루는 말포삼과 연결된다.",
         relatedSuspects: ["말포삼", "말포일"],
-        img: "/samunmong/assets/magic-school/evidence-cutouts/record-crystal.png",
+        img: "/samunmong/assets/magic-school/evidence-cutouts/record-crystal.webp",
         tool: "룬 해독 펜",
         toolResult: "기록 자체가 사라진 것이 아니라, 환각층이 위에 덧씌워져 있다.\n환각 마법을 건 사람과 지시한 사람을 따로 확인해야 한다."
       },
@@ -1837,7 +1837,7 @@
         location: "청소도구함",
         logic: "덩쿨도어는 현장 근처에 있었고 탄 냄새가 났지만, 실제로는 금지된 마법 담배를 피우고 있었다.",
         relatedSuspects: ["덩쿨도어"],
-        img: "/samunmong/assets/magic-school/evidence-cutouts/magic-cigarette-ash.png",
+        img: "/samunmong/assets/magic-school/evidence-cutouts/magic-cigarette-ash.webp",
         tool: "마력의 시선",
         toolResult: "초록 마력이 재 주변에만 둥글게 남아 있다.\n방화의 붉은 마력과 결이 달라, 덩쿨도어의 탄 냄새는 담배 쪽에 가깝다."
       },
@@ -1846,7 +1846,7 @@
         location: "도서관",
         logic: "말포일이 화염 감지 룬스톤의 약점을 미리 조사했다는 정황이다.",
         relatedSuspects: ["말포일"],
-        img: "/samunmong/assets/magic-school/evidence-cutouts/library-loan-ledger.png",
+        img: "/samunmong/assets/magic-school/evidence-cutouts/library-loan-ledger.webp",
         tool: "잔류 마력 렌즈",
         toolResult: "기록부의 해당 줄 주변에 말포일이 자주 쓰는 잉크와 같은 보라빛 먼지가 남아 있다.\n책을 빌린 사실을 단순한 우연으로 보기 어렵다."
       },
@@ -1855,7 +1855,7 @@
         location: "도서관",
         logic: "말포일이 책 지식으로 룬스톤 무력화를 연습했다는 수법 단서다.",
         relatedSuspects: ["말포일", "말포이"],
-        img: "/samunmong/assets/magic-school/evidence-cutouts/frost-returned-book.png",
+        img: "/samunmong/assets/magic-school/evidence-cutouts/frost-returned-book.webp",
         tool: "잔류 마력 렌즈",
         toolResult: "책 표지의 빙결 마력 결이 룬스톤 표면의 흔적과 거의 같다.\n이는 단순 독서가 아니라 실제 연습 흔적이다."
       },
@@ -1864,7 +1864,7 @@
         location: "기록 수정구실",
         logic: "말포삼이 환각 마법을 걸었고, 누군가가 그에게 부탁했다는 사실로 이어진다.",
         relatedSuspects: ["말포삼", "말포일"],
-        img: "/samunmong/assets/magic-school/evidence-cutouts/record-crystal.png",
+        img: "/samunmong/assets/magic-school/evidence-cutouts/record-crystal.webp",
         tool: "룬 해독 펜",
         toolResult: "수정구 조작 주문은 서툴지만 목적은 분명하다.\n직접 범행을 숨기려는 사람보다, 누군가의 부탁을 받고 덮은 흔적에 가깝다."
       },
@@ -1873,7 +1873,7 @@
         location: "학생들 기숙사",
         logic: "말포이가 버린 지팡이를 누군가 주워 방화에 이용했을 가능성을 보여 준다.",
         relatedSuspects: ["말포이", "말포일"],
-        img: "/samunmong/assets/magic-school/evidence-cutouts/discarded-wand-shard.png",
+        img: "/samunmong/assets/magic-school/evidence-cutouts/discarded-wand-shard.webp",
         tool: "마력의 시선",
         toolResult: "버려진 조각에는 말포이의 강한 마력 흔적이 남아 있지만, 실습실 지팡이에는 다른 손길의 잔류 마력이 덧씌워져 있다."
       },
@@ -1882,21 +1882,21 @@
         location: "교무 조사실",
         logic: "수정구 조작의 실행자는 말포삼이지만, 지시자는 말포일이라는 결정타 증언이다.",
         relatedSuspects: ["말포삼", "말포일"],
-        img: "/samunmong/assets/magic-school/evidence-cutouts/crystal-confession-vial.png"
+        img: "/samunmong/assets/magic-school/evidence-cutouts/crystal-confession-vial.webp"
       }
     };
 
     const spaceTools = {
       "신호 스캐너": {
-        img: "/assets/space-station/ui-icons-v3/scan-tool.png",
+        img: "/assets/space-station/ui-icons-v3/scan-tool.webp",
         note: "잔류 전자 신호와 장비 작동 흔적을 읽습니다."
       },
       "의료 분석 렌즈": {
-        img: "/assets/space-station/ui-icons-v3/hint-beacon.png",
+        img: "/assets/space-station/ui-icons-v3/hint-beacon.webp",
         note: "의료용 젤, 약품, 생체 기록의 미세 흔적을 확인합니다."
       },
       "로그 복구 모듈": {
-        img: "/assets/space-station/ui-icons-v3/log-record.png",
+        img: "/assets/space-station/ui-icons-v3/log-record.webp",
         note: "삭제되거나 끊긴 기록의 조각을 복구합니다."
       }
     };
@@ -1907,7 +1907,7 @@
         location: "에어록",
         logic: "정거장 내부에서는 액체였지만 그늘 구역의 극저온에서 얼어붙어 레버를 막았다는 수법 단서다.",
         relatedSuspects: ["메르스", "알라딘딘"],
-        img: "/assets/space-station/evidence/frozen-lever-gel.png",
+        img: "/assets/space-station/evidence/frozen-lever-gel.webp",
         tool: "의료 분석 렌즈",
         toolResult: "성분이 의료실 수술용 밀봉 젤과 일치한다.\n기계 결함이 아니라 누군가 레버 홈에 젤을 미리 채워 넣은 흔적이다."
       },
@@ -1916,7 +1916,7 @@
         location: "에어록",
         logic: "데이비드가 사고를 연기했을 가능성과 메르스와의 비밀 계약을 암시한다.",
         relatedSuspects: ["데이비드", "메르스"],
-        img: "/assets/space-station/evidence/final-radio-log.png",
+        img: "/assets/space-station/evidence/final-radio-log.webp",
         tool: "로그 복구 모듈",
         toolResult: "무전 마지막에 짧은 숨 고르기와 암호화된 개인 채널 호출 흔적이 남아 있다.\n단순 비명보다 누군가에게 보내는 신호처럼 들린다."
       },
@@ -1925,7 +1925,7 @@
         location: "의료실",
         logic: "범행 도구가 의료실에서 준비됐다는 정황이다.",
         relatedSuspects: ["메르스"],
-        img: "/assets/space-station/evidence/disinfectant-cloth-glove.png",
+        img: "/assets/space-station/evidence/disinfectant-cloth-glove.webp",
         tool: "의료 분석 렌즈",
         toolResult: "장갑 안쪽에는 메르스가 쓰는 의료용 소독제와 같은 잔류 성분이 남아 있다.\n레버 젤과 의료실이 연결된다."
       },
@@ -1934,7 +1934,7 @@
         location: "의료실",
         logic: "해리가 데이터를 날린 것이 아니라 누군가 해리 계정을 이용해 데이비드의 병을 숨겼다는 단서다.",
         relatedSuspects: ["해리", "메르스", "데이비드"],
-        img: "/assets/space-station/evidence/deleted-medical-record.png",
+        img: "/assets/space-station/evidence/deleted-medical-record.webp",
         tool: "로그 복구 모듈",
         toolResult: "삭제 명령은 해리 계정으로 실행됐지만 접근 위치는 의료실 단말이다.\n해리의 실수라는 설명과 맞지 않는다."
       },
@@ -1943,7 +1943,7 @@
         location: "산소 발생기실",
         logic: "정전은 우연이 아니라 외부 작업 시간에 맞춘 지연 장치였음을 보여 준다.",
         relatedSuspects: ["메르스"],
-        img: "/assets/space-station/evidence/damaged-pressure-sensor.png",
+        img: "/assets/space-station/evidence/damaged-pressure-sensor.webp",
         tool: "신호 스캐너",
         toolResult: "센서 손상 뒤에도 약 5시간 동안 정상값을 흉내 낸 기록이 남아 있다.\n정전 당시 알리바이는 범행 시간을 설명하지 못한다."
       },
@@ -1952,7 +1952,7 @@
         location: "데이터실",
         logic: "데이터 삭제가 해리 본인의 실수가 아니라 계정 도용일 수 있음을 보강한다.",
         relatedSuspects: ["해리", "메르스"],
-        img: "/assets/space-station/evidence/access-keycard-chip.png",
+        img: "/assets/space-station/evidence/access-keycard-chip.webp",
         tool: "로그 복구 모듈",
         toolResult: "칩의 마지막 인증 위치가 데이터실이 아니라 의료실 보조 단말로 찍혀 있다.\n해리가 자책하던 삭제 사고는 누군가의 위장일 가능성이 커진다."
       },
@@ -1961,28 +1961,28 @@
         location: "외부 작업 준비실",
         logic: "알라딘딘이 우주복을 점검했을 때 젤이 보이지 않았다는 진술을 뒷받침한다.",
         relatedSuspects: ["알라딘딘"],
-        img: "/assets/space-station/evidence/engineer-tool-clamp.png"
+        img: "/assets/space-station/evidence/engineer-tool-clamp.webp"
       },
       "커피 텀블러": {
         note: "정전 직전 복도에 떠다니던 텀블러. 대원들이 각자 어디에 있었는지 맞추는 알리바이 단서다.",
         location: "주방 복도",
         logic: "정전 당시 위치보다 정전이 준비된 시점이 더 중요하다는 점을 드러낸다.",
         relatedSuspects: ["안성줴줴이", "아인슈페너"],
-        img: "/assets/space-station/evidence/coffee-tumbler.png"
+        img: "/assets/space-station/evidence/coffee-tumbler.webp"
       }
     };
 
     const tools = isSpaceTheme ? spaceTools : isMagicTheme ? magicTools : {
       "돋보기": {
-        img: "/samunmong/assets/mudeok-interaction/tool-magnifying-glass.png",
+        img: "/samunmong/assets/mudeok-interaction/tool-magnifying-glass.webp",
         note: "작은 글자, 긁힌 자국, 미세한 흔적을 확대합니다."
       },
       "먼지털이 붓": {
-        img: "/samunmong/assets/mudeok-interaction/tool-dusting-brush.png",
+        img: "/samunmong/assets/mudeok-interaction/tool-dusting-brush.webp",
         note: "흙먼지나 재를 털어 숨은 표면을 드러냅니다."
       },
       "촛불 비추기": {
-        img: "/samunmong/assets/mudeok-interaction/tool-candle-lantern.png",
+        img: "/samunmong/assets/mudeok-interaction/tool-candle-lantern.webp",
         note: "어두운 곳, 비침, 눌린 자국을 빛으로 확인합니다."
       }
     };
@@ -1990,73 +1990,73 @@
     const evidenceData = isSpaceTheme ? spaceEvidenceData : isMagicTheme ? magicEvidenceData : window.SAMUNMONG_CONTENT?.evidenceData || {
       "호패 조각": {
         note: "점순 옆에서 발견된 신분 단서. 유문석의 물건처럼 보이지만 일부 글자가 긁혀 있다.",
-        img: "/samunmong/assets/evidence-wooden-tag.png",
+        img: "/samunmong/assets/evidence-wooden-tag.webp",
         tool: "먼지털이 붓",
         toolResult: "먼지털이 붓으로 털자 긁힌 글자 홈 사이에 고운 분가루가 남아 있다.\n거칠게 굴러다닌 물건이라기보다, 누군가 손에 쥐고 옮긴 뒤 일부러 현장에 둔 듯하다."
       },
       "돌쇠의 그림": {
         note: "최춘월의 방에서 발견된 숨겨둔 초상. 오래 숨긴 마음과 집착을 추적할 단서다.",
-        img: "/samunmong/assets/evidence-portrait-v2.png",
+        img: "/samunmong/assets/evidence-portrait-v2.webp",
         tool: "돋보기",
         toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있다.\n그림 가장자리에는 지운 글씨 자국이 남아 있고, ‘떠나지 마라’로 보이는 획이 희미하다.\n우연한 초상이라기보다 오래 눌러 둔 마음에 가깝다."
       },
       "헐거워진 노리개": {
         note: "끊어진 장식과 급히 잡아챈 듯한 흔적이 남은 노리개. 누가 지녔는지 확인해야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.png"
+        img: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.webp"
       },
       "무덕의 번진 일기": {
         note: "먹이 번져 읽기 어려운 일기. 점순과 돌쇠의 도망 계획이 춘월에게 닿은 경로를 추적할 수 있다.",
-        img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.png",
+        img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.webp",
         tool: "촛불 비추기",
         toolResult: "촛불을 비추자 번진 먹 아래 기록이 또렷해진다."
       },
       "진흙 묻은 짚신": {
         note: "문밖 젖은 길과 닮은 진흙이 묻은 짚신. 이동 경로를 비교할 단서다.",
-        img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-muddy-straw-shoes.png"
+        img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-muddy-straw-shoes.webp"
       },
       "찢어진 옷고름": {
         note: "무덕의 방에서 발견된 찢어진 옷고름. 하인 옷감보다 고급스럽고, 목을 조를 때 쓰였을 가능성이 있다.",
-        img: "/samunmong/assets/mudeok-interaction/evidence-torn-collar-tie.png"
+        img: "/samunmong/assets/mudeok-interaction/evidence-torn-collar-tie.webp"
       },
       "빈 호패 주머니": {
         note: "호패가 빠진 듯한 빈 주머니. 주인과 호패 조각의 관계를 확인할 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-empty-hopae-holder.png"
+        img: "/samunmong/assets/evidence-transparent/evidence-empty-hopae-holder.webp"
       },
       "하인 장부": {
         note: "하인들의 출입과 심부름 기록이 적힌 장부. 장소 이동을 대조할 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-servant-ledger.png"
+        img: "/samunmong/assets/evidence-transparent/evidence-servant-ledger.webp"
       },
       "혼서 조각": {
         note: "춘월의 혼인을 재촉하는 문서 조각. 춘월이 자기 삶을 통제하지 못하던 처지를 보여 준다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-marriage-letter.png"
+        img: "/samunmong/assets/evidence-transparent/evidence-marriage-letter.webp"
       },
       "피 묻은 붕대": {
         note: "피처럼 보이는 얼룩이 남은 붕대. 상처나 몸싸움 흔적과 연결될 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-bloodied-bandage.png"
+        img: "/samunmong/assets/evidence-transparent/evidence-bloodied-bandage.webp"
       },
       "돌쇠의 팔 상처": {
         note: "심문 중 돌쇠의 소매 아래에서 확인한 상처. 붕대를 감았던 흔적과 함께 봐야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.png"
+        img: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp"
       },
       "도망 보따리": {
         note: "급히 싼 듯한 보따리. 점순과 돌쇠가 떠나려 했고, 그 사실이 누군가의 감정을 건드렸는지 확인해야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-escape-bundle.png"
+        img: "/samunmong/assets/evidence-transparent/evidence-escape-bundle.webp"
       },
       "긁힌 팔 흔적": {
         note: "심문 중 소매 아래에서 확인한 긁힌 흔적. 점순이 마지막 순간 저항하며 남긴 상처일 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.png"
+        img: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp"
       },
       "작은 발자국": {
         note: "뒷문 마당에 남은 작은 발자국. 젖은 돌길의 이동 경로와 맞춰볼 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-small-footprints.png"
+        img: "/samunmong/assets/evidence-transparent/evidence-small-footprints.webp"
       },
       "끊어진 호패끈": {
         note: "호패와 연결되었을 법한 끊어진 끈. 호패 조각과 함께 봐야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.png"
+        img: "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.webp"
       },
       "찢어진 약속 편지": {
         note: "점순의 손에서 발견된 찢어진 약속 편지. 정중한 말투가 돌쇠의 평소 말투와 맞지 않는다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png"
+        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.webp"
       }
     };
 
@@ -2130,7 +2130,7 @@
     function evidenceCardHtml(name) {
       const data = evidenceData[name] || {};
       return `
-        <img class="evidence-thumb" src="${escapeHtml(data.img || "/samunmong/assets/evidence-wooden-tag.png")}" alt="">
+        <img class="evidence-thumb" src="${escapeHtml(data.img || "/samunmong/assets/evidence-wooden-tag.webp")}" alt="">
         <span class="evidence-card-copy">
           <strong>${escapeHtml(name)}</strong>
           ${data.tool ? `<span class="evidence-tool-cue">${escapeHtml(TOOL_NEEDED_HINT)}</span>` : ""}
@@ -2277,7 +2277,7 @@
       button.className = `tool-evidence-option${hasAnalyzedEvidence(name) ? " analyzed" : ""}`;
       button.type = "button";
       button.dataset.evidence = name;
-      button.innerHTML = `<img src="${escapeHtml(data.img || "/samunmong/assets/evidence-wooden-tag.png")}" alt=""><span><strong>${escapeHtml(name)}</strong>${sentenceBreakHtml(data.tool ? TOOL_NEEDED_HINT : "확인 완료")}</span>`;
+      button.innerHTML = `<img src="${escapeHtml(data.img || "/samunmong/assets/evidence-wooden-tag.webp")}" alt=""><span><strong>${escapeHtml(name)}</strong>${sentenceBreakHtml(data.tool ? TOOL_NEEDED_HINT : "확인 완료")}</span>`;
       button.addEventListener("click", () => setAnalysisTarget(name));
       list.appendChild(button);
     }
@@ -2303,7 +2303,7 @@
       if (!image || !title || !note) return;
       const analyzed = Boolean(name && hasAnalyzedEvidence(name));
 
-      image.src = data.img || "/samunmong/assets/evidence-wooden-tag.png";
+      image.src = data.img || "/samunmong/assets/evidence-wooden-tag.webp";
       image.alt = name ? `${name} 확대 이미지` : "";
       title.textContent = name || "증거를 선택하세요";
       note.textContent = analyzed
@@ -2578,7 +2578,7 @@
       }
       if (data.tool) setAnalysisTarget(name);
 
-      document.querySelector("#genericEvidenceImage").src = data.img || "/samunmong/assets/evidence-wooden-tag.png";
+      document.querySelector("#genericEvidenceImage").src = data.img || "/samunmong/assets/evidence-wooden-tag.webp";
       document.querySelector("#genericEvidenceTitle").textContent = name;
       document.querySelector("#genericEvidenceText").textContent = data.tool ? sentenceBreakText(TOOL_NEEDED_HINT) : "";
       document.querySelector("#genericEvidenceText").hidden = !data.tool;
@@ -3072,7 +3072,7 @@
         document.querySelector(`#${screenId} .plate`)?.setAttribute("src", imageSrc);
       });
       if (isMagicTheme) {
-        document.querySelector("#interrogationPlate")?.setAttribute("src", "/samunmong/assets/magic-school/interrogation/office-empty.png");
+        document.querySelector("#interrogationPlate")?.setAttribute("src", "/samunmong/assets/magic-school/interrogation/office-empty.webp");
       } else if (isSpaceTheme) {
         updateSuspect(false);
       }

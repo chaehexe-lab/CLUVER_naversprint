@@ -10,17 +10,17 @@ const truthUnlockKey = "samunmong-truth-unlocked";
 const evidence = [
   {
     name: "찢어진 약속 편지",
-    image: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.png",
+    image: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.webp",
     text: "돌쇠의 투박한 말투와 달리 지나치게 정중했다. 춘월이 돌쇠인 척 써 점순을 창고로 불러낸 미끼였다."
   },
   {
     name: "팔의 긁힌 자국",
-    image: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.png",
+    image: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp",
     text: "점순은 목이 졸리는 마지막 순간까지 저항했다. 손톱 밑 흔적과 춘월의 상처가 그 몸싸움을 증명했다."
   },
   {
     name: "유문석의 호패",
-    image: "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.png",
+    image: "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp",
     text: "춘월은 미리 가져간 호패의 끈을 잘라 시신 곁에 두었다. 유문석에게 죄를 뒤집어씌우기 위한 거짓 흔적이었다."
   }
 ] as const;

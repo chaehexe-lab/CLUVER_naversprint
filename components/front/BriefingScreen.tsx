@@ -4,22 +4,22 @@ const magicRecordCards = [
   {
     name: "기록 책",
     kind: "세 권의 기록",
-    image: "/samunmong/assets/magic-school/intro/final-ui/archive-books-closed.png"
+    image: "/samunmong/assets/magic-school/intro/final-ui/archive-books-closed.webp"
   },
   {
     name: "말포일",
     kind: "학생기록부",
-    image: "/samunmong/assets/magic-school/intro/final-ui/student-record-open.png"
+    image: "/samunmong/assets/magic-school/intro/final-ui/student-record-open.webp"
   },
   {
     name: "건달프",
     kind: "경비근무일지",
-    image: "/samunmong/assets/magic-school/intro/final-ui/guard-log-open.png"
+    image: "/samunmong/assets/magic-school/intro/final-ui/guard-log-open.webp"
   },
   {
     name: "덩쿨도어",
     kind: "교직원 기록",
-    image: "/samunmong/assets/magic-school/intro/final-ui/faculty-record-open.png"
+    image: "/samunmong/assets/magic-school/intro/final-ui/faculty-record-open.webp"
   }
 ] as const;
 
@@ -163,7 +163,7 @@ function SpaceStationBriefingScreen() {
     <section className="screen briefing-screen" id="briefingScreen">
       <img
         className="plate"
-        src="/assets/space-station/backgrounds/space-briefing-room.png"
+        src="/assets/space-station/backgrounds/space-briefing-room.webp"
         alt="우주정거장 오르빗-13 사건 브리핑실"
       />
       <div className="shade" />
@@ -287,7 +287,7 @@ export default function BriefingScreen({ initialTheme }: { initialTheme?: "magic
           <div className="briefing-step active" data-briefing-panel="0">
             <section className="memory-trace-sequence" data-memory-trace-state="intro" aria-label="사건 잔상 복원">
               <div className="memory-trace-frame">
-                <img src="/samunmong/assets/magic-school/intro/memory-trace/memory-trace-frame.png" alt="마법학교 방화사건 기억 프레임과 사건 현장" draggable={false} />
+                <img src="/samunmong/assets/magic-school/intro/memory-trace/memory-trace-frame.webp" alt="마법학교 방화사건 기억 프레임과 사건 현장" draggable={false} />
                 <div className="memory-trace-photo-zone" data-memory-draw-zone>
                   <svg className="memory-trace-drawing" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
                     <path data-memory-draw-path d="" />
@@ -317,7 +317,7 @@ export default function BriefingScreen({ initialTheme }: { initialTheme?: "magic
 
           <div className="briefing-step" data-briefing-panel="1" aria-hidden="true">
             <figure className="magic-case-file-visual">
-              <img src="/samunmong/assets/magic-school/intro/rebuilt/case-page-02.png" alt="마법학교 방화사건 마력 잔흔 분석 기록" draggable={false} />
+              <img src="/samunmong/assets/magic-school/intro/rebuilt/case-page-02.webp" alt="마법학교 방화사건 마력 잔흔 분석 기록" draggable={false} />
               <div className="magic-case-click-zones" aria-label="마력 흔적 넘기기">
                 <button type="button" data-briefing-prev-zone aria-label="이전 마력 흔적" />
                 <button type="button" data-briefing-next-zone aria-label="다음 마력 흔적" />
@@ -327,11 +327,11 @@ export default function BriefingScreen({ initialTheme }: { initialTheme?: "magic
             <div className="briefing-death-layout">
               <div className="briefing-evidence-stack">
                 <figure className="briefing-evidence-photo">
-                  <img src="/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.png" alt="점순 초기 검안 기록" draggable={false} />
+                  <img src="/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.webp" alt="점순 초기 검안 기록" draggable={false} />
                   <figcaption>기록: 초기 검안 기록</figcaption>
                 </figure>
                 <figure className="briefing-evidence-photo briefing-evidence-photo-small">
-                  <img src="/samunmong/assets/mudeok-interaction/evidence-jeomsun-hand-exam-paper.png" alt="점순이 손끝 밑 살점 검안 종이" draggable={false} />
+                  <img src="/samunmong/assets/mudeok-interaction/evidence-jeomsun-hand-exam-paper.webp" alt="점순이 손끝 밑 살점 검안 종이" draggable={false} />
                   <figcaption>증거: 손끝 검안 종이</figcaption>
                 </figure>
               </div>

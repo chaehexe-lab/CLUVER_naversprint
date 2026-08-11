@@ -5,9 +5,13 @@ type MenuButtonStyle = CSSProperties & {
   "--menu-y": string;
 };
 
-export default function MainScreen() {
+type MainScreenProps = {
+  active?: boolean;
+};
+
+export default function MainScreen({ active = false }: MainScreenProps) {
   return (
-    <section className="screen active" id="mainScreen">
+    <section className={`screen${active ? " active" : ""}`} id="mainScreen">
       <audio id="mainBgm" src="/samunmong/sound/bgm/main.mp3" autoPlay loop preload="metadata" playsInline />
       <img className="plate" src={screenImages.mainScreen} alt="삼운몽 세 개의 꿈 메인 화면" />
       {mainMenu.map((item) => (

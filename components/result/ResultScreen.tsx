@@ -11,7 +11,7 @@ const suspects = [
   {
     id: "dolsoe",
     name: "돌쇠",
-    image: "/samunmong/assets/suspects/dolsoe-seated.png",
+    image: "/samunmong/assets/suspects/dolsoe-seated.webp",
     slot: { left: "13.22%", top: "36.56%", width: "13.94%", height: "31.24%" },
     nameLeft: "20.16%",
     stampLeft: "24.25%",
@@ -20,7 +20,7 @@ const suspects = [
   {
     id: "chunwol",
     name: "최춘월",
-    image: "/samunmong/assets/suspects/chunwol-seated.png",
+    image: "/samunmong/assets/suspects/chunwol-seated.webp",
     slot: { left: "32.78%", top: "36.56%", width: "13.82%", height: "31.24%" },
     nameLeft: "39.65%",
     stampLeft: "43.7%",
@@ -29,7 +29,7 @@ const suspects = [
   {
     id: "yoomunseok",
     name: "유문석",
-    image: "/samunmong/assets/suspects/yoomunseok-seated.png",
+    image: "/samunmong/assets/suspects/yoomunseok-seated.webp",
     slot: { left: "52.57%", top: "36.56%", width: "13.88%", height: "31.24%" },
     nameLeft: "59.51%",
     stampLeft: "63.15%",
@@ -38,7 +38,7 @@ const suspects = [
   {
     id: "mudeok",
     name: "무덕",
-    image: "/samunmong/assets/suspects/mudeok-seated.png",
+    image: "/samunmong/assets/suspects/mudeok-seated.webp",
     slot: { left: "72.01%", top: "36.56%", width: "13.64%", height: "31.24%" },
     nameLeft: "78.83%",
     stampLeft: "82.6%",
@@ -50,7 +50,7 @@ const spaceSuspects = [
   {
     id: "harry",
     name: "해리",
-    image: "/assets/space-station/characters/harry-upper.png",
+    image: "/assets/space-station/characters/harry-upper.webp",
     slot: { left: "9.5%", top: "38.5%", width: "12.5%", height: "30%" },
     nameLeft: "15.5%",
     stampLeft: "18%",
@@ -59,7 +59,7 @@ const spaceSuspects = [
   {
     id: "mers",
     name: "메르스",
-    image: "/assets/space-station/characters/mers-upper.png",
+    image: "/assets/space-station/characters/mers-upper.webp",
     slot: { left: "26%", top: "37%", width: "12.5%", height: "31%" },
     nameLeft: "32%",
     stampLeft: "34.5%",
@@ -68,7 +68,7 @@ const spaceSuspects = [
   {
     id: "aladdindin",
     name: "알라딘딘",
-    image: "/assets/space-station/characters/aladdindin-upper.png",
+    image: "/assets/space-station/characters/aladdindin-upper.webp",
     slot: { left: "42.5%", top: "37.8%", width: "12.5%", height: "30.4%" },
     nameLeft: "48.5%",
     stampLeft: "51%",
@@ -77,7 +77,7 @@ const spaceSuspects = [
   {
     id: "ansungjyejyei",
     name: "안성줴줴이",
-    image: "/assets/space-station/characters/ansungjyejyei-upper.png",
+    image: "/assets/space-station/characters/ansungjyejyei-upper.webp",
     slot: { left: "59%", top: "38.2%", width: "12.5%", height: "30%" },
     nameLeft: "65%",
     stampLeft: "67.5%",
@@ -86,7 +86,7 @@ const spaceSuspects = [
   {
     id: "einspanner",
     name: "아인슈페너",
-    image: "/assets/space-station/characters/einspanner-upper.png",
+    image: "/assets/space-station/characters/einspanner-upper.webp",
     slot: { left: "75.5%", top: "38.2%", width: "12.5%", height: "30%" },
     nameLeft: "81.5%",
     stampLeft: "84%",
@@ -360,7 +360,7 @@ export default function ResultScreen() {
   const activeSuspects = theme === "spaceStation" ? spaceSuspects : suspects;
   const requiredEvidence = theme === "spaceStation" ? spaceRequiredEvidence : joseonRequiredEvidence;
   const correctSuspectId = correctSuspectByTheme[theme];
-  const resultBg = theme === "spaceStation" ? "/assets/space-station/backgrounds/emergency-investigation-room-v2.png" : "/samunmong/assets/final-accusation-bg.png";
+  const resultBg = theme === "spaceStation" ? "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp" : "/samunmong/assets/final-accusation-bg.webp";
   const accusationTitle = theme === "spaceStation" ? "최종 보고 대상 지목" : "최종 범인 지목";
   const backToInterrogationHref = theme === "spaceStation" ? "/?start=interrogationScreen&theme=spaceStation" : "/interrogation";
   const initialSuspectId = searchParams.get("suspectId");
