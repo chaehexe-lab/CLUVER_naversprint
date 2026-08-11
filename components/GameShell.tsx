@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import BriefingScreen from "@/components/front/BriefingScreen";
 import ButtonGuideLayer from "@/components/ButtonGuideLayer";
 import DreamSelectScreen from "@/components/front/DreamSelectScreen";
@@ -23,25 +23,73 @@ import { STARTABLE_SCREENS } from "@/lib/gameState";
 
 const CONTENT_SCRIPT = "/samunmong/content.js";
 const PROTOTYPE_SCRIPT = "/samunmong/prototype.js";
+const MAIN_SCREEN = "mainScreen";
 
 type GameShellProps = {
   initialScreen?: string;
   initialTheme?: "magicSchool" | "spaceStation";
 };
 
+function requestScreen(screenId: string) {
+  window.dispatchEvent(
+    new CustomEvent("samunmong:screen-request", {
+      cancelable: true,
+      detail: { screenId }
+    })
+  );
+}
+
 function ensureRequestedStartScreen(initialScreen?: string) {
   const startScreen = new URLSearchParams(window.location.search).get("start") || initialScreen;
   if (!startScreen || !STARTABLE_SCREENS.has(startScreen)) return;
 
-  document.querySelectorAll(".screen").forEach((screen) => {
-    screen.classList.toggle("active", screen.id === startScreen);
-  });
   document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
-  window.dispatchEvent(new CustomEvent("samunmong:screen-change", { detail: { screenId: startScreen } }));
+  requestScreen(startScreen);
+}
+
+function ActiveInvestigationScene({ screenId }: { screenId: string }) {
+  if (screenId === "fieldOne") return <FieldOneScene />;
+  if (screenId === "chunwolRoom") return <ChunwolRoomScene />;
+  if (screenId === "mudeokServantRoom") return <MudeokServantRoomScene />;
+  if (screenId === "yoomunseokSarangbang") return <YoomunseokSarangbangScene />;
+  if (screenId === "dolsoeQuarters") return <DolsoeQuartersScene />;
+  if (screenId === "backGateCourtyard") return <BackGateCourtyardScene />;
+
+  const magicScene = magicSchoolScenes.find((scene) => scene.id === screenId);
+  if (magicScene) return <MagicSchoolScene scene={magicScene} />;
+
+  const spaceScene = spaceStationScenes.find((scene) => scene.id === screenId);
+  return spaceScene ? <SpaceStationScene scene={spaceScene} /> : null;
 }
 
 export default function GameShell({ initialScreen, initialTheme }: GameShellProps) {
   const skipIntro = Boolean(initialScreen);
+  const [currentScreen, setCurrentScreen] = useState(
+    initialScreen && STARTABLE_SCREENS.has(initialScreen) ? initialScreen : MAIN_SCREEN
+  );
+
+  useEffect(() => {
+    const handleScreenRequest = (event: Event) => {
+      const screenEvent = event as CustomEvent<{ screenId?: string }>;
+      const screenId = screenEvent.detail?.screenId;
+      if (!screenId || (screenId !== MAIN_SCREEN && !STARTABLE_SCREENS.has(screenId))) return;
+
+      event.preventDefault();
+      setCurrentScreen(screenId);
+    };
+
+    window.addEventListener("samunmong:screen-request", handleScreenRequest);
+    return () => window.removeEventListener("samunmong:screen-request", handleScreenRequest);
+  }, []);
+
+  useLayoutEffect(() => {
+    document.querySelectorAll(".screen").forEach((screen) => {
+      screen.classList.toggle("active", screen.id === currentScreen);
+    });
+    window.dispatchEvent(
+      new CustomEvent("samunmong:screen-change", { detail: { screenId: currentScreen } })
+    );
+  }, [currentScreen]);
 
   useEffect(() => {
     const syncGameScale = () => {
@@ -74,7 +122,7 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
     const loadScript = (src: string) =>
       new Promise<void>((resolve, reject) => {
         const script = document.createElement("script");
-        script.src = `${src}?v=${Date.now()}`;
+        script.src = src;
         script.async = false;
         script.onload = () => resolve();
         script.onerror = () => reject(new Error(`Failed to load ${src}`));
@@ -105,18 +153,7 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
         <TutorialScreen />
         <DreamSelectScreen />
         <BriefingScreen initialTheme={initialTheme} />
-        <FieldOneScene />
-        <ChunwolRoomScene />
-        <MudeokServantRoomScene />
-        <YoomunseokSarangbangScene />
-        <DolsoeQuartersScene />
-        <BackGateCourtyardScene />
-        {magicSchoolScenes.map((scene) => (
-          <MagicSchoolScene scene={scene} key={scene.id} />
-        ))}
-        {spaceStationScenes.map((scene) => (
-          <SpaceStationScene scene={scene} key={scene.id} />
-        ))}
+        <ActiveInvestigationScene screenId={currentScreen} />
         <InterrogationScreen initialTheme={initialTheme} />
         <LocationIndicator initialScreen={initialScreen} initialTheme={initialTheme} />
         <GameSettingsOverlay />
