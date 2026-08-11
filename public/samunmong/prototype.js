@@ -1640,7 +1640,7 @@
     });
     on("#chooseJoseon", "click", () => {
       localStorage.setItem(themeKey, "joseon");
-      if (isMagicTheme) {
+      if (activeTheme !== "joseon") {
         window.location.href = "/?start=briefingScreen&theme=joseon";
         return;
       }
