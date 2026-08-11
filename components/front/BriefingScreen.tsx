@@ -200,6 +200,33 @@ function SpaceStationBriefingScreen() {
           </button>
         </div>
       </article>
+      <button
+        id="spaceBriefingNext"
+        type="button"
+        data-go="spaceAirlock"
+        aria-label="다음 화면으로 이동"
+        style={{
+          position: "absolute",
+          left: "50%",
+          bottom: "9.2%",
+          transform: "translateX(-50%)",
+          width: "clamp(172px, 18vw, 260px)",
+          aspectRatio: "420 / 132",
+          padding: 0,
+          border: 0,
+          background: "transparent",
+          cursor: "pointer",
+          zIndex: 8,
+          filter: "drop-shadow(0 18px 28px rgba(0,0,0,.48))"
+        }}
+      >
+        <img
+          src="/assets/space-station/ui-buttons/space-next-button.svg"
+          alt="다음"
+          draggable={false}
+          style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+        />
+      </button>
     </section>
   );
 }

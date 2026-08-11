@@ -1221,6 +1221,7 @@
       "/assets/space-station/ui-icons-v3/final-report.png",
       "/assets/space-station/ui-icons-v3/accuse-target.png",
       "/assets/space-station/ui-icons-v3/hint-beacon.png",
+      "/assets/space-station/ui-buttons/space-next-button.svg",
       "/assets/space-station/characters/harry-upper.png",
       "/assets/space-station/characters/mers-upper.png",
       "/assets/space-station/characters/aladdindin-upper.png",
