@@ -8,6 +8,7 @@
     const startCaseLabelNode = document.querySelector("[data-start-case-label]");
     const briefingCard = document.querySelector(".briefing-card");
     const briefingScreen = document.querySelector("#briefingScreen");
+    const briefingTitle = document.querySelector("#briefingScreen .briefing-card h2");
     const memoryOrbTrigger = document.querySelector("#memoryOrbTrigger");
     const briefingPrevButton = document.querySelector("#briefingPrev");
     const briefingNextButton = document.querySelector("#briefingNext");
@@ -52,17 +53,22 @@
     const requestedTheme = entryParams.get("theme");
     const requestedStart = entryParams.get("start") || "";
     const isMagicStart = requestedStart.startsWith("magic") || window.location.pathname.startsWith("/magic-");
-    if (requestedTheme === "magicSchool" || requestedTheme === "joseon") {
+    if (requestedTheme === "magicSchool" || requestedTheme === "spaceStation" || requestedTheme === "joseon") {
       localStorage.setItem(themeKey, requestedTheme);
     } else if (isMagicStart) {
       localStorage.setItem(themeKey, "magicSchool");
     }
-    const activeTheme = localStorage.getItem(themeKey) === "magicSchool" ? "magicSchool" : "joseon";
+    const storedTheme = localStorage.getItem(themeKey);
+    const activeTheme = storedTheme === "magicSchool" || storedTheme === "spaceStation" ? storedTheme : "joseon";
     const isMagicTheme = activeTheme === "magicSchool";
-    if (isMagicTheme) startCaseLabel = "조사 시작";
+    const isSpaceTheme = activeTheme === "spaceStation";
+    if (isMagicTheme || isSpaceTheme) startCaseLabel = "조사 시작";
     document.documentElement.dataset.samunmongTheme = activeTheme;
     const magicBriefingText = sentenceBreakText("“선생님, 제1 연금술 실습실이 밤새 불탔습니다.”\n\n당신은 이 꿈에서 갓 부임한 마법 교사입니다.\n마력의 시선으로 잔류 마법을 살피고, 학생과 교직원을 심문해 방화의 진범을 찾아야 합니다.");
-    const briefingText = isMagicTheme
+    const spaceBriefingText = sentenceBreakText("“오르빗-13에서 외부 작업 중 대원이 궤도 밖으로 이탈했습니다.”\n\n당신은 이 꿈에서 정거장 사고 조사관입니다.\n정전 기록, 산소 장치, 우주복 점검 로그와 마지막 무전을 맞춰 보며 사고처럼 보이는 죽음의 진실을 추적해야 합니다.");
+    const briefingText = isSpaceTheme
+      ? spaceBriefingText
+      : isMagicTheme
       ? magicBriefingText
       : sentenceBreakText("“사또님, 관아 근처에서 사람이 쓰러진 채 발견되었습니다.”\n\n당신은 이 꿈에서 고을의 사또입니다. 현장을 조사하고, 증거를 모아 용의자를 심문해야 합니다.");
     const magicSuspects = [
@@ -72,7 +78,14 @@
       { name: "말포이", id: "malpoi", scene: "/samunmong/assets/magic-school/interrogation/office-empty.png", sprite: "/samunmong/assets/magic-school/interrogation/malpoi-sprite.png", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.png" },
       { name: "말포삼", id: "malposam", scene: "/samunmong/assets/magic-school/interrogation/office-empty.png", sprite: "/samunmong/assets/magic-school/interrogation/malposam-sprite.png", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.png" }
     ];
-    const suspects = isMagicTheme ? magicSuspects : window.SAMUNMONG_CONTENT?.suspects || [
+    const spaceSuspects = [
+      { name: "해리", id: "harry", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.png", sprite: "/assets/space-station/characters/harry-upper-transparent.png", sleeveScene: "/assets/space-station/characters/harry-upper-transparent.png" },
+      { name: "메르스", id: "mers", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.png", sprite: "/assets/space-station/characters/mers-upper-aligned.png", sleeveScene: "/assets/space-station/characters/mers-upper-aligned.png" },
+      { name: "알라딘딘", id: "aladdindin", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.png", sprite: "/assets/space-station/characters/aladdindin-upper-aligned.png", sleeveScene: "/assets/space-station/characters/aladdindin-upper-aligned.png" },
+      { name: "안성줴줴이", id: "ansungjyejyei", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.png", sprite: "/assets/space-station/characters/ansungjyejyei-upper-aligned.png", sleeveScene: "/assets/space-station/characters/ansungjyejyei-upper-aligned.png" },
+      { name: "아인슈페너", id: "einspanner", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.png", sprite: "/assets/space-station/characters/einspanner-upper-aligned.png", sleeveScene: "/assets/space-station/characters/einspanner-upper-aligned.png" }
+    ];
+    const suspects = isSpaceTheme ? spaceSuspects : isMagicTheme ? magicSuspects : window.SAMUNMONG_CONTENT?.suspects || [
       { name: "돌쇠", id: "dolsoe", scene: "/samunmong/assets/scene-interrogation-dolsoe.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-dolsoe-sleeve.png?v=sleeve-20260707" },
       { name: "최춘월", id: "chunwol", scene: "/samunmong/assets/scene-interrogation-chunwol.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-chunwol-sleeve.png?v=sleeve-20260707" },
       { name: "유문석", id: "yoomunseok", scene: "/samunmong/assets/scene-interrogation-yoomunseok.png?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-yoomunseok-sleeve.png?v=sleeve-20260707" },
@@ -111,14 +124,14 @@
     }
 
     let suspectIndex = 0;
-    let activeNoteSuspectId = suspects[0]?.id || (isMagicTheme ? "gandalf" : "dolsoe");
+    let activeNoteSuspectId = suspects[0]?.id || (isSpaceTheme ? "harry" : isMagicTheme ? "gandalf" : "dolsoe");
     let briefingStepIndex = 0;
     let briefingRestoreTimer = 0;
     let isBriefingTyped = false;
     const conversationNotes = new Map();
     const sleeveCheckedSuspects = new Set();
     const saveKey = "samunmong-demo-state";
-    const themeStorageSuffix = isMagicTheme ? "magic-school" : "joseon";
+    const themeStorageSuffix = isSpaceTheme ? "space-station" : isMagicTheme ? "magic-school" : "joseon";
     const collectedEvidenceKey = `samunmong-collected-evidence-${themeStorageSuffix}`;
     const analyzedEvidenceKey = `samunmong-analyzed-evidence-${themeStorageSuffix}`;
     const conversationNotesKey = `samunmong-conversation-notes-${themeStorageSuffix}`;
@@ -155,7 +168,21 @@
       magicDormHallway: { name: "학생들 기숙사", x: "27.3%", y: "61.0%" },
       interrogationScreen: { name: "교무 조사실", x: "70.3%", y: "73.6%" }
     };
-    const locationMeta = isMagicTheme ? magicLocationMeta : joseonLocationMeta;
+    const spaceLocationMeta = {
+      tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
+      dreamScreen: { name: "꿈 선택", x: "18%", y: "18%" },
+      briefingScreen: { name: "사건 브리핑", x: "18%", y: "18%" },
+      spaceAirlock: { name: "에어록", x: "18%", y: "25%" },
+      spaceMedicalBay: { name: "의료실", x: "18%", y: "39%" },
+      spaceOxygenGenerator: { name: "산소 발생기실", x: "18%", y: "55%" },
+      spaceDataCore: { name: "데이터실", x: "18%", y: "72%" },
+      spaceScienceLab: { name: "과학 실험실", x: "82%", y: "25%" },
+      spaceGalleyCorridor: { name: "주방 복도", x: "82%", y: "39%" },
+      spaceSuitPrep: { name: "외부 작업 준비실", x: "82%", y: "55%" },
+      spaceObservation: { name: "관측 구역", x: "82%", y: "72%" },
+      interrogationScreen: { name: "비상 조사실", x: "50%", y: "78%" }
+    };
+    const locationMeta = isSpaceTheme ? spaceLocationMeta : isMagicTheme ? magicLocationMeta : joseonLocationMeta;
     const magicMapPins = [
       { goTo: "magicAlchemyLab", label: "제1 연금술 실습실로 이동", text: "제1 연금술 실습실", x: "23.4%", y: "27.6%", rot: "0deg" },
       { goTo: "magicCleaningCloset", label: "청소도구함으로 이동", text: "청소도구함", x: "44.0%", y: "27.2%", rot: "0deg" },
@@ -163,6 +190,17 @@
       { goTo: "magicRecordCrystalRoom", label: "기록 수정구실로 이동", text: "기록 수정구실", x: "78.4%", y: "47.4%", rot: "0deg" },
       { goTo: "magicDormHallway", label: "학생들 기숙사로 이동", text: "학생들 기숙사", x: "27.3%", y: "61.0%", rot: "0deg" },
       { goTo: "interrogationScreen", label: "교무 조사실로 이동", text: "교무 조사실", x: "70.3%", y: "73.6%", rot: "0deg" }
+    ];
+    const spaceMapPins = [
+      { screen: "spaceAirlock", goTo: "spaceAirlock", label: "에어록으로 이동", text: "에어록", x: "18%", y: "25%", rot: "0deg" },
+      { screen: "spaceMedicalBay", goTo: "spaceMedicalBay", label: "의료실로 이동", text: "의료실", x: "18%", y: "39%", rot: "0deg" },
+      { screen: "spaceOxygenGenerator", goTo: "spaceOxygenGenerator", label: "산소 발생기실로 이동", text: "산소 발생기실", x: "18%", y: "55%", rot: "0deg" },
+      { screen: "spaceDataCore", goTo: "spaceDataCore", label: "데이터실로 이동", text: "데이터실", x: "18%", y: "72%", rot: "0deg" },
+      { screen: "spaceScienceLab", goTo: "spaceScienceLab", label: "과학 실험실로 이동", text: "과학 실험실", x: "82%", y: "25%", rot: "0deg" },
+      { screen: "spaceGalleyCorridor", goTo: "spaceGalleyCorridor", label: "주방 복도로 이동", text: "주방 복도", x: "82%", y: "39%", rot: "0deg" },
+      { screen: "spaceSuitPrep", goTo: "spaceSuitPrep", label: "외부 작업 준비실로 이동", text: "외부 작업 준비실", x: "82%", y: "55%", rot: "0deg" },
+      { screen: "spaceObservation", label: "관측 구역 위치", text: "관측 구역", x: "82%", y: "72%", rot: "0deg" },
+      { screen: "interrogationScreen", goTo: "interrogationScreen", label: "비상 조사실로 이동", text: "비상 조사실", x: "50%", y: "78%", rot: "0deg" }
     ];
     const soundBase = "/samunmong/sound";
     const bgmTracks = {
@@ -710,11 +748,11 @@
       if (!target) return "";
       if (target.dataset.guide) return target.dataset.guide;
       if (buttonGuideTextById[target.id]) return buttonGuideTextById[target.id];
-      if (target.matches(".map-chip")) return "조사 장소를 오갑니다.";
-      if (target.matches(".bag-chip")) return isMagicTheme ? "차원 주머니 속 증거를 불러옵니다." : "모은 증거를 확인합니다.";
-      if (target.matches(".tool-chip")) return isMagicTheme ? "마력 감지로 잔류 흔적을 분석합니다." : "증거를 더 자세히 분석합니다.";
-      if (target.matches(".note-chip")) return "등장인물과 나눈 대화를 기록합니다.";
-      if (target.matches(".journal-chip")) return isMagicTheme ? "수사 일지에서 관계자별 기록을 확인합니다." : "처음 사건 일지를 다시 봅니다.";
+      if (target.matches(".map-chip")) return isSpaceTheme ? "오르빗-13의 구역 도면을 펼칩니다." : "조사 장소를 오갑니다.";
+      if (target.matches(".bag-chip")) return isSpaceTheme ? "증거 보관함에서 수집물을 확인합니다." : isMagicTheme ? "차원 주머니 속 증거를 불러옵니다." : "모은 증거를 확인합니다.";
+      if (target.matches(".tool-chip")) return isSpaceTheme ? "스캔 도구로 잔류 신호를 분석합니다." : isMagicTheme ? "마력 감지로 잔류 흔적을 분석합니다." : "증거를 더 자세히 분석합니다.";
+      if (target.matches(".note-chip")) return isSpaceTheme ? "대원별 통신 로그를 확인합니다." : "등장인물과 나눈 대화를 기록합니다.";
+      if (target.matches(".journal-chip")) return isSpaceTheme ? "초기 사고 보고서를 다시 확인합니다." : isMagicTheme ? "수사 일지에서 관계자별 기록을 확인합니다." : "처음 사건 일지를 다시 봅니다.";
       if (target.matches(".room-chip")) return target.getAttribute("aria-current") === "page" ? "현재 위치입니다." : "취조실로 이동합니다.";
       if (target.matches(".scene-hint")) return "남은 단서 위치를 잠깐 밝힙니다.";
       if (target.matches(".map-pin-button")) return target.getAttribute("aria-label") || "해당 장소로 이동합니다.";
@@ -877,36 +915,57 @@
       });
     }
 
-    function applyMagicMap() {
-      if (!isMagicTheme) return;
+    function applyThemeMap() {
+      if (!isMagicTheme && !isSpaceTheme) return;
+      const mapConfig = isSpaceTheme
+        ? {
+          src: "/assets/space-station/maps/orbit-13-blueprint.png",
+          alt: "우주정거장 오르빗-13 조사 구역 도면",
+          pins: spaceMapPins,
+          labelOffset: "0%"
+        }
+        : {
+          src: "/samunmong/assets/magic-school/ui/school-map.png",
+          alt: "마법학교 조사 장소가 표시된 학교 지도",
+          pins: magicMapPins,
+          labelOffset: "-12%"
+        };
       const mapImage = document.querySelector("#mapPanel .map-board img");
       if (mapImage) {
-        mapImage.src = "/samunmong/assets/magic-school/ui/school-map.png";
-        mapImage.alt = "마법학교 조사 장소가 표시된 학교 지도";
+        mapImage.src = mapConfig.src;
+        mapImage.alt = mapConfig.alt;
       }
 
       const labels = [...document.querySelectorAll(".map-label")];
       const pins = [...document.querySelectorAll(".map-pin-button")];
-      magicMapPins.forEach((item, index) => {
+      mapConfig.pins.forEach((item, index) => {
         const label = labels[index];
         if (label) {
+          label.hidden = false;
           label.textContent = item.text;
-          label.dataset.locationScreen = item.goTo;
+          label.dataset.locationScreen = item.screen || item.goTo;
           label.style.setProperty("--x", item.x);
-          label.style.setProperty("--y", `calc(${item.y} - 12%)`);
+          label.style.setProperty("--y", `calc(${item.y} + ${mapConfig.labelOffset})`);
           label.style.setProperty("--rot", item.rot);
         }
         const pin = pins[index];
         if (pin) {
-          pin.dataset.mapGo = item.goTo;
+          pin.hidden = false;
+          if (item.goTo) {
+            pin.dataset.mapGo = item.goTo;
+            pin.disabled = false;
+          } else {
+            delete pin.dataset.mapGo;
+            pin.disabled = true;
+          }
           pin.setAttribute("aria-label", item.label);
           pin.style.setProperty("--x", item.x);
           pin.style.setProperty("--y", item.y);
         }
       });
 
-      labels.slice(magicMapPins.length).forEach((label) => { label.hidden = true; });
-      pins.slice(magicMapPins.length).forEach((pin) => { pin.hidden = true; });
+      labels.slice(mapConfig.pins.length).forEach((label) => { label.hidden = true; });
+      pins.slice(mapConfig.pins.length).forEach((pin) => { pin.hidden = true; });
     }
 
     function applyMagicUiCopies() {
@@ -1141,9 +1200,47 @@
       "/samunmong/assets/magic-school/interrogation/malpoi.png",
       "/samunmong/assets/magic-school/interrogation/malposam.png"
     ];
-    const themeStartAssets = isMagicTheme ? magicThemeStartAssets : joseonThemeStartAssets;
+    const spaceThemeStartAssets = [
+      "/assets/space-station/backgrounds/orbit-13-airlock.png",
+      "/assets/space-station/backgrounds/emergency-investigation-room-v2.png",
+      "/assets/space-station/backgrounds/medical-bay.png",
+      "/assets/space-station/backgrounds/oxygen-generator.png",
+      "/assets/space-station/backgrounds/data-core.png",
+      "/assets/space-station/backgrounds/suit-prep.png",
+      "/assets/space-station/backgrounds/science-lab.png",
+      "/assets/space-station/backgrounds/galley-corridor.png",
+      "/assets/space-station/panels/log-record-panel-v2.png",
+      "/assets/space-station/panels/evidence-vault-panel-v2.png",
+      "/assets/space-station/panels/scan-tools-panel-v2.png",
+      "/assets/space-station/maps/orbit-13-blueprint.png",
+      "/assets/space-station/ui-icons-v2/emergency-investigation-v2.png",
+      "/assets/space-station/ui-icons-v3/orbit-blueprint.png",
+      "/assets/space-station/ui-icons-v3/evidence-vault.png",
+      "/assets/space-station/ui-icons-v3/log-record.png",
+      "/assets/space-station/ui-icons-v3/scan-tool.png",
+      "/assets/space-station/ui-icons-v3/final-report.png",
+      "/assets/space-station/ui-icons-v3/accuse-target.png",
+      "/assets/space-station/ui-icons-v3/hint-beacon.png",
+      "/assets/space-station/characters/harry-upper.png",
+      "/assets/space-station/characters/mers-upper.png",
+      "/assets/space-station/characters/aladdindin-upper.png",
+      "/assets/space-station/characters/ansungjyejyei-upper.png",
+      "/assets/space-station/characters/einspanner-upper.png",
+      "/assets/space-station/evidence/frozen-lever-gel.png",
+      "/assets/space-station/evidence/final-radio-log.png",
+      "/assets/space-station/evidence/disinfectant-cloth-glove.png",
+      "/assets/space-station/evidence/deleted-medical-record.png",
+      "/assets/space-station/evidence/damaged-pressure-sensor.png",
+      "/assets/space-station/evidence/access-keycard-chip.png",
+      "/assets/space-station/evidence/engineer-tool-clamp.png",
+      "/assets/space-station/evidence/coffee-tumbler.png",
+      "/assets/space-station/loading/space-transition-bg.png"
+    ];
+    const themeStartAssets = isSpaceTheme ? spaceThemeStartAssets : isMagicTheme ? magicThemeStartAssets : joseonThemeStartAssets;
     const magicLoadingArtwork =
       "url('/samunmong/assets/magic-school/loading/magic-transition-bg.png') center / cover no-repeat, #050403";
+    const spaceLoadingArtwork =
+      "url('/assets/space-station/loading/space-transition-bg.png') center / cover no-repeat, #030608";
     const magicThemeLoadingScreens = new Set([
       "briefingScreen",
       "magicAlchemyLab",
@@ -1160,11 +1257,19 @@
       return magicThemeLoadingScreens.has(targetScreenId) || magicThemeLoadingScreens.has(currentScreenId);
     }
 
+    function shouldUseSpaceLoading(targetScreenId) {
+      if (!isSpaceTheme) return false;
+      const currentScreenId = getActiveScreenId();
+      return spaceLocationMeta[targetScreenId] || spaceLocationMeta[currentScreenId];
+    }
+
     function setLoadingArtwork(targetScreenId) {
       if (!fade) return;
       fade.classList.remove("magic-rune-transition");
       if (shouldUseMagicLoading(targetScreenId)) {
         fade.style.background = magicLoadingArtwork;
+      } else if (shouldUseSpaceLoading(targetScreenId)) {
+        fade.style.background = spaceLoadingArtwork;
       } else {
         fade.style.removeProperty("background");
       }
@@ -1321,7 +1426,7 @@
 
     function showInitialScreenFromSetup() {
       const startScreen = entryParams.get("start") || document.querySelector(".game-shell")?.dataset.startScreen;
-      const allowedScreens = new Set(["tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne", "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters", "backGateCourtyard", "magicAlchemyLab", "magicCleaningCloset", "magicLibrary", "magicRecordCrystalRoom", "magicDormHallway", "interrogationScreen"]);
+      const allowedScreens = new Set(["tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne", "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters", "backGateCourtyard", "magicAlchemyLab", "magicCleaningCloset", "magicLibrary", "magicRecordCrystalRoom", "magicDormHallway", "spaceAirlock", "spaceMedicalBay", "spaceOxygenGenerator", "spaceDataCore", "spaceScienceLab", "spaceGalleyCorridor", "spaceSuitPrep", "interrogationScreen"]);
 
       if (!allowedScreens.has(startScreen)) {
         return;
@@ -1344,7 +1449,8 @@
       const suspectId = suspects[suspectIndex].id;
       const params = new URLSearchParams({
         suspect,
-        suspectId
+        suspectId,
+        theme: isSpaceTheme ? "spaceStation" : isMagicTheme ? "magicSchool" : "joseon"
       });
 
       playSfx("dream", 0.85);
@@ -1359,7 +1465,8 @@
     const exitDialog = document.querySelector("#exitDialog");
     const defaultSettings = { volume: 70, reduceMotion: false, highContrast: false };
     applySettings({ ...defaultSettings, ...readStored(settingsKey, {}) });
-    applyMagicMap();
+    if (briefingTitle && isSpaceTheme) briefingTitle.textContent = "우주정거장 살인사건";
+    applyThemeMap();
     applyMagicUiCopies();
     setMagicRecordTab("0");
     updateMagicStudentPage(0);
@@ -1461,6 +1568,10 @@
       localStorage.setItem(themeKey, "magicSchool");
       window.location.href = "/?start=briefingScreen&theme=magicSchool";
     });
+    on("#chooseSpaceStation", "click", () => {
+      localStorage.setItem(themeKey, "spaceStation");
+      window.location.href = "/?start=briefingScreen&theme=spaceStation";
+    });
     on("#memoryOrbTrigger", "click", beginMemoryRestoration);
     document.addEventListener("click", (event) => {
       const clickTarget = event.target instanceof Element ? event.target : event.target?.parentElement;
@@ -1542,12 +1653,12 @@
         return;
       }
 
-      if (isMagicTheme || hasSeenFieldGuide()) {
+      if (isMagicTheme || isSpaceTheme || hasSeenFieldGuide()) {
         sessionStorage.removeItem(fieldGuidePendingKey);
       } else {
         sessionStorage.setItem(fieldGuidePendingKey, "1");
       }
-      goRush(isMagicTheme ? "magicAlchemyLab" : "fieldOne", isMagicTheme ? "실습실로 이동 중..." : "현장으로 이동 중...");
+      goRush(isSpaceTheme ? "spaceAirlock" : isMagicTheme ? "magicAlchemyLab" : "fieldOne", isSpaceTheme ? "에어록으로 이동 중..." : isMagicTheme ? "실습실로 이동 중..." : "현장으로 이동 중...");
     });
     on("#nextFieldGuide", "click", () => {
       if (fieldGuideStep === "map-click") {
@@ -1682,7 +1793,93 @@
       }
     };
 
-    const tools = isMagicTheme ? magicTools : {
+    const spaceTools = {
+      "신호 스캐너": {
+        img: "/assets/space-station/ui-icons-v3/scan-tool.png",
+        note: "잔류 전자 신호와 장비 작동 흔적을 읽습니다."
+      },
+      "의료 분석 렌즈": {
+        img: "/assets/space-station/ui-icons-v3/hint-beacon.png",
+        note: "의료용 젤, 약품, 생체 기록의 미세 흔적을 확인합니다."
+      },
+      "로그 복구 모듈": {
+        img: "/assets/space-station/ui-icons-v3/log-record.png",
+        note: "삭제되거나 끊긴 기록의 조각을 복구합니다."
+      }
+    };
+
+    const spaceEvidenceData = {
+      "얼어붙은 추진 레버 젤": {
+        note: "외부 작업용 우주복 추진 레버 홈에서 발견된 투명한 얼음막. 내부 점검 때는 보이지 않았을 가능성이 있다.",
+        location: "에어록",
+        logic: "정거장 내부에서는 액체였지만 그늘 구역의 극저온에서 얼어붙어 레버를 막았다는 수법 단서다.",
+        relatedSuspects: ["메르스", "알라딘딘"],
+        img: "/assets/space-station/evidence/frozen-lever-gel.png",
+        tool: "의료 분석 렌즈",
+        toolResult: "성분이 의료실 수술용 밀봉 젤과 일치한다.\n기계 결함이 아니라 누군가 레버 홈에 젤을 미리 채워 넣은 흔적이다."
+      },
+      "마지막 무전 로그": {
+        note: "데이비드가 표류 직전 남긴 마지막 통신 기록. 겉으로는 구조 요청처럼 들리지만 표현이 지나치게 침착하다.",
+        location: "에어록",
+        logic: "데이비드가 사고를 연기했을 가능성과 메르스와의 비밀 계약을 암시한다.",
+        relatedSuspects: ["데이비드", "메르스"],
+        img: "/assets/space-station/evidence/final-radio-log.png",
+        tool: "로그 복구 모듈",
+        toolResult: "무전 마지막에 짧은 숨 고르기와 암호화된 개인 채널 호출 흔적이 남아 있다.\n단순 비명보다 누군가에게 보내는 신호처럼 들린다."
+      },
+      "소독천과 장갑": {
+        note: "의료실 폐기함 근처에서 발견된 소독천과 장갑. 투명 젤 성분이 희미하게 묻어 있다.",
+        location: "의료실",
+        logic: "범행 도구가 의료실에서 준비됐다는 정황이다.",
+        relatedSuspects: ["메르스"],
+        img: "/assets/space-station/evidence/disinfectant-cloth-glove.png",
+        tool: "의료 분석 렌즈",
+        toolResult: "장갑 안쪽에는 메르스가 쓰는 의료용 소독제와 같은 잔류 성분이 남아 있다.\n레버 젤과 의료실이 연결된다."
+      },
+      "삭제된 의료 기록": {
+        note: "데이비드의 퇴행성 근위축증 진단 기록이 해리 계정으로 삭제된 흔적.",
+        location: "의료실",
+        logic: "해리가 데이터를 날린 것이 아니라 누군가 해리 계정을 이용해 데이비드의 병을 숨겼다는 단서다.",
+        relatedSuspects: ["해리", "메르스", "데이비드"],
+        img: "/assets/space-station/evidence/deleted-medical-record.png",
+        tool: "로그 복구 모듈",
+        toolResult: "삭제 명령은 해리 계정으로 실행됐지만 접근 위치는 의료실 단말이다.\n해리의 실수라는 설명과 맞지 않는다."
+      },
+      "손상된 압력 센서": {
+        note: "산소 발생기 압력 밸브의 미세 센서가 얇은 날붙이로 손상되어 있다.",
+        location: "산소 발생기실",
+        logic: "정전은 우연이 아니라 외부 작업 시간에 맞춘 지연 장치였음을 보여 준다.",
+        relatedSuspects: ["메르스"],
+        img: "/assets/space-station/evidence/damaged-pressure-sensor.png",
+        tool: "신호 스캐너",
+        toolResult: "센서 손상 뒤에도 약 5시간 동안 정상값을 흉내 낸 기록이 남아 있다.\n정전 당시 알리바이는 범행 시간을 설명하지 못한다."
+      },
+      "접속 키카드 칩": {
+        note: "데이터실 바닥에서 발견된 접속 칩. 해리 계정 세션과 의료실 단말 접근 기록이 함께 남아 있다.",
+        location: "데이터실",
+        logic: "데이터 삭제가 해리 본인의 실수가 아니라 계정 도용일 수 있음을 보강한다.",
+        relatedSuspects: ["해리", "메르스"],
+        img: "/assets/space-station/evidence/access-keycard-chip.png",
+        tool: "로그 복구 모듈",
+        toolResult: "칩의 마지막 인증 위치가 데이터실이 아니라 의료실 보조 단말로 찍혀 있다.\n해리가 자책하던 삭제 사고는 누군가의 위장일 가능성이 커진다."
+      },
+      "엔지니어 공구 클램프": {
+        note: "외부 작업 준비실의 공구 클램프. 알라딘딘의 점검 루틴에 쓰였지만 레버 젤 흔적은 없다.",
+        location: "외부 작업 준비실",
+        logic: "알라딘딘이 우주복을 점검했을 때 젤이 보이지 않았다는 진술을 뒷받침한다.",
+        relatedSuspects: ["알라딘딘"],
+        img: "/assets/space-station/evidence/engineer-tool-clamp.png"
+      },
+      "커피 텀블러": {
+        note: "정전 직전 복도에 떠다니던 텀블러. 대원들이 각자 어디에 있었는지 맞추는 알리바이 단서다.",
+        location: "주방 복도",
+        logic: "정전 당시 위치보다 정전이 준비된 시점이 더 중요하다는 점을 드러낸다.",
+        relatedSuspects: ["안성줴줴이", "아인슈페너"],
+        img: "/assets/space-station/evidence/coffee-tumbler.png"
+      }
+    };
+
+    const tools = isSpaceTheme ? spaceTools : isMagicTheme ? magicTools : {
       "돋보기": {
         img: "/samunmong/assets/mudeok-interaction/tool-magnifying-glass.png",
         note: "작은 글자, 긁힌 자국, 미세한 흔적을 확대합니다."
@@ -1697,7 +1894,7 @@
       }
     };
 
-    const evidenceData = isMagicTheme ? magicEvidenceData : window.SAMUNMONG_CONTENT?.evidenceData || {
+    const evidenceData = isSpaceTheme ? spaceEvidenceData : isMagicTheme ? magicEvidenceData : window.SAMUNMONG_CONTENT?.evidenceData || {
       "호패 조각": {
         note: "점순 옆에서 발견된 신분 단서. 유문석의 물건처럼 보이지만 일부 글자가 긁혀 있다.",
         img: "/samunmong/assets/evidence-wooden-tag.png",
@@ -2345,6 +2542,28 @@
       hint.type = "button";
       hint.textContent = "힌트";
       hint.setAttribute("aria-label", "이 장면의 증거 위치 힌트");
+      if (isSpaceTheme) {
+        hint.textContent = "";
+        const hintIcon = document.createElement("img");
+        hintIcon.src = "/assets/space-station/ui-icons-v3/hint-beacon.png";
+        hintIcon.alt = "";
+        hintIcon.draggable = false;
+        hintIcon.style.position = "absolute";
+        hintIcon.style.left = "50%";
+        hintIcon.style.top = "-2px";
+        hintIcon.style.width = "62px";
+        hintIcon.style.height = "62px";
+        hintIcon.style.objectFit = "contain";
+        hintIcon.style.transform = "translateX(-50%)";
+        hintIcon.style.zIndex = "1";
+        hint.appendChild(hintIcon);
+        const hintText = document.createElement("span");
+        hintText.textContent = "힌트";
+        hintText.style.position = "relative";
+        hintText.style.zIndex = "2";
+        hintText.style.alignSelf = "end";
+        hint.appendChild(hintText);
+      }
       hint.addEventListener("click", () => {
         const remainingEvidence = evidenceHotspots.filter((hotspot) => !hotspot.classList.contains("collected"));
         if (!remainingEvidence.length) {
@@ -2366,7 +2585,7 @@
       document.querySelector("#suspectStage").dataset.suspect = suspect.id;
       document.querySelector("#interrogationPlate").src = suspect.scene;
       const suspectSprite = document.querySelector("#suspectSprite");
-      if (isMagicTheme && suspectSprite && suspect.sprite) {
+      if ((isMagicTheme || isSpaceTheme) && suspectSprite && suspect.sprite) {
         suspectSprite.src = suspect.sprite;
       } else if (suspectSprite) {
         suspectSprite.src = suspect.sleeveScene || suspect.scene;
@@ -2613,7 +2832,7 @@
           return;
         }
         closeGlobalPanel();
-        go(target, isMagicTheme ? "학교 지도에서 이동 중..." : "마을 지도에서 이동 중...");
+        go(target, isSpaceTheme ? "궤도 도면에서 이동 중..." : isMagicTheme ? "학교 지도에서 이동 중..." : "마을 지도에서 이동 중...");
       });
     });
 
@@ -2797,11 +3016,13 @@
     function applyContentImages() {
       const screenImages = window.SAMUNMONG_CONTENT?.screenImages || {};
       Object.entries(screenImages).forEach(([screenId, imageSrc]) => {
-        if (isMagicTheme && screenId === "interrogationScreen") return;
+        if ((isMagicTheme || isSpaceTheme) && screenId === "interrogationScreen") return;
         document.querySelector(`#${screenId} .plate`)?.setAttribute("src", imageSrc);
       });
       if (isMagicTheme) {
         document.querySelector("#interrogationPlate")?.setAttribute("src", "/samunmong/assets/magic-school/interrogation/office-empty.png");
+      } else if (isSpaceTheme) {
+        updateSuspect(false);
       }
     }
 

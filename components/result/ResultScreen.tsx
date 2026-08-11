@@ -5,6 +5,8 @@ import { type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } fr
 import { useSearchParams } from "next/navigation";
 import { finalCulpritId } from "@/lib/persona";
 
+type ResultTheme = "joseon" | "magicSchool" | "spaceStation";
+
 const suspects = [
   {
     id: "dolsoe",
@@ -12,6 +14,7 @@ const suspects = [
     image: "/samunmong/assets/suspects/dolsoe-seated.png",
     slot: { left: "13.22%", top: "36.56%", width: "13.94%", height: "31.24%" },
     nameLeft: "20.16%",
+    stampLeft: "24.25%",
     offsetX: "0%"
   },
   {
@@ -20,6 +23,7 @@ const suspects = [
     image: "/samunmong/assets/suspects/chunwol-seated.png",
     slot: { left: "32.78%", top: "36.56%", width: "13.82%", height: "31.24%" },
     nameLeft: "39.65%",
+    stampLeft: "43.7%",
     offsetX: "12%"
   },
   {
@@ -28,6 +32,7 @@ const suspects = [
     image: "/samunmong/assets/suspects/yoomunseok-seated.png",
     slot: { left: "52.57%", top: "36.56%", width: "13.88%", height: "31.24%" },
     nameLeft: "59.51%",
+    stampLeft: "63.15%",
     offsetX: "0%"
   },
   {
@@ -36,11 +41,60 @@ const suspects = [
     image: "/samunmong/assets/suspects/mudeok-seated.png",
     slot: { left: "72.01%", top: "36.56%", width: "13.64%", height: "31.24%" },
     nameLeft: "78.83%",
+    stampLeft: "82.6%",
     offsetX: "6.5%"
   }
 ] as const;
 
-const requiredEvidence = [
+const spaceSuspects = [
+  {
+    id: "harry",
+    name: "해리",
+    image: "/assets/space-station/characters/harry-upper.png",
+    slot: { left: "9.5%", top: "38.5%", width: "12.5%", height: "30%" },
+    nameLeft: "15.5%",
+    stampLeft: "18%",
+    offsetX: "0%"
+  },
+  {
+    id: "mers",
+    name: "메르스",
+    image: "/assets/space-station/characters/mers-upper.png",
+    slot: { left: "26%", top: "37%", width: "12.5%", height: "31%" },
+    nameLeft: "32%",
+    stampLeft: "34.5%",
+    offsetX: "0%"
+  },
+  {
+    id: "aladdindin",
+    name: "알라딘딘",
+    image: "/assets/space-station/characters/aladdindin-upper.png",
+    slot: { left: "42.5%", top: "37.8%", width: "12.5%", height: "30.4%" },
+    nameLeft: "48.5%",
+    stampLeft: "51%",
+    offsetX: "0%"
+  },
+  {
+    id: "ansungjyejyei",
+    name: "안성줴줴이",
+    image: "/assets/space-station/characters/ansungjyejyei-upper.png",
+    slot: { left: "59%", top: "38.2%", width: "12.5%", height: "30%" },
+    nameLeft: "65%",
+    stampLeft: "67.5%",
+    offsetX: "0%"
+  },
+  {
+    id: "einspanner",
+    name: "아인슈페너",
+    image: "/assets/space-station/characters/einspanner-upper.png",
+    slot: { left: "75.5%", top: "38.2%", width: "12.5%", height: "30%" },
+    nameLeft: "81.5%",
+    stampLeft: "84%",
+    offsetX: "0%"
+  }
+] as const;
+
+const joseonRequiredEvidence = [
   "호패 조각",
   "돌쇠의 그림",
   "긁힌 팔 흔적",
@@ -48,7 +102,19 @@ const requiredEvidence = [
   "찢어진 약속 편지"
 ] as const;
 
-const correctSuspectId = process.env.NEXT_PUBLIC_SAMUNMONG_CULPRIT_ID || finalCulpritId;
+const spaceRequiredEvidence = [
+  "얼어붙은 추진 레버 젤",
+  "손상된 압력 센서",
+  "삭제된 의료 기록",
+  "접속 키카드 칩",
+  "마지막 무전 로그"
+] as const;
+
+const correctSuspectByTheme = {
+  joseon: process.env.NEXT_PUBLIC_SAMUNMONG_CULPRIT_ID || finalCulpritId,
+  magicSchool: "malpoil",
+  spaceStation: "mers"
+} as const;
 const soundBase = "/samunmong/sound";
 const resultBgmPath = `${soundBase}/bgm/joseon.mp3`;
 const buttonSfxPath = `${soundBase}/sfx/button.mp3`;
@@ -85,11 +151,17 @@ const outcomeCopy = {
   }
 } as const;
 
-function readCollectedEvidence() {
+function getEvidenceStorageKey(theme: ResultTheme) {
+  if (theme === "spaceStation") return "samunmong-collected-evidence-space-station";
+  if (theme === "magicSchool") return "samunmong-collected-evidence-magic-school";
+  return "samunmong-collected-evidence-joseon";
+}
+
+function readCollectedEvidence(theme: ResultTheme) {
   if (typeof window === "undefined") return [] as string[];
 
   try {
-    const parsed = JSON.parse(window.localStorage.getItem("samunmong-collected-evidence") || "[]");
+    const parsed = JSON.parse(window.localStorage.getItem(getEvidenceStorageKey(theme)) || "[]");
     return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
   } catch {
     return [];
@@ -284,20 +356,26 @@ function TypewriterLines({ lines, onType }: { lines: readonly string[]; onType?:
 export default function ResultScreen() {
   const searchParams = useSearchParams();
   const { playButtonSfx, playTypingSfx } = useResultAudio();
+  const theme = (searchParams.get("theme") === "spaceStation" ? "spaceStation" : searchParams.get("theme") === "magicSchool" ? "magicSchool" : "joseon") satisfies ResultTheme;
+  const activeSuspects = theme === "spaceStation" ? spaceSuspects : suspects;
+  const requiredEvidence = theme === "spaceStation" ? spaceRequiredEvidence : joseonRequiredEvidence;
+  const correctSuspectId = correctSuspectByTheme[theme];
+  const resultBg = theme === "spaceStation" ? "/assets/space-station/backgrounds/emergency-investigation-room-v2.png" : "/samunmong/assets/final-accusation-bg.png";
+  const accusationTitle = theme === "spaceStation" ? "최종 보고 대상 지목" : "최종 범인 지목";
+  const backToInterrogationHref = theme === "spaceStation" ? "/?start=interrogationScreen&theme=spaceStation" : "/interrogation";
   const initialSuspectId = searchParams.get("suspectId");
   const [selectedSuspectId, setSelectedSuspectId] = useState(
-    suspects.some((suspect) => suspect.id === initialSuspectId) ? initialSuspectId : suspects[0].id
+    activeSuspects.some((suspect) => suspect.id === initialSuspectId) ? initialSuspectId : activeSuspects[0].id
   );
   const [showWarning, setShowWarning] = useState(false);
   const [showExitPrompt, setShowExitPrompt] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
 
-  const selectedSuspect = suspects.find((suspect) => suspect.id === selectedSuspectId) ?? suspects[0];
-  const selectedIndex = suspects.findIndex((suspect) => suspect.id === selectedSuspect.id);
+  const selectedSuspect = activeSuspects.find((suspect) => suspect.id === selectedSuspectId) ?? activeSuspects[0];
   const missingEvidence = useMemo(() => {
-    const collected = new Set(readCollectedEvidence());
+    const collected = new Set(readCollectedEvidence(theme));
     return requiredEvidence.filter((name) => !collected.has(name));
-  }, [showWarning]);
+  }, [requiredEvidence, showWarning, theme]);
 
   useEffect(() => {
     if (searchParams.get("previewWarning") === "1" && missingEvidence.length > 0) {
@@ -337,7 +415,8 @@ export default function ResultScreen() {
     const params = new URLSearchParams({
       suspect: selectedSuspect.name,
       suspectId: selectedSuspect.id,
-      outcome
+      outcome,
+      theme
     });
     navigateWithLoading(`/result?${params.toString()}&accused=1`);
   }
@@ -353,13 +432,13 @@ export default function ResultScreen() {
     const outcome = searchParams.get("outcome") === "success" ? "success" : "failure";
     const copy = outcomeCopy[outcome];
     const accusedSuspect =
-      suspects.find((suspect) => suspect.id === searchParams.get("suspectId")) ??
-      suspects.find((suspect) => suspect.name === searchParams.get("suspect")) ??
+      activeSuspects.find((suspect) => suspect.id === searchParams.get("suspectId")) ??
+      activeSuspects.find((suspect) => suspect.name === searchParams.get("suspect")) ??
       selectedSuspect;
 
     return (
       <main className={`result-screen result-verdict result-${outcome}`} onClickCapture={handleResultClick}>
-        <img className="result-full-bg" src="/samunmong/assets/final-accusation-bg.png" alt="" />
+        <img className="result-full-bg" src={resultBg} alt="" />
         <section className="verdict-stage" aria-labelledby="resultTitle">
           <article
             className="verdict-tag"
@@ -382,7 +461,7 @@ export default function ResultScreen() {
             <h1 id="resultTitle">{copy.title}</h1>
             <TypewriterLines lines={copy.lines} onType={playTypingSfx} />
             <div className="verdict-actions">
-              {outcome === "success" && accusedSuspect.id === finalCulpritId ? (
+              {outcome === "success" && accusedSuspect.id === correctSuspectId ? (
                 <button
                   className="wood-result-button"
                   type="button"
@@ -442,12 +521,12 @@ export default function ResultScreen() {
   return (
     <main className="result-screen accusation-screen" onClickCapture={handleResultClick}>
       <section className="accusation-stage" aria-labelledby="resultTitle">
-        <img className="accusation-bg" src="/samunmong/assets/final-accusation-bg.png" alt="" />
+        <img className="accusation-bg" src={resultBg} alt="" />
         <h1 id="resultTitle" className="accusation-title">
-          최종 범인 지목
+          {accusationTitle}
         </h1>
 
-        {suspects.map((suspect) => (
+        {activeSuspects.map((suspect) => (
           <button
             className={`accusation-suspect ${selectedSuspectId === suspect.id ? "selected" : ""}`}
             type="button"
@@ -467,7 +546,7 @@ export default function ResultScreen() {
           </button>
         ))}
 
-        {suspects.map((suspect) => (
+        {activeSuspects.map((suspect) => (
           <span className="accusation-name" key={`${suspect.id}-name`} style={{ left: suspect.nameLeft }}>
             {suspect.name}
           </span>
@@ -476,7 +555,7 @@ export default function ResultScreen() {
         <div
           className="accusation-stamp"
           aria-hidden="true"
-          style={{ left: `${24.25 + selectedIndex * 19.45}%` }}
+          style={{ left: selectedSuspect.stampLeft }}
         >
           지목
         </div>
@@ -485,8 +564,8 @@ export default function ResultScreen() {
           <button className="wood-result-button primary" type="button" onClick={() => confirmAccusation()}>
             이 자를 지목한다
           </button>
-          <Link className="wood-result-button" href="/interrogation">
-            취조실로 돌아간다
+          <Link className="wood-result-button" href={backToInterrogationHref}>
+            {theme === "spaceStation" ? "비상 조사실로 돌아간다" : "취조실로 돌아간다"}
           </Link>
         </div>
       </section>

@@ -5,7 +5,7 @@ import { screenLocationLabels, type ScreenLocationId } from "@/lib/gameState";
 
 type LocationIndicatorProps = {
   initialScreen?: string;
-  initialTheme?: "magicSchool";
+  initialTheme?: "magicSchool" | "spaceStation";
 };
 
 const LOCATION_KICKER = "\uD604\uC7AC \uC704\uCE58";
@@ -24,6 +24,8 @@ export default function LocationIndicator({ initialScreen, initialTheme }: Locat
   const currentLocation = isKnownLocation(activeScreen) && !HIDDEN_LOCATION_SCREENS.has(activeScreen)
     ? initialTheme === "magicSchool" && activeScreen === "interrogationScreen"
       ? "교무 조사실"
+      : initialTheme === "spaceStation" && activeScreen === "interrogationScreen"
+        ? "비상 조사실"
       : screenLocationLabels[activeScreen]
     : null;
 

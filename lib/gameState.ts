@@ -13,6 +13,13 @@ export const STARTABLE_SCREENS = new Set([
   "magicLibrary",
   "magicRecordCrystalRoom",
   "magicDormHallway",
+  "spaceAirlock",
+  "spaceMedicalBay",
+  "spaceOxygenGenerator",
+  "spaceDataCore",
+  "spaceScienceLab",
+  "spaceGalleyCorridor",
+  "spaceSuitPrep",
   "interrogationScreen"
 ]);
 
@@ -29,6 +36,13 @@ export const routeInitialScreens = {
   "/magic-library": "magicLibrary",
   "/magic-record-crystal-room": "magicRecordCrystalRoom",
   "/magic-dorm-hallway": "magicDormHallway",
+  "/space-airlock": "spaceAirlock",
+  "/space-medical-bay": "spaceMedicalBay",
+  "/space-oxygen-generator": "spaceOxygenGenerator",
+  "/space-data-core": "spaceDataCore",
+  "/space-science-lab": "spaceScienceLab",
+  "/space-galley-corridor": "spaceGalleyCorridor",
+  "/space-suit-prep": "spaceSuitPrep",
   "/interrogation": "interrogationScreen",
   "/tutorial": "tutorialScreen",
   "/dream": "dreamScreen",
@@ -53,6 +67,13 @@ export const screenLocationLabels = {
   magicLibrary: "도서관",
   magicRecordCrystalRoom: "기록 수정구실",
   magicDormHallway: "학생들 기숙사",
+  spaceAirlock: "에어록",
+  spaceMedicalBay: "의료실",
+  spaceOxygenGenerator: "산소 발생기실",
+  spaceDataCore: "데이터실",
+  spaceScienceLab: "과학 실험실",
+  spaceGalleyCorridor: "주방 복도",
+  spaceSuitPrep: "외부 작업 준비실",
   interrogationScreen: "\uCDE8\uC870\uC2E4"
 } as const;
 

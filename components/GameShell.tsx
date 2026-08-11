@@ -16,8 +16,9 @@ import FieldOneScene from "@/components/scenes/FieldOneScene";
 import InterrogationScreen from "@/components/scenes/InterrogationScreen";
 import MagicSchoolScene from "@/components/scenes/MagicSchoolScene";
 import MudeokServantRoomScene from "@/components/scenes/MudeokServantRoomScene";
+import SpaceStationScene from "@/components/scenes/SpaceStationScene";
 import YoomunseokSarangbangScene from "@/components/scenes/YoomunseokSarangbangScene";
-import { magicSchoolScenes } from "@/lib/gameData";
+import { magicSchoolScenes, spaceStationScenes } from "@/lib/gameData";
 import { STARTABLE_SCREENS } from "@/lib/gameState";
 
 const CONTENT_SCRIPT = "/samunmong/content.js";
@@ -25,7 +26,7 @@ const PROTOTYPE_SCRIPT = "/samunmong/prototype.js";
 
 type GameShellProps = {
   initialScreen?: string;
-  initialTheme?: "magicSchool";
+  initialTheme?: "magicSchool" | "spaceStation";
 };
 
 function ensureRequestedStartScreen(initialScreen?: string) {
@@ -64,7 +65,9 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
   useEffect(() => {
     let cancelled = false;
     const loadedScripts: HTMLScriptElement[] = [];
-    if (initialTheme === "magicSchool" || initialScreen?.startsWith("magic")) {
+    if (initialTheme) {
+      window.localStorage.setItem("samunmong-current-theme", initialTheme);
+    } else if (initialScreen?.startsWith("magic")) {
       window.localStorage.setItem("samunmong-current-theme", "magicSchool");
     }
 
@@ -101,7 +104,7 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
         <MainScreen />
         <TutorialScreen />
         <DreamSelectScreen />
-        <BriefingScreen />
+        <BriefingScreen initialTheme={initialTheme} />
         <FieldOneScene />
         <ChunwolRoomScene />
         <MudeokServantRoomScene />
@@ -110,6 +113,9 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
         <BackGateCourtyardScene />
         {magicSchoolScenes.map((scene) => (
           <MagicSchoolScene scene={scene} key={scene.id} />
+        ))}
+        {spaceStationScenes.map((scene) => (
+          <SpaceStationScene scene={scene} key={scene.id} />
         ))}
         <InterrogationScreen initialTheme={initialTheme} />
         <LocationIndicator initialScreen={initialScreen} initialTheme={initialTheme} />

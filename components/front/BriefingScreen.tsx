@@ -158,7 +158,57 @@ function MagicStartCaseButtonArt({ label }: { label: string }) {
   );
 }
 
-export default function BriefingScreen() {
+function SpaceStationBriefingScreen() {
+  return (
+    <section className="screen briefing-screen" id="briefingScreen">
+      <img
+        className="plate"
+        src="/assets/space-station/backgrounds/space-briefing-room.png"
+        alt="우주정거장 오르빗-13 사건 브리핑실"
+      />
+      <div className="shade" />
+      <article
+        className="hud briefing-card"
+        data-briefing-step="0"
+        style={{
+          width: "min(820px, 56vw)",
+          minHeight: "auto",
+          left: "50%",
+          top: "50%",
+          padding: "34px 44px 38px",
+          border: "1px solid rgba(160, 207, 229, .36)",
+          borderRadius: "22px",
+          color: "#eaf6ff",
+          background: "rgba(7, 13, 20, .48)",
+          boxShadow: "0 26px 80px rgba(0,0,0,.48), inset 0 0 42px rgba(101, 180, 226, .1)",
+          backdropFilter: "blur(3px)"
+        }}
+      >
+        <p className="briefing-kicker">ORBIT-13 INCIDENT LOG</p>
+        <h2>우주정거장 살인사건</h2>
+        <div className="briefing-step active" data-briefing-panel="0">
+          <div className="briefing-copy" id="briefingCopy" aria-live="polite" />
+        </div>
+        <div className="briefing-actions">
+          <button
+            className="button primary briefing-start ready"
+            id="startCase"
+            type="button"
+            aria-label="조사 시작"
+          >
+            조사 시작
+          </button>
+        </div>
+      </article>
+    </section>
+  );
+}
+
+export default function BriefingScreen({ initialTheme }: { initialTheme?: "magicSchool" | "spaceStation" }) {
+  if (initialTheme === "spaceStation") {
+    return <SpaceStationBriefingScreen />;
+  }
+
   return (
     <section className="screen briefing-screen" id="briefingScreen">
       <div className="magic-memory-stage">
