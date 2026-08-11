@@ -8,6 +8,15 @@
 
 [삼운몽: 세 개의 꿈 바로가기](https://cluver-naversprint.vercel.app)
 
+- 팀원은 Vercel 대시보드 링크가 아니라 위 공개 게임 링크로 접속하면 됩니다.
+- GitHub에 머지된 내용은 Vercel 자동 배포 후 공개 게임 링크에 반영됩니다.
+- Vercel 관리자 화면은 권한이 없으면 404처럼 보일 수 있습니다.
+
+### 바로 확인 링크
+
+- [메인 화면](https://cluver-naversprint.vercel.app)
+- [우주정거장 살인사건 브리핑](https://cluver-naversprint.vercel.app/?start=briefingScreen&theme=spaceStation)
+
 ## 프로젝트 목표
 
 - 추리 게임을 통해 **몰입감**과 **성취감**을 제공
