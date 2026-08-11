@@ -1322,6 +1322,7 @@
       "magicDormHallway",
       "interrogationScreen"
     ]);
+    const preThemeLoadingScreens = new Set(["mainScreen", "tutorialScreen", "dreamScreen"]);
 
     function shouldUseMagicLoading(targetScreenId) {
       if (!isMagicTheme) return false;
@@ -1338,6 +1339,10 @@
     function setLoadingArtwork(targetScreenId) {
       if (!fade) return;
       fade.classList.remove("magic-rune-transition");
+      if (preThemeLoadingScreens.has(targetScreenId)) {
+        fade.style.removeProperty("background");
+        return;
+      }
       if (shouldUseMagicLoading(targetScreenId)) {
         fade.style.background = magicLoadingArtwork;
       } else if (shouldUseSpaceLoading(targetScreenId)) {
