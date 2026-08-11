@@ -99,7 +99,19 @@ export default function GameSettingsOverlay() {
         onClick={toggleFullscreen}
         style={{ left: showGameSettingsButton ? "5.7%" : "2.4%" }}
       >
-        <span aria-hidden="true">{isFullscreen ? "↙" : "⛶"}</span>
+        {isFullscreen ? (
+          <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none">
+            <path
+              d="M4 9H7.5Q9 9 9 7.5V4M20 9H16.5Q15 9 15 7.5V4M4 15H7.5Q9 15 9 16.5V20M20 15H16.5Q15 15 15 16.5V20"
+              stroke="currentColor"
+              strokeWidth="1.7"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </svg>
+        ) : (
+          <span aria-hidden="true">⛶</span>
+        )}
       </button>
 
       <div className="main-dialog" id="settingsDialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
