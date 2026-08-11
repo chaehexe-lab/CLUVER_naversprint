@@ -11,7 +11,7 @@ export const spaceStationTheme = {
     truth: "우주 방사선 유발성 퇴행성 근위축증 말기 환자였고, 메르스에게 순직처럼 보이는 마지막 임무를 부탁했다."
   },
   assets: {
-    map: "/assets/space-station/maps/orbit-13-blueprint.png"
+    map: "/assets/space-station/maps/orbit-13-blueprint.webp"
   },
   ui: {
     map: "궤도 도면",

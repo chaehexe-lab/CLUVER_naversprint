@@ -270,20 +270,20 @@
 
 ### 지도 에셋
 
-- `궤도 도면`: `/assets/space-station/maps/orbit-13-blueprint.png`
+- `궤도 도면`: `/assets/space-station/maps/orbit-13-blueprint.webp`
 - 이미지 자체에는 텍스트를 넣지 않고, 장소명은 UI 레이어에서 얹는다.
 - 표시 장소: 에어록/외부 작업 준비실, 의료실, 산소 발생기실, 데이터실, 과학 실험실, 주방 복도, 비상 조사실, 관측 구역.
 
 ### UI 아이콘 에셋
 
-- `궤도 도면`: `/assets/space-station/ui-icons/orbit-map.png`
-- `증거 보관함`: `/assets/space-station/ui-icons/evidence-vault.png`
-- `스캔 키트`: `/assets/space-station/ui-icons/scan-kit.png`
-- `로그 기록`: `/assets/space-station/ui-icons/log-record.png`
-- `비상 조사실`: `/assets/space-station/ui-icons/emergency-investigation.png`
-- `센서 알림`: `/assets/space-station/ui-icons/sensor-alert.png`
-- `최종 보고`: `/assets/space-station/ui-icons/final-report.png`
-- `공용 버튼 프레임`: `/assets/space-station/ui-icons/command-button-frame.png`
+- `궤도 도면`: `/assets/space-station/ui-icons/orbit-map.webp`
+- `증거 보관함`: `/assets/space-station/ui-icons/evidence-vault.webp`
+- `스캔 키트`: `/assets/space-station/ui-icons/scan-kit.webp`
+- `로그 기록`: `/assets/space-station/ui-icons/log-record.webp`
+- `비상 조사실`: `/assets/space-station/ui-icons/emergency-investigation.webp`
+- `센서 알림`: `/assets/space-station/ui-icons/sensor-alert.webp`
+- `최종 보고`: `/assets/space-station/ui-icons/final-report.webp`
+- `공용 버튼 프레임`: `/assets/space-station/ui-icons/command-button-frame.webp`
 
 ## 14. 구현 메모
 

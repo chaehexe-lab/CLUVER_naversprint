@@ -91,8 +91,8 @@ export default function TeamIntro({ disabled = false }: TeamIntroProps) {
 
       <div className="intro-logo-scene" aria-hidden="true">
         <div className="intro-clouds">
-          <img className="intro-cloud intro-cloud-left" src="/samunmong/assets/intro/soft-cloud.png" alt="" />
-          <img className="intro-cloud intro-cloud-right" src="/samunmong/assets/intro/soft-cloud.png" alt="" />
+          <img className="intro-cloud intro-cloud-left" src="/samunmong/assets/intro/soft-cloud.webp" alt="" />
+          <img className="intro-cloud intro-cloud-right" src="/samunmong/assets/intro/soft-cloud.webp" alt="" />
         </div>
         <div className="intro-logo-aura" />
         <div className="intro-logo-word" aria-label="CLUVER">

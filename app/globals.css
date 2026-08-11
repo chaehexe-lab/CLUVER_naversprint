@@ -242,7 +242,7 @@ body {
   border-radius: 2px;
   background:
     linear-gradient(180deg, rgba(49, 27, 17, 0.03), rgba(49, 22, 14, 0.18)),
-    url("/samunmong/assets/ui/joseon-paper-panel-bg.png") center / 100% 100% no-repeat;
+    url("/samunmong/assets/ui/joseon-paper-panel-bg.webp") center / 100% 100% no-repeat;
   box-shadow:
     0 32px 90px rgba(0, 0, 0, 0.72),
     inset 0 0 34px rgba(43, 19, 10, 0.28);
@@ -372,7 +372,7 @@ body {
   width: min(29vw, 360px);
   aspect-ratio: 314 / 520;
   border: 0;
-  background: url("/samunmong/assets/final-verdict-card-base.png") center / 100% 100% no-repeat;
+  background: url("/samunmong/assets/final-verdict-card-base.webp") center / 100% 100% no-repeat;
   filter: drop-shadow(0 28px 56px rgba(0, 0, 0, 0.64));
   color: #f8e0b5;
   transform: rotate(-1.5deg);
@@ -605,7 +605,7 @@ body.tool-cursor-active .tool-preview-image * {
   overflow: hidden;
   background:
     linear-gradient(rgba(7, 5, 4, 0.72), rgba(7, 5, 4, 0.94)),
-    url("/samunmong/assets/final-accusation-bg.png") center / cover fixed;
+    url("/samunmong/assets/final-accusation-bg.webp") center / cover fixed;
   color: #3a2416;
   font-family: "NanumBareunJeongsin", "ChosunNm", serif;
 }

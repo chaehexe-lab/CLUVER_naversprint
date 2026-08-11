@@ -61,28 +61,28 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
   const isMagicTheme = initialTheme === "magicSchool";
   const isSpaceTheme = initialTheme === "spaceStation";
   const initialPlate = isMagicTheme
-    ? "/samunmong/assets/magic-school/interrogation/office-empty.png"
+    ? "/samunmong/assets/magic-school/interrogation/office-empty.webp"
     : isSpaceTheme
-      ? "/assets/space-station/backgrounds/emergency-investigation-room-v2.png"
-    : "/samunmong/assets/main-screen-v2.png";
+      ? "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp"
+    : "/samunmong/assets/main-screen-v2.webp";
   const initialSuspect = isSpaceTheme ? "harry" : isMagicTheme ? "gandalf" : "dolsoe";
-  const initialSprite = isSpaceTheme ? "/assets/space-station/characters/harry-upper-transparent.png" : isMagicTheme ? "/samunmong/assets/magic-school/interrogation/gandalf-sprite.png" : "/samunmong/assets/scene-interrogation-dolsoe.png?v=scene-20260707";
+  const initialSprite = isSpaceTheme ? "/assets/space-station/characters/harry-upper-transparent.webp" : isMagicTheme ? "/samunmong/assets/magic-school/interrogation/gandalf-sprite.webp" : "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707";
   const initialName = isSpaceTheme ? "해리" : isMagicTheme ? "건달프" : "";
-  const mapIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/orbit-blueprint.png" : "/samunmong/assets/labels/transparent/tool-village-map.png";
-  const noteIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/log-record.png" : "/samunmong/assets/labels/transparent/tool-note-short.png";
-  const journalIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/final-report.png" : "/samunmong/assets/ui-generated/tool-case-journal.png";
-  const bagIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/evidence-vault.png" : "/samunmong/assets/labels/transparent/tool-bag-short.png";
-  const toolIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/scan-tool.png" : "/samunmong/assets/labels/transparent/tool-investigation-tools.png";
-  const hintIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/hint-beacon.png" : "/samunmong/assets/ui-generated/tool-hint.png";
-  const accuseIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/accuse-target.png" : "/samunmong/assets/labels/transparent/tool-accuse-short.png";
+  const mapIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/orbit-blueprint.webp" : "/samunmong/assets/labels/transparent/tool-village-map.webp";
+  const noteIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/log-record.webp" : "/samunmong/assets/labels/transparent/tool-note-short.webp";
+  const journalIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/final-report.webp" : "/samunmong/assets/ui-generated/tool-case-journal.webp";
+  const bagIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/evidence-vault.webp" : "/samunmong/assets/labels/transparent/tool-bag-short.webp";
+  const toolIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/scan-tool.webp" : "/samunmong/assets/labels/transparent/tool-investigation-tools.webp";
+  const hintIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/hint-beacon.webp" : "/samunmong/assets/ui-generated/tool-hint.webp";
+  const accuseIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/accuse-target.webp" : "/samunmong/assets/labels/transparent/tool-accuse-short.webp";
   const bagPanelStyle = isSpaceTheme
-    ? ({ backgroundImage: "url('/assets/space-station/panels/evidence-vault-panel-v2.png')" } satisfies CSSProperties)
+    ? ({ backgroundImage: "url('/assets/space-station/panels/evidence-vault-panel-v2.webp')" } satisfies CSSProperties)
     : undefined;
   const toolPanelStyle = isSpaceTheme
-    ? ({ backgroundImage: "url('/assets/space-station/panels/scan-tools-panel-v2.png')" } satisfies CSSProperties)
+    ? ({ backgroundImage: "url('/assets/space-station/panels/scan-tools-panel-v2.webp')" } satisfies CSSProperties)
     : undefined;
   const notePanelStyle = isSpaceTheme
-    ? ({ backgroundImage: "url('/assets/space-station/panels/log-record-panel-v2.png')" } satisfies CSSProperties)
+    ? ({ backgroundImage: "url('/assets/space-station/panels/log-record-panel-v2.webp')" } satisfies CSSProperties)
     : undefined;
 
   return (
@@ -224,7 +224,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
         <button className="inspect-close" id="closeGenericEvidenceInspect" type="button" aria-label="단서 팝업 닫기">
           ×
         </button>
-        <img id="genericEvidenceImage" src="/samunmong/assets/evidence-wooden-tag.png" alt="" />
+        <img id="genericEvidenceImage" src="/samunmong/assets/evidence-wooden-tag.webp" alt="" />
         <div>
           <strong id="genericEvidenceTitle">단서 발견</strong>
           <p id="genericEvidenceText">단서를 확인했습니다.</p>
@@ -282,7 +282,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
           </div>
           <section className="tool-preview" aria-live="polite">
             <div className="tool-preview-image">
-              <img id="toolPreviewImage" src="/samunmong/assets/evidence-wooden-tag.png" alt="" draggable={false} />
+              <img id="toolPreviewImage" src="/samunmong/assets/evidence-wooden-tag.webp" alt="" draggable={false} />
             </div>
             <div className="tool-preview-copy">
               <span className="tool-panel-kicker">선택한 증거</span>
@@ -339,7 +339,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
           닫기
         </button>
         <div className="map-board">
-          <img src="/samunmong/assets/joseon-village-map-seven-locations-v2.png" alt="조사 장소가 붉은 인장으로 표시된 조선시대 수사 지도" />
+          <img src="/samunmong/assets/joseon-village-map-seven-locations-v2.webp" alt="조사 장소가 붉은 인장으로 표시된 조선시대 수사 지도" />
           {mapLabels.map((label) => (
             <span className="map-label" data-location-screen={label.screen} style={mapPositionStyle(label)} key={label.text}>
               {label.text}

@@ -130,7 +130,7 @@
       background:
         radial-gradient(circle at 50% 46%, rgba(255, 255, 255, .06), transparent 28%),
         linear-gradient(180deg, rgba(0, 0, 0, .02), rgba(0, 0, 0, .18)),
-        url("/samunmong/assets/intro/cluver-dream-bg.png") center / cover no-repeat,
+        url("/samunmong/assets/intro/cluver-dream-bg.webp") center / cover no-repeat,
         #100b17;
       font-family: "PFStardust", "VitroPride", system-ui, sans-serif;
       animation: intro-vacate .56s ease 8.42s forwards;
@@ -2433,7 +2433,7 @@
       top: 5px;
       width: 50px;
       height: 48px;
-      background: url("/samunmong/assets/ui-generated/tool-hint.png") center / contain no-repeat;
+      background: url("/samunmong/assets/ui-generated/tool-hint.webp") center / contain no-repeat;
       transform: translateX(-50%) rotate(-4deg);
       pointer-events: none;
     }
@@ -2723,13 +2723,13 @@
     .scene-chip.map-chip::before {
       width: 54px;
       height: 50px;
-      background-image: url("/samunmong/assets/ui-generated/tool-map.png");
+      background-image: url("/samunmong/assets/ui-generated/tool-map.webp");
     }
 
     .scene-chip.bag-chip::before {
       width: 54px;
       height: 50px;
-      background: url("/samunmong/assets/ui-generated/tool-bag.png") center / contain no-repeat;
+      background: url("/samunmong/assets/ui-generated/tool-bag.webp") center / contain no-repeat;
     }
 
     .scene-chip.bag-chip::after {
@@ -2739,19 +2739,19 @@
     .scene-chip.tool-chip::before {
       width: 58px;
       height: 52px;
-      background: url("/samunmong/assets/ui-generated/tool-kit.png") center / contain no-repeat;
+      background: url("/samunmong/assets/ui-generated/tool-kit.webp") center / contain no-repeat;
     }
 
     .scene-chip.note-chip::before {
       width: 50px;
       height: 52px;
-      background: url("/samunmong/assets/ui-generated/tool-note.png") center / contain no-repeat;
+      background: url("/samunmong/assets/ui-generated/tool-note.webp") center / contain no-repeat;
     }
 
     .scene-chip.journal-chip::before {
       width: 54px;
       height: 54px;
-      background: url("/samunmong/assets/ui-generated/tool-case-journal.png") center / contain no-repeat;
+      background: url("/samunmong/assets/ui-generated/tool-case-journal.webp") center / contain no-repeat;
     }
 
     html[data-samunmong-theme="spaceStation"] .scene-chip.map-chip::before,
@@ -2766,7 +2766,7 @@
       --tool-rot: 3deg;
       width: 44px;
       height: 54px;
-      background: url("/samunmong/assets/ui-generated/tool-interrogation.png") center / contain no-repeat;
+      background: url("/samunmong/assets/ui-generated/tool-interrogation.webp") center / contain no-repeat;
     }
 
     .scene-chip img {
@@ -3807,7 +3807,7 @@
       z-index: 6;
       height: 39%;
       pointer-events: none;
-      background: url("/samunmong/assets/magic-school/interrogation/office-empty.png") center bottom / 100% auto no-repeat;
+      background: url("/samunmong/assets/magic-school/interrogation/office-empty.webp") center bottom / 100% auto no-repeat;
       filter: drop-shadow(0 -8px 18px rgba(0, 0, 0, .18));
     }
 
@@ -3818,7 +3818,7 @@
       inset: 0;
       z-index: 6;
       pointer-events: none;
-      background: url("/assets/space-station/backgrounds/emergency-investigation-desk-foreground.png") center / cover no-repeat;
+      background: url("/assets/space-station/backgrounds/emergency-investigation-desk-foreground.webp") center / cover no-repeat;
     }
 
     .suspect-switch {
@@ -3976,7 +3976,7 @@
     .hint-prop::before {
       width: 50px;
       height: 48px;
-      background: url("/samunmong/assets/ui-generated/tool-hint.png") center / contain no-repeat;
+      background: url("/samunmong/assets/ui-generated/tool-hint.webp") center / contain no-repeat;
     }
 
     .hint-prop::after {
@@ -3993,7 +3993,7 @@
     .map-prop::before {
       width: 54px;
       height: 50px;
-      background: url("/samunmong/assets/ui-generated/tool-map.png") center / contain no-repeat;
+      background: url("/samunmong/assets/ui-generated/tool-map.webp") center / contain no-repeat;
       transform: translate(-50%, -50%) rotate(-8deg);
       box-shadow: 0 0 8px rgba(217,178,104,.18);
     }
@@ -4001,7 +4001,7 @@
     .room-prop::before {
       width: 44px;
       height: 54px;
-      background: url("/samunmong/assets/ui-generated/tool-interrogation.png") center / contain no-repeat;
+      background: url("/samunmong/assets/ui-generated/tool-interrogation.webp") center / contain no-repeat;
       transform: translate(-50%, -50%) rotate(3deg);
     }
 
@@ -4012,7 +4012,7 @@
     .note-prop::before {
       width: 50px;
       height: 52px;
-      background: url("/samunmong/assets/ui-generated/tool-note.png") center / contain no-repeat;
+      background: url("/samunmong/assets/ui-generated/tool-note.webp") center / contain no-repeat;
       transform: translate(-50%, -50%) rotate(5deg);
     }
 
@@ -4020,14 +4020,14 @@
       width: 54px;
       height: 50px;
       border: 0;
-      background: url("/samunmong/assets/ui-generated/tool-bag.png") center / contain no-repeat;
+      background: url("/samunmong/assets/ui-generated/tool-bag.webp") center / contain no-repeat;
     }
 
     .tool-kit-prop::before {
       width: 54px;
       height: 50px;
       border: 0;
-      background: url("/samunmong/assets/ui-generated/tool-kit.png") center / contain no-repeat;
+      background: url("/samunmong/assets/ui-generated/tool-kit.webp") center / contain no-repeat;
       transform: translate(-50%, -50%) rotate(4deg);
     }
 
@@ -4041,7 +4041,7 @@
       width: 42px;
       height: 42px;
       border-radius: 0;
-      background: url("/samunmong/assets/ui-generated/tool-accuse.png") center / contain no-repeat;
+      background: url("/samunmong/assets/ui-generated/tool-accuse.webp") center / contain no-repeat;
       box-shadow: 0 0 9px rgba(160,45,36,.26);
     }
 
@@ -4655,7 +4655,7 @@
       border-radius: 4px;
       background:
         linear-gradient(180deg, rgba(56, 30, 18, .035), rgba(42, 20, 13, .16)),
-        url("/samunmong/assets/ui/joseon-paper-panel-clean-bg.png") center / 100% 100% no-repeat;
+        url("/samunmong/assets/ui/joseon-paper-panel-clean-bg.webp") center / 100% 100% no-repeat;
       box-shadow:
         0 30px 118px rgba(0, 0, 0, .8),
         inset 0 0 32px rgba(48, 21, 11, .24);
@@ -5265,7 +5265,7 @@
       color: #2f2118;
       background:
         linear-gradient(180deg, rgba(255, 246, 218, .05), rgba(105, 70, 34, .08)),
-        url("/samunmong/assets/ui/parchment-frame-bg.png") center / 100% 100% no-repeat;
+        url("/samunmong/assets/ui/parchment-frame-bg.webp") center / 100% 100% no-repeat;
       box-shadow:
         0 28px 88px rgba(0,0,0,.62),
         inset 0 0 0 1px rgba(64, 33, 20, .32);
@@ -5283,7 +5283,7 @@
     .briefing-card[data-briefing-step="1"] {
       background:
         linear-gradient(180deg, rgba(255, 252, 234, .28), rgba(255, 236, 190, .14)),
-        url("/samunmong/assets/ui/parchment-frame-bg.png") center / 100% 100% no-repeat;
+        url("/samunmong/assets/ui/parchment-frame-bg.webp") center / 100% 100% no-repeat;
       box-shadow:
         0 24px 66px rgba(0,0,0,.48),
         inset 0 0 0 1px rgba(92, 52, 25, .2);
@@ -5603,7 +5603,7 @@
       color: #21140e;
       background:
         linear-gradient(rgba(255, 238, 205, .08), rgba(255, 238, 205, .08)),
-        url("/samunmong/assets/magic-school/ui/briefing-spellbook.png") center / cover no-repeat;
+        url("/samunmong/assets/magic-school/ui/briefing-spellbook.webp") center / cover no-repeat;
       box-shadow: 0 28px 80px rgba(0, 0, 0, .62);
       text-shadow: none;
     }
@@ -5923,7 +5923,7 @@
       color: #24170f;
       background:
         linear-gradient(rgba(255, 241, 211, .08), rgba(255, 241, 211, .08)),
-        url("/samunmong/assets/magic-school/ui/magic-common-panel.png") center / cover no-repeat;
+        url("/samunmong/assets/magic-school/ui/magic-common-panel.webp") center / cover no-repeat;
       box-shadow: 0 30px 88px rgba(0, 0, 0, .7);
     }
 
@@ -5996,7 +5996,7 @@
       border: 0;
       background:
         linear-gradient(rgba(255, 241, 211, .08), rgba(255, 241, 211, .08)),
-        url("/samunmong/assets/magic-school/ui/magic-common-panel.png") center / cover no-repeat;
+        url("/samunmong/assets/magic-school/ui/magic-common-panel.webp") center / cover no-repeat;
     }
 
     html[data-samunmong-theme="magicSchool"] .evidence-bag-pop .bag-pop-head,
@@ -6041,7 +6041,7 @@
       color: #24170f;
       background:
         linear-gradient(rgba(255, 241, 211, .08), rgba(255, 241, 211, .08)),
-        url("/samunmong/assets/magic-school/ui/magic-common-panel.png") center / cover no-repeat;
+        url("/samunmong/assets/magic-school/ui/magic-common-panel.webp") center / cover no-repeat;
       box-shadow: 0 30px 88px rgba(0, 0, 0, .72);
     }
 
@@ -6102,7 +6102,7 @@
       border: 0;
       background:
         linear-gradient(rgba(16, 10, 6, .05), rgba(16, 10, 6, .08)),
-        url("/samunmong/assets/magic-school/ui/map-panel-frame.png") center / cover no-repeat;
+        url("/samunmong/assets/magic-school/ui/map-panel-frame.webp") center / cover no-repeat;
       box-shadow: 0 30px 88px rgba(0, 0, 0, .72);
     }
 
@@ -7170,19 +7170,19 @@ html[data-samunmong-theme="magicSchool"] #interrogationScreen .scene-chip:hover:
 html[data-samunmong-theme="magicSchool"] .briefing-screen:has(.briefing-card[data-briefing-step="0"]) {
   background:
     linear-gradient(90deg, rgba(3, 5, 14, .22), rgba(3, 5, 14, .46)),
-    url("/samunmong/assets/magic-school/briefing/memory-orb-background.png") center / cover no-repeat;
+    url("/samunmong/assets/magic-school/briefing/memory-orb-background.webp") center / cover no-repeat;
 }
 
 html[data-samunmong-theme="magicSchool"] .briefing-screen:has(.briefing-card[data-briefing-step="1"]) {
   background:
     linear-gradient(90deg, rgba(3, 5, 14, .12), rgba(3, 5, 14, .58)),
-    url("/samunmong/assets/magic-school/briefing/mana-trace-background.png") center / cover no-repeat;
+    url("/samunmong/assets/magic-school/briefing/mana-trace-background.webp") center / cover no-repeat;
 }
 
 html[data-samunmong-theme="magicSchool"] .briefing-screen:has(.briefing-card[data-briefing-step="2"]) {
   background:
     linear-gradient(180deg, rgba(3, 5, 14, .16), rgba(3, 5, 14, .46)),
-    url("/samunmong/assets/magic-school/briefing/student-record-background.png") center / cover no-repeat;
+    url("/samunmong/assets/magic-school/briefing/student-record-background.webp") center / cover no-repeat;
 }
 
 html[data-samunmong-theme="magicSchool"] .briefing-screen:has(.briefing-card[data-briefing-step="0"]) .magic-memory-stage,
@@ -8377,7 +8377,7 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb .me
 html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .memory-orb {
   width: 172px !important;
   height: 172px !important;
-  background: url("/samunmong/assets/magic-school/intro/memory-orb-cutout-v2.png") center / contain no-repeat !important;
+  background: url("/samunmong/assets/magic-school/intro/memory-orb-cutout-v2.webp") center / contain no-repeat !important;
   filter:
     drop-shadow(0 0 18px rgba(104, 210, 225, .28))
     drop-shadow(0 20px 28px rgba(0, 0, 0, .42));
@@ -8411,7 +8411,7 @@ html[data-samunmong-theme="magicSchool"] .briefing-screen:has(.briefing-card[dat
 html[data-samunmong-theme="magicSchool"] .briefing-screen:has(.briefing-card[data-briefing-step="0"]) .magic-briefing-popup-frame,
 html[data-samunmong-theme="magicSchool"] .briefing-screen:has(.briefing-card[data-briefing-step="1"]) .magic-briefing-popup-frame {
   inset: -26px -34px !important;
-  background: url("/samunmong/assets/magic-school/intro/scroll-notice.png") center / contain no-repeat !important;
+  background: url("/samunmong/assets/magic-school/intro/scroll-notice.webp") center / contain no-repeat !important;
   filter:
     drop-shadow(0 32px 74px rgba(0, 0, 0, .8))
     drop-shadow(0 0 26px rgba(56, 137, 150, .12)) !important;
@@ -8884,7 +8884,7 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb .ma
   background:
     radial-gradient(circle at 50% 54%, rgba(247, 134, 54, .22), transparent 22%),
     radial-gradient(circle at 50% 50%, rgba(85, 216, 245, .15), transparent 34%),
-    url("/samunmong/assets/magic-school/briefing/memory-orb-background.png") center / cover no-repeat !important;
+    url("/samunmong/assets/magic-school/briefing/memory-orb-background.webp") center / cover no-repeat !important;
   box-shadow: 0 28px 90px rgba(0, 0, 0, .72) !important;
 }
 
@@ -9123,7 +9123,7 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .magic
   background:
     radial-gradient(circle at 50% 52%, rgba(248, 173, 94, .14), transparent 18%),
     radial-gradient(circle at 50% 49%, rgba(94, 48, 113, .18), transparent 40%),
-    url("/samunmong/assets/magic-school/briefing/memory-orb-background.png") center / cover no-repeat !important;
+    url("/samunmong/assets/magic-school/briefing/memory-orb-background.webp") center / cover no-repeat !important;
   border-radius: 24px !important;
   box-shadow: 0 36px 110px rgba(0, 0, 0, .72) !important;
   transform: translate(-50%, -50%) !important;
@@ -9153,7 +9153,7 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb .me
 html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .memory-orb {
   width: 100% !important;
   height: 100% !important;
-  background: url("/samunmong/assets/magic-school/intro/memory-orb-cutout.png") center / contain no-repeat !important;
+  background: url("/samunmong/assets/magic-school/intro/memory-orb-cutout.webp") center / contain no-repeat !important;
   filter:
     drop-shadow(0 28px 36px rgba(0, 0, 0, .52))
     drop-shadow(0 0 28px rgba(206, 147, 92, .32)) !important;
@@ -9628,7 +9628,7 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb,
 html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring {
   background:
     linear-gradient(180deg, rgba(3, 3, 6, .12), rgba(3, 3, 6, .3)),
-    url("/samunmong/assets/magic-school/briefing/memory-orb-background-v2.png") center / cover no-repeat,
+    url("/samunmong/assets/magic-school/briefing/memory-orb-background-v2.webp") center / cover no-repeat,
     #060403 !important;
 }
 
@@ -9708,7 +9708,7 @@ html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel 
   color: #24170f !important;
   background:
     linear-gradient(rgba(255, 241, 211, .08), rgba(255, 241, 211, .08)),
-    url("/samunmong/assets/magic-school/ui/magic-common-panel.png") center / 100% 100% no-repeat !important;
+    url("/samunmong/assets/magic-school/ui/magic-common-panel.webp") center / 100% 100% no-repeat !important;
   box-shadow: 0 30px 88px rgba(0, 0, 0, .72) !important;
 }
 

@@ -149,7 +149,7 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
     <div className="game-viewport">
       <main className="game-shell" data-start-screen={initialScreen} data-initial-theme={initialTheme}>
         <TeamIntro disabled={skipIntro} />
-        <MainScreen />
+        <MainScreen active={currentScreen === MAIN_SCREEN} />
         <TutorialScreen />
         <DreamSelectScreen />
         <BriefingScreen initialTheme={initialTheme} />
