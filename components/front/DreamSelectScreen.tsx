@@ -12,7 +12,7 @@ export default function DreamSelectScreen() {
       <div className="shade" />
       <article className="hud dream-select-card">
         <div className="dream-select-head">
-          <h2>어떤 꿈을 먼저 꾸시겠습니까?</h2>
+          <h2>어떤 꿈을 꾸시겠습니까?</h2>
         </div>
         <div className="dream-grid">
           {dreamOptions.map((dream) => (
@@ -29,7 +29,6 @@ export default function DreamSelectScreen() {
               <span className="dream-kicker">{dream.kicker}</span>
               <strong>{dream.title}</strong>
               <span className="dream-desc">{dream.description}</span>
-              <span className="dream-meta">{dream.meta}</span>
             </button>
           ))}
         </div>

@@ -97,7 +97,11 @@ export default function GameSettingsOverlay() {
         aria-label={isFullscreen ? "전체화면 종료" : "전체화면으로 보기"}
         title={isFullscreen ? "전체화면 종료" : "전체화면"}
         onClick={toggleFullscreen}
-        style={{ left: showGameSettingsButton ? "5.7%" : "2.4%" }}
+        style={{
+          left: showGameSettingsButton
+            ? "calc(clamp(30px, 5.6vw, 78px) + 56px)"
+            : "clamp(30px, 5.6vw, 78px)",
+        }}
       >
         {isFullscreen ? (
           <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none">
