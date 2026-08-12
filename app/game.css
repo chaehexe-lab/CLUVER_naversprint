@@ -1820,6 +1820,26 @@
       line-height: 1.56;
     }
 
+    .briefing-copy.briefing-rise-in {
+      animation: briefingStepIn .32s ease both;
+    }
+
+    html[data-samunmong-theme="joseon"] .briefing-copy strong {
+      font-weight: 800;
+    }
+
+    html[data-samunmong-theme="joseon"] .briefing-copy-line {
+      display: block;
+    }
+
+    html[data-samunmong-theme="joseon"] .briefing-copy-discovery {
+      margin-bottom: 1.56em;
+    }
+
+    html[data-samunmong-theme="joseon"] .briefing-copy-role {
+      white-space: nowrap;
+    }
+
     .briefing-caption {
       max-width: 780px;
       margin: 0;
@@ -4077,13 +4097,20 @@
     }
 
     .hint-prop {
-      display: block;
+      display: grid;
+      justify-items: center;
+      align-content: end;
       color: #f2e6d4;
       font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
       font-size: 0;
       letter-spacing: 0;
       text-shadow: 0 2px 4px #000, 0 0 8px rgba(0,0,0,.86);
-      filter: drop-shadow(0 8px 13px rgba(0,0,0,.6));
+      filter: none;
+    }
+
+    .hint-prop:hover,
+    .hint-prop:focus-visible {
+      filter: none;
     }
 
     .hint-prop::before {
@@ -4093,13 +4120,20 @@
     }
 
     .hint-prop::after {
-      content: "힌트";
-      position: absolute;
-      left: 50%;
-      bottom: 1px;
+      content: none;
+    }
+
+    .hint-prop .sr-only {
+      position: static;
+      width: auto;
+      height: auto;
+      overflow: visible;
+      clip: auto;
+      clip-path: none;
       color: #f2e6d4;
       font-size: clamp(16px, 1.55vw, 21px);
-      transform: translateX(-50%);
+      text-shadow: 0 2px 4px #000;
+      transform: none;
       white-space: nowrap;
     }
 

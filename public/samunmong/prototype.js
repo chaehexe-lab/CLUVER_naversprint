@@ -78,7 +78,7 @@
       ? spaceBriefingText
       : isMagicTheme
       ? magicBriefingText
-      : sentenceBreakText("“사또님, 관아 근처에서 사람이 쓰러진 채 발견되었습니다.”\n\n당신은 이 꿈에서 고을의 사또입니다. 현장을 조사하고, 증거를 모아 용의자를 심문해야 합니다.");
+      : sentenceBreakText("“사또님, 관아 근처에서 사람이 쓰러진 채 발견되었습니다.”\n\n당신은 이 꿈에서 고을의 사또입니다.\n현장을 조사하여 증거를 모으고, 용의자를 심문하여 범인을 찾아야 합니다.");
     const magicSuspects = [
       { name: "건달프", id: "gandalf", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/gandalf-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
       { name: "덩쿨도어", id: "dunguldoor", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/dunguldoor-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
@@ -1643,6 +1643,33 @@
 
     function typeBriefing() {
       if (!briefingCopy) return;
+      if (!isMagicTheme && !isSpaceTheme) {
+        const discoveryLine = document.createElement("span");
+        const roleLine = document.createElement("span");
+        const missionLine = document.createElement("span");
+        const emphasis = document.createElement("strong");
+        discoveryLine.className = "briefing-copy-line briefing-copy-discovery";
+        discoveryLine.textContent = "“사또님, 관아 근처에서 사람이 쓰러진 채 발견되었습니다.”";
+        roleLine.className = "briefing-copy-line briefing-copy-role";
+        roleLine.append(
+          document.createTextNode("당신은 이 꿈에서 "),
+          emphasis,
+          document.createTextNode("입니다.")
+        );
+        missionLine.className = "briefing-copy-line";
+        missionLine.textContent = "현장을 조사하여 증거를 모으고, 용의자를 심문하여 범인을 찾아야 합니다.";
+        emphasis.textContent = "고을의 사또";
+        clearInterval(typeBriefing.timer);
+        clearTimeout(typeBriefing.decodeTimer);
+        briefingCopy.replaceChildren(discoveryLine, roleLine, missionLine);
+        briefingCopy.classList.add("done");
+        briefingCopy.classList.remove("rune-decoding", "briefing-rise-in");
+        void briefingCopy.offsetWidth;
+        briefingCopy.classList.add("briefing-rise-in");
+        isBriefingTyped = true;
+        updateBriefingStep();
+        return;
+      }
       briefingCopy.textContent = "";
       briefingCopy.classList.remove("done");
       briefingCopy.classList.toggle("rune-decoding", isMagicTheme);
