@@ -761,8 +761,8 @@
     }
 
     .location-indicator {
-      left: calc(2.4% + 62px);
-      top: 2.4%;
+      left: 2.2%;
+      top: calc(2.4% + 56px);
       z-index: 16;
       min-width: 158px;
       display: grid;
@@ -986,11 +986,17 @@
       filter: brightness(1.14);
     }
 
-    .game-settings-button {
+    .game-utility-buttons {
       position: absolute;
       z-index: 36;
       top: 2.4%;
-      left: clamp(30px, 5.6vw, 78px);
+      left: 2.2%;
+      display: flex;
+      gap: 10px;
+    }
+
+    .game-settings-button {
+      position: static;
       width: 46px;
       height: 46px;
       display: grid;

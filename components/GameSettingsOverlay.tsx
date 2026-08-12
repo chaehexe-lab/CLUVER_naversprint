@@ -9,7 +9,7 @@ function getActiveScreenId() {
 export default function GameSettingsOverlay() {
   const [activeScreen, setActiveScreen] = useState("mainScreen");
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const showGameSettingsButton = activeScreen !== "mainScreen";
+  const showSettingsHomeButton = !["mainScreen", "tutorialScreen", "dreamScreen"].includes(activeScreen);
 
   useEffect(() => {
     const syncActiveScreen = () => setActiveScreen(getActiveScreenId());
@@ -102,44 +102,40 @@ export default function GameSettingsOverlay() {
 
   return (
     <>
-      <button
-        className="game-settings-button"
-        id="openGameSettings"
-        type="button"
-        data-open-settings="true"
-        aria-label="설정 열기"
-        hidden={!showGameSettingsButton}
-      >
-        <span aria-hidden="true">⚙</span>
-      </button>
+      <div className="game-utility-buttons">
+        <button
+          className="game-settings-button"
+          id="toggleFullscreen"
+          type="button"
+          aria-label={isFullscreen ? "전체화면 종료" : "전체화면으로 보기"}
+          title={isFullscreen ? "전체화면 종료" : "전체화면"}
+          onClick={toggleFullscreen}
+        >
+          {isFullscreen ? (
+            <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M4 8H6.5Q8 8 8 6.5V4M20 8H17.5Q16 8 16 6.5V4M4 16H6.5Q8 16 8 17.5V20M20 16H17.5Q16 16 16 17.5V20"
+                stroke="currentColor"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          ) : (
+            <span aria-hidden="true">⛶</span>
+          )}
+        </button>
 
-      <button
-        className="game-settings-button"
-        id="toggleFullscreen"
-        type="button"
-        aria-label={isFullscreen ? "전체화면 종료" : "전체화면으로 보기"}
-        title={isFullscreen ? "전체화면 종료" : "전체화면"}
-        onClick={toggleFullscreen}
-        style={{
-          left: showGameSettingsButton
-            ? "calc(clamp(30px, 5.6vw, 78px) + 56px)"
-            : "30px",
-        }}
-      >
-        {isFullscreen ? (
-          <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <path
-              d="M4 8H6.5Q8 8 8 6.5V4M20 8H17.5Q16 8 16 6.5V4M4 16H6.5Q8 16 8 17.5V20M20 16H17.5Q16 16 16 17.5V20"
-              stroke="currentColor"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        ) : (
-          <span aria-hidden="true">⛶</span>
-        )}
-      </button>
+        <button
+          className="game-settings-button"
+          id="openGameSettings"
+          type="button"
+          data-open-settings="true"
+          aria-label="설정 열기"
+        >
+          <span aria-hidden="true">⚙</span>
+        </button>
+      </div>
 
       <div className="main-dialog" id="settingsDialog" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
         <div className="main-dialog-panel">
@@ -153,7 +149,7 @@ export default function GameSettingsOverlay() {
             <input id="contrastSetting" type="checkbox" />
           </label>
           <div className="dialog-actions">
-            {activeScreen !== "dreamScreen" && (
+            {showSettingsHomeButton && (
               <button
                 className="button settings-home-button"
                 type="button"
