@@ -1892,6 +1892,10 @@
           finishBriefingTyping();
           return;
         }
+        if (briefingStepIndex >= briefingPanels.length - 1) {
+          startCaseButton?.click();
+          return;
+        }
         briefingStepIndex = isMagicTheme && briefingStepIndex === 0 ? 2 : briefingStepIndex + 1;
         updateBriefingStep();
       }

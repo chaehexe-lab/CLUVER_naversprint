@@ -10009,3 +10009,71 @@ html[data-samunmong-theme="magicSchool"] .global-panel.investigation-note-panel 
   outline: 2px solid rgba(111, 26, 23, .3) !important;
   outline-offset: 2px !important;
 }
+
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-kicker {
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card h2 {
+  font-size: clamp(36px, 4vw, 56px);
+}
+
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-caption {
+  font-size: clamp(18px, 1.7vw, 22px);
+}
+
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] h2::after {
+  margin-top: 18px;
+  transform: translateY(-5px);
+}
+
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-death-layout {
+  width: min(920px, 100%);
+  grid-template-columns: minmax(300px, 1.08fr) minmax(280px, .92fr);
+}
+
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-evidence-photo img {
+  max-height: 330px;
+}
+
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-evidence-photo-small img {
+  max-height: 320px;
+}
+
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-evidence-stack {
+  position: relative;
+  padding-bottom: 30px;
+}
+
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-evidence-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 30px;
+  margin: 0;
+  color: rgba(56, 32, 19, .78);
+  font-family: "NanumBareunJeongsin", "Noto Serif KR", serif;
+  font-size: clamp(16px, 2.4vw, 24px);
+  font-weight: 600;
+  text-align: center;
+}
+
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-death-copy {
+  position: relative;
+  border-left: 0;
+}
+
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-death-copy::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 5%;
+  bottom: 4%;
+  width: 2px;
+  background: rgba(105, 46, 28, .35);
+}
+
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-death-copy strong {
+  font-family: "ChilgokLjh", "Noto Serif KR", "Batang", serif;
+}
