@@ -10117,3 +10117,54 @@ html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing
 html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-death-copy strong {
   font-family: "ChilgokLjh", "Noto Serif KR", "Batang", serif;
 }
+
+/* Keep the settings dialog visually consistent across every game theme. */
+#settingsDialog .main-dialog-panel {
+  border: 1px solid rgba(199, 164, 126, .46) !important;
+  border-radius: 6px !important;
+  color: #f4eee8 !important;
+  background: rgba(13, 12, 15, .96) !important;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, .7) !important;
+}
+
+#settingsDialog .main-dialog-panel h2,
+#settingsDialog .setting-row,
+#settingsDialog .setting-row span {
+  color: #f4eee8 !important;
+  text-shadow: none !important;
+}
+
+#settingsDialog .setting-row input[type="range"],
+#settingsDialog .setting-row input[type="checkbox"] {
+  accent-color: #a87862 !important;
+}
+
+#settingsDialog .button {
+  position: relative !important;
+  overflow: visible !important;
+  border: 1px solid rgba(190, 159, 111, .42) !important;
+  border-radius: 999px !important;
+  color: #f4eee8 !important;
+  background: linear-gradient(135deg, rgba(92, 62, 39, .9), rgba(48, 31, 21, .9)) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+
+#settingsDialog .button::before,
+#settingsDialog .button::after {
+  content: none !important;
+}
+
+#settingsDialog .button:hover,
+#settingsDialog .button:focus-visible {
+  border-color: rgba(255, 245, 225, .46) !important;
+  background: linear-gradient(135deg, rgba(105, 72, 46, .94), rgba(55, 35, 23, .94)) !important;
+  filter: brightness(1.08) !important;
+  outline: none !important;
+}
+
+#settingsDialog .settings-home-button {
+  min-width: 38px !important;
+  width: 38px !important;
+  padding: 0 !important;
+}
