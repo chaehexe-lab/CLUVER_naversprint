@@ -953,11 +953,38 @@
     }
 
     .main-dialog-panel h2 { margin: 0 0 18px; font-family: "ChosunNm", "Batang", serif; }
+
+    #settingsDialog .main-dialog-panel {
+      width: min(360px, 82%);
+    }
+
+    #settingsDialog .main-dialog-panel h2 {
+      margin-bottom: 30px;
+    }
+
+    #settingsDialog .setting-row {
+      margin-block: 10px;
+    }
+
     .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 16px 0; }
     .setting-row input[type="range"] { width: 52%; accent-color: #a87862; padding: 0; border: 0;}
     .setting-row input[type="checkbox"] { width: 20px; height: 20px; accent-color: #a87862; }
     .dialog-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
     .dialog-actions button { min-width: 92px; }
+
+    #settingsDialog .settings-home-button {
+      min-width: 38px;
+      width: 38px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      margin-right: auto;
+    }
+
+    #settingsDialog #closeSettings:hover {
+      border-color: rgba(255, 245, 225, .46);
+      filter: brightness(1.14);
+    }
 
     .game-settings-button {
       position: absolute;

@@ -90,6 +90,16 @@ export default function GameSettingsOverlay() {
     document.querySelector("#settingsDialog")?.classList.remove("open");
   };
 
+  const goToThemeSelection = () => {
+    document.querySelector("#settingsDialog")?.classList.remove("open");
+    window.dispatchEvent(
+      new CustomEvent("samunmong:screen-request", {
+        cancelable: true,
+        detail: { screenId: "dreamScreen" }
+      })
+    );
+  };
+
   return (
     <>
       <button
@@ -143,6 +153,25 @@ export default function GameSettingsOverlay() {
             <input id="contrastSetting" type="checkbox" />
           </label>
           <div className="dialog-actions">
+            {activeScreen !== "dreamScreen" && (
+              <button
+                className="button settings-home-button"
+                type="button"
+                aria-label="테마 선택 화면으로 이동"
+                title="처음 화면으로 나가기"
+                onClick={goToThemeSelection}
+              >
+                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                  <path
+                    d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+            )}
             <button className="button primary" id="closeSettings" type="button" onClick={closeSettings}>
               확인
             </button>
