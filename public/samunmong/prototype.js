@@ -856,13 +856,10 @@
     }
 
     function applySettings(settings) {
-      document.body.classList.toggle("reduce-motion", settings.reduceMotion);
       document.body.classList.toggle("high-contrast", settings.highContrast);
       const volumeSetting = document.querySelector("#volumeSetting");
-      const motionSetting = document.querySelector("#motionSetting");
       const contrastSetting = document.querySelector("#contrastSetting");
       if (volumeSetting) volumeSetting.value = settings.volume;
-      if (motionSetting) motionSetting.checked = settings.reduceMotion;
       if (contrastSetting) contrastSetting.checked = settings.highContrast;
       applyAudioVolume();
     }
@@ -1725,7 +1722,7 @@
 
     const settingsDialog = document.querySelector("#settingsDialog");
     const exitDialog = document.querySelector("#exitDialog");
-    const defaultSettings = { volume: 70, reduceMotion: false, highContrast: false };
+    const defaultSettings = { volume: 70, highContrast: false };
     applySettings({ ...defaultSettings, ...readStored(settingsKey, {}) });
     if (briefingTitle && isSpaceTheme) briefingTitle.textContent = "우주정거장 살인사건";
     applyThemeMap();
@@ -1780,17 +1777,6 @@
     });
     on("#volumeSetting", "input", () => {
       applyAudioVolume();
-    });
-    on("#closeSettings", "click", () => {
-      const settings = {
-        volume: Number(document.querySelector("#volumeSetting").value),
-        reduceMotion: document.querySelector("#motionSetting").checked,
-        highContrast: document.querySelector("#contrastSetting").checked
-      };
-      localStorage.setItem(settingsKey, JSON.stringify(settings));
-      applySettings(settings);
-      settingsDialog?.classList.remove("open");
-      showToast("설정을 저장했습니다.");
     });
     on("#exitGame", "click", () => exitDialog?.classList.add("open"));
     on("#cancelExit", "click", () => exitDialog?.classList.remove("open"));

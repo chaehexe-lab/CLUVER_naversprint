@@ -148,7 +148,14 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
   }, [initialScreen, initialTheme]);
 
   return (
-    <div className="game-viewport">
+    <div
+      className="game-viewport"
+      ref={(viewport) => {
+        if (!viewport) return;
+        const scale = Math.min(window.innerWidth / 1600, window.innerHeight / 900, 1);
+        viewport.style.setProperty("--game-scale", String(scale));
+      }}
+    >
       <main className="game-shell" data-start-screen={initialScreen} data-initial-theme={initialTheme}>
         <TeamIntro disabled={skipIntro} />
         <MainScreen active={currentScreen === MAIN_SCREEN} />

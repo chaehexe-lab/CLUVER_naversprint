@@ -77,6 +77,19 @@ export default function GameSettingsOverlay() {
     }
   };
 
+  const closeSettings = () => {
+    const volumeSetting = document.querySelector<HTMLInputElement>("#volumeSetting");
+    const contrastSetting = document.querySelector<HTMLInputElement>("#contrastSetting");
+    const settings = {
+      volume: Number(volumeSetting?.value ?? 70),
+      highContrast: Boolean(contrastSetting?.checked)
+    };
+
+    window.localStorage.setItem("samunmong-demo-settings", JSON.stringify(settings));
+    document.body.classList.toggle("high-contrast", settings.highContrast);
+    document.querySelector("#settingsDialog")?.classList.remove("open");
+  };
+
   return (
     <>
       <button
@@ -100,15 +113,15 @@ export default function GameSettingsOverlay() {
         style={{
           left: showGameSettingsButton
             ? "calc(clamp(30px, 5.6vw, 78px) + 56px)"
-            : "clamp(30px, 5.6vw, 78px)",
+            : "30px",
         }}
       >
         {isFullscreen ? (
           <svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none">
             <path
-              d="M4 9H7.5Q9 9 9 7.5V4M20 9H16.5Q15 9 15 7.5V4M4 15H7.5Q9 15 9 16.5V20M20 15H16.5Q15 15 15 16.5V20"
+              d="M4 8H6.5Q8 8 8 6.5V4M20 8H17.5Q16 8 16 6.5V4M4 16H6.5Q8 16 8 17.5V20M20 16H17.5Q16 16 16 17.5V20"
               stroke="currentColor"
-              strokeWidth="1.7"
+              strokeWidth="1.2"
               strokeLinecap="round"
               strokeLinejoin="round"
             />
@@ -126,15 +139,11 @@ export default function GameSettingsOverlay() {
             <input id="volumeSetting" type="range" min="0" max="100" defaultValue="70" />
           </label>
           <label className="setting-row">
-            <span>화면 움직임 줄이기</span>
-            <input id="motionSetting" type="checkbox" />
-          </label>
-          <label className="setting-row">
             <span>고대비 화면</span>
             <input id="contrastSetting" type="checkbox" />
           </label>
           <div className="dialog-actions">
-            <button className="button primary" id="closeSettings" type="button">
+            <button className="button primary" id="closeSettings" type="button" onClick={closeSettings}>
               확인
             </button>
           </div>
