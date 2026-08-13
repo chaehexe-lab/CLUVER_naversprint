@@ -2582,6 +2582,19 @@
       outline: none;
     }
 
+    #fieldOne:has(.field-onboarding:not([hidden])) .scene-hint {
+      pointer-events: none;
+      cursor: default;
+    }
+
+    #fieldOne:has(.field-onboarding:not([hidden])) .scene-hint:hover,
+    #fieldOne:has(.field-onboarding:not([hidden])) .scene-hint:focus-visible {
+      transform: none;
+      filter: drop-shadow(0 9px 14px rgba(0,0,0,.68));
+      box-shadow: none;
+      outline: none;
+    }
+
     .hotspot.collected::before {
       background: radial-gradient(ellipse at 50% 52%, rgba(126,154,107,.055), rgba(126,154,107,.025) 42%, transparent 76%);
       box-shadow: 0 0 10px rgba(126,154,107,.045);
@@ -2679,14 +2692,38 @@
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(circle at 6.8% 87%, transparent 0 8.5%, rgba(0,0,0,.54) 13%, rgba(0,0,0,.66) 100%);
+        radial-gradient(
+          circle at calc(2.2% + 44px) calc(97% - 36px),
+          transparent 0 58px,
+          rgba(0,0,0,.54) 70px,
+          rgba(0,0,0,.66) 100px
+        );
       opacity: .92;
+      pointer-events: none;
+    }
+
+    #fieldOne:has(.field-onboarding[data-guide-step="map-click"]:not([hidden]))
+      .scene-chip:not(.field-guide-highlight),
+    #fieldOne:has(.field-onboarding[data-guide-step="room"]:not([hidden]))
+      .scene-chip:not(.field-guide-highlight),
+    #fieldOne:has(.field-onboarding[data-guide-step="tools"]:not([hidden]))
+      .scene-chip:not(.field-guide-highlight) {
       pointer-events: none;
     }
 
     .field-onboarding[data-guide-step="map-open"]::before {
       background:
         radial-gradient(circle at 50% 50%, transparent 0 42%, rgba(0,0,0,.42) 58%, rgba(0,0,0,.64) 100%);
+    }
+
+    .field-onboarding[data-guide-step="room"]::before {
+      background:
+        radial-gradient(
+          circle at calc(2.2% + 136px) calc(97% - 36px),
+          transparent 0 58px,
+          rgba(0,0,0,.54) 70px,
+          rgba(0,0,0,.66) 100px
+        );
     }
 
     .field-onboarding[data-guide-step="tools"]::before {
@@ -2716,9 +2753,24 @@
     }
 
     .field-onboarding[data-guide-step="map-click"] .field-guide-card {
-      left: 36%;
-      top: 16%;
-      transform: translateX(-50%);
+      left: 2.2%;
+      top: auto;
+      bottom: 19%;
+      width: min(750px, 90vw);
+      padding: 30px 36px;
+      transform: none;
+    }
+
+    .field-onboarding[data-guide-step="map-click"] .field-guide-actions {
+      display: none;
+    }
+
+    .field-onboarding[data-guide-step="map-click"] .field-guide-card h2 {
+      font-size: clamp(24px, 2.65vw, 34px);
+    }
+
+    .field-onboarding[data-guide-step="map-click"] .field-guide-card p:not(.field-guide-kicker) {
+      font-weight: 500;
     }
 
     .field-onboarding[data-guide-step="tools"] .field-guide-card {
@@ -2808,6 +2860,59 @@
       animation: fieldGuidePulse 1.18s ease-in-out infinite;
     }
 
+    #fieldOne:has(.field-onboarding[data-guide-step="room"]:not([hidden])) .scene-dock,
+    #fieldOne:has(.field-onboarding[data-guide-step="tools"]:not([hidden])) .scene-dock {
+      z-index: 63;
+    }
+
+    #fieldOne:has(.field-onboarding[data-guide-step="room"]:not([hidden]))
+      .scene-chip:not(.field-guide-highlight) {
+      opacity: .38;
+      filter: brightness(.46) saturate(.72);
+    }
+
+    #fieldOne:has(.field-onboarding[data-guide-step="tools"]:not([hidden]))
+      .scene-chip:not(.field-guide-highlight) {
+      opacity: .38;
+      filter: brightness(.46) saturate(.72);
+    }
+
+    #fieldOne:has(.field-onboarding[data-guide-step="tools"]:not([hidden]))
+      .scene-chip.field-guide-highlight {
+      animation: none;
+      filter: brightness(1.08) drop-shadow(0 0 12px rgba(255,255,255,.3)) !important;
+    }
+
+    #fieldOne:has(.field-onboarding[data-guide-step="tools"]:not([hidden]))
+      .scene-chip.field-guide-highlight::after {
+      content: none;
+    }
+
+    #fieldOne:has(.field-onboarding[data-guide-step="tools"]:not([hidden])) .scene-dock::after {
+      content: "";
+      position: absolute;
+      right: calc(2.4% - 4px);
+      bottom: calc(3% - 10px);
+      z-index: 65;
+      width: 96px;
+      height: calc(33% + 92px);
+      border: 2px solid rgba(238, 216, 161, .88);
+      border-radius: 30px;
+      background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.015));
+      box-shadow:
+        0 0 14px rgba(255,255,255,.3),
+        0 0 28px rgba(255,255,255,.14),
+        inset 0 0 12px rgba(255,255,255,.08);
+      pointer-events: none;
+    }
+
+    .scene-chip.map-chip.field-guide-highlight,
+    #fieldOne:has(.field-onboarding[data-guide-step="room"]:not([hidden]))
+      .scene-chip.room-chip.field-guide-highlight {
+      animation: none;
+      filter: brightness(1.08) drop-shadow(0 0 12px rgba(255,255,255,.3)) !important;
+    }
+
     .scene-chip.field-guide-highlight::after {
       content: "";
       position: absolute;
@@ -2818,6 +2923,32 @@
         0 0 0 8px rgba(159, 51, 39, .16),
         0 0 28px rgba(255, 199, 104, .42);
       pointer-events: none;
+    }
+
+    .scene-chip.map-chip.field-guide-highlight::after,
+    #fieldOne:has(.field-onboarding[data-guide-step="room"]:not([hidden]))
+      .scene-chip.room-chip.field-guide-highlight::after {
+      inset: auto;
+      left: 50%;
+      top: 50%;
+      width: 112px;
+      height: 100px;
+      border-color: rgba(238, 216, 161, .88);
+      border-radius: 30px;
+      background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.015));
+      box-shadow:
+        0 0 14px rgba(255,255,255,.3),
+        0 0 28px rgba(255,255,255,.14),
+        inset 0 0 12px rgba(255,255,255,.08);
+      transform: translate(-50%, -50%);
+      animation: none;
+    }
+
+    #fieldOne:has(.field-onboarding[data-guide-step="room"]:not([hidden]))
+      .scene-chip.room-chip.field-guide-highlight::after {
+      width: 96px;
+      height: 94px;
+      border-radius: 27px;
     }
 
     .global-panel.map-panel.field-guide-map-focus {
@@ -3105,6 +3236,12 @@
       right: 28px;
       top: 28px;
       z-index: 4;
+    }
+
+    html[data-samunmong-theme="joseon"] .map-floating-close,
+    html[data-samunmong-theme="joseon"] .map-floating-close:hover,
+    html[data-samunmong-theme="joseon"] .map-floating-close:focus-visible {
+      color: #f3e6c4;
     }
 
     .global-panel.bag-panel,
@@ -5320,12 +5457,7 @@
     }
 
     .field-onboarding[data-guide-step="tools"]::before {
-      background:
-        radial-gradient(circle at 6.8% 87%, transparent 0 7.5%, rgba(0,0,0,.38) 11%, transparent 12%),
-        radial-gradient(circle at 76.4% 88.5%, transparent 0 7.6%, rgba(0,0,0,.42) 11%, transparent 12.2%),
-        radial-gradient(circle at 88.4% 88.5%, transparent 0 7.6%, rgba(0,0,0,.42) 11%, transparent 12.2%),
-        radial-gradient(circle at 50% 84%, transparent 0 8.2%, rgba(0,0,0,.44) 12%, transparent 13%),
-        linear-gradient(180deg, rgba(0,0,0,.62), rgba(0,0,0,.28) 52%, rgba(0,0,0,.48));
+      background: linear-gradient(180deg, rgba(0,0,0,.62), rgba(0,0,0,.28) 52%, rgba(0,0,0,.48));
     }
 
     .field-onboarding[data-guide-step="map-open"]::before,

@@ -966,7 +966,11 @@
       let left = centerX;
       let top = targetTop - gap;
 
-      if (targetRight > shellWidth * .68 && fitsLeft) {
+      if (target.matches(".map-chip") && fitsTop) {
+        placement = "top";
+        left = clamp(centerX, margin + guideWidth / 2, shellWidth - margin - guideWidth / 2);
+        top = targetTop - gap;
+      } else if (targetRight > shellWidth * .68 && fitsLeft) {
         placement = "left";
         left = targetLeft - gap;
         top = clamp(centerY, margin + guideHeight / 2, shellHeight - margin - guideHeight / 2);
@@ -1353,7 +1357,8 @@
     const fieldGuideTargets = {
       "map-click": ["#openMapFromField"],
       "map-open": ["#mapPanel .map-pin-button.current", "#mapPanel .map-label.current"],
-      tools: ["#openBagFromField", "#fieldOne .open-tool-panel", "#openNoteFromField", "#fieldOne .room-chip"]
+      room: ["#fieldOne .room-chip"],
+      tools: ["#fieldOne .journal-chip", "#openNoteFromField", "#openBagFromField", "#fieldOne .open-tool-panel"]
     };
 
     function clearFieldGuideHighlights() {
@@ -1387,18 +1392,18 @@
       }
 
       if (fieldGuideNextButton) {
-        fieldGuideNextButton.hidden = false;
-        fieldGuideNextButton.textContent = step === "tools" ? "알겠습니다" : "다음";
+        fieldGuideNextButton.hidden = step === "map-click";
+        fieldGuideNextButton.textContent = step === "tools" ? "확인" : "다음";
       }
     }
 
     function advanceFieldGuideAfterMap() {
       if (fieldGuideStep !== "map-open") return;
-      setFieldGuideStep("tools");
+      setFieldGuideStep("room");
     }
 
     function isFieldGuideBlockingControls() {
-      return Boolean(fieldGuide && !fieldGuide.hidden && fieldGuideStep === "tools");
+      return Boolean(fieldGuide && !fieldGuide.hidden && ["room", "tools"].includes(fieldGuideStep));
     }
 
     function startFieldGuide() {
@@ -1958,6 +1963,10 @@
       }
       if (fieldGuideStep === "map-open") {
         closeGlobalPanel();
+        return;
+      }
+      if (fieldGuideStep === "room") {
+        setFieldGuideStep("tools");
         return;
       }
       closeFieldGuide();
@@ -3040,7 +3049,7 @@
       globalOverlay.classList.remove("show");
       document.body.classList.remove("tool-cursor-active");
       document.querySelector("#selectedToolCursor")?.classList.remove("show");
-      if (wasGuideMapOpen) setFieldGuideStep("tools");
+      if (wasGuideMapOpen) setFieldGuideStep("room");
     }
 
     document.addEventListener("click", (event) => {
