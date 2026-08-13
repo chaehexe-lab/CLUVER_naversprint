@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { finalCulpritId } from "@/lib/persona";
 
 type ResultTheme = "joseon" | "magicSchool" | "spaceStation";
@@ -354,6 +354,7 @@ function TypewriterLines({ lines, onType }: { lines: readonly string[]; onType?:
 }
 
 export default function ResultScreen() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const { playButtonSfx, playTypingSfx } = useResultAudio();
   const theme = (searchParams.get("theme") === "spaceStation" ? "spaceStation" : searchParams.get("theme") === "magicSchool" ? "magicSchool" : "joseon") satisfies ResultTheme;
@@ -398,7 +399,7 @@ export default function ResultScreen() {
   function navigateWithLoading(path: string, beforeNavigate?: () => void) {
     beforeNavigate?.();
     withLoading(() => {
-      window.location.href = path;
+      router.push(path);
     });
   }
 

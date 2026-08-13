@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { useEffect, useLayoutEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import BriefingScreen from "@/components/front/BriefingScreen";
 import ButtonGuideLayer from "@/components/ButtonGuideLayer";
 import DreamSelectScreen from "@/components/front/DreamSelectScreen";
@@ -63,10 +64,23 @@ function ActiveInvestigationScene({ screenId }: { screenId: string }) {
 }
 
 export default function GameShell({ initialScreen, initialTheme }: GameShellProps) {
+  const router = useRouter();
   const skipIntro = Boolean(initialScreen);
   const [currentScreen, setCurrentScreen] = useState(
     initialScreen && STARTABLE_SCREENS.has(initialScreen) ? initialScreen : MAIN_SCREEN
   );
+
+  useEffect(() => {
+    const navigationWindow = window as Window & { samunmongNavigate?: (href: string) => void };
+    const navigate = (href: string) => router.push(href);
+    navigationWindow.samunmongNavigate = navigate;
+
+    return () => {
+      if (navigationWindow.samunmongNavigate === navigate) {
+        delete navigationWindow.samunmongNavigate;
+      }
+    };
+  }, [router]);
 
   useEffect(() => {
     const handleScreenRequest = (event: Event) => {

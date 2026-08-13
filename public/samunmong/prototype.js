@@ -57,6 +57,13 @@
       }
     }
     const entryParams = new URLSearchParams(window.location.search);
+    const navigateWithinApp = (href) => {
+      if (typeof window.samunmongNavigate === "function") {
+        window.samunmongNavigate(href);
+        return;
+      }
+      window.location.href = href;
+    };
     const themeKey = "samunmong-current-theme";
     const requestedTheme = entryParams.get("theme");
     const requestedStart = entryParams.get("start") || "";
@@ -381,7 +388,7 @@
       closeSaveSlotDialog();
 
       const params = new URLSearchParams({ start: slot.screenId, theme: normalizedTheme });
-      window.location.href = `/?${params.toString()}`;
+      navigateWithinApp(`/?${params.toString()}`);
     }
 
     function clearThemeProgress(theme) {
@@ -1743,7 +1750,7 @@
       writeBgmState(currentBgm || bgmForScreen(getActiveScreenId()), bgmTracks[currentBgm || bgmForScreen(getActiveScreenId())]);
       showLoading("이동 중...");
       setTimeout(() => {
-        window.location.href = `/result?${params.toString()}`;
+        navigateWithinApp(`/result?${params.toString()}`);
       }, loadingDuration);
     }
 
@@ -1830,7 +1837,7 @@
       consumeNewDreamMode("joseon");
       localStorage.setItem(themeKey, "joseon");
       if (activeTheme !== "joseon") {
-        window.location.href = "/?start=briefingScreen&theme=joseon";
+        navigateWithinApp("/?start=briefingScreen&theme=joseon");
         return;
       }
       goAfterPreload("briefingScreen", joseonThemeStartAssets, {
@@ -1844,12 +1851,12 @@
     on("#chooseMagicSchool", "click", () => {
       consumeNewDreamMode("magicSchool");
       localStorage.setItem(themeKey, "magicSchool");
-      window.location.href = "/?start=briefingScreen&theme=magicSchool";
+      navigateWithinApp("/?start=briefingScreen&theme=magicSchool");
     });
     on("#chooseSpaceStation", "click", () => {
       consumeNewDreamMode("spaceStation");
       localStorage.setItem(themeKey, "spaceStation");
-      window.location.href = "/?start=briefingScreen&theme=spaceStation";
+      navigateWithinApp("/?start=briefingScreen&theme=spaceStation");
     });
     on("#memoryOrbTrigger", "click", beginMemoryRestoration);
     document.addEventListener("click", (event) => {
