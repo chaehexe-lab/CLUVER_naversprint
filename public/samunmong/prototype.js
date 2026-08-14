@@ -1018,6 +1018,10 @@
     function showHoverGuide(target) {
       const tooltip = document.querySelector("#buttonGuideTooltip");
       const text = getButtonGuideText(target);
+      if (document.querySelector("#fieldOnboarding:not([hidden])")) {
+        hideButtonGuides();
+        return;
+      }
       if (!tooltip || !text || target.disabled || target.hidden) return;
       clearTimeout(buttonGuideHideTimer);
       activeGuideTarget = target;
@@ -1369,6 +1373,7 @@
     function setFieldGuideStep(step) {
       fieldGuideStep = step;
       clearFieldGuideHighlights();
+      if (step) hideButtonGuides();
 
       if (!fieldGuide || !step) {
         if (fieldGuide) fieldGuide.hidden = true;

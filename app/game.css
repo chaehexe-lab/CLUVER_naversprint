@@ -2755,7 +2755,7 @@
     .field-onboarding[data-guide-step="map-click"] .field-guide-card {
       left: 2.2%;
       top: auto;
-      bottom: 19%;
+      bottom: 21%;
       width: min(750px, 90vw);
       padding: 30px 36px;
       transform: none;
@@ -3231,10 +3231,24 @@
       box-shadow: 0 28px 120px rgba(0,0,0,.82), inset 0 0 0 1px rgba(255,255,255,.04);
     }
 
+    html[data-samunmong-theme="joseon"] .global-panel.map-panel {
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    html[data-samunmong-theme="joseon"] .map-panel .map-board {
+      border-color: rgba(238, 216, 161, .46);
+      box-shadow:
+        inset 0 0 36px rgba(0,0,0,.58),
+        0 0 12px rgba(238, 216, 161, .18),
+        0 18px 60px rgba(0,0,0,.42);
+    }
+
     .map-floating-close {
       position: absolute;
       right: 28px;
-      top: 28px;
+      top: 38px;
       z-index: 4;
     }
 
@@ -3242,6 +3256,11 @@
     html[data-samunmong-theme="joseon"] .map-floating-close:hover,
     html[data-samunmong-theme="joseon"] .map-floating-close:focus-visible {
       color: #f3e6c4;
+      border-color: rgba(238, 216, 161, .66);
+      box-shadow:
+        0 0 10px rgba(238, 216, 161, .26),
+        inset 0 0 0 1px rgba(255, 241, 199, .16);
+      outline: none;
     }
 
     .global-panel.bag-panel,

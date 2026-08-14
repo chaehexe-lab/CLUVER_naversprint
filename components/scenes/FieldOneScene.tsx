@@ -81,7 +81,7 @@ export default function FieldOneScene() {
       <div className="field-onboarding" id="fieldOnboarding" data-guide-step="map-click" hidden>
         <article className="hud field-guide-card" aria-live="polite">
           <div className="field-guide-panel active" data-field-guide-panel="map-click">
-            <h2>사건 현장의 위치를 먼저 파악하십시오</h2>
+            <h2>먼저, 사건 현장의 위치를 파악하십시오</h2>
             <p>
               마을 지도에서 현재 위치와 이동할 수 있는 장소를 확인할 수 있습니다.
               <br />
