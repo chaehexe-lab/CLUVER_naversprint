@@ -94,9 +94,12 @@ export default function FieldOneScene() {
             <p>지도에서 붉게 빛나는 곳이 현재 위치입니다. 이후 다른 장소로 이동할 때도 이 지도에서 위치를 확인할 수 있습니다.</p>
           </div>
           <div className="field-guide-panel" data-field-guide-panel="room" aria-hidden="true">
-            <p className="field-guide-kicker">취조실</p>
-            <h2>용의자는 취조실에서 신문합니다</h2>
-            <p>왼쪽 아래의 <strong>취조실</strong>에서 네 용의자를 불러 사건에 관해 질문할 수 있습니다.</p>
+            <h2>용의자에게 사건에 대해 질문해 보십시오</h2>
+            <p>
+              취조실에서는 <strong>네 명의 용의자</strong>를 불러 신문할 수 있습니다.
+              <br />
+              수집한 <strong>증거를 함께 제시</strong>하며 질문할 수도 있습니다.
+            </p>
           </div>
           <div className="field-guide-panel" data-field-guide-panel="tools" aria-hidden="true">
             <p className="field-guide-kicker">현장 도구</p>

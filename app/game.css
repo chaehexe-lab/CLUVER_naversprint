@@ -2773,6 +2773,19 @@
       font-weight: 500;
     }
 
+    .field-onboarding[data-guide-step="room"] .field-guide-card {
+      left: 2.2%;
+      top: auto;
+      bottom: 19%;
+      width: min(860px, 90vw);
+      padding: 30px 36px;
+      transform: none;
+    }
+
+    .field-onboarding[data-guide-step="room"] .field-guide-card h2 {
+      white-space: nowrap;
+    }
+
     .field-onboarding[data-guide-step="tools"] .field-guide-card {
       top: 10%;
     }
