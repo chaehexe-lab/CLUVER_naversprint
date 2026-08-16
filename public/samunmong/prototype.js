@@ -164,6 +164,7 @@
     const analyzedEvidenceKey = `samunmong-analyzed-evidence-${themeStorageSuffix}`;
     const conversationNotesKey = `samunmong-conversation-notes-${themeStorageSuffix}`;
     const interrogationQuestionCountKey = `samunmong-interrogation-question-count-${themeStorageSuffix}`;
+    const interrogationKnownFactsKey = `samunmong-interrogation-known-facts-${themeStorageSuffix}`;
     const fieldGuidePendingKey = "samunmong-field-guide-pending";
     const fieldGuideSeenKey = "samunmong-field-guide-seen";
     const settingsKey = "samunmong-demo-settings";
@@ -398,6 +399,7 @@
       localStorage.removeItem(`samunmong-analyzed-evidence-${suffix}`);
       localStorage.removeItem(`samunmong-conversation-notes-${suffix}`);
       localStorage.removeItem(`samunmong-interrogation-question-count-${suffix}`);
+      localStorage.removeItem(`samunmong-interrogation-known-facts-${suffix}`);
       if (normalizedTheme === "joseon") localStorage.removeItem(fieldGuideSeenKey);
 
       const slots = readSaveSlots();
@@ -3194,7 +3196,8 @@
             userMessage: question,
             presentedEvidenceNames: selectedEvidence ? [selectedEvidence] : [],
             collectedEvidenceNames: getCollectedEvidenceNames(),
-            conversationHistory: history.slice(-8)
+            conversationHistory: history.slice(-8),
+            knownFactIds: readStoredNames(interrogationKnownFactsKey)
           })
         });
 
@@ -3208,10 +3211,15 @@
         while (history.length > 8) history.shift();
         addInterrogationAnswer(suspect, answer, data.source, data.warning);
         maybeCollectInterrogationEvidence(suspect, answer, data.usedEvidenceNames);
+        if (data.newFactId) {
+          const knownFactIds = new Set(readStoredNames(interrogationKnownFactsKey));
+          knownFactIds.add(data.newFactId);
+          localStorage.setItem(interrogationKnownFactsKey, JSON.stringify([...knownFactIds]));
+        }
         if (suspects[suspectIndex]?.id === suspect.id) {
           setAiMode(suspect.name);
         }
-        showToast(data.source === "openai" ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
+        showToast(data.source === "rag" || data.source === "openai" ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
       } catch (error) {
         if (suspects[suspectIndex]?.id === suspect.id) {
           showSuspectReply("지금은 답하기 어려워 보입니다.", "오류");
