@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState, type ComponentType } from "react";
 import { useRouter } from "next/navigation";
 import BriefingScreen from "@/components/front/BriefingScreen";
 import ButtonGuideLayer from "@/components/ButtonGuideLayer";
@@ -26,6 +26,22 @@ const CONTENT_SCRIPT = "/samunmong/content.js";
 const PROTOTYPE_SCRIPT = "/samunmong/prototype.js";
 const MAIN_SCREEN = "mainScreen";
 
+const INVESTIGATION_SCENE_COMPONENTS: Record<string, ComponentType> = {
+  fieldOne: FieldOneScene,
+  chunwolRoom: ChunwolRoomScene,
+  mudeokServantRoom: MudeokServantRoomScene,
+  yoomunseokSarangbang: YoomunseokSarangbangScene,
+  dolsoeQuarters: DolsoeQuartersScene,
+  backGateCourtyard: BackGateCourtyardScene
+};
+
+const MAGIC_SCENES_BY_ID = new Map<string, (typeof magicSchoolScenes)[number]>(
+  magicSchoolScenes.map((scene) => [scene.id, scene])
+);
+const SPACE_SCENES_BY_ID = new Map<string, (typeof spaceStationScenes)[number]>(
+  spaceStationScenes.map((scene) => [scene.id, scene])
+);
+
 type GameShellProps = {
   initialScreen?: string;
   initialTheme?: "magicSchool" | "spaceStation";
@@ -49,17 +65,13 @@ function ensureRequestedStartScreen(initialScreen?: string) {
 }
 
 function ActiveInvestigationScene({ screenId }: { screenId: string }) {
-  if (screenId === "fieldOne") return <FieldOneScene />;
-  if (screenId === "chunwolRoom") return <ChunwolRoomScene />;
-  if (screenId === "mudeokServantRoom") return <MudeokServantRoomScene />;
-  if (screenId === "yoomunseokSarangbang") return <YoomunseokSarangbangScene />;
-  if (screenId === "dolsoeQuarters") return <DolsoeQuartersScene />;
-  if (screenId === "backGateCourtyard") return <BackGateCourtyardScene />;
+  const InvestigationComponent = INVESTIGATION_SCENE_COMPONENTS[screenId];
+  if (InvestigationComponent) return <InvestigationComponent />;
 
-  const magicScene = magicSchoolScenes.find((scene) => scene.id === screenId);
+  const magicScene = MAGIC_SCENES_BY_ID.get(screenId);
   if (magicScene) return <MagicSchoolScene scene={magicScene} />;
 
-  const spaceScene = spaceStationScenes.find((scene) => scene.id === screenId);
+  const spaceScene = SPACE_SCENES_BY_ID.get(screenId);
   return spaceScene ? <SpaceStationScene scene={spaceScene} /> : null;
 }
 

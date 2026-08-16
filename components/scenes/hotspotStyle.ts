@@ -1,5 +1,5 @@
 import type { CSSProperties } from "react";
-import type { SceneHotspot } from "@/lib/gameTypes";
+import type { SceneHotspot, SceneProp } from "@/lib/gameTypes";
 
 export type HotspotStyle = CSSProperties & {
   "--x": string;
@@ -20,5 +20,21 @@ export function hotspotStyle(hotspot: SceneHotspot): HotspotStyle {
     "--clip": hotspot.clipPath,
     "--radius": hotspot.radius,
     "--rot": hotspot.rot
+  };
+}
+
+export type PropStyle = CSSProperties & {
+  "--x": string;
+  "--y": string;
+  "--w": string;
+  "--rot"?: string;
+};
+
+export function propStyle(prop: SceneProp): PropStyle {
+  return {
+    "--x": prop.x,
+    "--y": prop.y,
+    "--w": prop.w,
+    "--rot": prop.rot
   };
 }

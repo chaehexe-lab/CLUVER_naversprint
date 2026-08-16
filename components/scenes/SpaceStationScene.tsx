@@ -1,41 +1,7 @@
 import { spaceStationScenes } from "@/lib/gameData";
-import type { CSSProperties } from "react";
+import { hotspotStyle, propStyle } from "./hotspotStyle";
 
 type SpaceScene = (typeof spaceStationScenes)[number];
-
-type HotspotStyle = CSSProperties & {
-  "--x": string;
-  "--y": string;
-  "--w": string;
-  "--h": string;
-  "--rot"?: string;
-};
-
-type PropStyle = CSSProperties & {
-  "--x": string;
-  "--y": string;
-  "--w": string;
-  "--rot"?: string;
-};
-
-function hotspotStyle(hotspot: SpaceScene["hotspots"][number]): HotspotStyle {
-  return {
-    "--x": hotspot.x,
-    "--y": hotspot.y,
-    "--w": hotspot.w,
-    "--h": hotspot.h,
-    "--rot": hotspot.rot
-  };
-}
-
-function propStyle(prop: SpaceScene["props"][number]): PropStyle {
-  return {
-    "--x": prop.x,
-    "--y": prop.y,
-    "--w": prop.w,
-    "--rot": prop.rot
-  };
-}
 
 export default function SpaceStationScene({ scene }: { scene: SpaceScene }) {
   return (
