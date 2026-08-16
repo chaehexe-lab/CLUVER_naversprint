@@ -9,6 +9,7 @@ function getActiveScreenId() {
 export default function GameSettingsOverlay() {
   const [activeScreen, setActiveScreen] = useState("mainScreen");
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
   const showSettingsHomeButton = !["mainScreen", "tutorialScreen", "dreamScreen"].includes(activeScreen);
 
   useEffect(() => {
@@ -78,6 +79,7 @@ export default function GameSettingsOverlay() {
   };
 
   const closeSettings = () => {
+    setConfirmReset(false);
     const volumeSetting = document.querySelector<HTMLInputElement>("#volumeSetting");
     const contrastSetting = document.querySelector<HTMLInputElement>("#contrastSetting");
     const settings = {
@@ -91,11 +93,80 @@ export default function GameSettingsOverlay() {
   };
 
   const goToThemeSelection = () => {
+    setConfirmReset(false);
     document.querySelector("#settingsDialog")?.classList.remove("open");
     window.dispatchEvent(
       new CustomEvent("samunmong:screen-request", {
         cancelable: true,
         detail: { screenId: "dreamScreen" }
+      })
+    );
+  };
+
+  const getCurrentTheme = () => {
+    const requestedTheme = new URLSearchParams(window.location.search).get("theme");
+    const storedTheme = window.localStorage.getItem("samunmong-current-theme");
+    const theme = requestedTheme || storedTheme || document.documentElement.dataset.samunmongTheme || "joseon";
+    if (["magic", "magicSchool", "magic-school"].includes(theme)) return "magicSchool";
+    if (["space", "spaceStation", "space-station"].includes(theme)) return "spaceStation";
+    return "joseon";
+  };
+
+  const resetCurrentDream = () => {
+    const theme = getCurrentTheme();
+    const suffix = theme === "magicSchool" ? "magic-school" : theme === "spaceStation" ? "space-station" : "joseon";
+    const progressKeys = [
+      `samunmong-collected-evidence-${suffix}`,
+      `samunmong-analyzed-evidence-${suffix}`,
+      `samunmong-examined-clues-${suffix}`,
+      `samunmong-linked-evidence-${suffix}`,
+      `samunmong-conversation-notes-${suffix}`,
+      `samunmong-interrogation-question-count-${suffix}`
+    ];
+
+    progressKeys.forEach((key) => window.localStorage.removeItem(key));
+    if (theme === "joseon") {
+      window.localStorage.removeItem("samunmong-field-guide-seen");
+      window.localStorage.removeItem("samunmong-sato-skill-state");
+    }
+
+    try {
+      const slots = JSON.parse(window.localStorage.getItem("samunmong-save-slots") || "{}");
+      if (slots && typeof slots === "object") {
+        delete slots[theme];
+        window.localStorage.setItem("samunmong-save-slots", JSON.stringify(slots));
+      }
+    } catch {
+      window.localStorage.removeItem("samunmong-save-slots");
+    }
+
+    try {
+      const legacySave = JSON.parse(window.localStorage.getItem("samunmong-demo-state") || "null");
+      const legacyTheme = ["magic", "magicSchool", "magic-school"].includes(legacySave?.theme)
+        ? "magicSchool"
+        : ["space", "spaceStation", "space-station"].includes(legacySave?.theme)
+          ? "spaceStation"
+          : "joseon";
+      if (!legacySave || legacyTheme === theme) {
+        window.localStorage.removeItem("samunmong-demo-state");
+      }
+    } catch {
+      window.localStorage.removeItem("samunmong-demo-state");
+    }
+
+    window.sessionStorage.removeItem("samunmong-field-guide-pending");
+    window.sessionStorage.removeItem("samunmong-new-dream-mode");
+    window.sessionStorage.removeItem("samunmong-truth-unlocked");
+    window.location.assign("/");
+  };
+
+  const exitToMain = () => {
+    setConfirmReset(false);
+    document.querySelector("#settingsDialog")?.classList.remove("open");
+    window.dispatchEvent(
+      new CustomEvent("samunmong:screen-request", {
+        cancelable: true,
+        detail: { screenId: "mainScreen" }
       })
     );
   };
@@ -148,6 +219,24 @@ export default function GameSettingsOverlay() {
             <span>고대비 화면</span>
             <input id="contrastSetting" type="checkbox" />
           </label>
+          <div className="settings-game-actions" aria-label="게임 진행 관리">
+            <button className="button settings-reset-button" type="button" onClick={() => setConfirmReset(true)}>
+              처음부터 시작
+            </button>
+            <button className="button settings-exit-button" type="button" onClick={exitToMain}>
+              게임 나가기
+            </button>
+          </div>
+          {confirmReset && (
+            <div className="settings-reset-confirm" role="alert">
+              <strong>현재 꿈을 처음부터 시작할까요?</strong>
+              <p>이 꿈의 수사 기록과 저장 지점만 삭제됩니다. 다른 꿈과 설정은 유지됩니다.</p>
+              <div>
+                <button className="button" type="button" onClick={() => setConfirmReset(false)}>취소</button>
+                <button className="button danger" type="button" onClick={resetCurrentDream}>기록 지우고 시작</button>
+              </div>
+            </div>
+          )}
           <div className="dialog-actions">
             {showSettingsHomeButton && (
               <button

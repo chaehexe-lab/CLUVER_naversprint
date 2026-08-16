@@ -4,6 +4,7 @@ import Link from "next/link";
 import { type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { finalCulpritId } from "@/lib/persona";
+import { joseonAjeonAssets, joseonSatoSkillAssets } from "@/lib/joseonSatoSkillAssets";
 
 type ResultTheme = "joseon" | "magicSchool" | "spaceStation";
 
@@ -166,6 +167,11 @@ function readCollectedEvidence(theme: ResultTheme) {
   } catch {
     return [];
   }
+}
+
+function objectParticle(name: string) {
+  const last = name.charCodeAt(name.length - 1) - 0xac00;
+  return last >= 0 && last <= 11171 && last % 28 !== 0 ? "을" : "를";
 }
 
 function returnToBriefingWithProgress() {
@@ -371,6 +377,8 @@ export default function ResultScreen() {
   const [showWarning, setShowWarning] = useState(false);
   const [showExitPrompt, setShowExitPrompt] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
+  const [showSealRitual, setShowSealRitual] = useState(false);
+  const [sealStep, setSealStep] = useState<"ready" | "inked" | "pressed">("ready");
 
   const selectedSuspect = activeSuspects.find((suspect) => suspect.id === selectedSuspectId) ?? activeSuspects[0];
   const missingEvidence = useMemo(() => {
@@ -403,15 +411,7 @@ export default function ResultScreen() {
     });
   }
 
-  function confirmAccusation(force = false) {
-    if (!force && missingEvidence.length > 0) {
-      withLoading(() => {
-        setShowLoading(false);
-        setShowWarning(true);
-      });
-      return;
-    }
-
+  function finalizeAccusation() {
     const outcome = correctSuspectId && selectedSuspect.id === correctSuspectId ? "success" : "failure";
     const params = new URLSearchParams({
       suspect: selectedSuspect.name,
@@ -420,6 +420,23 @@ export default function ResultScreen() {
       theme
     });
     navigateWithLoading(`/result?${params.toString()}&accused=1`);
+  }
+
+  function confirmAccusation(force = false) {
+    if (!force && missingEvidence.length > 0) {
+      withLoading(() => {
+        setShowLoading(false);
+        setShowWarning(true);
+      });
+      return;
+    }
+    setShowWarning(false);
+    if (theme === "joseon") {
+      setSealStep("ready");
+      setShowSealRitual(true);
+      return;
+    }
+    finalizeAccusation();
   }
 
   function openExitPrompt() {
@@ -584,6 +601,32 @@ export default function ResultScreen() {
                 더 조사한다
               </button>
             </div>
+          </section>
+        </div>
+      ) : null}
+      {showSealRitual ? (
+        <div className="official-seal-backdrop" role="presentation">
+          <section className="official-seal-ritual" role="dialog" aria-modal="true" aria-labelledby="officialSealTitle">
+            <img className="official-seal-workbench" src={joseonSatoSkillAssets.officialSeal.workbench} alt="" />
+            <button className="official-seal-close" type="button" aria-label="관인 확정 닫기" onClick={() => setShowSealRitual(false)}>×</button>
+            <header>
+              <img src={sealStep === "pressed" ? joseonAjeonAssets.portraits.confirmed : joseonAjeonAssets.portraits.officialReport} alt="판결을 보좌하는 아전" />
+              <div><small>사또의 권한 · 관인 확정</small><h2 id="officialSealTitle">{selectedSuspect.name}{objectParticle(selectedSuspect.name)} 공식 수사 가설로 확정</h2><p>{sealStep === "ready" ? "관인을 먼저 인주에 묻히십시오." : sealStep === "inked" ? "판결문의 빈 인영 위에 관인을 내리십시오." : "관인이 찍혔습니다. 이제 판결을 고할 수 있습니다."}</p></div>
+            </header>
+            <div className="official-seal-suspect">
+              <img src={selectedSuspect.image} alt="" />
+              <strong>{selectedSuspect.name}</strong>
+            </div>
+            <button
+              className={`official-seal-object step-${sealStep}`}
+              type="button"
+              onClick={() => setSealStep((step) => step === "ready" ? "inked" : step === "inked" ? "pressed" : step)}
+              aria-label={sealStep === "ready" ? "관인에 인주 묻히기" : sealStep === "inked" ? "판결문에 관인 찍기" : "관인 확정 완료"}
+            >
+              <img src={sealStep === "ready" ? joseonSatoSkillAssets.officialSeal.objects[0] : sealStep === "inked" ? joseonSatoSkillAssets.officialSeal.objects[1] : joseonSatoSkillAssets.officialSeal.objects[3]} alt="" />
+            </button>
+            {sealStep === "pressed" ? <img className="official-seal-imprint" src={joseonSatoSkillAssets.officialSeal.objects[7]} alt="찍힌 관인" /> : null}
+            <button className="official-seal-confirm" type="button" disabled={sealStep !== "pressed"} onClick={finalizeAccusation}>판결을 확정한다</button>
           </section>
         </div>
       ) : null}

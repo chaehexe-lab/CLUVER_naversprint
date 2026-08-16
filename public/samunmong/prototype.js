@@ -44,6 +44,7 @@
     let fieldGuideNextButton = document.querySelector("#nextFieldGuide");
     let fieldGuideSkipButton = document.querySelector("#skipFieldGuide");
     let selectedEvidence = "";
+    let currentToolResultEvidence = "";
     let isAskingAi = false;
     const interrogationHistories = new Map();
 
@@ -162,6 +163,8 @@
     const themeStorageSuffix = isSpaceTheme ? "space-station" : isMagicTheme ? "magic-school" : "joseon";
     const collectedEvidenceKey = `samunmong-collected-evidence-${themeStorageSuffix}`;
     const analyzedEvidenceKey = `samunmong-analyzed-evidence-${themeStorageSuffix}`;
+    const examinedCluesKey = `samunmong-examined-clues-${themeStorageSuffix}`;
+    const linkedEvidenceKey = `samunmong-linked-evidence-${themeStorageSuffix}`;
     const conversationNotesKey = `samunmong-conversation-notes-${themeStorageSuffix}`;
     const interrogationQuestionCountKey = `samunmong-interrogation-question-count-${themeStorageSuffix}`;
     const fieldGuidePendingKey = "samunmong-field-guide-pending";
@@ -396,6 +399,8 @@
       const suffix = themeSuffixes[normalizedTheme] || themeSuffixes.joseon;
       localStorage.removeItem(`samunmong-collected-evidence-${suffix}`);
       localStorage.removeItem(`samunmong-analyzed-evidence-${suffix}`);
+      localStorage.removeItem(`samunmong-examined-clues-${suffix}`);
+      localStorage.removeItem(`samunmong-linked-evidence-${suffix}`);
       localStorage.removeItem(`samunmong-conversation-notes-${suffix}`);
       localStorage.removeItem(`samunmong-interrogation-question-count-${suffix}`);
       if (normalizedTheme === "joseon") localStorage.removeItem(fieldGuideSeenKey);
@@ -653,6 +658,17 @@
       sound.play().catch(() => {});
     }
 
+    function playDreamTraceSfx() {
+      const level = getAudioLevel();
+      if (level <= 0) return;
+      const activeTrack = bgmTracks[currentBgm || bgmForScreen(getActiveScreenId())];
+      if (activeTrack) activeTrack.volume = Math.max(0, Math.min(1, level * 0.14));
+      const sound = new Audio("/samunmong/audio/joseon-dream-trace-sting-v2.wav");
+      sound.volume = Math.max(0.42, Math.min(0.88, level * 0.86));
+      sound.play().catch(() => {});
+      window.setTimeout(() => applyAudioVolume(), 2480);
+    }
+
     function playButtonSfx(volumeScale = 0.58) {
       const now = performance.now();
       if (now - lastButtonSfxAt < 120) return;
@@ -871,12 +887,42 @@
       applyAudioVolume();
     }
 
-    function showToast(message) {
-      toast.textContent = sentenceBreakText(message);
+    function showToast(message, options = {}) {
+      const image = document.querySelector("#toastEvidenceImage");
+      const title = document.querySelector("#toastTitle");
+      const messageEl = document.querySelector("#toastMessage");
+      const closeButton = document.querySelector("#closeToast");
+      const hasEvidence = Boolean(options.image && options.title);
+
+      toast.classList.toggle("evidence-toast", hasEvidence);
+      toast.classList.toggle("dismissible", Boolean(options.dismissible));
+      toast.setAttribute("role", hasEvidence ? "dialog" : "status");
+      if (image) {
+        image.hidden = !hasEvidence;
+        image.src = hasEvidence ? options.image : "";
+        image.alt = hasEvidence ? `${options.title} 증거 사진` : "";
+      }
+      if (title) {
+        title.hidden = !hasEvidence;
+        title.textContent = hasEvidence ? options.title : "";
+      }
+      if (closeButton) closeButton.hidden = !options.dismissible;
+      if (messageEl) messageEl.textContent = sentenceBreakText(message);
       toast.classList.add("show");
       clearTimeout(showToast.timer);
-      showToast.timer = setTimeout(() => toast.classList.remove("show"), 1900);
+      if (!options.dismissible) {
+        showToast.timer = setTimeout(() => toast.classList.remove("show"), options.duration || 1900);
+      }
     }
+
+    function closeToast() {
+      clearTimeout(showToast.timer);
+      toast.classList.remove("show", "dismissible", "evidence-toast");
+      toast.setAttribute("role", "status");
+      document.querySelector("#closeToast")?.setAttribute("hidden", "");
+    }
+
+    document.querySelector("#closeToast")?.addEventListener("click", closeToast);
 
     function on(selector, eventName, handler) {
       document.querySelector(selector)?.addEventListener(eventName, handler);
@@ -1998,6 +2044,64 @@
     let currentEvidenceForTool = "";
     let selectedToolForAnalysis = "";
     let swipeStartPoint = null;
+    let swipeLastPoint = null;
+    let toolAnalysisProgress = 0;
+    let toolAnalysisCompleted = false;
+    let toolLastMoveAt = 0;
+    let toolLastDirection = 0;
+    let toolDirectionChanges = 0;
+    let toolPage = 0;
+    let evidenceFlipped = false;
+    let documentPuzzleEvidence = "";
+    let tactilePuzzleBypass = false;
+    let tactilePuzzleProgress = 0;
+    let tactilePuzzlePointer = null;
+    let rubbingStrokeStep = 0;
+    let rubbingDragState = null;
+    let footprintDragState = null;
+    let footprintPuzzleStep = 0;
+    let footprintMeasureDragState = null;
+    let knotPuzzleStep = 0;
+    let knotDragState = null;
+    let sampleDragState = null;
+    let materialPuzzleMode = "";
+    let materialPuzzleTool = "";
+    let materialPuzzleFolder = "";
+    let materialPuzzleStage = 0;
+    const placedMaterialSamples = new Set();
+    let materialLastDirection = 0;
+    let materialDirectDrag = null;
+    let specialPuzzleMode = "";
+    let specialPuzzleStep = 0;
+    let specialDragState = null;
+    let specialSurfaceDrag = null;
+    let specialExplorerDrag = null;
+    let pendingEvidenceComparison = null;
+    let pendingConfrontationQuestion = "";
+    let confrontationStep = 0;
+    let ritualDragState = null;
+    let pendingSleeveQuestion = "";
+    let sleeveInspectionStep = 0;
+    let sleeveInspectionBypass = false;
+    const placedDocumentPieces = new Set();
+    const documentPieceState = new Map();
+    let draggedDocumentPiece = null;
+    const documentPieceLayouts = {
+      default: {
+        a: { startX: 15, startY: 80, startRotation: -45, targetX: 28, targetY: 43, targetRotation: 0 },
+        b: { startX: 50, startY: 82, startRotation: 45, targetX: 50, targetY: 45, targetRotation: 0 },
+        c: { startX: 85, startY: 80, startRotation: 90, targetX: 72, targetY: 43, targetRotation: 0 }
+      },
+      honseo: {
+        a: { startX: 13, startY: 80, startRotation: -45, targetX: 25, targetY: 48, targetRotation: 0 },
+        b: { startX: 51, startY: 82, startRotation: 45, targetX: 50, targetY: 48, targetRotation: 0 },
+        c: { startX: 87, startY: 80, startRotation: 90, targetX: 76, targetY: 48, targetRotation: 0 }
+      }
+    };
+
+    function getDocumentPieceLayout(pieceId) {
+      return documentPieceLayouts[documentPuzzleEvidence === "혼서 조각" ? "honseo" : "default"][pieceId];
+    }
     const TOOL_NEEDED_HINT = "특정 도구를 이용해 자세히 알아봐야 할 것 같다.";
 
     const magicTools = {
@@ -2195,19 +2299,69 @@
       "촛불 비추기": {
         img: "/samunmong/assets/mudeok-interaction/tool-candle-lantern.webp",
         note: "어두운 곳, 비침, 눌린 자국을 빛으로 확인합니다."
+      },
+      "발자국 실측줄": {
+        img: "/samunmong/assets/interactions/evidence-tools/expanded/tool-footprint-measuring-cord.png",
+        note: "발자국과 신발의 폭·길이·보폭을 나란히 잽니다."
+      },
+      "문서 맞춤판": {
+        img: "/samunmong/assets/interactions/evidence-tools/expanded/tool-document-matching-board.png",
+        note: "찢긴 종이의 결, 먹선과 절단면을 고정해 맞춥니다."
+      },
+      "혈흔 시험포": {
+        img: "/samunmong/assets/interactions/evidence-tools/expanded/tool-blood-test-cloth.png",
+        note: "얼룩을 시험포에 옮겨 피인지 다른 물질인지 가립니다."
+      },
+      "탁본 도구": {
+        img: "/samunmong/assets/interactions/evidence-tools/secondary/tool-rubbing-kit.png",
+        note: "종이와 먹주머니로 패인 글자와 눌린 자국을 떠냅니다."
+      },
+      "섬유 대조틀": {
+        img: "/samunmong/assets/interactions/evidence-tools/secondary/tool-fiber-comparison-frame.png",
+        note: "실의 꼬임과 광택을 나란히 고정해 비교합니다."
+      },
+      "먹빛 시험석": {
+        img: "/samunmong/assets/interactions/evidence-tools/secondary/tool-ink-comparison-kit.png",
+        note: "먹 번짐과 농도를 시험지에 옮겨 서로 대조합니다."
+      },
+      "증거 연결판": {
+        img: "/samunmong/assets/interactions/evidence-tools/crosscheck/tool-evidence-connection-board.webp",
+        note: "서로 떨어져 발견된 물건을 한 판에 고정해 연결합니다."
+      },
+      "흙 대조 접시": {
+        img: "/samunmong/assets/interactions/evidence-tools/crosscheck/tool-soil-comparison-tray.webp",
+        note: "흙과 짚 부스러기를 칸별로 걸러 이동 흔적을 대조합니다."
+      },
+      "상처 대조첩": {
+        img: "/samunmong/assets/interactions/evidence-tools/crosscheck/tool-wound-comparison-folio.webp",
+        note: "상처 기록과 붕대의 얼룩 위치를 나란히 맞춥니다."
+      },
+      "문서 펼침칼": {
+        img: "/samunmong/assets/interactions/evidence-tools/hidden-structure/tool-document-opening-knife.webp",
+        note: "붙거나 겹친 한지 층을 손상 없이 천천히 분리합니다."
+      },
+      "매듭 해체 송곳": {
+        img: "/samunmong/assets/interactions/evidence-tools/hidden-structure/tool-knot-picking-awl.webp",
+        note: "조여진 매듭을 끊지 않고 고리 순서대로 풀어냅니다."
+      },
+      "압흔 탁본판": {
+        img: "/samunmong/assets/interactions/evidence-tools/hidden-structure/tool-pressure-rubbing-board.webp",
+        note: "종이 아래에 남은 붓의 눌림과 필압을 먹가루로 떠냅니다."
       }
     };
+    const isJoseonToolInteraction = !isMagicTheme && !isSpaceTheme;
 
     const evidenceData = isSpaceTheme ? spaceEvidenceData : isMagicTheme ? magicEvidenceData : window.SAMUNMONG_CONTENT?.evidenceData || {
       "호패 조각": {
         note: "점순 옆에서 발견된 신분 단서. 유문석의 물건처럼 보이지만 일부 글자가 긁혀 있다.",
-        img: "/samunmong/assets/evidence-wooden-tag.webp",
+        img: "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp",
         tool: "먼지털이 붓",
         toolResult: "먼지털이 붓으로 털자 긁힌 글자 홈 사이에 고운 분가루가 남아 있다.\n거칠게 굴러다닌 물건이라기보다, 누군가 손에 쥐고 옮긴 뒤 일부러 현장에 둔 듯하다."
       },
       "돌쇠의 그림": {
         note: "최춘월의 방에서 발견된 숨겨둔 초상. 오래 숨긴 마음과 집착을 추적할 단서다.",
-        img: "/samunmong/assets/evidence-portrait-v2.webp",
+        img: "/samunmong/assets/evidence-transparent/evidence-portrait-concealed-v1.png",
+        toolResultAsset: "/samunmong/assets/interactions/portrait-stroke-puzzle/state-2.png?v=portrait-reveal-v5",
         tool: "돋보기",
         toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있다.\n그림 가장자리에는 지운 글씨 자국이 남아 있고, ‘떠나지 마라’로 보이는 획이 희미하다.\n우연한 초상이라기보다 오래 눌러 둔 마음에 가깝다."
       },
@@ -2271,6 +2425,30 @@
       }
     };
 
+    const joseonEvidenceImageByName = {
+      "호패 조각": "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp",
+      "돌쇠의 그림": "/samunmong/assets/evidence-transparent/evidence-portrait-concealed-v1.png",
+      "헐거워진 노리개": "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.webp",
+      "무덕의 번진 일기": "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.webp",
+      "진흙 묻은 짚신": "/samunmong/assets/mudeok-interaction/evidence-mudeok-muddy-straw-shoes.webp",
+      "찢어진 옷고름": "/samunmong/assets/mudeok-interaction/evidence-torn-collar-tie.webp",
+      "빈 호패 주머니": "/samunmong/assets/evidence-transparent/evidence-empty-hopae-holder.webp",
+      "하인 장부": "/samunmong/assets/evidence-transparent/evidence-servant-ledger.webp",
+      "혼서 조각": "/samunmong/assets/evidence-transparent/evidence-marriage-letter.webp",
+      "피 묻은 붕대": "/samunmong/assets/evidence-transparent/evidence-bloodied-bandage.webp",
+      "돌쇠의 팔 상처": "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp",
+      "도망 보따리": "/samunmong/assets/evidence-transparent/evidence-escape-bundle.webp",
+      "긁힌 팔 흔적": "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp",
+      "작은 발자국": "/samunmong/assets/evidence-transparent/evidence-small-footprints.webp",
+      "끊어진 호패끈": "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.webp",
+      "찢어진 약속 편지": "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.webp"
+    };
+
+    function getEvidenceImage(name, fallback = "/samunmong/assets/evidence-wooden-tag.webp") {
+      if (!isJoseonToolInteraction) return evidenceData[name]?.img || fallback;
+      return joseonEvidenceImageByName[name] || evidenceData[name]?.img || fallback;
+    }
+
     function escapeHtml(value) {
       return String(value ?? "")
         .replaceAll("&", "&amp;")
@@ -2325,6 +2503,38 @@
       return lines.filter(Boolean).join("\n\n");
     }
 
+    function getToolAnalysisSteps(name) {
+      const data = evidenceData[name] || {};
+      const primary = data.tool ? [{ tool: data.tool, result: data.toolResult, asset: data.toolResultAsset }] : [];
+      const followUps = Array.isArray(data.followUpTools) ? data.followUpTools : [];
+      const preferInkPuzzle = ["무덕의 번진 일기", "찢어진 약속 편지"].includes(name);
+      const selectedFollowUp = preferInkPuzzle
+        ? followUps.find((step) => step.tool === "먹빛 시험석")
+        : followUps.at(-1);
+      const decisiveFollowUp = selectedFollowUp ? [selectedFollowUp] : [];
+      return primary.concat(decisiveFollowUp);
+    }
+
+    function hasCompletedToolStep(name, toolName) {
+      if (evidenceData[name]?.tool === toolName && hasAnalyzedEvidence(name)) return true;
+      return readStoredNames(analyzedEvidenceKey).includes(`${name}::${toolName}`);
+    }
+
+    function getPendingToolStep(name) {
+      const steps = getToolAnalysisSteps(name);
+      return steps.find((step) => !hasCompletedToolStep(name, step.tool)) || null;
+    }
+
+    function saveCompletedToolStep(name, toolName) {
+      if (evidenceData[name]?.tool === toolName) {
+        saveAnalyzedEvidence(name);
+        return;
+      }
+      const analyzed = new Set(readStoredNames(analyzedEvidenceKey));
+      analyzed.add(`${name}::${toolName}`);
+      localStorage.setItem(analyzedEvidenceKey, JSON.stringify([...analyzed]));
+    }
+
     function getEvidenceDetailText(name, analyzed = false) {
       const data = evidenceData[name] || {};
       const lines = [
@@ -2338,17 +2548,430 @@
       return lines.filter(Boolean).join("\n");
     }
 
+    const evidenceStoryCues = {
+      "호패 조각": ["누명", "유문석 ← 조작된 호패"],
+      "돌쇠의 그림": ["동기", "춘월 → 돌쇠를 향한 집착"],
+      "헐거워진 노리개": ["동선", "춘월의 급한 움직임"],
+      "무덕의 번진 일기": ["진술", "도망 계획 → 춘월"],
+      "진흙 묻은 짚신": ["동선", "짚신 ≠ 작은 발자국"],
+      "찢어진 옷고름": ["수법", "비단 끈 → 목 졸림"],
+      "빈 호패 주머니": ["누명", "방에서 사라진 호패"],
+      "하인 장부": ["동선", "지워진 출입 기록"],
+      "혼서 조각": ["동기", "강요된 혼인 → 압박"],
+      "피 묻은 붕대": ["상흔", "붕대 ↔ 돌쇠의 팔"],
+      "돌쇠의 팔 상처": ["상흔", "붕대를 감았던 자리"],
+      "도망 보따리": ["동기", "점순·돌쇠의 도망"],
+      "긁힌 팔 흔적": ["저항", "점순이 남긴 상처"],
+      "작은 발자국": ["동선", "작은 발 → 뒷문"],
+      "끊어진 호패끈": ["누명", "잘라낸 호패끈"],
+      "찢어진 약속 편지": ["진술", "말투 ≠ 돌쇠"]
+    };
+
+    const evidenceStoryMeanings = {
+      "호패 조각": "유문석에게 죄를 씌우려고 옮긴 흔적",
+      "돌쇠의 그림": "춘월이 돌쇠에게 품은 집착의 단서",
+      "헐거워진 노리개": "급히 움직인 사람의 흔적",
+      "무덕의 번진 일기": "도망 계획을 아는 사람이 있음",
+      "진흙 묻은 짚신": "현장 발자국의 주인과 다름",
+      "찢어진 옷고름": "목을 조른 물건과 이어짐",
+      "빈 호패 주머니": "호패가 일부러 옮겨졌을 가능성",
+      "하인 장부": "누군가 출입 기록을 감춤",
+      "혼서 조각": "강요된 혼인이 갈등을 만듦",
+      "피 묻은 붕대": "숨긴 팔 상처와 이어짐",
+      "돌쇠의 팔 상처": "붕대를 감았던 자리와 맞음",
+      "도망 보따리": "점순과 돌쇠가 떠날 준비를 함",
+      "긁힌 팔 흔적": "점순이 마지막에 저항함",
+      "작은 발자국": "뒷문으로 움직인 작은 발",
+      "끊어진 호패끈": "호패가 우연히 떨어진 것이 아님",
+      "찢어진 약속 편지": "돌쇠가 쓴 편지가 아닐 가능성"
+    };
+
+    const evidenceConnections = [
+      ["호패 조각", "빈 호패 주머니", "호패는 우연히 떨어진 것이 아니라 누명을 위해 옮겨졌다."],
+      ["호패 조각", "끊어진 호패끈", "호패끈을 끊어 조각을 현장에 남긴 흔적이다."],
+      ["빈 호패 주머니", "끊어진 호패끈", "비어 있는 주머니와 잘린 끈이 호패 조작을 함께 가리킨다."],
+      ["진흙 묻은 짚신", "작은 발자국", "짚신의 크기와 현장의 작은 발자국이 서로 맞지 않는다."],
+      ["피 묻은 붕대", "돌쇠의 팔 상처", "붕대를 감았던 자리와 돌쇠의 팔 상처가 맞아떨어진다."],
+      ["피 묻은 붕대", "긁힌 팔 흔적", "붕대는 몸싸움에서 생긴 긁힌 상처를 감추고 있었다."],
+      ["도망 보따리", "무덕의 번진 일기", "도망 준비가 기록되어 있어 계획을 아는 사람이 있었음을 보여준다."],
+      ["찢어진 옷고름", "긁힌 팔 흔적", "찢어진 옷고름과 긁힌 팔은 마지막 몸싸움이 있었음을 가리킨다."]
+    ];
+
+    function getEvidenceSource(name) {
+      return evidenceData[name]?.source || name;
+    }
+
+    function getEvidenceConnection(first, second) {
+      const sourceA = getEvidenceSource(first);
+      const sourceB = getEvidenceSource(second);
+      return evidenceConnections.find(([a, b]) => (a === sourceA && b === sourceB) || (a === sourceB && b === sourceA));
+    }
+
+    function withKoreanParticle(word, pair) {
+      const value = String(word || "");
+      const code = value.charCodeAt(value.length - 1);
+      const hasBatchim = code >= 0xac00 && code <= 0xd7a3 ? (code - 0xac00) % 28 !== 0 : false;
+      const [withBatchim, withoutBatchim] = pair.split("/");
+      return `${value}${hasBatchim ? withBatchim : withoutBatchim}`;
+    }
+
+    const evidenceQuestionTemplates = {
+      "누명": [
+        (name) => `${withKoreanParticle(name, "이/가")} 왜 현장에 있었지?`,
+        () => "누가 이 물건을 옮길 수 있었나?",
+        () => "사라진 호패를 마지막으로 본 때는?"
+      ],
+      "동선": [
+        (name) => `${withKoreanParticle(name, "과/와")} 네 이동 경로가 왜 다르지?`,
+        () => "뒷문을 지난 사람이 누구냐?",
+        () => "사건 직전 어디에서 누구를 보았지?"
+      ],
+      "동기": [
+        (name) => `${withKoreanParticle(name, "을/를")} 알고 있었나?`,
+        () => "점순이 떠나려 한 사실을 알았나?",
+        () => "혼인과 도망 계획을 누가 반대했지?"
+      ],
+      "수법": [
+        (name) => `${withKoreanParticle(name, "은/는")} 몸싸움에서 생긴 것인가?`,
+        () => "점순의 목에 남은 흔적을 설명해라.",
+        () => "사건 뒤 옷과 몸을 감춘 이유는?"
+      ],
+      "상흔": [
+        (name) => `${withKoreanParticle(name, "과/와")} 네 상처가 왜 맞지?`,
+        () => "그 상처는 언제 누구에게 생겼나?",
+        () => "붕대를 감춘 이유를 말해라."
+      ],
+      "저항": [
+        (name) => `${withKoreanParticle(name, "은/는")} 점순의 저항 흔적인가?`,
+        () => "사건 당시 몸싸움이 있었나?",
+        () => "소매 아래 상처를 왜 숨겼지?"
+      ],
+      "진술": [
+        (name) => `${name} 내용이 네 말과 왜 다르지?`,
+        () => "이 글을 쓴 사람의 말투를 아나?",
+        () => "도망 계획을 언제 처음 알았지?"
+      ]
+    };
+
+    function updateEvidenceInterrogationUI(name) {
+      if (themeId !== "joseon") return;
+      const data = evidenceData[name] || {};
+      const source = getEvidenceSource(name);
+      const [role] = getEvidenceStoryCue(name, data);
+      const image = document.querySelector("#presentedEvidenceImage");
+      const roleBadge = document.querySelector("#presentedEvidenceRole");
+      if (image) {
+        image.src = getEvidenceImage(name);
+        image.alt = source;
+        image.hidden = false;
+      }
+      if (roleBadge) {
+        roleBadge.textContent = role;
+        roleBadge.hidden = false;
+      }
+      const templates = evidenceQuestionTemplates[role] || [
+        (evidenceName) => `${evidenceName}을 본 적 있나?`,
+        () => "이 증거와 네 진술이 어떻게 이어지지?",
+        () => "이 증거에 대해 숨긴 말이 있나?"
+      ];
+      document.querySelectorAll(".prompt-line").forEach((button, index) => {
+        button.hidden = index >= 3;
+        if (index >= 3) return;
+        const template = templates[index % templates.length];
+        button.textContent = template(source);
+        button.classList.add("evidence-question");
+      });
+    }
+
+    function showEvidenceResponseMarker(name) {
+      const marker = document.querySelector("#evidenceResponseMarker");
+      if (!marker || themeId !== "joseon" || !name) return;
+      const data = evidenceData[name] || {};
+      const [role] = getEvidenceStoryCue(name, data);
+      marker.hidden = false;
+      document.querySelector("#responseEvidenceImage").src = getEvidenceImage(name);
+      document.querySelector("#responseEvidenceImage").alt = getEvidenceSource(name);
+      document.querySelector("#responseEvidenceRole").textContent = `${role} 증거와 대면`;
+      document.querySelector("#responseEvidenceMeaning").textContent = getEvidenceStoryMeaning(name, data);
+    }
+
+    function saveEvidenceConnection(first, second) {
+      const linked = new Set(readStoredNames(linkedEvidenceKey));
+      linked.add(evidencePairKey(getEvidenceSource(first), getEvidenceSource(second)));
+      localStorage.setItem(linkedEvidenceKey, JSON.stringify([...linked]));
+      updateEvidenceThreadUI();
+    }
+
+    function getUnlockedStoryConnections() {
+      const linked = new Set(readStoredNames(linkedEvidenceKey));
+      return evidenceConnections.filter(([first, second]) => linked.has(evidencePairKey(first, second)));
+    }
+
+    function updateEvidenceThreadUI() {
+      const unlocked = getUnlockedStoryConnections();
+      const examined = readExaminedClues();
+      const count = document.querySelector("#evidenceThreadCount");
+      if (count) count.textContent = String(unlocked.length + examined.length);
+      const trigger = document.querySelector("#openEvidenceThread");
+      trigger?.classList.toggle("has-clues", unlocked.length + examined.length > 0);
+      document.querySelectorAll("#evidenceList .evidence[data-evidence]").forEach((card) => {
+        const source = getEvidenceSource(card.dataset.evidence);
+        card.classList.toggle("story-linked", examined.some((clue) => clue.source === source) || unlocked.some(([a, b]) => a === source || b === source));
+      });
+    }
+
+    function renderEvidenceThread() {
+      const list = document.querySelector("#evidenceThreadList");
+      if (!list) return;
+      const unlocked = getUnlockedStoryConnections();
+      const examined = readExaminedClues();
+      if (!unlocked.length && !examined.length) {
+        list.innerHTML = `<div class="evidence-thread-empty"><b>아직 이어진 실마리가 없습니다</b><span>증거를 열고 관련 증거 하나를 골라 이어 보십시오.</span></div>`;
+        return;
+      }
+      const examinedHtml = examined.map((clue, index) => {
+        const data = evidenceData[clue.name] || { source: clue.source, note: clue.note, img: clue.img };
+        const [role] = getEvidenceStoryCue(clue.name, data);
+        return `<article class="evidence-thread-entry examined-thread-entry">
+          <em>${String(index + 1).padStart(2, "0")}</em>
+          <div class="examined-thread-flow">
+            <span><img src="${escapeHtml(getEvidenceImage(clue.source, clue.img))}" alt=""><b>${escapeHtml(clue.source)}</b></span>
+            <i aria-hidden="true">→</i>
+            <span><img src="${escapeHtml(clue.img)}" alt=""><b>${escapeHtml(clue.note)}</b></span>
+          </div>
+          <strong><small>${escapeHtml(role)}</small>${escapeHtml(getEvidenceStoryMeaning(clue.name, data))}</strong>
+        </article>`;
+      }).join("");
+      const linkedHtml = unlocked.map(([first, second, conclusion], index) => {
+        const firstData = evidenceData[first] || {};
+        const secondData = evidenceData[second] || {};
+        return `<article class="evidence-thread-entry">
+          <em>${String(examined.length + index + 1).padStart(2, "0")}</em>
+          <div class="evidence-thread-pair">
+            <span><img src="${escapeHtml(getEvidenceImage(first))}" alt=""><b>${escapeHtml(first)}</b></span>
+            <i aria-hidden="true">＋</i>
+            <span><img src="${escapeHtml(getEvidenceImage(second))}" alt=""><b>${escapeHtml(second)}</b></span>
+          </div>
+          <strong>${escapeHtml(conclusion)}</strong>
+        </article>`;
+      }).join("");
+      list.innerHTML = examinedHtml + linkedHtml;
+    }
+
+    function getEvidenceStoryCue(name, data) {
+      const cue = evidenceStoryCues[data.source || name] || ["단서", "사건과 연결"];
+      return cue;
+    }
+
+    function getEvidenceStoryMeaning(name, data) {
+      return evidenceStoryMeanings[data.source || name] || "다른 증거와 이어지는 단서";
+    }
+
+    function isEvidenceMeaningRevealed(name, data = evidenceData[name] || {}) {
+      if (data.derived) return true;
+      if (!data.tool) return true;
+      const source = data.source || name;
+      return readExaminedClues().some((clue) => clue.source === source);
+    }
+
+    function refreshEvidenceCard(name) {
+      const card = [...document.querySelectorAll("#evidenceList .evidence[data-evidence]")]
+        .find((item) => item.dataset.evidence === name);
+      if (!card) return;
+      const data = evidenceData[name] || {};
+      const revealed = isEvidenceMeaningRevealed(name, data);
+      card.dataset.storyRole = revealed ? getEvidenceStoryCue(name, data)[0] : "???";
+      card.classList.toggle("meaning-revealed", revealed);
+      card.classList.toggle("meaning-unknown", !revealed);
+      card.innerHTML = evidenceCardHtml(name);
+    }
+
+    function showToolConclusion(name, factText = "", meaningText = "") {
+      const panel = document.querySelector("#toolConclusion");
+      if (!panel) return;
+      const data = evidenceData[name] || {};
+      const [role, storyBeat] = getEvidenceStoryCue(name, data);
+      const fact = sentenceBreakText(factText || data.note || storyBeat).split("\n").find(Boolean) || storyBeat;
+      panel.hidden = false;
+      document.querySelector("#toolConclusionRole").textContent = role;
+      document.querySelector("#toolConclusionFact").textContent = fact;
+      document.querySelector("#toolConclusionMeaning").textContent = meaningText || getEvidenceStoryMeaning(name, data);
+    }
+
+    function hideToolConclusion() {
+      const panel = document.querySelector("#toolConclusion");
+      if (panel) panel.hidden = true;
+    }
+
+    function matchesEvidenceStoryFilter(role, filter) {
+      if (filter === "all") return true;
+      if (filter === "수법") return ["수법", "상흔", "저항"].includes(role);
+      return role === filter;
+    }
+
+    function setEvidenceStoryFilter(filter = "all") {
+      const bag = document.querySelector("#evidenceBagPop");
+      const filters = document.querySelector("#evidenceStoryFilters");
+      if (!bag || !filters) return;
+
+      bag.classList.toggle("story-filtering", filter !== "all");
+      filters.querySelectorAll("[data-story-filter]").forEach((button) => {
+        const isActive = button.dataset.storyFilter === filter;
+        button.classList.toggle("active", isActive);
+        button.setAttribute("aria-pressed", String(isActive));
+      });
+
+      document.querySelectorAll("#evidenceList .evidence-location-section").forEach((section) => {
+        let visibleCount = 0;
+        section.querySelectorAll(".evidence[data-evidence]").forEach((card) => {
+          const visible = matchesEvidenceStoryFilter(card.dataset.storyRole || "단서", filter);
+          card.classList.toggle("story-filter-hidden", !visible);
+          if (visible) visibleCount += 1;
+        });
+        section.classList.toggle("story-section-hidden", filter !== "all" && visibleCount === 0);
+        const count = section.querySelector(".evidence-location-head span");
+        if (filter !== "all" && count) count.textContent = `${visibleCount}점`;
+      });
+
+      if (filter === "all") {
+        updateEvidenceLocationCounts();
+        setActiveEvidenceLocation(getActiveEvidenceLocation() || document.querySelector("#evidenceLocationTabs [data-evidence-location]")?.dataset.evidenceLocation);
+      }
+    }
+
+    document.querySelector("#evidenceStoryFilters")?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-story-filter]");
+      if (!button) return;
+      playSfx("buttonAlt", 0.48);
+      setEvidenceStoryFilter(button.dataset.storyFilter || "all");
+    });
+
     function evidenceCardHtml(name) {
       const data = evidenceData[name] || {};
+      const summary = sentenceBreakText(data.note || "현장에서 발견된 단서입니다.").split("\n").find(Boolean) || "";
+      const [storyRole, storyBeat] = getEvidenceStoryCue(name, data);
+      const meaningRevealed = isEvidenceMeaningRevealed(name, data);
+      const stateFrame = data.derived
+        ? data.isNew
+          ? "/samunmong/assets/interactions/sato-skills/inventory-states/new.png"
+          : "/samunmong/assets/interactions/sato-skills/inventory-states/resolved.png"
+        : meaningRevealed
+          ? "/samunmong/assets/interactions/sato-skills/inventory-states/resolved.png"
+          : "/samunmong/assets/interactions/sato-skills/inventory-states/basic.png";
       return `
-        <img class="evidence-thumb" src="${escapeHtml(data.img || "/samunmong/assets/evidence-wooden-tag.webp")}" alt="">
+        <span class="evidence-visual">
+          <img class="evidence-thumb" src="${escapeHtml(getEvidenceImage(name))}" alt="">
+          <img class="evidence-state-frame" src="${stateFrame}" alt="">
+        </span>
         <span class="evidence-card-copy">
+          <span class="evidence-kind-mark">${data.derived ? data.isNew ? "새 증좌" : "검험 증좌" : meaningRevealed ? "감식 완료" : "미확인 증거"}</span>
           <strong>${escapeHtml(name)}</strong>
-          ${data.tool ? `<span class="evidence-tool-cue">${escapeHtml(TOOL_NEEDED_HINT)}</span>` : ""}
-          <span class="evidence-location">획득: ${escapeHtml(getEvidenceLocation(name))}</span>
-          <span>${sentenceBreakHtml(data.note || "현장에서 발견된 단서")}</span>
-          ${data.logic ? `<span class="evidence-logic">${sentenceBreakHtml(data.logic)}</span>` : ""}
+          <span class="evidence-story-cue"><b>${meaningRevealed ? `${escapeHtml(storyRole)} 증거` : "???"}</b><span>${meaningRevealed ? escapeHtml(storyBeat) : "감식하면 의미가 드러납니다"}</span></span>
+          <span class="evidence-summary">${escapeHtml(summary)}</span>
         </span>`;
+    }
+
+    function getExaminedClueName(evidenceName, toolName) {
+      const source = String(evidenceName || "증거")
+        .replace(/^(무덕|돌쇠|춘월|유문석)의\s*/, "")
+        .replace(/피 묻은\s*/, "");
+      const findingByTool = {
+        "돋보기": "확대 흔적",
+        "먼지털이 붓": "숨은 가루",
+        "촛불 비추기": "배면 기록",
+        "발자국 실측줄": "치수 대조",
+        "문서 맞춤판": "복원 문서",
+        "혈흔 시험포": "혈흔 반응",
+        "탁본 도구": "새김 탁본",
+        "섬유 대조틀": "섬유 대조",
+        "먹빛 시험석": "먹빛 대조",
+        "증거 연결판": "연결 관계",
+        "흙 대조 접시": "토질 대조",
+        "상처 대조첩": "상흔 대조",
+        "문서 펼침칼": "숨은 종이층",
+        "매듭 해체 송곳": "매듭 속 흔적",
+        "압흔 탁본판": "눌린 필획"
+      };
+      return `${source} · ${findingByTool[toolName] || "검험 흔적"}`;
+    }
+
+    function readExaminedClues() {
+      const stored = readStored(examinedCluesKey, []);
+      if (!Array.isArray(stored)) return [];
+      const valid = stored.filter((item) => {
+        if (!item || typeof item.name !== "string" || typeof item.source !== "string" || typeof item.tool !== "string") return false;
+        return hasCompletedToolStep(item.source, item.tool);
+      });
+      if (valid.length !== stored.length) {
+        localStorage.setItem(examinedCluesKey, JSON.stringify(valid));
+        const hasAnyCompletedAnalysis = readStoredNames(analyzedEvidenceKey).length > 0;
+        if (!valid.length && stored.length && !hasAnyCompletedAnalysis) {
+          localStorage.removeItem(linkedEvidenceKey);
+        }
+      }
+      return valid;
+    }
+
+    function registerExaminedClue(evidenceName, toolName, resultText, resultAsset) {
+      const name = getExaminedClueName(evidenceName, toolName);
+      const note = sentenceBreakText(resultText).split("\n").find(Boolean) || "검험으로 새 흔적을 확인했다.";
+      const clue = {
+        name,
+        source: evidenceName,
+        tool: toolName,
+        note,
+        img: resultAsset || getEvidenceImage(evidenceName),
+        isNew: true
+      };
+      const saved = readExaminedClues().filter((item) => item.name !== name);
+      saved.push(clue);
+      localStorage.setItem(examinedCluesKey, JSON.stringify(saved));
+      evidenceData[name] = {
+        note,
+        location: "검험 증좌",
+        img: clue.img,
+        derived: true,
+        isNew: true,
+        source: evidenceName
+      };
+      addEvidenceCardToInterrogation(name);
+      refreshEvidenceCard(evidenceName);
+      document.querySelectorAll(`#toolEvidenceList [data-evidence="${CSS.escape(evidenceName)}"]`).forEach((item) => item.remove());
+      return name;
+    }
+
+    function restoreExaminedClues() {
+      const clues = readExaminedClues();
+      const known = new Set(clues.map((clue) => `${clue.source}::${clue.tool}`));
+      readStoredNames(analyzedEvidenceKey).forEach((storedName) => {
+        const [source, storedTool] = storedName.split("::");
+        const tool = storedTool || evidenceData[source]?.tool;
+        if (!source || !tool || known.has(`${source}::${tool}`) || !evidenceData[source]) return;
+        const step = getToolAnalysisSteps(source).find((item) => item.tool === tool);
+        const resultText = step?.result || evidenceData[source].toolResult || "검험으로 새 흔적을 확인했다.";
+        clues.push({
+          name: getExaminedClueName(source, tool),
+          source,
+          tool,
+          note: sentenceBreakText(resultText).split("\n").find(Boolean),
+          img: step?.asset || evidenceData[source].toolResultAsset || evidenceData[source].img,
+          isNew: false
+        });
+        known.add(`${source}::${tool}`);
+      });
+      localStorage.setItem(examinedCluesKey, JSON.stringify(clues));
+      clues.forEach((clue) => {
+        evidenceData[clue.name] = {
+          note: clue.note,
+          location: "검험 증좌",
+          img: clue.img,
+          derived: true,
+          isNew: Boolean(clue.isNew),
+          source: clue.source
+        };
+        addEvidenceCardToInterrogation(clue.name);
+        refreshEvidenceCard(clue.source);
+      });
     }
 
     function getEvidenceLocationSection(list, location) {
@@ -2388,6 +3011,7 @@
       button.textContent = location;
       button.addEventListener("click", () => {
         playSfx("buttonAlt", 0.48);
+        setEvidenceStoryFilter("all");
         setActiveEvidenceLocation(location);
       });
       tabs.appendChild(button);
@@ -2454,6 +3078,7 @@
         addEvidenceToToolPanel(name);
         markEvidenceCollectedInScene(name);
       });
+      restoreExaminedClues();
 
       analyzedEvidence.forEach((name) => {
         const data = evidenceData[name];
@@ -2467,6 +3092,8 @@
 
     function setAnalysisTarget(name) {
       currentEvidenceForTool = name;
+      evidenceFlipped = false;
+      resetToolInteraction(true);
       document.querySelector("#analysisTarget").textContent = name;
       document.querySelectorAll("#toolEvidenceList .tool-evidence-option").forEach((item) => {
         item.classList.toggle("selected", item.dataset.evidence === name);
@@ -2474,22 +3101,80 @@
       updateToolPreview(name);
     }
 
+    function evidencePairKey(firstName, secondName) {
+      return [firstName, secondName].sort((a, b) => a.localeCompare(b, "ko")).join("::");
+    }
+
+    const evidencePairComparisons = new Map([
+      [["호패 조각", "빈 호패 주머니"], {
+        result: "주머니 안쪽의 눌린 자리와 호패 조각의 폭이 맞는다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-hopae-three-way-link.webp"
+      }],
+      [["호패 조각", "끊어진 호패끈"], {
+        result: "호패 구멍의 마찰 자국과 끊어진 끈의 굵기가 이어진다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-hopae-three-way-link.webp"
+      }],
+      [["진흙 묻은 짚신", "작은 발자국"], {
+        result: "같은 마당 흙이지만 발의 길이와 짚 섬유 비율은 서로 다르다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-footprint-soil-link.webp"
+      }],
+      [["피 묻은 붕대", "돌쇠의 팔 상처"], {
+        result: "붕대를 감은 방향과 상처의 피가 번진 중심이 맞물린다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-bandage-wound-link.webp"
+      }],
+      [["찢어진 옷고름", "긁힌 팔 흔적"], {
+        result: "상처 끝에 남은 가는 섬유와 옷고름의 풀린 비단실이 같은 방향으로 꼬여 있다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/secondary/result-fiber-match.png"
+      }]
+    ].map(([names, comparison]) => [evidencePairKey(names[0], names[1]), comparison]));
+
+    function compareEvidencePair(firstName, secondName) {
+      if (!firstName || !secondName || firstName === secondName) return;
+      const key = evidencePairKey(firstName, secondName);
+      const comparison = evidencePairComparisons.get(key);
+      if (!comparison) {
+        playSfx("buttonAlt", 0.42);
+        showToast("연결되지 않음");
+        return;
+      }
+      openRedThreadPuzzle(firstName, secondName, key, comparison);
+    }
+
     function addEvidenceToToolPanel(name) {
       const list = document.querySelector("#toolEvidenceList");
       if (!list) return;
       const data = evidenceData[name] || {};
       if (!data.tool) return;
+      if (getToolAnalysisSteps(name).some((step) => hasCompletedToolStep(name, step.tool))) return;
 
       list.querySelector(".evidence-empty")?.remove();
       const exists = [...list.children].some((item) => item.dataset.evidence === name);
       if (exists) return;
 
       const button = document.createElement("button");
-      button.className = `tool-evidence-option${hasAnalyzedEvidence(name) ? " analyzed" : ""}`;
+      button.className = `tool-evidence-option${getToolAnalysisSteps(name).length > 0 && !getPendingToolStep(name) ? " analyzed" : ""}`;
       button.type = "button";
       button.dataset.evidence = name;
-      button.innerHTML = `<img src="${escapeHtml(data.img || "/samunmong/assets/evidence-wooden-tag.webp")}" alt=""><span><strong>${escapeHtml(name)}</strong>${sentenceBreakHtml(data.tool ? TOOL_NEEDED_HINT : "확인 완료")}</span>`;
+      button.draggable = isJoseonToolInteraction;
+      button.innerHTML = `<img src="${escapeHtml(getEvidenceImage(name))}" alt=""><span><strong>${escapeHtml(name)}</strong></span>`;
       button.addEventListener("click", () => setAnalysisTarget(name));
+      button.addEventListener("dragstart", (event) => {
+        event.dataTransfer?.setData("text/x-samunmong-evidence", name);
+        if (event.dataTransfer) event.dataTransfer.effectAllowed = "link";
+        showToast(`${name} · 다른 증거에 겹쳐 보기`);
+      });
+      button.addEventListener("dragover", (event) => {
+        const sourceName = event.dataTransfer?.types.includes("text/x-samunmong-evidence");
+        if (!sourceName) return;
+        event.preventDefault();
+        if (event.dataTransfer) event.dataTransfer.dropEffect = "link";
+      });
+      button.addEventListener("drop", (event) => {
+        event.preventDefault();
+        const sourceName = event.dataTransfer?.getData("text/x-samunmong-evidence");
+        compareEvidencePair(sourceName, name);
+      });
+      if (readStoredNames(linkedEvidenceKey).some((key) => key.split("::").includes(name))) button.classList.add("linked");
       list.appendChild(button);
     }
 
@@ -2509,35 +3194,83 @@
     function updateToolPreview(name) {
       const data = evidenceData[name] || {};
       const image = document.querySelector("#toolPreviewImage");
+      const revealImage = document.querySelector("#toolRevealImage");
       const title = document.querySelector("#toolPreviewTitle");
       const note = document.querySelector("#toolPreviewNote");
       if (!image || !title || !note) return;
       const analyzed = Boolean(name && hasAnalyzedEvidence(name));
+      const steps = getToolAnalysisSteps(name);
+      const pendingStep = getPendingToolStep(name);
+      const allStepsComplete = steps.length > 0 && !pendingStep;
 
-      image.src = data.img || "/samunmong/assets/evidence-wooden-tag.webp";
+      image.src = getEvidenceImage(name);
+      if (revealImage) revealImage.src = image.src;
       image.alt = name ? `${name} 확대 이미지` : "";
       title.textContent = name || "증거를 선택하세요";
       note.textContent = analyzed
-        ? getEvidenceAnalysisText(name)
+        ? allStepsComplete
+          ? "분석 완료 · 자세한 내용은 기록장에 저장됨"
+          : `한 번 더 확인 가능 · ${pendingStep?.tool || "추가 도구"}`
         : name
-          ? sentenceBreakText(`${getEvidenceDetailText(name)}${data.tool ? `\n${TOOL_NEEDED_HINT}` : ""}`)
-        : "수집한 증거를 고르면 이곳에 크게 표시됩니다.";
+          ? "반응할 것 같은 도구를 골라 증거 위를 한 번 훑으십시오."
+          : "왼쪽에서 증거를 고르십시오.";
+      const examinedClue = readExaminedClues().slice().reverse().find((clue) => clue.source === name);
+      if (examinedClue) {
+        const clueData = evidenceData[examinedClue.name] || { source: examinedClue.source, note: examinedClue.note };
+        showToolConclusion(examinedClue.name, examinedClue.note, getEvidenceStoryMeaning(examinedClue.name, clueData));
+      } else {
+        hideToolConclusion();
+      }
       const preview = document.querySelector(".tool-preview");
       preview?.classList.remove("revealed", "wrong-tool");
       preview?.classList.toggle("revealed", analyzed);
       document.querySelectorAll(`#toolEvidenceList [data-evidence="${name}"]`).forEach((item) => {
-        item.classList.toggle("analyzed", analyzed);
+        item.classList.toggle("analyzed", allStepsComplete);
       });
+      const target = document.querySelector("#analysisTarget");
+      if (target && name) {
+        const evidenceButtons = [...document.querySelectorAll("#toolEvidenceList .tool-evidence-option")];
+        const completeCount = evidenceButtons.filter((button) => getToolAnalysisSteps(button.dataset.evidence).length > 0 && !getPendingToolStep(button.dataset.evidence)).length;
+        target.textContent = allStepsComplete
+          ? `${completeCount}/${evidenceButtons.length} · 완료`
+          : pendingStep
+            ? `${completeCount}/${evidenceButtons.length} · ${pendingStep.tool}`
+            : name;
+      }
       requestAnimationFrame(syncEvidenceShadowBounds);
       setTimeout(syncEvidenceShadowBounds, 80);
+      renderTools();
+    }
+
+    function flipCurrentEvidence() {
+      const data = evidenceData[currentEvidenceForTool] || {};
+      if (!data.reverseImg) {
+        showToast("뒤집어 볼 면이 없습니다");
+        return;
+      }
+      evidenceFlipped = !evidenceFlipped;
+      const image = document.querySelector("#toolPreviewImage");
+      const revealImage = document.querySelector("#toolRevealImage");
+      const nextImage = evidenceFlipped ? data.reverseImg : getEvidenceImage(currentEvidenceForTool);
+      if (image) image.src = nextImage;
+      if (revealImage) revealImage.src = nextImage;
+      const title = document.querySelector("#toolPreviewTitle");
+      if (title) title.textContent = evidenceFlipped ? `${currentEvidenceForTool} · 뒷면` : currentEvidenceForTool;
+      const note = document.querySelector("#toolPreviewNote");
+      if (note) note.textContent = evidenceFlipped ? "뒷면의 흔적이 드러났습니다." : "앞면으로 되돌렸습니다.";
+      playSfx("buttonAlt", 0.58);
+      showToast(evidenceFlipped ? "증거 뒤집기" : "앞면 확인");
+      requestAnimationFrame(syncEvidenceShadowBounds);
     }
 
     function addEvidenceCardToInterrogation(name) {
       const list = document.querySelector("#evidenceList");
+      const data = evidenceData[name] || {};
       document.querySelector("#emptyInterrogationEvidence")?.remove();
       const existing = [...list.querySelectorAll(".evidence")].find((item) => item.dataset.evidence === name);
       if (existing) {
         existing.classList.remove("hidden");
+        refreshEvidenceCard(name);
         updateEvidenceLocationCounts();
         return;
       }
@@ -2545,14 +3278,17 @@
       const location = getEvidenceLocation(name);
       const sectionGrid = getEvidenceLocationSection(list, location);
       const button = document.createElement("button");
-      button.className = "evidence evidence-card";
+      const meaningRevealed = isEvidenceMeaningRevealed(name, data);
+      button.className = `evidence evidence-card${data.derived ? " examined-evidence" : " field-evidence"}${data.isNew ? " new-evidence" : ""}${meaningRevealed ? " meaning-revealed" : " meaning-unknown"}`;
       button.type = "button";
       button.dataset.evidence = name;
       button.dataset.location = location;
+      button.dataset.storyRole = meaningRevealed ? getEvidenceStoryCue(name, data)[0] : "???";
       button.innerHTML = evidenceCardHtml(name);
       button.addEventListener("click", () => selectEvidence(button));
       sectionGrid.appendChild(button);
       updateEvidenceLocationCounts();
+      updateEvidenceThreadUI();
       setActiveEvidenceLocation(location);
     }
 
@@ -2560,29 +3296,434 @@
       document.querySelectorAll(".evidence").forEach((item) => item.classList.remove("active"));
       button.classList.add("active");
       selectedEvidence = button.dataset.evidence;
-      document.querySelector("#presentedEvidence").textContent = selectedEvidence;
+      const selectedData = evidenceData[selectedEvidence];
+      if (selectedData?.derived && selectedData.isNew) {
+        selectedData.isNew = false;
+        const clues = readExaminedClues();
+        const savedClue = clues.find((clue) => clue.name === selectedEvidence);
+        if (savedClue) savedClue.isNew = false;
+        localStorage.setItem(examinedCluesKey, JSON.stringify(clues));
+        button.classList.remove("new-evidence");
+        button.querySelector(".evidence-kind-mark").textContent = "검험 증좌";
+        button.querySelector(".evidence-state-frame").src = "/samunmong/assets/interactions/sato-skills/inventory-states/resolved.png";
+      }
+      playSfx("buttonAlt", 0.62);
+      showEvidenceStoryPreview(selectedEvidence);
+    }
+
+    function showEvidenceStoryPreview(name) {
+      const preview = document.querySelector("#evidenceStoryPreview");
+      const data = evidenceData[name] || {};
+      if (!preview) return;
+      const [role, fact] = getEvidenceStoryCue(name, data);
+      const meaningRevealed = isEvidenceMeaningRevealed(name, data);
+      preview.hidden = false;
+      document.querySelector("#evidencePreviewKind").textContent = data.derived ? "검험으로 얻은 증좌" : meaningRevealed ? `감식으로 확인한 ${role} 증거` : "아직 의미를 모르는 현장 증거";
+      document.querySelector("#evidencePreviewTitle").textContent = data.source || name;
+      document.querySelector("#evidencePreviewImage").src = getEvidenceImage(name);
+      document.querySelector("#evidencePreviewImage").alt = name;
+      document.querySelector("#evidencePreviewObject").textContent = data.source || name;
+      document.querySelector("#evidencePreviewFact").textContent = meaningRevealed ? fact : "도구함에서 이 증거를 감식하십시오.";
+      document.querySelector("#evidencePreviewRole").textContent = meaningRevealed ? `${role} 증거` : "???";
+      document.querySelector("#evidencePreviewMeaning").textContent = meaningRevealed ? getEvidenceStoryMeaning(name, data) : "감식을 마치면 사건에서의 의미가 열립니다.";
+      renderEvidencePeople(name);
+      const connectionResult = document.querySelector("#evidenceConnectionResult");
+      if (connectionResult) {
+        connectionResult.hidden = true;
+        connectionResult.classList.remove("no-connection", "connected");
+      }
+
+      const relatedRow = document.querySelector("#evidenceRelatedRow");
+      const related = [];
+      const relatedSources = new Set([data.source || name]);
+      const collectedCards = [...document.querySelectorAll("#evidenceList .evidence[data-evidence]")];
+      collectedCards.sort((a, b) => Number(Boolean(getEvidenceConnection(name, b.dataset.evidence))) - Number(Boolean(getEvidenceConnection(name, a.dataset.evidence))));
+      collectedCards.forEach((card) => {
+        const cardData = evidenceData[card.dataset.evidence] || {};
+        const source = cardData.source || card.dataset.evidence;
+        const matchesRole = matchesEvidenceStoryFilter(card.dataset.storyRole || "단서", role === "상흔" || role === "저항" ? "수법" : role);
+        if ((!matchesRole && !getEvidenceConnection(name, card.dataset.evidence)) || relatedSources.has(source) || related.length >= 3) return;
+        relatedSources.add(source);
+        related.push(card);
+      });
+      relatedRow.innerHTML = related.length ? `<span>하나를 골라 실마리 잇기</span>` : "";
+      related.forEach((card) => {
+        const relatedButton = document.createElement("button");
+        relatedButton.type = "button";
+        relatedButton.textContent = evidenceData[card.dataset.evidence]?.source || card.dataset.evidence;
+        relatedButton.addEventListener("click", () => connectEvidenceClues(name, card.dataset.evidence, relatedButton));
+        relatedRow.appendChild(relatedButton);
+      });
+    }
+
+    const suspectPortraits = {
+      dolsoe: "/samunmong/assets/suspects/dolsoe-seated.webp",
+      chunwol: "/samunmong/assets/suspects/chunwol-seated.webp",
+      yoomunseok: "/samunmong/assets/suspects/yoomunseok-seated.webp",
+      mudeok: "/samunmong/assets/suspects/mudeok-seated.webp"
+    };
+
+    function findJoseonSuspect(personName) {
+      return suspects.find((suspect) => suspect.name === personName || suspect.name.includes(personName) || personName.includes(suspect.name));
+    }
+
+    function renderEvidencePeople(name) {
+      const row = document.querySelector("#evidencePeopleRow");
+      if (!row) return;
+      const data = evidenceData[name] || {};
+      const sourceData = evidenceData[data.source || name] || data;
+      const people = Array.isArray(sourceData.relatedSuspects) ? sourceData.relatedSuspects : [];
+      row.replaceChildren();
+      if (!people.length || themeId !== "joseon") {
+        row.hidden = true;
+        return;
+      }
+      row.hidden = false;
+      const label = document.createElement("span");
+      label.textContent = "누구에게 물을까";
+      row.appendChild(label);
+      people.slice(0, 4).forEach((personName) => {
+        const suspect = findJoseonSuspect(personName);
+        if (!suspect) return;
+        const button = document.createElement("button");
+        button.type = "button";
+        button.setAttribute("aria-label", `${suspect.name}에게 이 증거 제시`);
+        button.innerHTML = `<img src="${escapeHtml(suspectPortraits[suspect.id] || suspect.scene)}" alt=""><span><b>${escapeHtml(suspect.name)}</b><small>에게 묻기</small></span>`;
+        button.addEventListener("click", () => presentEvidenceToSuspect(name, suspect.id));
+        row.appendChild(button);
+      });
+    }
+
+    function presentEvidenceToSuspect(name, suspectId) {
+      const targetIndex = suspects.findIndex((suspect) => suspect.id === suspectId);
+      if (targetIndex < 0) return;
+      selectedEvidence = name;
+      suspectIndex = targetIndex;
+      updateSuspect(false);
+      const presented = document.querySelector("#presentedEvidence");
+      if (presented) presented.textContent = name;
+      updateEvidenceInterrogationUI(name);
+      closeEvidenceStoryPreview();
+      closeToolResultPopup();
+      setEvidenceBag(false);
+      playSfx("buttonAlt", 0.62);
+      showToast(`${suspects[targetIndex].name}에게 ${getEvidenceSource(name)} 제시`);
+      if (getActiveScreenId() !== "interrogationScreen") {
+        go("interrogationScreen", `${suspects[targetIndex].name}을 불러 심문 중...`);
+      }
+      window.setTimeout(() => document.querySelector("#questionInput")?.focus(), 380);
+    }
+
+    function connectEvidenceClues(first, second, button) {
+      const result = document.querySelector("#evidenceConnectionResult");
+      if (!result) return;
+      const connection = getEvidenceConnection(first, second);
+      result.hidden = false;
+      result.classList.remove("no-connection", "connected");
+      void result.offsetWidth;
+      if (!connection) {
+        result.classList.add("no-connection");
+        document.querySelector("#evidenceConnectionText").textContent = "두 증거는 아직 직접 이어지지 않는다.";
+        playSfx("buttonAlt", 0.35);
+        return;
+      }
+      result.classList.add("connected");
+      document.querySelector("#connectionImageA").src = getEvidenceImage(first);
+      document.querySelector("#connectionImageB").src = getEvidenceImage(second);
+      document.querySelector("#connectionImageA").alt = getEvidenceSource(first);
+      document.querySelector("#connectionImageB").alt = getEvidenceSource(second);
+      document.querySelector("#evidenceConnectionText").textContent = connection[2];
+      button?.classList.add("connected");
+      saveEvidenceConnection(first, second);
+      playSfx("seal", 0.58);
+      showToast("실마리가 이어졌습니다");
+    }
+
+    function closeEvidenceStoryPreview() {
+      const preview = document.querySelector("#evidenceStoryPreview");
+      if (preview) preview.hidden = true;
+    }
+
+    document.querySelector("#closeEvidenceStoryPreview")?.addEventListener("click", () => {
+      playSfx("buttonAlt", 0.45);
+      closeEvidenceStoryPreview();
+    });
+
+    document.querySelector("#confirmEvidencePresent")?.addEventListener("click", () => {
+      if (!selectedEvidence) return;
+      const presented = document.querySelector("#presentedEvidence");
+      if (presented) presented.textContent = selectedEvidence;
+      updateEvidenceInterrogationUI(selectedEvidence);
+      closeEvidenceStoryPreview();
       setEvidenceBag(false);
       playSfx("buttonAlt", 0.62);
       showToast(`증거 제시: ${selectedEvidence}`);
+    });
+
+    document.querySelector("#openEvidenceThread")?.addEventListener("click", () => {
+      closeEvidenceStoryPreview();
+      renderEvidenceThread();
+      const panel = document.querySelector("#evidenceThreadPanel");
+      if (panel) panel.hidden = false;
+      playSfx("paper", 0.52);
+    });
+
+    document.querySelector("#closeEvidenceThread")?.addEventListener("click", () => {
+      const panel = document.querySelector("#evidenceThreadPanel");
+      if (panel) panel.hidden = true;
+      playSfx("buttonAlt", 0.42);
+    });
+
+    const joseonCoreToolNames = ["돋보기", "먼지털이 붓", "촛불 비추기"];
+    const joseonRequiredToolGroups = {
+      "발자국 실측줄": "돋보기",
+      "혈흔 시험포": "돋보기",
+      "섬유 대조틀": "돋보기",
+      "증거 연결판": "돋보기",
+      "상처 대조첩": "돋보기",
+      "탁본 도구": "먼지털이 붓",
+      "흙 대조 접시": "먼지털이 붓",
+      "매듭 해체 송곳": "먼지털이 붓",
+      "문서 맞춤판": "촛불 비추기",
+      "먹빛 시험석": "촛불 비추기",
+      "문서 펼침칼": "촛불 비추기",
+      "압흔 탁본판": "촛불 비추기"
+    };
+
+    function getJoseonCoreTool(requiredTool) {
+      return joseonRequiredToolGroups[requiredTool] || requiredTool;
     }
 
     function renderTools() {
       const grid = document.querySelector("#toolGrid");
       grid.innerHTML = "";
-      Object.entries(tools).forEach(([name, tool]) => {
+      const entries = Object.entries(tools);
+      let visibleEntries = entries;
+      if (isJoseonToolInteraction) {
+        visibleEntries = joseonCoreToolNames.map((name) => [name, tools[name]]).filter(([, tool]) => Boolean(tool));
+      }
+      visibleEntries.forEach(([name, tool]) => {
         const button = document.createElement("button");
-        button.className = "tool-card";
+        button.className = `tool-card option${selectedToolForAnalysis === name ? " active" : ""}`;
         button.type = "button";
         button.dataset.tool = name;
-        button.innerHTML = `<img src="${escapeHtml(tool.img)}" alt=""><span><strong>${escapeHtml(name)}</strong>${sentenceBreakHtml(tool.note)}</span>`;
+        button.draggable = isJoseonToolInteraction;
+        button.setAttribute("aria-label", `${name}을 증거에 사용`);
+        button.innerHTML = isJoseonToolInteraction
+          ? `<img src="${escapeHtml(tool.img)}" alt=""><strong>${escapeHtml(name)}</strong>`
+          : `<img src="${escapeHtml(tool.img)}" alt=""><span><strong>${escapeHtml(name)}</strong><span>사용하기</span></span>`;
         button.addEventListener("click", () => {
-          selectedToolForAnalysis = name;
-          updateToolCursor();
-          document.querySelectorAll(".tool-card").forEach((item) => item.classList.toggle("active", item.dataset.tool === name));
-          showToast(`${name} 선택. 증거 위를 문질러 보세요.`);
+          activateTool(name);
+          showToast(`${name} 선택 · ${getToolGestureCopy(name)}`);
+        });
+        button.addEventListener("dragstart", (event) => {
+          activateTool(name);
+          event.dataTransfer?.setData("text/x-samunmong-tool", name);
+          if (event.dataTransfer) event.dataTransfer.effectAllowed = "move";
+          showToast(`${name}을 증거 위에 놓으십시오`);
         });
         grid.appendChild(button);
       });
+    }
+
+    function activateTool(name) {
+      selectedToolForAnalysis = name;
+      resetToolInteraction(false);
+      syncToolInteractionMode();
+      updateToolCursor();
+      document.querySelectorAll(".tool-card").forEach((item) => item.classList.toggle("active", item.dataset.tool === name));
+    }
+
+    const toolReactionAssets = {
+      "돋보기": {
+        primary: "/samunmong/assets/interactions/evidence-tools/lens-focus.png",
+        secondary: "/samunmong/assets/interactions/evidence-tools/fiber-highlight.png",
+        mode: "lens"
+      },
+      "먼지털이 붓": {
+        primary: "/samunmong/assets/interactions/evidence-tools/wood-dust-stroke.png",
+        secondary: "/samunmong/assets/interactions/evidence-tools/charcoal-sweep.png",
+        mode: "brush"
+      },
+      "촛불 비추기": {
+        primary: "/samunmong/assets/interactions/evidence-tools/candle-bloom.png",
+        secondary: "/samunmong/assets/interactions/evidence-tools/ink-reveal.png",
+        mode: "light"
+      },
+      "발자국 실측줄": {
+        primary: "/samunmong/assets/interactions/evidence-tools/expanded/result-footprint-comparison.png",
+        secondary: "/samunmong/assets/interactions/evidence-tools/expanded/result-evidence-confirmed.png",
+        mode: "measure"
+      },
+      "문서 맞춤판": {
+        primary: "/samunmong/assets/interactions/evidence-tools/expanded/result-document-reconstruction.png",
+        secondary: "/samunmong/assets/interactions/evidence-tools/expanded/result-backlit-writing.png",
+        mode: "document"
+      },
+      "혈흔 시험포": {
+        primary: "/samunmong/assets/interactions/evidence-tools/expanded/result-blood-reaction.png",
+        secondary: "/samunmong/assets/interactions/evidence-tools/expanded/result-evidence-confirmed.png",
+        mode: "blood"
+      },
+      "탁본 도구": {
+        primary: "/samunmong/assets/interactions/evidence-tools/secondary/result-hopae-rubbing.png",
+        secondary: "/samunmong/assets/interactions/evidence-tools/secondary/result-secondary-analysis-complete.png",
+        mode: "rubbing"
+      },
+      "섬유 대조틀": {
+        primary: "/samunmong/assets/interactions/evidence-tools/secondary/result-fiber-match.png",
+        secondary: "/samunmong/assets/interactions/evidence-tools/secondary/result-cord-reconstruction.png",
+        mode: "fiber"
+      },
+      "먹빛 시험석": {
+        primary: "/samunmong/assets/interactions/evidence-tools/secondary/result-ink-diffusion.png",
+        secondary: "/samunmong/assets/interactions/evidence-tools/secondary/result-secondary-analysis-complete.png",
+        mode: "ink"
+      },
+      "증거 연결판": {
+        primary: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-hopae-three-way-link.webp",
+        secondary: "/samunmong/assets/interactions/evidence-tools/crosscheck/feedback-evidence-slots.webp",
+        mode: "connect"
+      },
+      "흙 대조 접시": {
+        primary: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-footprint-soil-link.webp",
+        secondary: "/samunmong/assets/interactions/evidence-tools/crosscheck/feedback-soil-layers.webp",
+        mode: "soil"
+      },
+      "상처 대조첩": {
+        primary: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-bandage-wound-link.webp",
+        secondary: "/samunmong/assets/interactions/evidence-tools/crosscheck/feedback-stain-patterns.webp",
+        mode: "wound"
+      },
+      "문서 펼침칼": {
+        primary: "/samunmong/assets/interactions/evidence-tools/hidden-structure/result-unfolded-document.webp",
+        secondary: "/samunmong/assets/interactions/evidence-tools/hidden-structure/feedback-separated-paper-layers.webp",
+        mode: "unfold"
+      },
+      "매듭 해체 송곳": {
+        primary: "/samunmong/assets/interactions/evidence-tools/hidden-structure/result-loosened-knot-sequence.webp",
+        secondary: "/samunmong/assets/interactions/evidence-tools/hidden-structure/feedback-knot-opening-stages.webp",
+        mode: "knot"
+      },
+      "압흔 탁본판": {
+        primary: "/samunmong/assets/interactions/evidence-tools/hidden-structure/result-pressure-writing.webp",
+        secondary: "/samunmong/assets/interactions/evidence-tools/hidden-structure/feedback-impression-reveal.webp",
+        mode: "impression"
+      }
+    };
+
+    function getToolGestureCopy(toolName) {
+      const gestures = {
+        "돋보기": "천천히 훑기",
+        "촛불 비추기": "빛을 한 번 통과시키기",
+        "발자국 실측줄": "발끝에서 뒤꿈치까지 긋기",
+        "문서 맞춤판": "찢긴 선 따라 긋기",
+        "혈흔 시험포": "얼룩 두 곳 누르기",
+        "탁본 도구": "좌우로 한 번 문지르기",
+        "섬유 대조틀": "실을 따라 훑기",
+        "먹빛 시험석": "작은 원 그리기",
+        "증거 연결판": "연결점 두 곳 누르기",
+        "흙 대조 접시": "좌우로 한 번 거르기",
+        "상처 대조첩": "대응 지점 두 곳 누르기",
+        "문서 펼침칼": "가장자리 따라 밀기",
+        "매듭 해체 송곳": "매듭 둘레에 원 그리기",
+        "압흔 탁본판": "좌우로 한 번 문지르기"
+      };
+      return gestures[toolName] || "한 번 쓸어 내리기";
+    }
+
+    function getToolInteractionType(toolName) {
+      if (["혈흔 시험포", "증거 연결판", "상처 대조첩"].includes(toolName)) return "tap";
+      if (["발자국 실측줄", "문서 맞춤판", "섬유 대조틀", "문서 펼침칼"].includes(toolName)) return "trace";
+      return "sweep";
+    }
+
+    function updateToolProgress(value) {
+      toolAnalysisProgress = Math.max(0, Math.min(100, value));
+      const fill = document.querySelector("#toolAnalysisProgressFill");
+      const progress = document.querySelector("#toolAnalysisProgress");
+      fill?.style.setProperty("--tool-progress", `${toolAnalysisProgress}%`);
+      document.querySelector(".tool-preview-image")?.style.setProperty("--tool-reveal", `${toolAnalysisProgress}%`);
+      progress?.classList.toggle("active", toolAnalysisProgress > 0 && toolAnalysisProgress < 100);
+      progress?.classList.toggle("complete", toolAnalysisProgress >= 100);
+      const stage = document.querySelector("#toolAnalysisStage");
+      if (stage) {
+        stage.textContent = toolAnalysisProgress >= 100
+          ? "단서 확정"
+          : toolAnalysisProgress >= 68
+            ? "숨은 흔적 대조"
+            : toolAnalysisProgress >= 34
+              ? "미세 흔적 분리"
+              : toolAnalysisProgress > 0
+                ? "표면 확인"
+                : "조사 준비";
+        stage.classList.toggle("active", toolAnalysisProgress > 0);
+        stage.classList.toggle("complete", toolAnalysisProgress >= 100);
+      }
+    }
+
+    function resetToolInteraction(clearTool = true) {
+      swipeStartPoint = null;
+      swipeLastPoint = null;
+      toolAnalysisCompleted = false;
+      toolLastMoveAt = 0;
+      toolLastDirection = 0;
+      toolDirectionChanges = 0;
+      updateToolProgress(0);
+      const preview = document.querySelector(".tool-preview");
+      preview?.classList.remove("swiping", "wrong-tool", "tool-reacting");
+      preview?.removeAttribute("data-tool-mode");
+      document.querySelector("#toolReactionLayer")?.classList.remove("show", "wrong", "success");
+      if (clearTool) selectedToolForAnalysis = "";
+      syncToolInteractionMode();
+    }
+
+    function syncToolInteractionMode() {
+      const reaction = toolReactionAssets[selectedToolForAnalysis];
+      const preview = document.querySelector(".tool-preview");
+      const primary = document.querySelector("#toolReactionPrimary");
+      const secondary = document.querySelector("#toolReactionSecondary");
+      const guide = document.querySelector("#toolGestureGuide");
+      if (reaction) {
+        preview?.setAttribute("data-tool-mode", reaction.mode);
+        if (primary) primary.src = reaction.primary;
+        if (secondary) secondary.src = reaction.secondary;
+      }
+      if (guide) {
+        guide.textContent = selectedToolForAnalysis
+          ? `이제 증거 위에서 · ${getToolGestureCopy(selectedToolForAnalysis)}`
+          : evidenceData[currentEvidenceForTool]?.reverseImg
+            ? "좌우로 밀면 뒷면 · 아래 도구로 감식"
+            : "아래 도구 중 하나를 올려놓으세요";
+      }
+    }
+
+    function positionToolReaction(event) {
+      const area = document.querySelector(".tool-preview-image");
+      const layer = document.querySelector("#toolReactionLayer");
+      if (!area || !layer) return;
+      const rect = area.getBoundingClientRect();
+      layer.style.setProperty("--reaction-x", `${event.clientX - rect.left}px`);
+      layer.style.setProperty("--reaction-y", `${event.clientY - rect.top}px`);
+    }
+
+    function showWrongToolReaction(event) {
+      const layer = document.querySelector("#toolReactionLayer");
+      const primary = document.querySelector("#toolReactionPrimary");
+      if (primary) primary.src = "/samunmong/assets/interactions/evidence-tools/wrong-tool-puff.png";
+      positionToolReaction(event);
+      layer?.classList.add("show", "wrong");
+      window.setTimeout(() => {
+        layer?.classList.remove("show", "wrong");
+        syncToolInteractionMode();
+      }, 620);
+    }
+
+    function showSuccessfulToolReaction() {
+      const layer = document.querySelector("#toolReactionLayer");
+      const primary = document.querySelector("#toolReactionPrimary");
+      if (primary) primary.src = "/samunmong/assets/interactions/evidence-tools/discovery-burst.png";
+      layer?.classList.add("show", "success");
     }
 
     function ensureToolCursor() {
@@ -2643,16 +3784,1428 @@
       if (isInside) updateWipePosition(event);
     }
 
-    function showToolResultPopup(evidenceName, toolName, resultText) {
+    function dragToolOverEvidence(event) {
+      if (!isJoseonToolInteraction || !selectedToolForAnalysis) return;
+      event.preventDefault();
+      if (event.dataTransfer) event.dataTransfer.dropEffect = "move";
+      positionToolReaction(event);
+      document.querySelector(".tool-preview")?.classList.add("tool-reacting");
+      document.querySelector("#toolReactionLayer")?.classList.add("show");
+    }
+
+    function dropToolOnEvidence(event) {
+      if (!isJoseonToolInteraction) return;
+      event.preventDefault();
+      const droppedTool = event.dataTransfer?.getData("text/x-samunmong-tool") || selectedToolForAnalysis;
+      if (!droppedTool || !currentEvidenceForTool) return;
+      activateTool(droppedTool);
+      positionToolReaction(event);
+      const expectedTool = getPendingToolStep(currentEvidenceForTool)?.tool;
+      if (getJoseonCoreTool(expectedTool) !== droppedTool) {
+        showWrongToolReaction(event);
+        document.querySelector(".tool-preview")?.classList.add("wrong-tool");
+        window.setTimeout(() => document.querySelector(".tool-preview")?.classList.remove("wrong-tool"), 420);
+        showToast("반응 없음");
+        return;
+      }
+      updateToolProgress(100);
+      document.querySelector("#toolReactionLayer")?.classList.add("show");
+      window.setTimeout(() => analyzeEvidenceWithTool(expectedTool), 140);
+    }
+
+    function showToolResultPopup(evidenceName, toolName, resultText, resultAsset = "") {
       const panel = document.querySelector("#toolResultPopup");
       if (!panel) return;
+      const resultData = evidenceData[evidenceName] || {};
+      const sourceName = resultData.source || "";
+      const sourceData = evidenceData[sourceName] || {};
+      const [storyRole, storyBeat] = getEvidenceStoryCue(evidenceName, resultData);
+      currentToolResultEvidence = evidenceName;
 
-      document.querySelector("#toolResultKicker").textContent = `${toolName} 분석`;
+      document.querySelector("#toolResultKicker").textContent = toolName === "현장 채증" ? "새로운 증거" : "새 단서 확정";
       document.querySelector("#toolResultTitle").textContent = evidenceName;
-      document.querySelector("#toolResultText").textContent = sentenceBreakText(resultText);
+      document.querySelector("#toolResultStoryRole").textContent = storyRole;
+      document.querySelector("#toolResultStoryBeat").textContent = storyBeat;
+      document.querySelector("#toolResultLocation").textContent = `발견 · ${getEvidenceLocation(evidenceName)}`;
+      renderToolResultPeople(evidenceName);
+      const resultHeadline = sentenceBreakText(resultText).split("\n").find(Boolean) || "새로운 흔적을 찾았습니다.";
+      document.querySelector("#toolResultText").textContent = resultHeadline;
+      const sourceImage = document.querySelector("#toolResultSourceImage");
+      if (sourceImage) sourceImage.src = sourceData.img || resultData.img || resultAsset || "/samunmong/assets/evidence-wooden-tag.webp";
+      const resultImage = document.querySelector("#toolResultImage");
+      if (resultImage) {
+        resultImage.hidden = false;
+        resultImage.src = resultAsset || getEvidenceImage(evidenceName, "/samunmong/assets/interactions/evidence-tools/expanded/result-evidence-confirmed.png");
+      }
+      panel.classList.remove("acquired");
+      panel.classList.toggle("has-transformation", Boolean(sourceName));
+      void panel.offsetWidth;
       panel.classList.add("show");
+      panel.classList.add("acquired");
       panel.setAttribute("aria-hidden", "false");
       globalOverlay.classList.add("show");
+      playSfx("evidence", 0.9);
+    }
+
+    function renderToolResultPeople(name) {
+      const row = document.querySelector("#toolResultPeople");
+      if (!row) return;
+      const data = evidenceData[name] || {};
+      const sourceData = evidenceData[data.source || name] || data;
+      const people = Array.isArray(sourceData.relatedSuspects) ? sourceData.relatedSuspects : [];
+      row.replaceChildren();
+      people.slice(0, 3).forEach((personName) => {
+        const suspect = findJoseonSuspect(personName);
+        if (!suspect) return;
+        const button = document.createElement("button");
+        button.type = "button";
+        button.setAttribute("aria-label", `${suspect.name}에게 바로 묻기`);
+        button.innerHTML = `<img src="${escapeHtml(suspectPortraits[suspect.id] || suspect.scene)}" alt=""><span>${escapeHtml(suspect.name)}</span>`;
+        button.addEventListener("click", () => presentEvidenceToSuspect(name, suspect.id));
+        row.appendChild(button);
+      });
+    }
+
+    document.querySelector("#openResultInBag")?.addEventListener("click", () => {
+      if (!currentToolResultEvidence) return;
+      const name = currentToolResultEvidence;
+      closeToolResultPopup();
+      setEvidenceBag(true);
+      setActiveEvidenceLocation(getEvidenceLocation(name));
+      showEvidenceStoryPreview(name);
+      playSfx("bag", 0.62);
+    });
+
+    function openDocumentAssembly(evidenceName) {
+      documentPuzzleEvidence = evidenceName;
+      placedDocumentPieces.clear();
+      const isHonseo = evidenceName === "혼서 조각";
+      const stage = document.querySelector("#documentAssemblyStage");
+      stage?.setAttribute("data-document-kind", isHonseo ? "honseo" : "letter");
+      const honseoPieces = {
+        a: "/samunmong/assets/interactions/document-puzzle/honseo-pieces/fragment-a-v2.png",
+        b: "/samunmong/assets/interactions/document-puzzle/honseo-pieces/fragment-b-v2.png",
+        c: "/samunmong/assets/interactions/document-puzzle/honseo-pieces/fragment-c-v2.png"
+      };
+      const promiseLetterPieces = {
+        a: "/samunmong/assets/interactions/document-puzzle/drag-pieces/fragment-a-letter-v4.png",
+        b: "/samunmong/assets/interactions/document-puzzle/drag-pieces/fragment-b-letter-v4.png",
+        c: "/samunmong/assets/interactions/document-puzzle/drag-pieces/fragment-c-letter-v4.png"
+      };
+      stage?.querySelectorAll("[data-document-piece], [data-document-target]").forEach((item) => {
+        const pieceId = item.dataset.documentPiece || item.dataset.documentTarget;
+        const image = item.querySelector("img");
+        if (image) image.src = isHonseo ? honseoPieces[pieceId] : promiseLetterPieces[pieceId];
+      });
+      document.querySelector("#documentAssemblyTitle").textContent = evidenceName;
+      document.querySelector("#documentAssemblyGuide").textContent = isHonseo ? "인장과 테두리가 이어지도록 혼서 조각을 직접 맞추십시오 · 짧게 누르면 회전" : "찢긴 글줄이 이어지도록 편지 조각을 끌어 맞추십시오 · 짧게 누르면 회전";
+      document.querySelector("#documentAssemblyBoard").src = "/samunmong/assets/interactions/document-puzzle/board-empty.webp";
+      document.querySelector("#documentAssemblyStage")?.classList.remove("completed");
+      document.querySelectorAll(".document-piece").forEach((button) => {
+        button.disabled = false;
+        button.classList.remove("placed", "dragging", "wrong-fit");
+        const config = getDocumentPieceLayout(button.dataset.documentPiece);
+        const state = { x: config.startX, y: config.startY, rotation: config.startRotation };
+        documentPieceState.set(button.dataset.documentPiece, state);
+        updateDocumentPiecePosition(button, state);
+      });
+      openGlobalPanel("documentAssemblyPanel");
+      playSfx("map", 0.62);
+    }
+
+    function updateDocumentPiecePosition(button, state) {
+      button.style.setProperty("--piece-x", `${state.x}%`);
+      button.style.setProperty("--piece-y", `${state.y}%`);
+      button.style.setProperty("--piece-rotation", `${state.rotation}deg`);
+    }
+
+    function startDocumentPieceDrag(button, event) {
+      const pieceId = button.dataset.documentPiece;
+      if (!pieceId || placedDocumentPieces.has(pieceId)) return;
+      draggedDocumentPiece = { button, pieceId, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, moved: false };
+      button.setPointerCapture?.(event.pointerId);
+      button.classList.add("dragging");
+      event.preventDefault();
+    }
+
+    function moveDocumentPiece(event) {
+      if (!draggedDocumentPiece || draggedDocumentPiece.pointerId !== event.pointerId) return;
+      const rect = document.querySelector("#documentAssemblyStage")?.getBoundingClientRect();
+      if (!rect?.width || !rect.height) return;
+      const state = documentPieceState.get(draggedDocumentPiece.pieceId);
+      state.x = Math.max(8, Math.min(92, ((event.clientX - rect.left) / rect.width) * 100));
+      state.y = Math.max(10, Math.min(88, ((event.clientY - rect.top) / rect.height) * 100));
+      draggedDocumentPiece.moved ||= Math.hypot(event.clientX - draggedDocumentPiece.startX, event.clientY - draggedDocumentPiece.startY) > 7;
+      updateDocumentPiecePosition(draggedDocumentPiece.button, state);
+      event.preventDefault();
+    }
+
+    function finishDocumentPieceDrag(event) {
+      if (!draggedDocumentPiece || draggedDocumentPiece.pointerId !== event.pointerId) return;
+      const { button, pieceId, moved } = draggedDocumentPiece;
+      const state = documentPieceState.get(pieceId);
+      button.classList.remove("dragging");
+      draggedDocumentPiece = null;
+      if (!moved) {
+        state.rotation = (state.rotation + 45) % 360;
+        updateDocumentPiecePosition(button, state);
+        playSfx("buttonAlt", 0.42);
+        return;
+      }
+      const target = getDocumentPieceLayout(pieceId);
+      const rawRotationDelta = Math.abs(state.rotation - target.targetRotation) % 360;
+      const rotationDelta = Math.min(rawRotationDelta, 360 - rawRotationDelta);
+      const distance = Math.hypot(state.x - target.targetX, state.y - target.targetY);
+      if (distance > 12 || rotationDelta > 20) {
+        button.classList.add("wrong-fit");
+        window.setTimeout(() => button.classList.remove("wrong-fit"), 320);
+        document.querySelector("#documentAssemblyGuide").textContent = rotationDelta > 20 ? "방향이 맞지 않습니다 · 조각을 짧게 눌러 회전" : "찢어진 가장자리가 맞는 자리를 찾아보십시오";
+        playSfx("buttonAlt", 0.36);
+        return;
+      }
+      state.x = target.targetX;
+      state.y = target.targetY;
+      state.rotation = target.targetRotation;
+      updateDocumentPiecePosition(button, state);
+      placedDocumentPieces.add(pieceId);
+      button.classList.add("placed");
+      button.disabled = true;
+      const count = placedDocumentPieces.size;
+      if (count === 3) {
+        document.querySelector("#documentAssemblyBoard").src = documentPuzzleEvidence === "혼서 조각" ? "/samunmong/assets/interactions/document-puzzle/board-complete-honseo-v2.png" : "/samunmong/assets/interactions/document-puzzle/board-complete-letter-v3.png";
+        document.querySelector("#documentAssemblyStage")?.classList.add("completed");
+      }
+      document.querySelector("#documentAssemblyGuide").textContent = count === 3 ? "문서 복원 완료" : `조각이 맞물렸습니다 · ${count}/3`;
+      playSfx(count === 3 ? "evidence" : "buttonAlt", count === 3 ? 0.9 : 0.58);
+      if (count === 3) {
+        finishTactilePuzzle("문서 맞춤판");
+      }
+    }
+
+    function clearInteractionEarnedEvidence(panel) {
+      if (!panel) return;
+      panel.querySelector(".interaction-earned-evidence")?.remove();
+      panel.classList.remove("interaction-complete");
+      const closeButton = panel.querySelector(".global-close");
+      if (closeButton?.dataset.defaultLabel) closeButton.textContent = closeButton.dataset.defaultLabel;
+    }
+
+    const joseonDreamTraceByEvidence = {
+      "호패 조각": {
+        image: "/samunmong/assets/interactions/dream-traces/empty-hopae-pouch-v2.png",
+        alt: "정체를 감춘 인물이 주머니에서 호패를 훔쳐 꺼내는 몽흔"
+      },
+      "도망 보따리": {
+        image: "/samunmong/assets/interactions/dream-traces/escape-plan-overheard-v1.png",
+        alt: "두 사람이 도망 보따리를 준비하는 동안 누군가 문밖에서 엿듣는 몽흔"
+      },
+      "작은 발자국": {
+        image: "/samunmong/assets/interactions/dream-traces/straw-shoe-mismatch-v2.png",
+        alt: "정체를 감춘 인물이 큰 짚신을 작은 발자국 옆에 내려놓는 몽흔"
+      },
+      "빈 호패 주머니": {
+        image: "/samunmong/assets/interactions/dream-traces/empty-hopae-pouch-v2.png",
+        alt: "정체를 감춘 인물이 주머니에서 호패를 훔쳐 꺼내는 몽흔"
+      },
+      "진흙 묻은 짚신": {
+        image: "/samunmong/assets/interactions/dream-traces/straw-shoe-mismatch-v2.png",
+        alt: "정체를 감춘 인물이 큰 짚신을 작은 발자국 옆에 내려놓는 몽흔"
+      },
+      "헐거워진 노리개": {
+        image: "/samunmong/assets/interactions/dream-traces/norigae-snag-v2.png",
+        alt: "두 인물이 갈라지는 순간 노리개가 남색 소매에 걸려 찢기는 몽흔"
+      },
+      "하인 장부": {
+        image: "/samunmong/assets/interactions/dream-traces/ledger-record-erased-v1.png",
+        alt: "정체를 감춘 인물이 이미 적힌 출입 기록을 먹으로 덮어 지우는 몽흔"
+      },
+      "찢어진 약속 편지": {
+        image: "/samunmong/assets/interactions/dream-traces/false-letter-written-v1.png",
+        alt: "정체를 감춘 인물이 격식 있는 편지를 대신 쓰고 찢는 몽흔"
+      },
+      "돌쇠의 그림": {
+        image: "/samunmong/assets/interactions/dream-traces/portrait-redrawn-v1.png",
+        alt: "정체를 감춘 인물이 돌쇠의 초상을 여러 번 덧그리는 몽흔"
+      },
+      "무덕의 번진 일기": {
+        image: "/samunmong/assets/interactions/dream-traces/escape-plan-overheard-v1.png",
+        alt: "두 사람의 도망 계획을 문밖의 누군가가 엿듣고 기록하는 몽흔"
+      }
+    };
+
+    function renderInteractionEarnedEvidence(panel, clue) {
+      if (!panel || !clue) return;
+      clearInteractionEarnedEvidence(panel);
+      const data = evidenceData[clue.name] || { source: clue.source, note: clue.note, img: clue.img };
+      const sourceName = clue.source || data.source || clue.name;
+      const dreamTrace = joseonDreamTraceByEvidence[sourceName];
+      const result = document.createElement("article");
+      result.className = `interaction-earned-evidence ${dreamTrace ? "dream-trace-evidence" : "evidence-still-result"}`;
+      result.setAttribute("aria-live", "polite");
+      result.innerHTML = `
+        <section class="evidence-recovery-still">
+          <div class="evidence-object-stage">
+            <img src="${escapeHtml(clue.img || data.img || "/samunmong/assets/evidence-wooden-tag.webp")}" alt="${escapeHtml(clue.name)}" draggable="false">
+            <i aria-hidden="true">증좌</i>
+          </div>
+          <div class="evidence-recovery-copy">
+            <span>검험을 마쳤습니다</span>
+            <strong>${escapeHtml(clue.name)}</strong>
+            <small>새 증좌가 보따리에 기록됨</small>
+            ${dreamTrace ? '<button type="button" class="dream-trace-toggle"><b>꿈자취 살피기</b><em>증좌에 밴 지난 순간을 엿봄</em></button>' : ""}
+          </div>
+        </section>
+        ${dreamTrace ? `<figure class="dream-trace-still" hidden>
+          <img src="${escapeHtml(dreamTrace.image)}" alt="${escapeHtml(dreamTrace.alt)}" draggable="false">
+          <figcaption>
+            <span>꿈자취</span>
+            <strong>${escapeHtml(clue.name)}</strong>
+            <button type="button" class="dream-trace-return">증좌로 돌아가기</button>
+          </figcaption>
+        </figure>` : ""}`;
+      const evidenceStill = result.querySelector(".evidence-recovery-still");
+      const dreamTraceStill = result.querySelector(".dream-trace-still");
+      const traceToggle = result.querySelector(".dream-trace-toggle");
+      const traceReturn = result.querySelector(".dream-trace-return");
+      traceToggle?.addEventListener("click", () => {
+        result.classList.remove("trace-revealed");
+        dreamTraceStill.hidden = false;
+        evidenceStill.hidden = true;
+        void result.offsetWidth;
+        result.classList.add("trace-revealed");
+        playDreamTraceSfx();
+      });
+      traceReturn?.addEventListener("click", () => {
+        result.classList.remove("trace-revealed");
+        dreamTraceStill.hidden = true;
+        evidenceStill.hidden = false;
+      });
+      panel.appendChild(result);
+      panel.classList.add("interaction-complete");
+      const closeButton = panel.querySelector(".global-close");
+      if (closeButton) {
+        if (!closeButton.dataset.defaultLabel) closeButton.dataset.defaultLabel = closeButton.textContent || "그만두기";
+        closeButton.textContent = "확인하고 닫기";
+      }
+      result.scrollIntoView?.({ behavior: "smooth", block: "nearest" });
+    }
+
+    function finishTactilePuzzle(toolName) {
+      playSfx("evidence", 0.9);
+      const completedPanel = document.querySelector(".global-panel.show");
+      const completedSource = currentEvidenceForTool;
+      window.setTimeout(() => {
+        tactilePuzzleBypass = true;
+        analyzeEvidenceWithTool(toolName);
+        tactilePuzzleBypass = false;
+        const clue = readExaminedClues().slice().reverse().find((item) => item.source === completedSource && item.tool === toolName);
+        renderInteractionEarnedEvidence(completedPanel, clue);
+      }, 420);
+    }
+
+    function openRubbingPuzzle() {
+      tactilePuzzleProgress = 0;
+      tactilePuzzlePointer = null;
+      rubbingStrokeStep = 0;
+      rubbingDragState = null;
+      document.querySelector("#rubbingPuzzleImage").src = "/samunmong/assets/interactions/ledger-rubbing-puzzle/state-1-v1.png";
+      document.querySelector("#rubbingPuzzleGuide").textContent = "아래쪽의 붉은 손가락 고리에 손을 넣고, 먹뭉치를 한지의 검은 띠 전체에 가로로 길게 문지르십시오.";
+      document.querySelectorAll("[data-rubbing-lane]").forEach((lane, index) => {
+        lane.classList.toggle("active", index === 0);
+        lane.classList.remove("complete");
+      });
+      const charcoal = document.querySelector("#rubbingCharcoal");
+      charcoal?.classList.remove("dragging", "wrong-fit");
+      if (charcoal) {
+        charcoal.disabled = false;
+        charcoal.dataset.rubbingStep = "1";
+      }
+      charcoal?.style.setProperty("--rubbing-x", "0px");
+      charcoal?.style.setProperty("--rubbing-y", "0px");
+      openGlobalPanel("rubbingPuzzlePanel");
+      playSfx("map", 0.62);
+    }
+
+    function startRubbingDrag(event) {
+      if (tactilePuzzleProgress < 0) return;
+      const charcoal = event.currentTarget;
+      charcoal.setPointerCapture?.(event.pointerId);
+      rubbingDragState = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY };
+      charcoal.classList.add("dragging");
+      event.preventDefault();
+    }
+
+    function moveRubbingDrag(event) {
+      if (!rubbingDragState || rubbingDragState.pointerId !== event.pointerId) return;
+      const charcoal = document.querySelector("#rubbingCharcoal");
+      charcoal?.style.setProperty("--rubbing-x", `${event.clientX - rubbingDragState.startX}px`);
+      charcoal?.style.setProperty("--rubbing-y", `${event.clientY - rubbingDragState.startY}px`);
+      event.preventDefault();
+    }
+
+    function finishRubbingDrag(event) {
+      if (!rubbingDragState || rubbingDragState.pointerId !== event.pointerId) return;
+      const charcoal = document.querySelector("#rubbingCharcoal");
+      const dx = event.clientX - rubbingDragState.startX;
+      const dy = event.clientY - rubbingDragState.startY;
+      const validStroke = Math.abs(dx) > 150 && Math.abs(dx) > Math.abs(dy) * 1.8;
+      charcoal?.classList.remove("dragging");
+      charcoal?.style.setProperty("--rubbing-x", "0px");
+      charcoal?.style.setProperty("--rubbing-y", "0px");
+      rubbingDragState = null;
+      if (!validStroke) {
+        charcoal?.classList.remove("wrong-fit");
+        void charcoal?.offsetWidth;
+        charcoal?.classList.add("wrong-fit");
+        document.querySelector("#rubbingPuzzleGuide").textContent = "먹뭉치를 검게 덮인 한지 띠에 대고 한쪽 끝에서 반대쪽 끝까지 길게 문지르십시오.";
+        return;
+      }
+      rubbingStrokeStep = 1;
+      document.querySelectorAll("[data-rubbing-lane]").forEach((lane) => lane.classList.remove("active"));
+      document.querySelector("#rubbingPuzzleImage").src = "/samunmong/assets/interactions/ledger-rubbing-puzzle/state-4-v1.png";
+      document.querySelector("#rubbingPuzzleGuide").textContent = "한 번에 뜬 압흔에서 가운데 출입 기록만 나중에 덮어 지운 흔적이 드러났습니다.";
+      playSfx("buttonAlt", 0.56);
+      tactilePuzzleProgress = -999;
+      charcoal?.setAttribute("disabled", "true");
+      finishTactilePuzzle(selectedToolForAnalysis);
+    }
+
+    function openKnotPuzzle() {
+      knotPuzzleStep = 0;
+      knotDragState = null;
+      document.querySelector("#knotPuzzleImage").src = "/samunmong/assets/interactions/knot-puzzle/state-1.png";
+      document.querySelector("#knotPuzzleGuide").textContent = "빛나는 매듭 중심을 아래로 당겨 바깥 고리를 느슨하게 만드십시오.";
+      document.querySelectorAll("[data-knot-loop]").forEach((button) => button.disabled = false);
+      document.querySelector("#knotPuzzleStage")?.setAttribute("data-knot-step", "1");
+      openGlobalPanel("knotPuzzlePanel");
+      playSfx("map", 0.62);
+    }
+
+    function startKnotDrag(button, event) {
+      if (button.disabled) return;
+      knotDragState = { button, loop: Number(button.dataset.knotLoop), pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+      button.setPointerCapture?.(event.pointerId);
+      button.classList.add("dragging");
+      event.preventDefault();
+    }
+
+    function moveKnotDrag(event) {
+      if (!knotDragState || knotDragState.pointerId !== event.pointerId) return;
+      const dx = event.clientX - knotDragState.x;
+      const dy = event.clientY - knotDragState.y;
+      knotDragState.button.style.setProperty("--pull-x", `${Math.max(-64, Math.min(64, dx))}px`);
+      knotDragState.button.style.setProperty("--pull-y", `${Math.max(-64, Math.min(64, dy))}px`);
+      event.preventDefault();
+    }
+
+    function finishKnotDrag(event) {
+      if (!knotDragState || knotDragState.pointerId !== event.pointerId) return;
+      const { button, loop, x, y } = knotDragState;
+      const dx = event.clientX - x;
+      const dy = event.clientY - y;
+      const pulledCorrectly = loop === 1 ? dy > 42 && Math.abs(dx) < 55 : loop === 2 ? dx < -42 : dx > 42;
+      button.classList.remove("dragging");
+      button.style.removeProperty("--pull-x");
+      button.style.removeProperty("--pull-y");
+      knotDragState = null;
+      if (!pulledCorrectly) {
+        document.querySelector("#knotPuzzleGuide").textContent = "화살표 방향으로 고리를 길게 당기십시오";
+        return;
+      }
+      pullKnotLoop(loop);
+    }
+
+    function pullKnotLoop(loopNumber) {
+      const sequence = [1, 3];
+      if (Number(loopNumber) !== sequence[knotPuzzleStep]) {
+        document.querySelector("#knotPuzzleGuide").textContent = "그 고리는 더 조여집니다 · 다른 고리부터";
+        document.querySelector("#knotPuzzlePanel")?.classList.add("puzzle-miss");
+        window.setTimeout(() => document.querySelector("#knotPuzzlePanel")?.classList.remove("puzzle-miss"), 280);
+        playSfx("buttonAlt", 0.4);
+        return;
+      }
+      knotPuzzleStep += 1;
+      document.querySelector("#knotPuzzleImage").src = `/samunmong/assets/interactions/knot-puzzle/state-${knotPuzzleStep + 1}.png`;
+      document.querySelector(`[data-knot-loop="${loopNumber}"]`)?.setAttribute("disabled", "true");
+      document.querySelector("#knotPuzzleStage")?.setAttribute("data-knot-step", String(Math.min(2, knotPuzzleStep + 1)));
+      document.querySelector("#knotPuzzleGuide").textContent = knotPuzzleStep < 2 ? "매듭 중심이 풀렸습니다. 드러난 오른쪽 숨은 실을 바깥으로 당기십시오." : "매듭 속에 감춰졌던 다른 색의 섬유를 찾았습니다.";
+      playSfx("buttonAlt", 0.62);
+      if (knotPuzzleStep === 2) {
+        document.querySelector("#knotPuzzleImage").src = "/samunmong/assets/interactions/knot-puzzle/state-4.png";
+        finishTactilePuzzle("매듭 해체 송곳");
+      }
+    }
+
+    function openFootprintPuzzle() {
+      tactilePuzzleProgress = 0;
+      tactilePuzzlePointer = null;
+      footprintDragState = null;
+      footprintMeasureDragState = null;
+      footprintPuzzleStep = 0;
+      document.querySelector("#footprintPuzzleImage").src = "/samunmong/assets/interactions/footprint-puzzle/state-1.png";
+      document.querySelector("#footprintPuzzleGuide").textContent = "오른쪽의 짚신 밑창을 왼쪽 발자국 윤곽에 직접 포개십시오.";
+      const shoe = document.querySelector("#footprintShoePiece");
+      shoe?.classList.remove("dragging", "matched", "wrong-fit");
+      shoe?.style.setProperty("--shoe-x", "0px");
+      shoe?.style.setProperty("--shoe-y", "0px");
+      document.querySelector("#footprintDropTarget")?.classList.remove("matched");
+      document.querySelector("#footprintPuzzleStage")?.setAttribute("data-footprint-step", "sole");
+      const measureTool = document.querySelector("#footprintMeasureTool");
+      measureTool?.classList.remove("dragging", "placed", "wrong-fit");
+      measureTool?.style.setProperty("--measure-x", "0px");
+      measureTool?.style.setProperty("--measure-y", "0px");
+      openGlobalPanel("footprintPuzzlePanel");
+      playSfx("map", 0.62);
+    }
+
+    function startFootprintDrag(event) {
+      if (tactilePuzzleProgress < 0) return;
+      const shoe = event.currentTarget;
+      shoe.setPointerCapture?.(event.pointerId);
+      footprintDragState = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY };
+      shoe.classList.add("dragging");
+      event.preventDefault();
+    }
+
+    function moveFootprintDrag(event) {
+      if (!footprintDragState || footprintDragState.pointerId !== event.pointerId) return;
+      const shoe = document.querySelector("#footprintShoePiece");
+      shoe?.style.setProperty("--shoe-x", `${event.clientX - footprintDragState.startX}px`);
+      shoe?.style.setProperty("--shoe-y", `${event.clientY - footprintDragState.startY}px`);
+      event.preventDefault();
+    }
+
+    function finishFootprintDrag(event) {
+      if (!footprintDragState || footprintDragState.pointerId !== event.pointerId) return;
+      const shoe = document.querySelector("#footprintShoePiece");
+      const target = document.querySelector("#footprintDropTarget");
+      const shoeRect = shoe?.getBoundingClientRect();
+      const targetRect = target?.getBoundingClientRect();
+      const centerX = shoeRect ? shoeRect.left + shoeRect.width / 2 : 0;
+      const centerY = shoeRect ? shoeRect.top + shoeRect.height / 2 : 0;
+      const matched = targetRect && centerX >= targetRect.left && centerX <= targetRect.right && centerY >= targetRect.top && centerY <= targetRect.bottom;
+      footprintDragState = null;
+      shoe?.classList.remove("dragging");
+      if (!matched) {
+        shoe?.style.setProperty("--shoe-x", "0px");
+        shoe?.style.setProperty("--shoe-y", "0px");
+        shoe?.classList.remove("wrong-fit");
+        void shoe?.offsetWidth;
+        shoe?.classList.add("wrong-fit");
+        document.querySelector("#footprintPuzzleGuide").textContent = "뒤꿈치부터 빛나는 윤곽 안에 포개 보십시오.";
+        return;
+      }
+      shoe?.classList.add("matched");
+      target?.classList.add("matched");
+      document.querySelector("#footprintPuzzleImage").src = "/samunmong/assets/interactions/footprint-puzzle/state-3.png";
+      document.querySelector("#footprintPuzzleGuide").textContent = "밑창을 포갰습니다. 이제 실측줄을 발끝부터 뒤꿈치까지 놓아 길이를 확인하십시오.";
+      document.querySelector("#footprintPuzzleStage")?.setAttribute("data-footprint-step", "measure");
+      footprintPuzzleStep = 1;
+    }
+
+    function startFootprintMeasureDrag(event) {
+      if (footprintPuzzleStep !== 1) return;
+      const tool = event.currentTarget;
+      tool.setPointerCapture?.(event.pointerId);
+      footprintMeasureDragState = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY };
+      tool.classList.add("dragging");
+      event.preventDefault();
+    }
+
+    function moveFootprintMeasureDrag(event) {
+      if (!footprintMeasureDragState || footprintMeasureDragState.pointerId !== event.pointerId) return;
+      const tool = document.querySelector("#footprintMeasureTool");
+      tool?.style.setProperty("--measure-x", `${event.clientX - footprintMeasureDragState.startX}px`);
+      tool?.style.setProperty("--measure-y", `${event.clientY - footprintMeasureDragState.startY}px`);
+      event.preventDefault();
+    }
+
+    function finishFootprintMeasureDrag(event) {
+      if (!footprintMeasureDragState || footprintMeasureDragState.pointerId !== event.pointerId) return;
+      const tool = document.querySelector("#footprintMeasureTool");
+      const target = document.querySelector("#footprintMeasureTarget");
+      const toolRect = tool?.getBoundingClientRect();
+      const targetRect = target?.getBoundingClientRect();
+      const centerX = toolRect ? toolRect.left + toolRect.width / 2 : 0;
+      const centerY = toolRect ? toolRect.top + toolRect.height / 2 : 0;
+      const placed = targetRect && centerX >= targetRect.left && centerX <= targetRect.right && centerY >= targetRect.top && centerY <= targetRect.bottom;
+      footprintMeasureDragState = null;
+      tool?.classList.remove("dragging");
+      if (!placed) {
+        tool?.style.setProperty("--measure-x", "0px");
+        tool?.style.setProperty("--measure-y", "0px");
+        tool?.classList.remove("wrong-fit");
+        void tool?.offsetWidth;
+        tool?.classList.add("wrong-fit");
+        document.querySelector("#footprintPuzzleGuide").textContent = "실측줄 가운데를 발자국의 발끝과 뒤꿈치 사이에 놓으십시오.";
+        return;
+      }
+      tool?.classList.add("placed");
+      document.querySelector("#footprintPuzzleImage").src = "/samunmong/assets/interactions/footprint-puzzle/state-4.png";
+      document.querySelector("#footprintPuzzleGuide").textContent = "길이와 폭이 맞지 않습니다 · 이 짚신의 주인이 남긴 발자국이 아닙니다.";
+      document.querySelector("#footprintPuzzleStage")?.setAttribute("data-footprint-step", "complete");
+      footprintPuzzleStep = 2;
+      tactilePuzzleProgress = -999;
+      finishTactilePuzzle("발자국 실측줄");
+    }
+
+    const materialPuzzleConfig = {
+      "돋보기": { mode: "focus", folder: "focus-puzzle", title: "초점 맞추기", guide: "렌즈를 천천히 원형으로 움직여 선명한 지점을 찾으십시오.", gesture: "◎ 초점 찾기" },
+      "먼지털이 붓": { mode: "brush", folder: "brush-puzzle", title: "먼지 털어내기", guide: "붓을 좌우로 왕복해 홈 속 먼지를 털어내십시오.", gesture: "↔ 왕복 쓸기" },
+      "촛불 비추기": { mode: "light", folder: "candle-puzzle", title: "배면광 맞추기", guide: "촛불을 종이 뒤쪽으로 끌어 숨은 획을 찾으십시오.", gesture: "↗ 빛 옮기기" },
+      "혈흔 시험포": { mode: "sample", folder: "comparison-puzzle", title: "얼룩 옮겨 찍기", guide: "얼룩포와 깨끗한 대조포를 위의 빈 백자 잔에 하나씩 올리십시오.", gesture: "천 조각을 백자 잔에 올리기" },
+      "섬유 대조틀": { mode: "sample", folder: "comparison-puzzle", title: "섬유 결 맞추기", guide: "남색 비단실과 비교 모시실을 위의 두 백자 표본 잔에 하나씩 올리십시오.", gesture: "실꾸러미를 표본 잔에 올리기" },
+      "먹빛 시험석": { mode: "sample", folder: "comparison-puzzle", title: "먹 농도 맞추기", guide: "마른 먹 시험지와 젖은 먹 시험지를 위의 두 백자 표본 잔에 하나씩 올리십시오.", gesture: "한지 시험편을 표본 잔에 올리기" },
+      "증거 연결판": { mode: "sample", folder: "comparison-puzzle", title: "증거 연결하기", guide: "두 흔적을 올리고 공통 지점을 붉은 핀으로 고정하십시오.", gesture: "연결점 3곳 누르기" },
+      "흙 대조 접시": { mode: "sample", folder: "comparison-puzzle", title: "흙 알갱이 가르기", guide: "양쪽 흙을 놓고 같은 알갱이를 골라내십시오.", gesture: "표본 3곳 누르기" },
+      "상처 대조첩": { mode: "sample", folder: "comparison-puzzle", title: "상처 자국 포개기", guide: "얼룩과 상처 방향을 차례로 고정하십시오.", gesture: "대조점 3곳 누르기" },
+      "문서 펼침칼": { mode: "peel", folder: "paper-peel-puzzle", title: "혼서의 붙은 종이층 펼치기", guide: "오른쪽 아래에서 말려 올라온 한지 귀퉁이 밑으로 펼침칼을 밀어 넣으십시오.", gesture: "들린 종이 귀퉁이 열기" }
+    };
+
+    function openMaterialPuzzle(toolName) {
+      const config = materialPuzzleConfig[toolName];
+      if (!config) return false;
+      materialPuzzleMode = config.mode;
+      materialPuzzleTool = toolName;
+      materialPuzzleFolder = config.mode === "peel" && currentEvidenceForTool === "혼서 조각" ? "honseo-peel-puzzle" : config.folder;
+      materialPuzzleStage = 0;
+      placedMaterialSamples.clear();
+      materialLastDirection = 0;
+      tactilePuzzleProgress = 0;
+      tactilePuzzlePointer = null;
+      document.querySelector("#materialPuzzleTitle").textContent = config.title;
+      document.querySelector("#materialPuzzleGuide").textContent = config.guide;
+      document.querySelector("#materialPuzzleGesture").textContent = config.gesture;
+      document.querySelector("#materialPuzzleImage").src = materialPuzzleFolder === "honseo-peel-puzzle"
+        ? "/samunmong/assets/interactions/honseo-peel-puzzle/state-1-v1.png"
+        : `/samunmong/assets/interactions/${materialPuzzleFolder}/state-1.png`;
+      const touchPoints = document.querySelector("#sampleTouchPoints");
+      touchPoints.hidden = config.mode !== "sample";
+      const sampleKindByTool = { "혈흔 시험포": "blood", "섬유 대조틀": "fiber", "먹빛 시험석": "ink", "증거 연결판": "link", "흙 대조 접시": "soil", "상처 대조첩": "wound" };
+      const sampleLabels = {
+        blood: ["얼룩포", "대조포", "시약"], fiber: ["현장 실", "비교 실", "꼬임핀"], ink: ["원문 먹", "대조 먹", "번짐 고정"],
+        link: ["첫 증좌", "둘째 증좌", "붉은 핀"], soil: ["현장 흙", "비교 흙", "같은 알갱이"], wound: ["상처 방향", "붕대 결", "겹침핀"]
+      };
+      const sampleTargets = {
+        blood: ["얼룩 홈", "대조 홈", "시약 홈"], fiber: ["왼쪽 틀", "오른쪽 틀", "꼬임 중앙"], ink: ["원문 벼루", "대조 벼루", "번짐점"],
+        link: ["왼쪽 증좌", "오른쪽 증좌", "연결점"], soil: ["왼 접시", "오른 접시", "공통 알갱이"], wound: ["상처 윤곽", "붕대 윤곽", "겹친 중심"]
+      };
+      const sampleSprites = {
+        blood: [
+          "/samunmong/assets/interactions/material-samples/blood-stained-cloth-v1.png",
+          "/samunmong/assets/interactions/material-samples/clean-comparison-cloth-v1.png",
+          ""
+        ],
+        fiber: [
+          "/samunmong/assets/interactions/material-samples/dark-silk-fibers-v1.png",
+          "/samunmong/assets/interactions/material-samples/pale-ramie-fibers-v1.png",
+          ""
+        ],
+        ink: [
+          "/samunmong/assets/interactions/material-samples/dry-ink-hanji-v1.png",
+          "/samunmong/assets/interactions/material-samples/wet-ink-hanji-v1.png",
+          ""
+        ],
+        soil: [
+          "/samunmong/assets/interactions/evidence-reverse/muddy-straw-shoe-sole-v2.png",
+          "/samunmong/assets/evidence-transparent/evidence-small-footprints.webp",
+          ""
+        ],
+        wound: [
+          "/samunmong/assets/interactions/evidence-reverse/bloodied-bandage-inner-v2.png",
+          "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp",
+          ""
+        ],
+        link: [
+          "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp",
+          "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.webp",
+          ""
+        ]
+      };
+      const sampleKind = sampleKindByTool[toolName] || "link";
+      touchPoints.dataset.sampleKind = sampleKind;
+      touchPoints.querySelectorAll("button").forEach((button, index) => {
+        button.hidden = config.mode === "sample" && index === 2;
+        button.disabled = config.mode === "sample" && index === 2;
+        button.dataset.label = sampleLabels[sampleKind][index];
+        button.setAttribute("aria-label", `${sampleLabels[sampleKind][index]} 끌기`);
+        const sampleImage = button.querySelector("[data-sample-image]");
+        const sampleSprite = sampleSprites[sampleKind]?.[index] || "";
+        sampleImage.src = sampleSprite;
+        sampleImage.alt = sampleSprite ? sampleLabels[sampleKind][index] : "";
+        sampleImage.hidden = !sampleSprite;
+        button.classList.remove("dragging", "wrong-fit");
+        button.style.removeProperty("--sample-x");
+        button.style.removeProperty("--sample-y");
+      });
+      touchPoints.querySelectorAll("[data-sample-target]").forEach((target, index) => {
+        target.hidden = config.mode === "sample" && index === 2;
+        target.textContent = sampleTargets[sampleKind][index];
+        target.classList.toggle("active", config.mode === "sample" && index < 2);
+        target.classList.remove("complete");
+      });
+      const directLayer = document.querySelector("#materialDirectLayer");
+      directLayer.hidden = config.mode === "sample";
+      directLayer.dataset.mode = config.mode;
+      directLayer.querySelectorAll("[data-material-target]").forEach((target, index) => {
+        target.classList.toggle("active", index === 0);
+        target.classList.remove("complete");
+        target.hidden = config.mode === "peel" && index > 0;
+      });
+      const handTool = document.querySelector("#materialHandTool");
+      const toolSprites = {
+        focus: ["/samunmong/assets/mudeok-interaction/tool-magnifying-glass.webp", "조선식 돋보기"],
+        brush: ["/samunmong/assets/interactions/hand-tools-generated/joseon-dusting-brush-v2.png", "대나무 먼지털이 붓"],
+        light: ["/samunmong/assets/interactions/hand-tools-generated/joseon-candle-holder-v2.png", "황동 촛대"],
+        peel: ["/samunmong/assets/interactions/hand-tools-generated/joseon-paper-knife-v2.png", "대나무 문서 펼침칼"]
+      };
+      const [toolSprite, label] = toolSprites[config.mode] || toolSprites.focus;
+      const handToolImage = document.querySelector("#materialHandToolImage");
+      handToolImage.src = toolSprite;
+      handToolImage.alt = label;
+      document.querySelector("#materialHandToolName").textContent = label;
+      handTool.setAttribute("aria-label", `${label}를 잡아 빛나는 지점으로 옮기기`);
+      handTool.classList.remove("dragging", "wrong-fit", "complete");
+      handTool.style.setProperty("--material-x", "0px");
+      handTool.style.setProperty("--material-y", "0px");
+      materialDirectDrag = null;
+      openGlobalPanel("materialPuzzlePanel");
+      playSfx("map", 0.62);
+      return true;
+    }
+
+    function startMaterialDirectDrag(event) {
+      if (materialPuzzleMode === "sample" || tactilePuzzleProgress < 0) return;
+      const tool = event.currentTarget;
+      tool.setPointerCapture?.(event.pointerId);
+      materialDirectDrag = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY };
+      tool.classList.add("dragging");
+      event.preventDefault();
+    }
+
+    function moveMaterialDirectDrag(event) {
+      if (!materialDirectDrag || materialDirectDrag.pointerId !== event.pointerId) return;
+      const tool = document.querySelector("#materialHandTool");
+      tool?.style.setProperty("--material-x", `${event.clientX - materialDirectDrag.startX}px`);
+      tool?.style.setProperty("--material-y", `${event.clientY - materialDirectDrag.startY}px`);
+      event.preventDefault();
+    }
+
+    function finishMaterialDirectDrag(event) {
+      if (!materialDirectDrag || materialDirectDrag.pointerId !== event.pointerId) return;
+      const tool = document.querySelector("#materialHandTool");
+      const nextStep = materialPuzzleStage + 1;
+      const target = document.querySelector(`[data-material-target="${nextStep}"]`);
+      const targetRect = target?.getBoundingClientRect();
+      const toolRect = tool?.getBoundingClientRect();
+      const x = toolRect ? toolRect.left + toolRect.width / 2 : 0;
+      const y = toolRect ? toolRect.top + toolRect.height / 2 : 0;
+      const hit = targetRect && x >= targetRect.left && x <= targetRect.right && y >= targetRect.top && y <= targetRect.bottom;
+      materialDirectDrag = null;
+      tool?.classList.remove("dragging");
+      tool?.style.setProperty("--material-x", "0px");
+      tool?.style.setProperty("--material-y", "0px");
+      if (!hit) {
+        tool?.classList.remove("wrong-fit");
+        void tool?.offsetWidth;
+        tool?.classList.add("wrong-fit");
+        const retryCopy = {
+          focus: "렌즈 중심을 빛나는 획 위에 천천히 겹치십시오.",
+          brush: "붓 끝을 빛나는 먼지 결 위에 놓으십시오.",
+          light: "촛불 불빛을 종이 뒤의 빛나는 자리로 옮기십시오.",
+          peel: "칼끝을 들뜬 종이 가장자리의 빛나는 곳에 대십시오."
+        };
+        document.querySelector("#materialPuzzleGuide").textContent = retryCopy[materialPuzzleMode] || "도구 중심을 현재 빛나는 흔적 위에 정확히 놓으십시오.";
+        return;
+      }
+      target?.classList.remove("active");
+      target?.classList.add("complete");
+      materialPuzzleStage += 1;
+      const config = materialPuzzleConfig[materialPuzzleTool];
+      if (materialPuzzleMode === "peel" && materialPuzzleFolder === "honseo-peel-puzzle") {
+        document.querySelector("#materialPuzzleImage").src = "/samunmong/assets/interactions/honseo-peel-puzzle/state-4-v1.png";
+        document.querySelector("#materialPuzzleGuide").textContent = "겹쳐 붙인 종이 아래에서 이어진 붉은 인장과 오래 눌린 접힘이 한눈에 드러났습니다.";
+        tactilePuzzleProgress = -999;
+        tool?.classList.add("complete");
+        playSfx("buttonAlt", 0.55);
+        finishTactilePuzzle(materialPuzzleTool);
+        return;
+      }
+      document.querySelector("#materialPuzzleImage").src = `/samunmong/assets/interactions/${materialPuzzleFolder}/state-${materialPuzzleStage + 1}.png`;
+      const progressCopy = {
+        focus: ["초점이 잡혔습니다. 이어지는 가는 선으로 렌즈를 옮기십시오.", "표면 아래 숨은 긁힘과 덧그린 선이 선명해졌습니다."],
+        brush: ["겉먼지가 걷혔습니다. 드러난 홈을 따라 붓을 옮기십시오.", "홈 안에 끼어 있던 흙과 섬유가 드러났습니다."],
+        light: ["빛이 종이 뒤로 스몄습니다. 어둡게 겹친 수정 획으로 옮기십시오.", "지운 글 아래에 눌린 원래 기록이 드러났습니다."],
+        peel: ["들뜬 모서리를 열었습니다. 봉인선을 따라 칼을 옮기십시오.", "겹쳐 붙였던 안쪽 종이와 기록이 펼쳐졌습니다."]
+      };
+      document.querySelector("#materialPuzzleGuide").textContent = progressCopy[materialPuzzleMode]?.[materialPuzzleStage - 1] || `감식 진행 · ${materialPuzzleStage}/2`;
+      playSfx("buttonAlt", 0.55);
+      if (materialPuzzleStage === 2) {
+        document.querySelector("#materialPuzzleImage").src = `/samunmong/assets/interactions/${materialPuzzleFolder}/state-4.png`;
+        tactilePuzzleProgress = -999;
+        tool?.classList.add("complete");
+        finishTactilePuzzle(materialPuzzleTool);
+        return;
+      }
+      document.querySelector(`[data-material-target="${materialPuzzleStage + 1}"]`)?.classList.add("active");
+    }
+
+    function updateMaterialPuzzle(distance, dx, dy) {
+      if (tactilePuzzleProgress < 0 || materialPuzzleMode === "sample") return;
+      let gain = distance * 0.12;
+      if (materialPuzzleMode === "brush") {
+        const direction = Math.sign(dx);
+        if (direction && materialLastDirection && direction !== materialLastDirection) gain += 16;
+        if (direction) materialLastDirection = direction;
+      } else if (materialPuzzleMode === "focus") {
+        gain = Math.min(8, distance * 0.2);
+      } else if (materialPuzzleMode === "light") {
+        gain = Math.max(0, (-dy + dx) * 0.14);
+      } else if (materialPuzzleMode === "peel") {
+        gain = Math.max(0, dx * 0.2);
+      }
+      tactilePuzzleProgress = Math.min(100, tactilePuzzleProgress + gain);
+      const state = Math.min(4, Math.floor(tactilePuzzleProgress / 28) + 1);
+      const config = materialPuzzleConfig[materialPuzzleTool];
+      document.querySelector("#materialPuzzleImage").src = `/samunmong/assets/interactions/${materialPuzzleFolder || config.folder}/state-${state}.png`;
+      if (state > materialPuzzleStage) {
+        materialPuzzleStage = state;
+        playSfx("buttonAlt", 0.46);
+      }
+      if (tactilePuzzleProgress >= 84) {
+        tactilePuzzleProgress = -999;
+        document.querySelector("#materialPuzzleGuide").textContent = "숨은 흔적을 확인했습니다.";
+        finishTactilePuzzle(materialPuzzleTool);
+      }
+    }
+
+    function placeSamplePoint(point, targetPoint = point) {
+      const samplePoint = Number(point);
+      if (materialPuzzleMode !== "sample" || ![1, 2].includes(samplePoint) || placedMaterialSamples.has(samplePoint)) return;
+      placedMaterialSamples.add(samplePoint);
+      materialPuzzleStage = placedMaterialSamples.size;
+      const config = materialPuzzleConfig[materialPuzzleTool];
+      document.querySelector("#materialPuzzleImage").src = `/samunmong/assets/interactions/${config.folder}/state-${materialPuzzleStage === 2 ? 4 : 2}.png`;
+      document.querySelector(`[data-sample-point="${point}"]`)?.setAttribute("disabled", "true");
+      document.querySelector(`[data-sample-target="${targetPoint}"]`)?.classList.remove("active");
+      document.querySelector(`[data-sample-target="${targetPoint}"]`)?.classList.add("complete");
+      const placedLabel = document.querySelector(`[data-sample-point="${point}"]`)?.dataset.label || "표본";
+      const finalSampleCopy = {
+        "혈흔 시험포": "두 얼룩이 놓이자 시험포가 자동으로 번집니다. 피의 반응 색과 중심이 이어집니다.",
+        "섬유 대조틀": "두 실을 걸자 대조틀의 눈금에서 굵기와 꼬임 방향이 이어집니다.",
+        "먹빛 시험석": "두 먹방울이 번지며 서로 다른 마름 속도와 테두리가 드러납니다.",
+        "증거 연결판": "두 증좌가 놓이자 공통 흔적의 붉은 핀이 자동으로 맞물립니다.",
+        "흙 대조 접시": "두 흙을 놓자 체가 고운 흙과 짚 부스러기를 갈라 차이를 보여줍니다.",
+        "상처 대조첩": "상처와 붕대를 포개자 피가 스민 중심과 감긴 방향이 맞물립니다."
+      };
+      document.querySelector("#materialPuzzleGuide").textContent = materialPuzzleStage === 1
+        ? ["혈흔 시험포", "섬유 대조틀", "먹빛 시험석"].includes(materialPuzzleTool)
+          ? `${placedLabel}을 놓았습니다. 남은 표본도 비어 있는 백자 잔에 올리십시오.`
+          : `${placedLabel}을 놓았습니다. 남은 표본도 빛나는 자리에 올리십시오.`
+        : finalSampleCopy[materialPuzzleTool] || "두 표본이 놓이자 공통 흔적이 드러났습니다.";
+      playSfx("buttonAlt", 0.58);
+      if (materialPuzzleStage === 2) finishTactilePuzzle(materialPuzzleTool);
+    }
+
+    function startSampleDrag(button, event) {
+      if (materialPuzzleMode !== "sample" || button.disabled) return;
+      sampleDragState = { button, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY };
+      button.setPointerCapture?.(event.pointerId);
+      button.classList.add("dragging");
+      event.preventDefault();
+    }
+
+    function moveSampleDrag(event) {
+      if (!sampleDragState || sampleDragState.pointerId !== event.pointerId) return;
+      sampleDragState.button.style.setProperty("--sample-x", `${event.clientX - sampleDragState.startX}px`);
+      sampleDragState.button.style.setProperty("--sample-y", `${event.clientY - sampleDragState.startY}px`);
+      event.preventDefault();
+    }
+
+    function finishSampleDrag(event) {
+      if (!sampleDragState || sampleDragState.pointerId !== event.pointerId) return;
+      const { button } = sampleDragState;
+      const point = Number(button.dataset.samplePoint);
+      const sampleRect = button.getBoundingClientRect();
+      const openTargets = [...document.querySelectorAll("#sampleTouchPoints [data-sample-target]")]
+        .filter((target) => !target.hidden && !target.classList.contains("complete"));
+      const matchedTarget = openTargets.find((target) => {
+        const dropZone = target.getBoundingClientRect();
+        const overlapWidth = Math.max(0, Math.min(sampleRect.right, dropZone.right) - Math.max(sampleRect.left, dropZone.left));
+        const overlapHeight = Math.max(0, Math.min(sampleRect.bottom, dropZone.bottom) - Math.max(sampleRect.top, dropZone.top));
+        const overlapArea = overlapWidth * overlapHeight;
+        const sampleArea = Math.max(1, sampleRect.width * sampleRect.height);
+        const pointerInside = event.clientX >= dropZone.left && event.clientX <= dropZone.right && event.clientY >= dropZone.top && event.clientY <= dropZone.bottom;
+        return pointerInside || overlapArea / sampleArea >= 0.12;
+      });
+      sampleDragState = null;
+      button.classList.remove("dragging");
+      if (matchedTarget) {
+        button.style.removeProperty("--sample-x");
+        button.style.removeProperty("--sample-y");
+        placeSamplePoint(button.dataset.samplePoint, matchedTarget.dataset.sampleTarget);
+        return;
+      }
+      button.classList.add("wrong-fit");
+      button.style.removeProperty("--sample-x");
+      button.style.removeProperty("--sample-y");
+      window.setTimeout(() => button.classList.remove("wrong-fit"), 260);
+      document.querySelector("#materialPuzzleGuide").textContent = ["혈흔 시험포", "섬유 대조틀", "먹빛 시험석"].includes(materialPuzzleTool)
+        ? "천 조각이 백자 잔을 충분히 덮도록 올리십시오. 왼쪽과 오른쪽 어느 빈 잔이든 괜찮습니다."
+        : "현재 표본과 같은 이름의 빛나는 자리에 놓으십시오.";
+    }
+
+    function prepareSpecialPuzzle(mode, folder, title, guide, gesture) {
+      specialPuzzleMode = mode;
+      specialPuzzleStep = 0;
+      tactilePuzzleProgress = 0;
+      tactilePuzzlePointer = null;
+      materialLastDirection = 0;
+      document.querySelector("#specialPuzzleTitle").textContent = title;
+      document.querySelector("#specialPuzzleGuide").textContent = guide;
+      document.querySelector("#specialPuzzleGesture").textContent = gesture;
+      document.querySelector("#ledgerRecoveredRecords")?.remove();
+      const puzzleImage = document.querySelector("#specialPuzzleImage");
+      puzzleImage.src = getSpecialPuzzleImageSrc(folder, 1);
+      puzzleImage.onload = () => requestAnimationFrame(syncDirectAffordanceFragments);
+      const points = document.querySelector("#specialTouchPoints");
+      points.hidden = mode === "soil";
+      points.dataset.specialMode = mode;
+      points.dataset.activeStep = "1";
+      const surfaceHandle = document.querySelector("#specialSurfaceHandle");
+      surfaceHandle.hidden = mode !== "soil";
+      surfaceHandle.dataset.surfaceMode = mode;
+      const surfaceImage = document.querySelector("#specialSurfaceToolImage");
+      surfaceImage.src = mode === "bandage" ? "/samunmong/assets/interactions/evidence-reverse/bloodied-bandage-inner-v2.png" : "/samunmong/assets/interactions/hand-tools-generated/joseon-bamboo-sieve-v2.png";
+      surfaceImage.alt = mode === "bandage" ? "풀어낼 피 묻은 붕대 끝" : "조선식 대나무 체";
+      document.querySelector("#specialSurfaceDirection").textContent = mode === "bandage" ? "→" : "↔";
+      surfaceHandle.setAttribute("aria-label", mode === "bandage" ? "붕대 끝을 잡아 오른쪽으로 풀기" : "대나무 체를 잡아 좌우로 기울이기");
+      surfaceHandle.classList.remove("dragging", "wrong-fit", "complete");
+      surfaceHandle.style.setProperty("--surface-x", "0px");
+      surfaceHandle.style.setProperty("--surface-y", "0px");
+      surfaceHandle.style.setProperty("--surface-tilt", "0deg");
+      specialSurfaceDrag = null;
+      const explorerTool = document.querySelector("#specialExplorerTool");
+      const explorerImage = document.querySelector("#specialExplorerToolImage");
+      const explorerReaction = document.querySelector("#specialExplorerReaction");
+      const usesExplorerTool = mode === "ink";
+      explorerTool.hidden = !usesExplorerTool;
+      explorerTool.classList.remove("dragging", "wrong-fit", "complete");
+      explorerTool.style.setProperty("--explorer-x", "0px");
+      explorerTool.style.setProperty("--explorer-y", "0px");
+      specialExplorerDrag = null;
+      if (usesExplorerTool) {
+        explorerImage.src = "/samunmong/assets/interactions/direct-affordances/finger-loop-rubbing-wad-v1.png";
+        explorerImage.alt = "먹선을 문지를 손가락 고리 먹뭉치";
+        explorerReaction.src = mode === "ink"
+            ? "/samunmong/assets/interactions/evidence-tools/ink-reveal.png"
+            : "/samunmong/assets/interactions/evidence-tools/charcoal-sweep.png";
+        explorerTool.setAttribute("aria-label", "먹뭉치를 잡아 겹친 먹선 문지르기");
+      }
+      const gestureArrows = getSpecialGestureArrows(mode);
+      points.querySelectorAll("button").forEach((button, index) => {
+        button.disabled = false;
+        button.dataset.gesture = gestureArrows[index];
+        button.dataset.label = mode === "pouch"
+          ? ["반쯤 뒤집힌 주머니 안감", "", ""][index]
+            : mode === "ledger"
+            ? ["장부틀 왼쪽 등잔 손잡이", "", ""][index]
+            : mode === "bandage"
+              ? ["오른쪽으로 들린 붕대 끝", "", ""][index]
+            : mode === "portrait"
+              ? ["묶인 초상의 풀린 붉은 끈", "", ""][index]
+              : mode === "ink"
+                ? ["편지 먹", "덧쓴 먹", "장부 먹"][index]
+                : mode === "norigae"
+                  ? ["휘어진 고리에 걸린 남색 옷감", "", ""][index]
+                  : mode === "bundle"
+                    ? ["매듭에서 길게 나온 붉은 끈", "", ""][index]
+                    : mode === "silk"
+                      ? ["조인 고리 밖으로 나온 비단 꼬리", "", ""][index]
+                      : mode === "hopaeThread"
+                        ? ["호패 구멍 앞의 끊어진 끈 끝", "", ""][index]
+                        : mode === "stride"
+                          ? ["짚신 윤곽", "발뒤꿈치 기준", "보폭 실측줄"][index]
+                          : mode === "thread"
+                            ? ["첫 증거패", "둘째 증거패", "결론 매듭"][index]
+                            : mode === "diary"
+                              ? ["일기장을 잠근 대나무 핀", "", ""][index]
+                              : mode === "hopaeMark"
+                                ? ["말려 올라온 한지 탁본", "", ""][index]
+                                : mode === "shoeMud" ? ["들린 진흙 껍질", "", ""][index]
+                                : mode === "footprintTrace" ? ["기름 한지 대나무 축", "", ""][index]
+            : "";
+        button.setAttribute("aria-label", ["pouch", "ledger", "bandage", "portrait", "ink", "norigae", "bundle", "silk", "hopaeThread", "stride", "thread", "diary", "hopaeMark", "shoeMud", "footprintTrace"].includes(mode) ? `${button.dataset.label} 직접 움직이기` : `${index + 1}번째 흔적 직접 움직이기`);
+        button.classList.remove("dragging", "wrong-fit");
+        button.style.removeProperty("--special-x");
+        button.style.removeProperty("--special-y");
+      });
+      openGlobalPanel("specialEvidencePuzzlePanel");
+      requestAnimationFrame(syncDirectAffordanceFragments);
+      playSfx("map", 0.62);
+    }
+
+    function getSpecialPuzzleImageSrc(folder, state) {
+      const versions = {
+        "bandage-puzzle": "unrolled-blood-pattern-v4",
+        "bundle-puzzle": "two-person-escape-kit-v6",
+        "hopae-thread-puzzle": "physical-hopae-cord-fit-v4",
+        "hopae-mark-puzzle": "peeled-hopae-rubbing-v5",
+        "ledger-timeline-puzzle": "rail-backlight-ledger-v5",
+        "diary-timeline-puzzle": "accordion-diary-v4",
+        "portrait-stroke-puzzle": "concealed-until-open-v5",
+        "norigae-puzzle": "foreign-navy-fiber-v2",
+        "pouch-lining-puzzle": "inside-out-cloth-pouch-v5",
+        "silk-tension-puzzle": "flattened-goreum-v4",
+        "stride-puzzle": "physical-stride-v3",
+        "shoe-mud-puzzle": "peeled-mud-cast-v4",
+        "footprint-trace-puzzle": "rolled-oiled-hanji-v4"
+      };
+      const version = versions[folder] ? `?v=${versions[folder]}` : "";
+      return `/samunmong/assets/interactions/${folder}/state-${state}.png${version}`;
+    }
+
+    function getSpecialGestureArrows(mode) {
+      return {
+        norigae: ["↗", "←", "→"],
+        bundle: ["→", "→", "→"],
+        bandage: ["→", "→", "→"],
+        ink: ["→", "←", "→"],
+        portrait: ["↘", "↗", "↓"],
+        hopaeThread: ["←", "←", "←"],
+        stride: ["↓", "→", "→"],
+        pouch: ["↓", "↓", "→"],
+        silk: ["←", "→", "↓"],
+        ledger: ["→", "→", "↓"],
+        diary: ["→", "↑", "↑"], hopaeMark: ["↖", "←", "↓"], shoeMud: ["→", "→", "←"], footprintTrace: ["←", "↓", "→"],
+        thread: ["→", "↘", "←"]
+      }[mode] || ["→", "↓", "←"];
+    }
+
+    function getDirectAffordanceVector(gesture) {
+      return {
+        "→": [7, 0], "←": [-7, 0], "↑": [0, -7], "↓": [0, 7],
+        "↗": [5, -5], "↖": [-5, -5], "↘": [5, 5], "↙": [-5, 5]
+      }[gesture] || [5, 0];
+    }
+
+    function getPhysicalAffordanceAsset(mode, point) {
+      const key = `${mode}:${point}`;
+      if (["norigae:2", "norigae:3", "thread:1", "thread:3"].includes(key)) {
+        return "/samunmong/assets/interactions/direct-affordances/cord-pull-loop-v1.png";
+      }
+      if (["footprintTrace:3", "stride:3"].includes(key)) {
+        return "/samunmong/assets/interactions/evidence-tools/expanded/tool-footprint-measuring-cord.png";
+      }
+      return "";
+    }
+
+    function getPhysicalContactTrace(mode, point) {
+      const key = `${mode}:${point}`;
+      return "";
+    }
+
+    function syncDirectAffordanceFragments() {
+      const stage = document.querySelector("#specialPuzzleStage");
+      const board = document.querySelector("#specialPuzzleImage");
+      const points = document.querySelector("#specialTouchPoints");
+      if (!stage || !board || !points || !stage.clientWidth || !stage.clientHeight) return;
+      points.querySelectorAll("button").forEach((button) => {
+        let fragment = button.querySelector(".direct-affordance-fragment");
+        if (!fragment) {
+          fragment = document.createElement("img");
+          fragment.className = "direct-affordance-fragment";
+          fragment.alt = "";
+          fragment.draggable = false;
+          fragment.setAttribute("aria-hidden", "true");
+          button.appendChild(fragment);
+        }
+        fragment.src = board.currentSrc || board.src;
+        fragment.style.width = `${stage.clientWidth}px`;
+        fragment.style.height = `${stage.clientHeight}px`;
+        fragment.style.left = `${-button.offsetLeft}px`;
+        fragment.style.top = `${-button.offsetTop}px`;
+        const [idleX, idleY] = getDirectAffordanceVector(button.dataset.gesture);
+        button.style.setProperty("--affordance-idle-x", `${idleX}px`);
+        button.style.setProperty("--affordance-idle-y", `${idleY}px`);
+        let physicalCue = button.querySelector(".physical-pull-affordance");
+        const cueAsset = getPhysicalAffordanceAsset(points.dataset.specialMode, button.dataset.specialPoint);
+        if (cueAsset && !physicalCue) {
+          physicalCue = document.createElement("img");
+          physicalCue.className = "physical-pull-affordance";
+          physicalCue.alt = "";
+          physicalCue.draggable = false;
+          physicalCue.setAttribute("aria-hidden", "true");
+          button.appendChild(physicalCue);
+        }
+        if (physicalCue) {
+          physicalCue.hidden = !cueAsset;
+          if (cueAsset) physicalCue.src = cueAsset;
+        }
+        button.classList.toggle("has-physical-affordance", Boolean(cueAsset));
+        let contactTrace = button.querySelector(".physical-contact-trace");
+        const traceAsset = getPhysicalContactTrace(points.dataset.specialMode, button.dataset.specialPoint);
+        if (traceAsset && !contactTrace) {
+          contactTrace = document.createElement("img");
+          contactTrace.className = "physical-contact-trace";
+          contactTrace.alt = "";
+          contactTrace.draggable = false;
+          contactTrace.setAttribute("aria-hidden", "true");
+          button.prepend(contactTrace);
+        }
+        if (contactTrace) {
+          contactTrace.hidden = !traceAsset;
+          if (traceAsset) contactTrace.src = traceAsset;
+        }
+      });
+    }
+
+    function startSpecialDrag(button, event) {
+      if (["soil", "ink"].includes(specialPuzzleMode) || button.disabled) return;
+      specialDragState = { button, pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+      button.setPointerCapture?.(event.pointerId);
+      button.classList.add("dragging");
+      document.querySelector("#specialPuzzleStage")?.classList.add("is-direct-manipulating");
+      event.preventDefault();
+    }
+
+    function moveSpecialDrag(event) {
+      if (!specialDragState || specialDragState.pointerId !== event.pointerId) return;
+      specialDragState.button.style.setProperty("--special-x", `${Math.max(-80, Math.min(80, event.clientX - specialDragState.x))}px`);
+      specialDragState.button.style.setProperty("--special-y", `${Math.max(-80, Math.min(80, event.clientY - specialDragState.y))}px`);
+      event.preventDefault();
+    }
+
+    function specialGestureMatches(arrow, dx, dy) {
+      const vectors = { "→": [1, 0], "←": [-1, 0], "↑": [0, -1], "↓": [0, 1], "↗": [0.7, -0.7], "↖": [-0.7, -0.7], "↘": [0.7, 0.7], "↙": [-0.7, 0.7] };
+      const [vx, vy] = vectors[arrow] || [1, 0];
+      return dx * vx + dy * vy > 42;
+    }
+
+    function finishSpecialDrag(event) {
+      if (!specialDragState || specialDragState.pointerId !== event.pointerId) return;
+      const { button, x, y } = specialDragState;
+      specialDragState = null;
+      const matches = specialGestureMatches(button.dataset.gesture, event.clientX - x, event.clientY - y);
+      button.classList.remove("dragging");
+      document.querySelector("#specialPuzzleStage")?.classList.remove("is-direct-manipulating");
+      button.style.removeProperty("--special-x");
+      button.style.removeProperty("--special-y");
+      if (matches) {
+        selectSpecialPoint(button.dataset.specialPoint);
+        return;
+      }
+      button.classList.add("wrong-fit");
+      window.setTimeout(() => button.classList.remove("wrong-fit"), 280);
+      document.querySelector("#specialPuzzleGuide").textContent = specialPuzzleMode === "pouch"
+        ? "입구 밖으로 나온 베이지색 안감의 아래 끝을 잡아 아래로 끝까지 뒤집으십시오."
+        : `${button.dataset.label || "움직이는 부분"}을 잡고 물건이 풀리는 결을 따라 끝까지 움직이십시오.`;
+      playSfx("buttonAlt", 0.34);
+    }
+
+    function startSpecialExplorerDrag(event) {
+      const tool = document.querySelector("#specialExplorerTool");
+      if (!tool || tool.hidden || !["portrait", "ink"].includes(specialPuzzleMode)) return;
+      specialExplorerDrag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
+      tool.setPointerCapture?.(event.pointerId);
+      tool.classList.add("dragging");
+      document.querySelector("#specialPuzzleStage")?.classList.add("is-direct-manipulating");
+      event.preventDefault();
+    }
+
+    function moveSpecialExplorerDrag(event) {
+      if (!specialExplorerDrag || specialExplorerDrag.pointerId !== event.pointerId) return;
+      const tool = document.querySelector("#specialExplorerTool");
+      tool?.style.setProperty("--explorer-x", `${event.clientX - specialExplorerDrag.x}px`);
+      tool?.style.setProperty("--explorer-y", `${event.clientY - specialExplorerDrag.y}px`);
+      event.preventDefault();
+    }
+
+    function finishSpecialExplorerDrag(event) {
+      if (!specialExplorerDrag || specialExplorerDrag.pointerId !== event.pointerId) return;
+      specialExplorerDrag = null;
+      const tool = document.querySelector("#specialExplorerTool");
+      tool?.classList.remove("dragging");
+      tool?.style.setProperty("--explorer-x", "0px");
+      tool?.style.setProperty("--explorer-y", "0px");
+      document.querySelector("#specialPuzzleStage")?.classList.remove("is-direct-manipulating");
+      const hit = [...document.querySelectorAll("#specialTouchPoints [data-special-point]:not(:disabled)")].find((target) => {
+        const rect = target.getBoundingClientRect();
+        return event.clientX >= rect.left && event.clientX <= rect.right && event.clientY >= rect.top && event.clientY <= rect.bottom;
+      });
+      if (hit) {
+        selectSpecialPoint(hit.dataset.specialPoint);
+        return;
+      }
+      tool?.classList.add("wrong-fit");
+      window.setTimeout(() => tool?.classList.remove("wrong-fit"), 320);
+      document.querySelector("#specialPuzzleGuide").textContent = specialPuzzleMode === "portrait"
+          ? "먹뭉치를 겹쳐진 얼굴선 위에 대고 문질러 보십시오."
+          : "먹뭉치를 번짐 테두리가 다른 먹자국 위에 대고 문질러 보십시오.";
+      playSfx("buttonAlt", 0.34);
+    }
+
+    function openNorigaePuzzle() {
+      prepareSpecialPuzzle("norigae", "norigae-puzzle", "노리개에 걸린 옷감 빼내기", "휘어진 장식 고리에 팽팽하게 걸린 남색 옷감 끝을 잡아 오른쪽 위로 빼내십시오.", "걸린 남색 옷감 빼내기");
+    }
+
+    function openSoilSievePuzzle() {
+      prepareSpecialPuzzle("soil", "soil-sieve-puzzle", "흙과 짚 가려내기", "접시를 좌우로 번갈아 흔들어 알갱이를 층으로 나누십시오.", "↔ 접시 흔들기");
+    }
+
+    function openRedThreadPuzzle(firstName, secondName, key, comparison) {
+      pendingEvidenceComparison = { firstName, secondName, key, comparison };
+      const names = new Set([firstName, secondName]);
+      if (names.has("호패 조각") && names.has("끊어진 호패끈")) {
+        prepareSpecialPuzzle("hopaeThread", "hopae-thread-puzzle", "끊어진 호패끈 맞춰 보기", "호패 구멍 바로 옆의 끊어진 끈 끝을 잡아 왼쪽으로 꿰어 보십시오.", "끊어진 끈 끝을 호패 구멍에 꿰기");
+        return;
+      }
+      if (names.has("진흙 묻은 짚신") && names.has("작은 발자국")) {
+        prepareSpecialPuzzle("stride", "stride-puzzle", "짚신과 발자국 포개기", "따로 놓인 짚신을 직접 잡아 진흙 발자국 위에 포개십시오.", "윤곽 포개기 → 실측줄 늘리기");
+        return;
+      }
+      prepareSpecialPuzzle("thread", "red-thread-puzzle", "두 증거의 공통 흔적 묶기", "첫 증거패에서 풀려 나온 붉은 실을 잡아 다른 증거패에 이으십시오.", "증거 잇기 → 결론 매듭 죄기");
+    }
+
+    function openBundlePuzzle() {
+      prepareSpecialPuzzle("bundle", "bundle-puzzle", "돌쇠의 도망 보따리 풀기", "중앙 매듭에서 오른쪽으로 길게 나온 붉은 끈을 잡아 한 번에 당기십시오.", "실제 매듭끈을 당겨 보따리 펼치기");
+    }
+
+    function openBandagePuzzle() {
+      prepareSpecialPuzzle("bandage", "bandage-puzzle", "피 묻은 붕대 펼치기", "오른쪽 끝에서 들려 있는 실제 붕대 끝을 잡아 오른쪽으로 길게 당기십시오.", "붕대 한 번에 펼치기");
+    }
+
+    function openInkMatchPuzzle() {
+      prepareSpecialPuzzle("ink", "ink-match-puzzle", "먹 번짐 대조하기", "정답 순서는 없습니다. 세 먹자국을 어느 것부터든 문질러 번지는 속도와 테두리를 비교하십시오.", "먹자국 하나씩 문질러 보기");
+    }
+
+    function openPortraitStrokePuzzle() {
+      prepareSpecialPuzzle("portrait", "portrait-stroke-puzzle", "숨겨 둔 돌쇠의 초상 펼치기", "말아 둔 초상을 묶은 붉은 끈의 풀린 끝을 잡아 오른쪽 아래로 당기십시오.", "초상 묶은 끈 풀기");
+    }
+
+    function openPouchLiningPuzzle() {
+      prepareSpecialPuzzle("pouch", "pouch-lining-puzzle", "빈 호패 주머니 안감 뒤집기", "입구 밖으로 반쯤 나온 베이지색 안감의 아래 끝을 잡아 완전히 뒤집으십시오.", "주머니 안감 아래로 뒤집기");
+    }
+
+    function openSilkTensionPuzzle() {
+      prepareSpecialPuzzle("silk", "silk-tension-puzzle", "조여진 옷고름 펼치기", "조인 고리에서 왼쪽 아래로 길게 나온 비단 꼬리를 잡아 왼쪽으로 빼내십시오.", "비단 꼬리 당겨 펼치기");
+    }
+
+    function openLedgerTimelinePuzzle() {
+      prepareSpecialPuzzle("ledger", "ledger-timeline-puzzle", "덧칠된 출입 기록 비추기", "장부틀 왼쪽에서 튀어나온 검은 나무 손잡이를 잡아 오른쪽으로 미십시오.", "등잔 손잡이 오른쪽으로 밀기");
+    }
+
+    function showLedgerRecoveredRecords() {
+      const stage = document.querySelector("#specialPuzzleStage");
+      if (!stage || document.querySelector("#ledgerRecoveredRecords")) return;
+      const records = [
+        ["유시", "무덕", "사랑방에 차를 올림"],
+        ["초경", "돌쇠", "심부름 뒤 바깥채로 돌아감"],
+        ["초경 반", "춘월", "혼서 문제로 사랑방을 다녀감"],
+        ["이경", "유문석", "대문과 뒷문 빗장을 살핌"],
+        ["이경 뒤", "무덕", "빗소리에 젖은 빨래를 걷음"],
+        ["이경 뒤", "먹으로 덧칠됨", "안채에서 뒷문 쪽으로 나감"]
+      ];
+      const reveal = document.createElement("section");
+      reveal.id = "ledgerRecoveredRecords";
+      reveal.className = "ledger-recovered-records";
+      reveal.setAttribute("aria-label", "등잔으로 복원한 하인 장부 출입 기록");
+      reveal.innerHTML = `
+        <header><span>등잔 아래 드러난 기록</span><strong>유월 그믐밤 출입 장부</strong></header>
+        <ol>${records.map(([time, name, action], index) => `
+          <li class="${index === records.length - 1 ? "erased" : ""}">
+            <time>${escapeHtml(time)}</time><b>${escapeHtml(name)}</b><span>${escapeHtml(action)}</span>
+          </li>`).join("")}</ol>
+        <p>모두 다녀간 기록임. 마지막 한 줄만 이름을 알아볼 수 없게 나중에 덮었음.</p>
+        <button type="button">장부에 옮겨 적기</button>`;
+      reveal.querySelector("button")?.addEventListener("click", () => {
+        finishTactilePuzzle("촛불 비추기");
+      }, { once: true });
+      stage.appendChild(reveal);
+      document.querySelector("#specialPuzzleGuide").textContent = "여러 사람이 오간 기록 사이에서 이름 하나만 나중에 덮였습니다. 내용을 살핀 뒤 장부에 옮겨 적으십시오.";
+      playSfx("paper", 0.65);
+    }
+
+    function openDiaryTimelinePuzzle() {
+      prepareSpecialPuzzle("diary", "diary-timeline-puzzle", "물에 붙은 무덕의 일기 펼치기", "일기장을 가로질러 잠근 대나무 핀의 오른쪽 손잡이를 잡아 끝까지 빼내십시오.", "대나무 잠금핀 빼기");
+    }
+    function openHopaeMarkPuzzle() {
+      prepareSpecialPuzzle("hopaeMark", "hopae-mark-puzzle", "호패 이름 홈 탁본 벗기기", "호패 위에서 말려 올라온 한지 귀퉁이를 잡아 왼쪽 위로 벗기십시오.", "한지 탁본 벗기기");
+    }
+    function openShoeMudPuzzle() { prepareSpecialPuzzle("shoeMud", "shoe-mud-puzzle", "짚신 밑창의 진흙 본 벗기기", "뒤꿈치에서 들린 진흙 껍질을 잡아 짚신 앞쪽으로 한 번에 벗기십시오.", "진흙 껍질 벗기기"); }
+    function openFootprintTracePuzzle() { prepareSpecialPuzzle("footprintTrace", "footprint-trace-puzzle", "작은 발자국 윤곽 뜨기", "오른쪽 대나무 축을 잡아 왼쪽으로 굴려 기름 한지를 발자국 위에 펼치십시오.", "한지 축 왼쪽으로 굴리기"); }
+
+    function selectSpecialPoint(point) {
+      if (specialPuzzleMode === "soil") return;
+      const expectedSequences = {
+        norigae: [1],
+        bundle: [1],
+        bandage: [1],
+        ink: [2, 1, 3],
+        portrait: [1],
+        hopaeThread: [1],
+        stride: [1, 3],
+        pouch: [1],
+        silk: [1],
+        ledger: [1],
+        diary: [1], hopaeMark: [1], shoeMud: [1], footprintTrace: [1],
+        thread: [1, 3]
+      };
+      const expected = expectedSequences[specialPuzzleMode] || [1, 2, 3];
+      if (!["portrait", "ink"].includes(specialPuzzleMode) && Number(point) !== expected[specialPuzzleStep]) {
+        document.querySelector("#specialPuzzleGuide").textContent = specialPuzzleMode === "norigae" ? "실 길이가 맞지 않습니다 · 다른 장식부터" : specialPuzzleMode === "bundle" ? "아래 천이 걸렸습니다 · 위쪽 귀부터" : specialPuzzleMode === "ink" ? "먹빛이 너무 진해집니다 · 연한 먹부터" : specialPuzzleMode === "portrait" ? "이 선은 위에 덧그려졌습니다 · 아래 획부터" : specialPuzzleMode === "stride" ? "보폭 순서가 어긋납니다 · 뒤꿈치부터" : specialPuzzleMode === "pouch" ? ["가운데 홈의 말린 받침천 귀퉁이를 잡아 올리십시오.", "들린 받침천을 아래쪽으로 끝까지 벗기십시오."][specialPuzzleStep] : specialPuzzleMode === "silk" ? "비단 결이 반대로 꺾입니다 · 늘어난 끝부터" : specialPuzzleMode === "ledger" ? "시간 간격이 맞지 않습니다 · 이른 흔적부터" : "연결 순서가 어긋납니다 · 시작점부터";
+        document.querySelector("#specialEvidencePuzzlePanel")?.classList.add("puzzle-miss");
+        window.setTimeout(() => document.querySelector("#specialEvidencePuzzlePanel")?.classList.remove("puzzle-miss"), 280);
+        return;
+      }
+      specialPuzzleStep += 1;
+      const folderByMode = { norigae: "norigae-puzzle", bundle: "bundle-puzzle", bandage: "bandage-puzzle", ink: "ink-match-puzzle", portrait: "portrait-stroke-puzzle", hopaeThread: "hopae-thread-puzzle", stride: "stride-puzzle", pouch: "pouch-lining-puzzle", silk: "silk-tension-puzzle", ledger: "ledger-timeline-puzzle", diary: "diary-timeline-puzzle", hopaeMark: "hopae-mark-puzzle", shoeMud: "shoe-mud-puzzle", footprintTrace: "footprint-trace-puzzle", thread: "red-thread-puzzle" };
+      const folder = folderByMode[specialPuzzleMode] || "red-thread-puzzle";
+      document.querySelector("#specialPuzzleImage").src = getSpecialPuzzleImageSrc(folder, specialPuzzleStep + 1);
+      document.querySelector(`[data-special-point="${point}"]`)?.setAttribute("disabled", "true");
+      document.querySelector("#specialTouchPoints").dataset.activeStep = String(Math.min(3, specialPuzzleStep + 1));
+      requestAnimationFrame(syncDirectAffordanceFragments);
+      document.querySelector("#specialPuzzleGuide").textContent = specialPuzzleMode === "pouch"
+        ? ["", "완전히 뒤집힌 안감에 호패 눌림과 잘린 붉은 끈 섬유가 함께 남았습니다. 호패는 자연히 빠진 것이 아니라 끈을 잘라 꺼낸 물건입니다."][specialPuzzleStep]
+        : specialPuzzleMode === "norigae"
+          ? ["", "휘어진 고리에서 노리개와 재질이 다른 남색 옷감이 빠졌습니다. 오래 닳은 것이 아니라 다른 옷에 강하게 걸렸던 흔적입니다."][specialPuzzleStep]
+        : specialPuzzleMode === "bundle"
+            ? ["", "크기가 다른 두 벌의 옷과 두 끼분 식량, 노잣돈이 함께 싸여 있습니다. 두 사람이 떠날 준비였고, 젖은 마당 흙이 묻은 뒤 마른 실내에서 한 번 열렸습니다."][specialPuzzleStep]
+            : specialPuzzleMode === "bandage"
+              ? ["", "왼쪽의 짙은 최초 혈흔에서 오른쪽으로 옅어지는 반복 자국이 이어집니다. 좁은 팔에 감았던 붕대이며, 팔 상처와 대조해야 주인을 알 수 있습니다."][specialPuzzleStep]
+            : specialPuzzleMode === "silk"
+              ? ["", "조임 자리는 마찰로 번들거리고 찢긴 끝의 긴 섬유가 한 방향으로 늘어났습니다. 칼로 자른 것이 아니라 강한 힘에 조여진 뒤 끊어진 옷고름입니다."][specialPuzzleStep]
+              : specialPuzzleMode === "hopaeThread"
+                ? ["", "끈 굵기와 호패 구멍, 오래 닳아 반질거리는 마찰 홈이 정확히 맞습니다. 따로 발견된 끈은 이 호패에 매여 있던 끈입니다."][specialPuzzleStep]
+                : specialPuzzleMode === "stride"
+                  ? ["", "뒤꿈치를 맞추자 짚신 앞코가 발자국 밖으로 나옵니다. 실측줄을 오른쪽으로 늘리십시오.", "현장 발자국은 짚신보다 짧고 폭도 좁아 같은 사람의 흔적이 아닙니다."][specialPuzzleStep]
+                  : specialPuzzleMode === "thread"
+                    ? ["", "두 증거가 한 줄로 이어졌습니다. 위쪽 결론 매듭을 왼쪽으로 당겨 고정하십시오.", "두 증거의 공통 흔적이 하나의 사건 흐름으로 묶였습니다."][specialPuzzleStep]
+        : specialPuzzleMode === "ledger"
+          ? ["", "등잔의 배면광 아래 검은 덧칠보다 먼저 눌린 붓획이 한 줄 전체에 이어집니다. 이 칸은 처음부터 빈칸이 아니라 기록한 뒤 일부러 지운 자리입니다."][specialPuzzleStep]
+          : specialPuzzleMode === "diary"
+            ? ["", "6/29의 다툼, 6/30의 뒷문과 작은 발자국, 7/1 춘월이 돌쇠 이름을 알게 된 흐름이 이어집니다. 춘월은 도망 계획을 사건 전에 알고 있었습니다."][specialPuzzleStep]
+            : specialPuzzleMode === "hopaeMark"
+              ? ["", "탁본의 짙고 이어진 원래 홈 위로, 옅고 끊긴 새 긁힘이 겹칩니다. 누군가 이름 홈을 나중에 일부러 훼손했습니다."][specialPuzzleStep]
+              : specialPuzzleMode === "shoeMud" ? ["", "진흙 본과 드러난 짚신 밑창에 같은 짜임이 남았습니다. 다른 발자국과 대조할 수 있는 밑창 무늬를 확보했습니다."][specialPuzzleStep]
+              : specialPuzzleMode === "footprintTrace" ? ["", "기름 한지에 짧고 좁은 발 윤곽과 이동 방향이 그대로 남았습니다. 짚신 밑창 기록과 대조할 수 있습니다."][specialPuzzleStep]
+          : specialPuzzleMode === "portrait"
+            ? ["", "묶인 초상 안에서 여러 번 고쳐 그린 돌쇠의 얼굴과 지우다 남은 ‘떠나지 마라’가 드러났습니다. 춘월이 오래 숨겨 둔 마음입니다."][specialPuzzleStep]
+            : specialPuzzleMode === "ink"
+              ? ["", "첫 먹은 천천히 번지고 가장자리가 고르게 마릅니다.", "다른 먹은 빠르게 퍼져 테두리가 짙게 남습니다.", "원문과 덧쓴 문장은 같은 때 쓴 것이 아니라, 다른 먹으로 나중에 고친 흔적입니다."][specialPuzzleStep]
+          : specialPuzzleStep < 3 ? `한 단계 진행했습니다 · ${specialPuzzleStep}/3` : specialPuzzleMode === "norigae" ? "매듭 속 낯선 남색 섬유가 드러났습니다." : specialPuzzleMode === "bundle" ? "보따리 속 이동 준비물이 모두 드러났습니다." : specialPuzzleMode === "ink" ? "문서와 같은 먹 농도를 찾았습니다." : specialPuzzleMode === "portrait" ? "처음 그린 선과 지워진 흔적을 복원했습니다." : specialPuzzleMode === "hopaeThread" ? "끈 굵기와 오래된 마찰 홈이 정확히 맞습니다." : specialPuzzleMode === "stride" ? "짚신보다 발자국의 길이와 보폭이 짧습니다." : specialPuzzleMode === "silk" ? "비단실이 날이 아니라 강한 힘에 끊겼습니다." : "두 증거의 물리적 관계가 이어졌습니다.";
+      playSfx("buttonAlt", 0.58);
+      const requiredSpecialSteps = ["ledger", "bandage", "hopaeMark", "portrait", "norigae", "diary", "shoeMud", "footprintTrace", "pouch", "silk", "bundle", "hopaeThread"].includes(specialPuzzleMode) ? 1 : ["stride", "thread"].includes(specialPuzzleMode) ? 2 : 3;
+      if (specialPuzzleStep !== requiredSpecialSteps) return;
+      document.querySelector("#specialExplorerTool")?.classList.add("complete");
+      if (specialPuzzleMode === "norigae") {
+        finishTactilePuzzle(getPendingToolStep(currentEvidenceForTool)?.tool || "매듭 해체 송곳");
+        return;
+      }
+      if (specialPuzzleMode === "bundle") {
+        finishTactilePuzzle(getPendingToolStep(currentEvidenceForTool)?.tool || "먼지털이 붓");
+        return;
+      }
+      if (specialPuzzleMode === "bandage") {
+        finishTactilePuzzle(getPendingToolStep(currentEvidenceForTool)?.tool || "혈흔 시험포");
+        return;
+      }
+      if (specialPuzzleMode === "ink") {
+        finishTactilePuzzle("먹빛 시험석");
+        return;
+      }
+      if (specialPuzzleMode === "portrait") {
+        finishTactilePuzzle("돋보기");
+        return;
+      }
+      if (["pouch", "silk"].includes(specialPuzzleMode)) {
+        finishTactilePuzzle("돋보기");
+        return;
+      }
+      if (specialPuzzleMode === "ledger") {
+        showLedgerRecoveredRecords();
+        return;
+      }
+      if (specialPuzzleMode === "diary") {
+        finishTactilePuzzle("촛불 비추기");
+        return;
+      }
+      if (specialPuzzleMode === "hopaeMark") { finishTactilePuzzle("먼지털이 붓"); return; }
+      if (["shoeMud", "footprintTrace"].includes(specialPuzzleMode)) { finishTactilePuzzle("발자국 실측줄"); return; }
+      const pending = pendingEvidenceComparison;
+      if (!pending) return;
+      const linkedPairs = new Set(readStoredNames(linkedEvidenceKey));
+      linkedPairs.add(pending.key);
+      localStorage.setItem(linkedEvidenceKey, JSON.stringify([...linkedPairs]));
+      document.querySelectorAll(`#toolEvidenceList [data-evidence="${pending.firstName}"], #toolEvidenceList [data-evidence="${pending.secondName}"]`).forEach((item) => item.classList.add("linked"));
+      const storyConclusion = evidenceConnections.find(([first, second]) => evidencePairKey(first, second) === pending.key)?.[2] || "두 증거가 같은 사건 흐름을 가리킵니다.";
+      window.setTimeout(() => {
+        openGlobalPanel("toolPanel");
+        const previewNote = document.querySelector("#toolPreviewNote");
+        if (previewNote) previewNote.textContent = sentenceBreakText(pending.comparison.result).split("\n").find(Boolean) || "두 증거의 관계를 확인했습니다.";
+        showToolConclusion(pending.firstName, pending.comparison.result, storyConclusion);
+        updateEvidenceThreadUI();
+        showToast("증거 연결 완료 · 사건 줄거리에 기록했습니다.");
+      }, 420);
+      playSfx("evidence", 0.86);
+    }
+
+    function startSpecialSurfaceDrag(event) {
+      if (!['soil', 'bandage'].includes(specialPuzzleMode) || tactilePuzzleProgress < 0) return;
+      const handle = event.currentTarget;
+      handle.setPointerCapture?.(event.pointerId);
+      specialSurfaceDrag = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY };
+      handle.classList.add("dragging");
+      event.preventDefault();
+    }
+
+    function moveSpecialSurfaceDrag(event) {
+      if (!specialSurfaceDrag || specialSurfaceDrag.pointerId !== event.pointerId) return;
+      const handle = document.querySelector("#specialSurfaceHandle");
+      const dx = event.clientX - specialSurfaceDrag.startX;
+      const dy = event.clientY - specialSurfaceDrag.startY;
+      handle?.style.setProperty("--surface-x", `${dx}px`);
+      handle?.style.setProperty("--surface-y", `${dy}px`);
+      handle?.style.setProperty("--surface-tilt", `${Math.max(-13, Math.min(13, dx / 9))}deg`);
+      event.preventDefault();
+    }
+
+    function finishSpecialSurfaceDrag(event) {
+      if (!specialSurfaceDrag || specialSurfaceDrag.pointerId !== event.pointerId) return;
+      const handle = document.querySelector("#specialSurfaceHandle");
+      const dx = event.clientX - specialSurfaceDrag.startX;
+      const dy = event.clientY - specialSurfaceDrag.startY;
+      const expectedDirection = specialPuzzleMode === "bandage" ? 1 : (specialPuzzleStep % 2 === 0 ? -1 : 1);
+      const correct = Math.abs(dx) > 80 && Math.abs(dx) > Math.abs(dy) * 1.7 && Math.sign(dx) === expectedDirection;
+      specialSurfaceDrag = null;
+      handle?.classList.remove("dragging");
+      handle?.style.setProperty("--surface-x", "0px");
+      handle?.style.setProperty("--surface-y", "0px");
+      handle?.style.setProperty("--surface-tilt", "0deg");
+      if (!correct) {
+        handle?.classList.remove("wrong-fit");
+        void handle?.offsetWidth;
+        handle?.classList.add("wrong-fit");
+        document.querySelector("#specialPuzzleGuide").textContent = specialPuzzleMode === "bandage" ? "붕대 끝을 감긴 결을 따라 오른쪽으로 길게 당기십시오." : `${expectedDirection < 0 ? "왼쪽" : "오른쪽"}으로 체 손잡이를 기울이십시오.`;
+        return;
+      }
+      specialPuzzleStep += 1;
+      const folder = specialPuzzleMode === "bandage" ? "bandage-puzzle" : "soil-sieve-puzzle";
+      document.querySelector("#specialPuzzleImage").src = getSpecialPuzzleImageSrc(folder, specialPuzzleStep + 1);
+      const surfaceRequiredSteps = specialPuzzleMode === "bandage" ? 1 : 2;
+      if (specialPuzzleMode === "bandage") {
+        document.querySelector("#specialPuzzleGuide").textContent = "붕대가 한 번에 펼쳐져 안쪽 혈흔의 시작점과 감긴 방향이 드러났습니다.";
+      } else {
+        const nextDirection = specialPuzzleStep % 2 === 0 ? "왼쪽" : "오른쪽";
+        document.querySelector("#specialPuzzleGuide").textContent = specialPuzzleStep < surfaceRequiredSteps ? `굵은 흙이 한쪽으로 갈렸습니다. 체를 ${nextDirection}으로 한 번 더 기울이십시오.` : "두 번 체질하자 흙과 짚 사이에서 창백한 돌 알갱이가 분리됐습니다.";
+      }
+      playSfx("buttonAlt", 0.58);
+      if (specialPuzzleStep === surfaceRequiredSteps) {
+        document.querySelector("#specialPuzzleImage").src = getSpecialPuzzleImageSrc(folder, 4);
+        tactilePuzzleProgress = -999;
+        handle?.classList.add("complete");
+        finishTactilePuzzle(specialPuzzleMode === "bandage" ? "상처 대조첩" : "흙 대조 접시");
+      }
     }
 
     function closeToolResultPopup() {
@@ -2662,6 +5215,14 @@
       const hasOpenGlobalPanel = globalPanels.some((panel) => panel.classList.contains("show"));
       if (!hasOpenGlobalPanel && !evidenceBagPop.classList.contains("open")) {
         globalOverlay.classList.remove("show");
+      }
+      const evidenceButtons = [...document.querySelectorAll("#toolEvidenceList .tool-evidence-option")];
+      const currentIndex = evidenceButtons.findIndex((button) => button.dataset.evidence === currentEvidenceForTool);
+      const orderedButtons = evidenceButtons.slice(currentIndex + 1).concat(evidenceButtons.slice(0, currentIndex + 1));
+      const nextButton = orderedButtons.find((button) => getPendingToolStep(button.dataset.evidence));
+      if (nextButton && nextButton.dataset.evidence !== currentEvidenceForTool) {
+        setAnalysisTarget(nextButton.dataset.evidence);
+        showToast(`다음 증거 · ${nextButton.dataset.evidence}`);
       }
     }
 
@@ -2677,23 +5238,117 @@
         return;
       }
 
-      if (data.tool !== toolName) {
+      const activeStep = getPendingToolStep(currentEvidenceForTool);
+      if (!activeStep && getToolAnalysisSteps(currentEvidenceForTool).length) {
+        showToast("이 증거의 도구 분석은 모두 마쳤습니다.");
+        return;
+      }
+      const expectedTool = activeStep?.tool || data.tool;
+      if (expectedTool !== toolName) {
         document.querySelector(".tool-preview")?.classList.add("wrong-tool");
         setTimeout(() => document.querySelector(".tool-preview")?.classList.remove("wrong-tool"), 520);
         showToast("다른 도구를 시도해 보세요.");
         return;
       }
+      if (!tactilePuzzleBypass && toolName === "문서 맞춤판" && ["혼서 조각", "찢어진 약속 편지"].includes(currentEvidenceForTool)) {
+        openDocumentAssembly(currentEvidenceForTool);
+        return;
+      }
+      if (!tactilePuzzleBypass && ["탁본 도구", "압흔 탁본판"].includes(toolName)) {
+        openRubbingPuzzle();
+        return;
+      }
+      if (!tactilePuzzleBypass && toolName === "돋보기" && currentEvidenceForTool === "헐거워진 노리개") {
+        openNorigaePuzzle();
+        return;
+      }
+      if (!tactilePuzzleBypass && toolName === "먼지털이 붓" && currentEvidenceForTool === "호패 조각") { openHopaeMarkPuzzle(); return; }
+      if (!tactilePuzzleBypass && toolName === "먼지털이 붓" && currentEvidenceForTool === "도망 보따리") { openBundlePuzzle(); return; }
+      if (!tactilePuzzleBypass && toolName === "돋보기" && currentEvidenceForTool === "돌쇠의 그림") {
+        openPortraitStrokePuzzle();
+        return;
+      }
+      if (!tactilePuzzleBypass && toolName === "돋보기" && currentEvidenceForTool === "빈 호패 주머니") {
+        openPouchLiningPuzzle();
+        return;
+      }
+      if (!tactilePuzzleBypass && toolName === "돋보기" && currentEvidenceForTool === "찢어진 옷고름") {
+        openSilkTensionPuzzle();
+        return;
+      }
+      if (!tactilePuzzleBypass && toolName === "촛불 비추기" && currentEvidenceForTool === "하인 장부") {
+        openLedgerTimelinePuzzle();
+        return;
+      }
+      if (!tactilePuzzleBypass && toolName === "촛불 비추기" && currentEvidenceForTool === "무덕의 번진 일기") {
+        openDiaryTimelinePuzzle();
+        return;
+      }
+      if (!tactilePuzzleBypass && toolName === "매듭 해체 송곳") {
+        if (currentEvidenceForTool === "헐거워진 노리개") {
+          openNorigaePuzzle();
+          return;
+        }
+        if (currentEvidenceForTool === "도망 보따리") {
+          openBundlePuzzle();
+          return;
+        }
+        openKnotPuzzle();
+        return;
+      }
+      if (!tactilePuzzleBypass && toolName === "발자국 실측줄") {
+        if (currentEvidenceForTool === "진흙 묻은 짚신") openShoeMudPuzzle();
+        else if (currentEvidenceForTool === "작은 발자국") openFootprintTracePuzzle();
+        else openFootprintPuzzle();
+        return;
+      }
+      if (!tactilePuzzleBypass && toolName === "흙 대조 접시") {
+        openSoilSievePuzzle();
+        return;
+      }
+      if (!tactilePuzzleBypass && toolName === "상처 대조첩" && currentEvidenceForTool === "피 묻은 붕대") {
+        openBandagePuzzle();
+        return;
+      }
+      if (!tactilePuzzleBypass && toolName === "먹빛 시험석" && ["무덕의 번진 일기", "하인 장부", "혼서 조각", "찢어진 약속 편지"].includes(currentEvidenceForTool)) {
+        openInkMatchPuzzle();
+        return;
+      }
+      if (!tactilePuzzleBypass && openMaterialPuzzle(toolName)) return;
 
-      const resultText = getEvidenceAnalysisText(currentEvidenceForTool);
+      const requiredEvidence = [
+        ...(Array.isArray(data.comparisonWith) ? data.comparisonWith : data.comparisonWith ? [data.comparisonWith] : []),
+        ...(Array.isArray(activeStep?.requiresEvidence) ? activeStep.requiresEvidence : [])
+      ];
+      const missingEvidence = requiredEvidence.find((name) => !readStoredNames(collectedEvidenceKey).includes(name));
+      if (missingEvidence) {
+        toolAnalysisCompleted = false;
+        updateToolProgress(72);
+        document.querySelector("#toolReactionLayer")?.classList.remove("show", "success");
+        showToast(`교차 대조할 증거 ‘${missingEvidence}’도 먼저 확보해야 합니다.`);
+        const previewNote = document.querySelector("#toolPreviewNote");
+        if (previewNote) previewNote.textContent = `현재 증거의 기록은 얻었지만 ‘${missingEvidence}’이 없어 아직 교차 대조할 수 없습니다.`;
+        return;
+      }
+
+      const resultText = sentenceBreakText(activeStep?.result || getEvidenceAnalysisText(currentEvidenceForTool));
       addObservationToNote(`${currentEvidenceForTool} 추가 분석`, resultText);
-      saveAnalyzedEvidence(currentEvidenceForTool);
+      saveCompletedToolStep(currentEvidenceForTool, toolName);
       document.querySelectorAll(`[data-evidence-name="${currentEvidenceForTool}"]`).forEach((item) => item.classList.add("analyzed"));
       document.querySelectorAll(`#toolEvidenceList [data-evidence="${currentEvidenceForTool}"]`).forEach((item) => item.classList.add("analyzed"));
       document.querySelector(".tool-preview")?.classList.add("revealed");
+      toolAnalysisCompleted = true;
+      updateToolProgress(100);
+      showSuccessfulToolReaction();
       const previewNote = document.querySelector("#toolPreviewNote");
-      if (previewNote) previewNote.textContent = sentenceBreakText(resultText);
-      showToolResultPopup(currentEvidenceForTool, toolName, resultText);
-      showToast(`${toolName}로 ${currentEvidenceForTool}을 분석했습니다.`);
+      if (previewNote) previewNote.textContent = "단서 확인 완료";
+      const resultAsset = activeStep?.asset || data.toolResultAsset || toolReactionAssets[toolName]?.primary || "/samunmong/assets/interactions/evidence-tools/discovery-burst.png";
+      const sourceEvidenceName = currentEvidenceForTool;
+      const examinedClueName = registerExaminedClue(sourceEvidenceName, toolName, resultText, resultAsset);
+      if (previewNote) previewNote.textContent = sentenceBreakText(resultText).split("\n").find(Boolean) || "새로운 흔적을 확인했습니다.";
+      showToolConclusion(examinedClueName, resultText);
+      updateEvidenceThreadUI();
+      showToast(`결론 기록 · ${getEvidenceStoryMeaning(examinedClueName, evidenceData[examinedClueName] || {})}`);
     }
 
     function beginToolSwipe(event) {
@@ -2704,8 +5359,29 @@
       event.preventDefault();
       event.currentTarget?.setPointerCapture?.(event.pointerId);
       swipeStartPoint = { x: event.clientX, y: event.clientY };
+      swipeLastPoint = { x: event.clientX, y: event.clientY };
+      toolLastMoveAt = performance.now();
       updateWipePosition(event);
+      positionToolReaction(event);
+      const data = evidenceData[currentEvidenceForTool] || {};
+      const pendingStep = getPendingToolStep(currentEvidenceForTool);
+      if (!pendingStep && getToolAnalysisSteps(currentEvidenceForTool).length) {
+        showToast("이 증거의 도구 분석은 모두 마쳤습니다.");
+        return;
+      }
+      const expectedTool = pendingStep?.tool || data.tool;
+      const isCorrectTool = Boolean(isJoseonToolInteraction && selectedToolForAnalysis && getJoseonCoreTool(expectedTool) === selectedToolForAnalysis);
+      const interactionType = getToolInteractionType(selectedToolForAnalysis);
       document.querySelector(".tool-preview")?.classList.add("swiping");
+      document.querySelector(".tool-preview")?.classList.toggle("tool-reacting", isCorrectTool);
+      document.querySelector("#toolReactionLayer")?.classList.toggle("show", isCorrectTool);
+      if (isCorrectTool && interactionType === "tap" && !toolAnalysisCompleted) {
+        updateToolProgress(toolAnalysisProgress + 52);
+        showToast(toolAnalysisProgress >= 100 ? "채취 완료" : "한 곳 더 누르기");
+        if (toolAnalysisProgress >= 100) {
+          window.setTimeout(() => analyzeEvidenceWithTool(expectedTool), 120);
+        }
+      }
     }
 
     function moveToolSwipe(event) {
@@ -2713,10 +5389,61 @@
       event.preventDefault();
       moveToolCursor(event);
       updateWipePosition(event);
-      const dx = event.clientX - swipeStartPoint.x;
-      const dy = event.clientY - swipeStartPoint.y;
-      const distance = Math.min(170, Math.max(70, Math.hypot(dx, dy)));
+      positionToolReaction(event);
+      const data = evidenceData[currentEvidenceForTool] || {};
+      const expectedTool = getPendingToolStep(currentEvidenceForTool)?.tool || data.tool;
+      if (isJoseonToolInteraction && selectedToolForAnalysis && getJoseonCoreTool(expectedTool) === selectedToolForAnalysis && swipeLastPoint && !toolAnalysisCompleted) {
+        const dx = event.clientX - swipeLastPoint.x;
+        const dy = event.clientY - swipeLastPoint.y;
+        const segment = Math.hypot(dx, dy);
+        const now = performance.now();
+        const elapsed = Math.max(8, now - toolLastMoveAt);
+        const speed = segment / elapsed;
+        let gain = 0;
+        if (selectedToolForAnalysis === "먼지털이 붓") {
+          const direction = Math.abs(dx) >= Math.abs(dy) ? Math.sign(dx) : Math.sign(dy);
+          if (toolLastDirection && direction && direction !== toolLastDirection) toolDirectionChanges += 1;
+          if (direction) toolLastDirection = direction;
+          gain = segment < 75 ? segment / 7 + Math.min(2.4, toolDirectionChanges * .18) : 0;
+        } else if (selectedToolForAnalysis === "돋보기") {
+          gain = speed >= .08 && speed <= 1.05 && segment < 55 ? segment / 6.4 : 0;
+        } else if (selectedToolForAnalysis === "촛불 비추기") {
+          gain = speed >= .04 && speed <= .72 && segment < 48 ? segment / 6.8 + elapsed / 180 : 0;
+        } else if (selectedToolForAnalysis === "발자국 실측줄") {
+          gain = Math.abs(dx) >= Math.abs(dy) * .65 && speed <= 1.2 && segment < 65 ? segment / 5.8 : 0;
+        } else if (selectedToolForAnalysis === "문서 맞춤판") {
+          gain = speed <= .9 && segment < 52 ? segment / 6.2 : 0;
+        } else if (selectedToolForAnalysis === "혈흔 시험포") {
+          gain = segment < 30 ? segment / 4.8 + elapsed / 240 : 0;
+        } else if (selectedToolForAnalysis === "탁본 도구") {
+          gain = Math.abs(dx) > Math.abs(dy) * .8 && segment < 58 ? segment / 5.8 : 0;
+        } else if (selectedToolForAnalysis === "섬유 대조틀") {
+          gain = Math.abs(dy) > Math.abs(dx) * .55 && speed <= 1 && segment < 52 ? segment / 6 : 0;
+        } else if (selectedToolForAnalysis === "먹빛 시험석") {
+          gain = speed <= .95 && segment < 44 ? segment / 5.7 : 0;
+        } else if (selectedToolForAnalysis === "증거 연결판") {
+          gain = segment < 64 ? segment / 5.6 : 0;
+        } else if (selectedToolForAnalysis === "흙 대조 접시") {
+          gain = Math.abs(dx) > Math.abs(dy) * .65 && segment < 60 ? segment / 5.5 : 0;
+        } else if (selectedToolForAnalysis === "상처 대조첩") {
+          gain = speed <= 1.05 && segment < 54 ? segment / 5.8 : 0;
+        } else if (selectedToolForAnalysis === "문서 펼침칼") {
+          gain = Math.abs(dx) > Math.abs(dy) * .72 && speed <= .82 && segment < 50 ? segment / 5.5 : 0;
+        } else if (selectedToolForAnalysis === "매듭 해체 송곳") {
+          gain = speed <= .9 && segment < 42 ? segment / 5.25 : 0;
+        } else if (selectedToolForAnalysis === "압흔 탁본판") {
+          gain = Math.abs(dx) > Math.abs(dy) * .62 && segment < 58 ? segment / 5.4 : 0;
+        }
+        if (gain <= 0 && segment < 80) gain = segment / 12;
+        if (gain > 0) updateToolProgress(toolAnalysisProgress + gain * 2.75);
+        toolLastMoveAt = now;
+      }
+      swipeLastPoint = { x: event.clientX, y: event.clientY };
+      const distance = Math.min(180, Math.max(72, 72 + toolAnalysisProgress * .9));
       document.querySelector(".tool-preview-image")?.style.setProperty("--wipe-size", `${distance}px`);
+      if (toolAnalysisProgress >= 100 && !toolAnalysisCompleted) {
+        analyzeEvidenceWithTool(expectedTool);
+      }
     }
 
     function finishToolSwipe(event) {
@@ -2727,17 +5454,50 @@
       const dy = event.clientY - swipeStartPoint.y;
       const distance = Math.hypot(dx, dy);
       swipeStartPoint = null;
-      document.querySelector(".tool-preview")?.classList.remove("swiping");
+      swipeLastPoint = null;
+      document.querySelector(".tool-preview")?.classList.remove("swiping", "tool-reacting");
+      if (!toolAnalysisCompleted) document.querySelector("#toolReactionLayer")?.classList.remove("show");
 
       if (!selectedToolForAnalysis) {
-        showToast("아래 도구 탭에서 도구를 먼저 고르세요.");
+        if (Math.abs(dx) > Math.abs(dy) && distance >= 48) {
+          flipCurrentEvidence();
+        } else {
+          showToast(evidenceData[currentEvidenceForTool]?.reverseImg ? "좌우로 밀어 뒤집기" : "도구를 골라 사용하기");
+        }
         return;
+      }
+      if (!isJoseonToolInteraction) {
+        if (distance < 56) {
+          showToast("증거 위를 조금 더 길게 문질러 보세요.");
+          return;
+        }
+        analyzeEvidenceWithTool(selectedToolForAnalysis);
+        return;
+      }
+      const data = evidenceData[currentEvidenceForTool] || {};
+      const expectedTool = getPendingToolStep(currentEvidenceForTool)?.tool || data.tool;
+      const interactionType = getToolInteractionType(selectedToolForAnalysis);
+      if (getJoseonCoreTool(expectedTool) !== selectedToolForAnalysis) {
+        showWrongToolReaction(event);
+        document.querySelector(".tool-preview")?.classList.add("wrong-tool");
+        setTimeout(() => document.querySelector(".tool-preview")?.classList.remove("wrong-tool"), 520);
+        showToast("반응 없음");
+        return;
+      }
+      if (interactionType === "tap") {
+        window.setTimeout(() => document.querySelector("#toolReactionLayer")?.classList.remove("show"), 160);
+        return;
+      }
+      if (toolAnalysisProgress >= 100 && !toolAnalysisCompleted) {
+        analyzeEvidenceWithTool(expectedTool);
       }
       if (distance < 56) {
-        showToast("증거 위를 조금 더 길게 문질러 보세요.");
+        showToast(getToolGestureCopy(selectedToolForAnalysis));
         return;
       }
-      analyzeEvidenceWithTool(selectedToolForAnalysis);
+      if (!toolAnalysisCompleted) {
+        showToast(`${Math.round(toolAnalysisProgress)}% · 한 번 더`);
+      }
     }
 
     function showInspect(id) {
@@ -2762,19 +5522,19 @@
       addEvidenceToNote("호패 조각");
     }
     function collectPortrait() {
-      if (portraitCollected) {
+      const alreadyCollected = portraitCollected || readStoredNames(collectedEvidenceKey).includes("돌쇠의 그림");
+      if (alreadyCollected) {
+        portraitCollected = true;
         setAnalysisTarget("돌쇠의 그림");
         openGlobalPanel("toolPanel");
         return;
       }
       portraitCollected = true;
-      document.querySelector("#collectPortrait").textContent = "수집 완료";
-      document.querySelector("#portraitHotspot")?.classList.add("collected");
-      playSfx("evidence", 0.85);
-      addEvidenceToBag("돌쇠의 그림");
-      addEvidenceToNote("돌쇠의 그림");
+      const portraitHotspot = document.querySelector("#portraitHotspot");
+      if (portraitHotspot) beginEvidenceCollection("돌쇠의 그림", portraitHotspot);
+      const collectButton = document.querySelector("#collectPortrait");
+      if (collectButton) collectButton.textContent = "보따리에서 분석하기";
       hideInspectPanels();
-      showToast("돌쇠의 그림이 기록에 남았다. 감춰둔 시선에는 반드시 이유가 있다.");
     }
     function showGenericEvidence(name, hotspot) {
       const data = evidenceData[name] || {};
@@ -2782,20 +5542,38 @@
       pendingEvidenceHotspot = hotspot;
       const alreadyCollected = hotspot.classList.contains("collected");
       if (!alreadyCollected) {
-        markEvidenceCollectedInScene(name);
-        playSfx("evidence", 0.85);
-        addEvidenceToBag(name);
-        addEvidenceToNote(name);
+        beginEvidenceCollection(name, hotspot);
+        return;
       }
       if (data.tool) setAnalysisTarget(name);
 
-      document.querySelector("#genericEvidenceImage").src = data.img || "/samunmong/assets/evidence-wooden-tag.webp";
+      document.querySelector("#genericEvidenceImage").src = getEvidenceImage(name);
       document.querySelector("#genericEvidenceTitle").textContent = name;
       document.querySelector("#genericEvidenceText").textContent = data.tool ? sentenceBreakText(TOOL_NEEDED_HINT) : "";
       document.querySelector("#genericEvidenceText").hidden = !data.tool;
       document.querySelector("#genericEvidenceInspect").classList.add("show");
       clearTimeout(showInspect.timer);
     }
+
+    function beginEvidenceCollection(name, hotspot) {
+      hideInspectPanels();
+      closeToast();
+      pendingEvidenceName = name;
+      pendingEvidenceHotspot = hotspot;
+      markEvidenceCollectedInScene(name);
+      playSfx("evidence", 0.9);
+      addEvidenceToBag(name);
+      addEvidenceToNote(name);
+      if (evidenceData[name]?.tool) setAnalysisTarget(name);
+      showToast("보따리에 들어갔습니다", {
+        image: getEvidenceImage(name),
+        title: name,
+        dismissible: true,
+      });
+      pendingEvidenceName = "";
+      pendingEvidenceHotspot = null;
+    }
+
     document.addEventListener("click", (event) => {
       const target = event.target instanceof Element ? event.target : null;
       if (!target) return;
@@ -2809,17 +5587,23 @@
         return;
       }
 
-      const hotspot = target.closest("[data-evidence-name]");
+      const hotspot = target.closest("[data-evidence-name], #hopaeHotspot, #portraitHotspot");
       if (!hotspot) return;
       if (hotspot.id === "hopaeHotspot") {
-        collectHopae();
-        showInspect("#hopaeInspect");
+        const hasHopae = readStoredNames(collectedEvidenceKey).includes("호패 조각");
+        if (!hasHopae) {
+          hopaeCollected = true;
+          beginEvidenceCollection("호패 조각", hotspot);
+        } else {
+          hopaeCollected = true;
+          addEvidenceCardToInterrogation("호패 조각");
+          setAnalysisTarget("호패 조각");
+          showInspect("#hopaeInspect");
+        }
         return;
       }
       if (hotspot.id === "portraitHotspot") {
         collectPortrait();
-        document.querySelector("#collectPortrait").textContent = "보따리에서 분석하기";
-        showInspect("#portraitInspect");
         return;
       }
       showGenericEvidence(hotspot.dataset.evidenceName, hotspot);
@@ -2846,6 +5630,73 @@
       swipeStartPoint = null;
       document.querySelector(".tool-preview")?.classList.remove("swiping");
     });
+    document.querySelector(".tool-preview-image")?.addEventListener("dragover", dragToolOverEvidence);
+    document.querySelector(".tool-preview-image")?.addEventListener("drop", dropToolOnEvidence);
+    document.querySelector(".tool-preview-image")?.addEventListener("dragleave", () => {
+      document.querySelector(".tool-preview")?.classList.remove("tool-reacting");
+      document.querySelector("#toolReactionLayer")?.classList.remove("show");
+    });
+    document.querySelectorAll(".document-piece").forEach((button) => {
+      button.addEventListener("pointerdown", (event) => startDocumentPieceDrag(button, event));
+    });
+    document.querySelector("#documentAssemblyStage")?.addEventListener("pointermove", moveDocumentPiece);
+    document.querySelector("#documentAssemblyStage")?.addEventListener("pointerup", finishDocumentPieceDrag);
+    document.querySelector("#documentAssemblyStage")?.addEventListener("pointercancel", finishDocumentPieceDrag);
+    document.querySelectorAll("[data-knot-loop]").forEach((button) => {
+      button.addEventListener("pointerdown", (event) => startKnotDrag(button, event));
+    });
+    const knotStageElement = document.querySelector("#knotPuzzleStage");
+    knotStageElement?.addEventListener("pointermove", moveKnotDrag);
+    knotStageElement?.addEventListener("pointerup", finishKnotDrag);
+    knotStageElement?.addEventListener("pointercancel", finishKnotDrag);
+    const rubbingStage = document.querySelector("#rubbingPuzzleStage");
+    document.querySelector("#rubbingCharcoal")?.addEventListener("pointerdown", startRubbingDrag);
+    rubbingStage?.addEventListener("pointermove", moveRubbingDrag);
+    rubbingStage?.addEventListener("pointerup", finishRubbingDrag);
+    rubbingStage?.addEventListener("pointercancel", finishRubbingDrag);
+    const footprintStage = document.querySelector("#footprintPuzzleStage");
+    document.querySelector("#footprintShoePiece")?.addEventListener("pointerdown", startFootprintDrag);
+    document.querySelector("#footprintMeasureTool")?.addEventListener("pointerdown", startFootprintMeasureDrag);
+    footprintStage?.addEventListener("pointermove", moveFootprintDrag);
+    footprintStage?.addEventListener("pointerup", finishFootprintDrag);
+    footprintStage?.addEventListener("pointercancel", finishFootprintDrag);
+    footprintStage?.addEventListener("pointermove", moveFootprintMeasureDrag);
+    footprintStage?.addEventListener("pointerup", finishFootprintMeasureDrag);
+    footprintStage?.addEventListener("pointercancel", finishFootprintMeasureDrag);
+    document.querySelectorAll("[data-sample-point]").forEach((button) => {
+      button.addEventListener("pointerdown", (event) => startSampleDrag(button, event));
+    });
+    const materialStageElement = document.querySelector("#materialPuzzleStage");
+    document.querySelector("#materialHandTool")?.addEventListener("pointerdown", startMaterialDirectDrag);
+    materialStageElement?.addEventListener("pointermove", moveSampleDrag);
+    materialStageElement?.addEventListener("pointerup", finishSampleDrag);
+    materialStageElement?.addEventListener("pointercancel", finishSampleDrag);
+    materialStageElement?.addEventListener("pointermove", moveMaterialDirectDrag);
+    materialStageElement?.addEventListener("pointerup", finishMaterialDirectDrag);
+    materialStageElement?.addEventListener("pointercancel", finishMaterialDirectDrag);
+    document.querySelectorAll("[data-special-point]").forEach((button) => {
+      button.addEventListener("pointerdown", (event) => startSpecialDrag(button, event));
+    });
+    document.querySelectorAll("[data-ritual-kind]").forEach((piece) => {
+      piece.addEventListener("pointerdown", (event) => startRitualDrag(piece, event));
+    });
+    [document.querySelector("#confrontationStage"), document.querySelector("#sleeveInspectionStage")].forEach((stage) => {
+      stage?.addEventListener("pointermove", moveRitualDrag);
+      stage?.addEventListener("pointerup", finishRitualDrag);
+      stage?.addEventListener("pointercancel", finishRitualDrag);
+    });
+    const specialStageElement = document.querySelector("#specialPuzzleStage");
+    document.querySelector("#specialSurfaceHandle")?.addEventListener("pointerdown", startSpecialSurfaceDrag);
+    document.querySelector("#specialExplorerTool")?.addEventListener("pointerdown", startSpecialExplorerDrag);
+    specialStageElement?.addEventListener("pointermove", moveSpecialDrag);
+    specialStageElement?.addEventListener("pointerup", finishSpecialDrag);
+    specialStageElement?.addEventListener("pointercancel", finishSpecialDrag);
+    specialStageElement?.addEventListener("pointermove", moveSpecialSurfaceDrag);
+    specialStageElement?.addEventListener("pointerup", finishSpecialSurfaceDrag);
+    specialStageElement?.addEventListener("pointercancel", finishSpecialSurfaceDrag);
+    specialStageElement?.addEventListener("pointermove", moveSpecialExplorerDrag);
+    specialStageElement?.addEventListener("pointerup", finishSpecialExplorerDrag);
+    specialStageElement?.addEventListener("pointercancel", finishSpecialExplorerDrag);
     document.querySelector("#toolPreviewImage")?.addEventListener("dragstart", (event) => event.preventDefault());
     document.querySelector("#toolPreviewImage")?.addEventListener("load", syncEvidenceShadowBounds);
     setupEvidenceScreen(getActiveScreenId());
@@ -3011,8 +5862,19 @@
 
     function openGlobalPanel(id) {
       if (id !== "mapPanel" && isFieldGuideBlockingControls()) return;
+      if (document.querySelector("#mainScreen")?.classList.contains("active")) {
+        globalPanels.forEach((panel) => {
+          panel.classList.remove("show", "closing");
+          panel.setAttribute("aria-hidden", "true");
+        });
+        globalOverlay.classList.remove("show");
+        return;
+      }
       hideInspectPanels();
       setEvidenceBag(false);
+
+      const openingPanel = document.getElementById(id);
+      if (openingPanel && !openingPanel.classList.contains("show")) clearInteractionEarnedEvidence(openingPanel);
 
       globalPanels.forEach((panel) => {
         const isOpen = panel.id === id;
@@ -3023,6 +5885,11 @@
       globalOverlay.classList.add("show");
       if (id === "mapPanel") playSfx("map", 0.78);
       if (id === "toolPanel") playSfx("buttonAlt", 0.62);
+      if (id === "toolPanel" && !currentEvidenceForTool) {
+        const firstPendingEvidence = [...document.querySelectorAll("#toolEvidenceList .tool-evidence-option")]
+          .find((button) => getPendingToolStep(button.dataset.evidence));
+        if (firstPendingEvidence) setAnalysisTarget(firstPendingEvidence.dataset.evidence);
+      }
       if (id === "fieldNotePanel") {
         playSfx("buttonAlt", 0.62);
         renderConversationNotes();
@@ -3057,6 +5924,25 @@
       if (wasGuideMapOpen) setFieldGuideStep("room");
     }
 
+    function closeOrReturnFromGlobalPanel(event) {
+      const toolSubPanel = event?.currentTarget?.closest?.(
+        "#documentAssemblyPanel, #rubbingPuzzlePanel, #knotPuzzlePanel, #footprintPuzzlePanel, #materialPuzzlePanel, #specialEvidencePuzzlePanel"
+      );
+      if (toolSubPanel) {
+        tactilePuzzlePointer = null;
+        specialDragState = null;
+        specialSurfaceDrag = null;
+        sampleDragState = null;
+        draggedDocumentPiece = null;
+        toolSubPanel.querySelectorAll(".dragging, .wrong-fit").forEach((item) => item.classList.remove("dragging", "wrong-fit"));
+        resetToolInteraction(true);
+        renderTools();
+        openGlobalPanel("toolPanel");
+        return;
+      }
+      closeGlobalPanel();
+    }
+
     document.addEventListener("click", (event) => {
       const target = event.target instanceof Element ? event.target : null;
       if (!target) return;
@@ -3078,9 +5964,16 @@
       event.preventDefault();
       openGlobalPanel("toolPanel");
     });
-    document.querySelectorAll(".global-close").forEach((button) => button.addEventListener("click", closeGlobalPanel));
+    document.querySelectorAll(".global-close").forEach((button) => button.addEventListener("click", closeOrReturnFromGlobalPanel));
+    window.addEventListener("resize", syncDirectAffordanceFragments);
     on("#closeToolResult", "click", closeToolResultPopup);
-    globalOverlay.addEventListener("click", closeGlobalPanel);
+    globalOverlay.addEventListener("click", () => {
+      if (document.querySelector(".tactile-puzzle-panel.show.interaction-complete")) {
+        showToast("새 증좌를 확인한 뒤 ‘확인하고 닫기’를 눌러 주십시오.");
+        return;
+      }
+      closeGlobalPanel();
+    });
     document.querySelectorAll("[data-map-go]").forEach((button) => {
       button.addEventListener("pointerdown", () => button.classList.add("pressing"));
       button.addEventListener("pointerup", () => button.classList.remove("pressing"));
@@ -3156,6 +6049,7 @@
       addConversationMessage(suspect.id, "suspect", answer, "", isCurrentSuspect);
       if (suspects[suspectIndex]?.id === suspect.id) {
         showSuspectReply(answer, suspect.name);
+        showEvidenceResponseMarker(selectedEvidence);
       }
       if (source === "fallback" && warning) {
         showToast(warning);
@@ -3223,22 +6117,64 @@
       }
     }
 
-    document.querySelector("#askButton").addEventListener("click", async () => {
-      const question = document.querySelector("#questionInput").value.trim();
-      if (!question) {
-        showToast("질문을 입력하거나 위의 문장을 눌러줘");
+    function openEvidenceConfrontation(question) {
+      pendingConfrontationQuestion = question;
+      confrontationStep = 0;
+      document.querySelector("#confrontationTitle").textContent = `${suspects[suspectIndex].name}에게 증거 대면`;
+      document.querySelector("#confrontationEvidenceName").textContent = selectedEvidence;
+      document.querySelector("#confrontationGuide").textContent = "증거패를 심문상에 올린 뒤 관인을 끌어 찍어 대면을 확정하십시오.";
+      document.querySelector("#confrontationImage").src = "/samunmong/assets/interactions/confrontation-puzzle/state-1.png";
+      resetRitualDrag("confrontation");
+      openGlobalPanel("evidenceConfrontationPanel");
+      playSfx("map", 0.62);
+    }
+
+    function openSleeveInspection(question) {
+      const suspect = suspects[suspectIndex];
+      pendingSleeveQuestion = question;
+      sleeveInspectionStep = 0;
+      document.querySelector("#sleeveInspectionTitle").textContent = `${suspect.name}의 소매 확인`;
+      document.querySelector("#sleeveInspectionGuide").textContent = "손목 끈을 풀고 소매를 올려 팔의 흔적을 직접 확인하십시오.";
+      document.querySelector("#sleeveInspectionImage").src = "/samunmong/assets/interactions/sleeve-inspection-puzzle/state-1.png";
+      resetRitualDrag("sleeve");
+      openGlobalPanel("sleeveInspectionPanel");
+      playSfx("map", 0.62);
+    }
+
+    function advanceSleeveInspection(step) {
+      if (Number(step) !== sleeveInspectionStep + 1) {
+        showToast("손목 끈부터 순서대로 확인하십시오.");
         return;
       }
-      if (getRemainingInterrogationQuestions() <= 0) {
-        showSuspectReply("더는 대답하지 않으려 한다.", "침묵");
-        showToast("취조 가능한 질문 횟수를 모두 사용했습니다.");
-        updateInterrogationQuestionLimitUI();
+      sleeveInspectionStep += 1;
+      document.querySelector("#sleeveInspectionImage").src = `/samunmong/assets/interactions/sleeve-inspection-puzzle/state-${sleeveInspectionStep === 2 ? 4 : sleeveInspectionStep + 1}.png`;
+      completeRitualStep("sleeve", sleeveInspectionStep);
+      document.querySelector("#sleeveInspectionGuide").textContent = sleeveInspectionStep === 1 ? "손목 끈이 풀렸습니다. 소매 끝을 위로 밀어 올리십시오." : "소매 아래 팔의 흔적이 드러났고 증거 기록에 자동으로 남았습니다.";
+      playSfx(sleeveInspectionStep === 2 ? "evidence" : "buttonAlt", sleeveInspectionStep === 2 ? 0.9 : 0.58);
+      if (sleeveInspectionStep === 2) {
+        const question = pendingSleeveQuestion;
+        window.setTimeout(async () => {
+          closeGlobalPanel();
+          sleeveInspectionBypass = true;
+          try {
+            await performInterrogationQuestion(question);
+          } finally {
+            sleeveInspectionBypass = false;
+          }
+        }, 360);
+      }
+    }
+
+    async function performInterrogationQuestion(question) {
+      const isSleeveQuestion = /소매/.test(question) && /(걷|올리|보|확인|드러|살펴)/.test(question);
+      if (isJoseonToolInteraction && isSleeveQuestion && !sleeveInspectionBypass) {
+        openSleeveInspection(question);
         return;
       }
       playSfx("ask", 0.82);
       recordInterrogationQuestion();
       addInterrogationSummary(question);
-      if (/소매/.test(question) && /(걷|올리|보|확인|드러|살펴)/.test(question)) {
+      if (isSleeveQuestion) {
         const suspect = suspects[suspectIndex];
         sleeveCheckedSuspects.add(suspect.id);
         document.querySelector("#interrogationPlate").src = suspect.sleeveScene;
@@ -3267,6 +6203,112 @@
       }
       document.querySelector("#questionInput").value = "";
       await requestAiAnswer(question);
+    }
+
+    function advanceEvidenceConfrontation(step) {
+      if (Number(step) !== confrontationStep + 1) {
+        showToast("대면 절차를 순서대로 진행하십시오.");
+        return;
+      }
+      confrontationStep += 1;
+      document.querySelector("#confrontationImage").src = `/samunmong/assets/interactions/confrontation-puzzle/state-${confrontationStep === 2 ? 4 : confrontationStep + 1}.png`;
+      completeRitualStep("confrontation", confrontationStep);
+      document.querySelector("#confrontationGuide").textContent = confrontationStep === 1 ? "증거가 심문상에 놓였습니다. 오른쪽 위의 관인을 끌어 찍으십시오." : "관인이 찍혀 증거 대면이 확정됐습니다.";
+      playSfx(confrontationStep === 2 ? "evidence" : "buttonAlt", confrontationStep === 2 ? 0.9 : 0.58);
+      if (confrontationStep === 2) {
+        const question = pendingConfrontationQuestion;
+        window.setTimeout(() => {
+          closeGlobalPanel();
+          performInterrogationQuestion(question);
+        }, 360);
+      }
+    }
+
+    function resetRitualDrag(kind) {
+      ritualDragState = null;
+      document.querySelectorAll(`[data-ritual-kind="${kind}"]`).forEach((piece) => {
+        piece.classList.toggle("active", piece.dataset.ritualStep === "1");
+        piece.classList.remove("complete", "dragging", "wrong-fit");
+        piece.style.setProperty("--ritual-x", "0px");
+        piece.style.setProperty("--ritual-y", "0px");
+      });
+      document.querySelectorAll(`[data-ritual-target^="${kind}-"]`).forEach((target, index) => {
+        target.classList.toggle("active", index === 0);
+        target.classList.remove("complete");
+      });
+    }
+
+    function completeRitualStep(kind, step) {
+      const piece = document.querySelector(`[data-ritual-kind="${kind}"][data-ritual-step="${step}"]`);
+      const target = document.querySelector(`[data-ritual-target="${kind}-${step}"]`);
+      piece?.classList.remove("active", "dragging");
+      piece?.classList.add("complete");
+      target?.classList.remove("active");
+      target?.classList.add("complete");
+      document.querySelector(`[data-ritual-kind="${kind}"][data-ritual-step="${step + 1}"]`)?.classList.add("active");
+      document.querySelector(`[data-ritual-target="${kind}-${step + 1}"]`)?.classList.add("active");
+    }
+
+    function startRitualDrag(piece, event) {
+      if (!piece.classList.contains("active") || piece.classList.contains("complete")) return;
+      event.preventDefault();
+      const stage = piece.closest(".ritual-drag-stage");
+      stage?.setPointerCapture?.(event.pointerId);
+      ritualDragState = { piece, stage, pointerId: event.pointerId, startX: event.clientX, startY: event.clientY };
+      piece.classList.add("dragging");
+    }
+
+    function moveRitualDrag(event) {
+      if (!ritualDragState || ritualDragState.pointerId !== event.pointerId) return;
+      event.preventDefault();
+      ritualDragState.piece.style.setProperty("--ritual-x", `${event.clientX - ritualDragState.startX}px`);
+      ritualDragState.piece.style.setProperty("--ritual-y", `${event.clientY - ritualDragState.startY}px`);
+    }
+
+    function finishRitualDrag(event) {
+      if (!ritualDragState || ritualDragState.pointerId !== event.pointerId) return;
+      const { piece } = ritualDragState;
+      const kind = piece.dataset.ritualKind;
+      const step = Number(piece.dataset.ritualStep);
+      const target = document.querySelector(`[data-ritual-target="${kind}-${step}"]`);
+      const pieceRect = piece.getBoundingClientRect();
+      const targetRect = target?.getBoundingClientRect();
+      const centerX = pieceRect.left + pieceRect.width / 2;
+      const centerY = pieceRect.top + pieceRect.height / 2;
+      const hit = targetRect && centerX >= targetRect.left && centerX <= targetRect.right && centerY >= targetRect.top && centerY <= targetRect.bottom;
+      piece.classList.remove("dragging");
+      ritualDragState = null;
+      if (hit) {
+        if (kind === "confrontation") advanceEvidenceConfrontation(step);
+        else advanceSleeveInspection(step);
+        return;
+      }
+      piece.style.setProperty("--ritual-x", "0px");
+      piece.style.setProperty("--ritual-y", "0px");
+      piece.classList.remove("wrong-fit");
+      void piece.offsetWidth;
+      piece.classList.add("wrong-fit");
+      showToast(kind === "confrontation" ? "빛나는 자리에 패를 직접 올려놓으십시오." : "화살표가 가리키는 자리까지 직접 움직이십시오.");
+    }
+
+    document.querySelector("#askButton").addEventListener("click", async () => {
+      const question = document.querySelector("#questionInput").value.trim();
+      if (!question) {
+        showToast("질문을 입력하거나 위의 문장을 눌러줘");
+        return;
+      }
+      if (getRemainingInterrogationQuestions() <= 0) {
+        showSuspectReply("더는 대답하지 않으려 한다.", "침묵");
+        showToast("취조 가능한 질문 횟수를 모두 사용했습니다.");
+        updateInterrogationQuestionLimitUI();
+        return;
+      }
+      const isSleeveQuestion = /소매/.test(question) && /(걷|올리|보|확인|드러|살펴)/.test(question);
+      if (isJoseonToolInteraction && selectedEvidence && !isSleeveQuestion) {
+        openEvidenceConfrontation(question);
+        return;
+      }
+      await performInterrogationQuestion(question);
     });
 
     document.querySelector("#questionInput").addEventListener("keydown", (event) => {
