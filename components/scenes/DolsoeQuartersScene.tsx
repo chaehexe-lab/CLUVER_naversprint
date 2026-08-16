@@ -1,66 +1,6 @@
-﻿import { dolsoeQuartersScene } from "@/lib/gameData";
-import { hotspotStyle } from "./hotspotStyle";
-import type { CSSProperties } from "react";
-
-
-type PropStyle = CSSProperties & {
-  "--x": string;
-  "--y": string;
-  "--w": string;
-  "--rot"?: string;
-};
-
-
-function propStyle(prop: (typeof dolsoeQuartersScene.props)[number]): PropStyle {
-  return {
-    "--x": prop.x,
-    "--y": prop.y,
-    "--w": prop.w,
-    "--rot": prop.rot
-  };
-}
+import { dolsoeQuartersScene } from "@/lib/gameData";
+import InvestigationScene from "./InvestigationScene";
 
 export default function DolsoeQuartersScene() {
-  return (
-    <section className="screen" id={dolsoeQuartersScene.id}>
-      <img className="plate" src={dolsoeQuartersScene.image} alt={dolsoeQuartersScene.alt} />
-      <div className="shade" />
-
-      {dolsoeQuartersScene.props.map((prop) => (
-        <img
-          key={`${prop.image}-${prop.x}-${prop.y}`}
-          className="scene-prop evidence-prop"
-          src={prop.image}
-          alt={prop.alt}
-          style={propStyle(prop)}
-        />
-      ))}
-
-      {dolsoeQuartersScene.hotspots.map((hotspot) => (
-        <button
-          key={hotspot.evidenceName}
-          className="hotspot object-outline"
-          data-evidence-name={hotspot.evidenceName}
-          style={hotspotStyle(hotspot)}
-          type="button"
-          aria-label={hotspot.ariaLabel}
-        />
-      ))}
-
-      <nav className="hud scene-dock" aria-label="돌쇠 처소 메뉴">
-        {dolsoeQuartersScene.dock.map((action) => (
-          <button
-            key={action.className}
-            className={`scene-chip ${action.className}`}
-            data-go={action.goTo}
-            type="button"
-            aria-label={action.ariaLabel}
-          >
-            <img src={action.image} alt="" />
-            <span className="sr-only">{action.label}</span>
-          </button>
-        ))}
-      </nav>
-    </section>
-  );
+  return <InvestigationScene scene={dolsoeQuartersScene} dockAriaLabel="돌쇠 처소 메뉴" />;
 }
