@@ -173,6 +173,9 @@
     let fieldGuideStep = "";
     let fieldGuideMapTimer = 0;
     let briefingReturnScreenId = "fieldOne";
+    let interrogationReactionTimer = 0;
+    let interrogationThinkingSoundTimer = 0;
+    let newFactToastTimer = 0;
 
     const joseonLocationMeta = {
       tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
@@ -3138,6 +3141,68 @@
       if (badge) badge.textContent = text;
     }
 
+    const newFactTitles = {
+      CHUNWOL_HEARD_ESCAPE_PLAN: "춘월은 두 사람의 도망 가능성을 들었다",
+      CHUNWOL_HIDDEN_PORTRAIT: "춘월이 숨긴 돌쇠의 초상",
+      CHUNWOL_LETTER_ACCESS: "양반가의 종이와 정중한 편지 말투",
+      CHUNWOL_RIBBON_MATERIAL: "점순의 목 흔적과 맞는 고급 비단",
+      CHUNWOL_ARM_SCRATCH: "춘월의 소매 아래 긁힌 상처",
+      CHUNWOL_HOPAE_POWDER: "호패에 남은 향 섞인 분가루",
+      DOLSOE_ESCAPE_PLAN: "돌쇠와 점순의 도망 계획",
+      DOLSOE_LETTER_MISMATCH: "돌쇠의 말투와 다른 약속 편지",
+      YOOMUNSEOK_MISSING_HOPAE: "사건 전날 사라진 유문석의 호패",
+      MUDEOK_TOLD_CHUNWOL: "무덕이 춘월에게 흘린 점순의 행방",
+      MUDEOK_FOUND_RIBBON: "무덕이 집 근처에서 주운 옷고름"
+    };
+
+    function stopInterrogationThinkingSound() {
+      window.clearInterval(interrogationThinkingSoundTimer);
+      interrogationThinkingSoundTimer = 0;
+    }
+
+    function setInterrogationReaction(reaction = "calm", holdMs = 0) {
+      const screen = document.querySelector("#interrogationScreen");
+      const candle = document.querySelector("#interrogationCandle");
+      const normalized = ["calm", "thinking", "attentive", "avoid", "nervous", "shocked", "silent"].includes(reaction)
+        ? reaction
+        : "calm";
+
+      window.clearTimeout(interrogationReactionTimer);
+      screen?.setAttribute("data-interrogation-reaction", normalized);
+      candle?.setAttribute("data-state", normalized);
+
+      if (normalized === "thinking") {
+        stopInterrogationThinkingSound();
+        playSfx("type1", 0.1);
+        interrogationThinkingSoundTimer = window.setInterval(() => {
+          if (!document.hidden) playSfx("type1", 0.08);
+        }, 850);
+      } else {
+        stopInterrogationThinkingSound();
+      }
+
+      if (holdMs > 0 && normalized !== "calm") {
+        interrogationReactionTimer = window.setTimeout(() => setInterrogationReaction("calm"), holdMs);
+      }
+    }
+
+    function showNewFactDiscovery(factId) {
+      if (!factId) return;
+      const toast = document.querySelector("#newFactToast");
+      const title = document.querySelector("#newFactTitle");
+      if (!toast || !title) return;
+
+      window.clearTimeout(newFactToastTimer);
+      title.textContent = newFactTitles[factId] || "새로운 사실이 기록되었습니다";
+      toast.classList.add("show");
+      toast.setAttribute("aria-hidden", "false");
+      playSfx("evidence", 0.48);
+      newFactToastTimer = window.setTimeout(() => {
+        toast.classList.remove("show");
+        toast.setAttribute("aria-hidden", "true");
+      }, 3600);
+    }
+
     function showSuspectReply(text, mode = "답변") {
       const reply = document.querySelector("#suspectReply");
       const replyText = document.querySelector("#suspectReplyText");
@@ -3186,6 +3251,7 @@
       askButton.disabled = true;
       askButton.textContent = "답변 중";
       showSuspectReply("답을 고르는 중", "답변 중");
+      setInterrogationReaction("thinking");
 
       try {
         const response = await fetch("/api/interrogate/", {
@@ -3211,6 +3277,8 @@
         while (history.length > 8) history.shift();
         addInterrogationAnswer(suspect, answer, data.source, data.warning);
         maybeCollectInterrogationEvidence(suspect, answer, data.usedEvidenceNames);
+        setInterrogationReaction(data.reaction || "attentive", data.newFactId ? 4200 : 3000);
+        if (data.newFactId) showNewFactDiscovery(data.newFactId);
         if (data.newFactId) {
           const knownFactIds = new Set(readStoredNames(interrogationKnownFactsKey));
           knownFactIds.add(data.newFactId);
@@ -3221,11 +3289,15 @@
         }
         showToast(data.source === "rag" || data.source === "openai" ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
       } catch (error) {
+        setInterrogationReaction("calm");
         if (suspects[suspectIndex]?.id === suspect.id) {
           showSuspectReply("지금은 답하기 어려워 보입니다.", "오류");
         }
         showToast("AI 답변을 받지 못했습니다.");
       } finally {
+        if (document.querySelector("#interrogationCandle")?.getAttribute("data-state") === "thinking") {
+          setInterrogationReaction("calm");
+        }
         isAskingAi = false;
         updateInterrogationQuestionLimitUI();
       }
@@ -3282,6 +3354,15 @@
         event.preventDefault();
         document.querySelector("#askButton").click();
       }
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stopInterrogationThinkingSound();
+    });
+    window.addEventListener("pagehide", () => {
+      stopInterrogationThinkingSound();
+      window.clearTimeout(interrogationReactionTimer);
+      window.clearTimeout(newFactToastTimer);
     });
 
     function applyContentImages() {

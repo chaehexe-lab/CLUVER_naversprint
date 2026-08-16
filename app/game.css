@@ -4099,6 +4099,278 @@
       display: none;
     }
 
+    .interrogation-candle {
+      position: absolute;
+      left: 50%;
+      bottom: 18.5%;
+      z-index: 8;
+      width: 58px;
+      height: 128px;
+      transform: translateX(-50%);
+      transform-origin: 50% 100%;
+      pointer-events: none;
+      isolation: isolate;
+    }
+
+    .candle-halo {
+      position: absolute;
+      left: 50%;
+      top: -42px;
+      width: 188px;
+      height: 188px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255, 190, 93, .3) 0, rgba(207, 116, 42, .1) 42%, transparent 72%);
+      filter: blur(9px);
+      transform: translateX(-50%);
+      opacity: .72;
+    }
+
+    .candle-flame {
+      position: absolute;
+      left: 50%;
+      top: 3px;
+      width: 22px;
+      height: 39px;
+      border-radius: 55% 45% 58% 42% / 72% 68% 32% 28%;
+      background: linear-gradient(180deg, #fff7d1 0 18%, #f8bc55 46%, #b64820 100%);
+      box-shadow: 0 0 12px rgba(255, 211, 115, .9), 0 0 30px rgba(226, 120, 47, .56);
+      transform: translateX(-50%) rotate(2deg);
+      transform-origin: 50% 100%;
+      animation: interrogation-flame-calm 2.8s ease-in-out infinite;
+    }
+
+    .candle-flame-core {
+      position: absolute;
+      left: 50%;
+      bottom: 4px;
+      width: 8px;
+      height: 19px;
+      border-radius: 50% 50% 42% 42%;
+      background: rgba(255, 252, 224, .92);
+      transform: translateX(-50%);
+    }
+
+    .candle-wick {
+      position: absolute;
+      left: 50%;
+      top: 37px;
+      width: 2px;
+      height: 11px;
+      border-radius: 2px;
+      background: #1d110e;
+      transform: translateX(-50%);
+    }
+
+    .candle-body {
+      position: absolute;
+      left: 50%;
+      bottom: 13px;
+      width: 31px;
+      height: 73px;
+      border-radius: 5px 5px 8px 8px;
+      background:
+        linear-gradient(90deg, rgba(77, 38, 21, .8), rgba(184, 117, 66, .96) 34%, rgba(235, 176, 105, .92) 57%, rgba(84, 40, 24, .86)),
+        #9f613c;
+      box-shadow: inset 0 2px rgba(255, 214, 155, .3), 0 8px 16px rgba(0, 0, 0, .5);
+      transform: translateX(-50%);
+    }
+
+    .candle-body::before {
+      content: "";
+      position: absolute;
+      inset: -2px 3px auto;
+      height: 8px;
+      border-radius: 50%;
+      background: #c7895b;
+      box-shadow: inset 0 -3px rgba(77, 37, 24, .55);
+    }
+
+    .candle-dish {
+      position: absolute;
+      left: 50%;
+      bottom: 4px;
+      width: 54px;
+      height: 15px;
+      border-radius: 50%;
+      border: 2px solid rgba(126, 79, 39, .9);
+      background: linear-gradient(180deg, #9b6736, #382216 72%);
+      box-shadow: 0 7px 12px rgba(0, 0, 0, .52);
+      transform: translateX(-50%);
+    }
+
+    .interrogation-candle[data-state="thinking"] .candle-flame {
+      animation: interrogation-flame-thinking .22s ease-in-out infinite alternate;
+    }
+
+    .interrogation-candle[data-state="thinking"] .candle-halo {
+      animation: interrogation-halo-thinking .72s ease-in-out infinite alternate;
+    }
+
+    .interrogation-candle[data-state="attentive"] .candle-flame {
+      animation: interrogation-flame-attentive 1.15s ease-in-out infinite;
+    }
+
+    .interrogation-candle[data-state="avoid"] .candle-flame {
+      height: 31px;
+      filter: saturate(.66);
+      animation: interrogation-flame-avoid 1.8s ease-in-out infinite;
+    }
+
+    .interrogation-candle[data-state="avoid"] .candle-halo {
+      opacity: .38;
+      transform: translateX(-58%) scaleX(.72);
+    }
+
+    .interrogation-candle[data-state="nervous"] .candle-flame {
+      animation: interrogation-flame-nervous .42s ease-in-out infinite alternate;
+    }
+
+    .interrogation-candle[data-state="nervous"] .candle-halo {
+      opacity: .94;
+    }
+
+    .interrogation-candle[data-state="shocked"] .candle-flame {
+      background: linear-gradient(180deg, #eefcff 0 22%, #78c9e6 48%, #356b91 100%);
+      box-shadow: 0 0 15px rgba(164, 232, 255, .96), 0 0 42px rgba(63, 142, 186, .65);
+      animation: interrogation-flame-shocked .34s ease-out 1 both;
+    }
+
+    .interrogation-candle[data-state="shocked"] .candle-halo {
+      background: radial-gradient(circle, rgba(109, 206, 239, .34), rgba(35, 90, 126, .11) 44%, transparent 72%);
+    }
+
+    .interrogation-candle[data-state="silent"] .candle-flame {
+      height: 15px;
+      width: 11px;
+      opacity: .58;
+      filter: grayscale(.45);
+      animation: none;
+    }
+
+    .interrogation-candle[data-state="silent"] .candle-halo {
+      opacity: .15;
+    }
+
+    #interrogationScreen .shade,
+    #interrogationScreen .suspect-stage,
+    #interrogationScreen .suspect-sprite {
+      transition: opacity .45s ease, filter .45s ease, transform .45s ease, background .45s ease;
+    }
+
+    #interrogationScreen[data-interrogation-reaction="avoid"] .shade {
+      background: linear-gradient(90deg, rgba(0, 0, 0, .14), rgba(0, 0, 0, .42));
+    }
+
+    #interrogationScreen[data-interrogation-reaction="avoid"] .suspect-stage {
+      transform: translateX(-48%);
+      filter: brightness(.75) saturate(.78);
+    }
+
+    #interrogationScreen[data-interrogation-reaction="nervous"] .suspect-stage {
+      animation: interrogation-suspect-breath .86s ease-in-out 3;
+      filter: brightness(.88) saturate(.9);
+    }
+
+    #interrogationScreen[data-interrogation-reaction="shocked"] .shade,
+    #interrogationScreen[data-interrogation-reaction="silent"] .shade {
+      background: rgba(0, 0, 0, .52);
+    }
+
+    #interrogationScreen[data-interrogation-reaction="shocked"] .suspect-stage,
+    #interrogationScreen[data-interrogation-reaction="silent"] .suspect-stage {
+      filter: brightness(.58) saturate(.62);
+    }
+
+    .new-fact-toast {
+      position: absolute;
+      top: 8.5%;
+      right: 3.5%;
+      z-index: 30;
+      width: min(340px, 31vw);
+      padding: 13px 17px 14px;
+      border-left: 3px solid rgba(212, 166, 84, .92);
+      background: linear-gradient(90deg, rgba(27, 18, 12, .96), rgba(17, 12, 9, .9));
+      box-shadow: 0 14px 34px rgba(0, 0, 0, .48);
+      color: #f2e6cc;
+      opacity: 0;
+      transform: translateY(-12px);
+      transition: opacity .28s ease, transform .28s ease;
+      pointer-events: none;
+    }
+
+    .new-fact-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .new-fact-toast span {
+      display: block;
+      margin-bottom: 4px;
+      color: #cfa45e;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .new-fact-toast strong {
+      display: block;
+      font-size: 14px;
+      line-height: 1.45;
+      letter-spacing: 0;
+    }
+
+    @keyframes interrogation-flame-calm {
+      0%, 100% { transform: translateX(-50%) rotate(2deg) scale(1); }
+      45% { transform: translateX(-50%) rotate(-3deg) scale(.96, 1.04); }
+      72% { transform: translateX(-50%) rotate(4deg) scale(1.03, .97); }
+    }
+
+    @keyframes interrogation-flame-thinking {
+      from { transform: translateX(-50%) rotate(-8deg) scale(.92, 1.06); }
+      to { transform: translateX(-50%) rotate(8deg) scale(1.07, .91); }
+    }
+
+    @keyframes interrogation-halo-thinking {
+      from { opacity: .4; transform: translateX(-50%) scale(.9); }
+      to { opacity: .82; transform: translateX(-50%) scale(1.06); }
+    }
+
+    @keyframes interrogation-flame-attentive {
+      0%, 100% { transform: translateX(-50%) rotate(0) scale(1); }
+      35% { transform: translateX(-50%) rotate(-5deg) scale(.94, 1.14); }
+      58% { transform: translateX(-50%) rotate(3deg) scale(1.02, 1.06); }
+    }
+
+    @keyframes interrogation-flame-avoid {
+      0%, 100% { transform: translateX(-50%) rotate(-7deg) scale(.87, 1); }
+      50% { transform: translateX(-50%) rotate(5deg) scale(.76, .86); }
+    }
+
+    @keyframes interrogation-flame-nervous {
+      from { transform: translateX(-50%) rotate(-9deg) scale(.92, .92); }
+      to { transform: translateX(-50%) rotate(7deg) scale(1.12, 1.28); }
+    }
+
+    @keyframes interrogation-flame-shocked {
+      0% { transform: translateX(-50%) scale(.72, .7); }
+      38% { transform: translateX(-50%) scale(1.36, 1.56); }
+      100% { transform: translateX(-50%) scale(1, 1.12); }
+    }
+
+    @keyframes interrogation-suspect-breath {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-3px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .interrogation-candle *,
+      #interrogationScreen .suspect-stage,
+      #interrogationScreen .suspect-sprite,
+      .new-fact-toast {
+        animation: none !important;
+        transition-duration: .01ms !important;
+      }
+    }
+
     html[data-samunmong-theme="magicSchool"] .interrogation-desk-foreground,
     .game-shell[data-initial-theme="magicSchool"] .interrogation-desk-foreground {
       display: block;

@@ -105,6 +105,20 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
           />
         </div>
         <div className="interrogation-desk-foreground" aria-hidden="true" />
+        <div className="interrogation-candle" id="interrogationCandle" data-state="calm" aria-hidden="true">
+          <span className="candle-halo" />
+          <span className="candle-flame">
+            <span className="candle-flame-core" />
+          </span>
+          <span className="candle-wick" />
+          <span className="candle-body" />
+          <span className="candle-dish" />
+        </div>
+
+        <div className="new-fact-toast" id="newFactToast" role="status" aria-live="polite" aria-hidden="true">
+          <span>수사 노트</span>
+          <strong id="newFactTitle">새로운 사실이 기록되었습니다</strong>
+        </div>
 
         <div className="hud suspect-name" id="suspectName">
           {initialName}
