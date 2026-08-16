@@ -22,8 +22,8 @@ import YoomunseokSarangbangScene from "@/components/scenes/YoomunseokSarangbangS
 import { magicSchoolScenes, spaceStationScenes } from "@/lib/gameData";
 import { STARTABLE_SCREENS } from "@/lib/gameState";
 
-const CONTENT_SCRIPT = "/samunmong/content.js";
-const PROTOTYPE_SCRIPT = "/samunmong/prototype.js";
+const CONTENT_SCRIPT = "/samunmong/content.js?v=20260816-interactions-v91";
+const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260816-interactions-v110";
 const MAIN_SCREEN = "mainScreen";
 
 const INVESTIGATION_SCENE_COMPONENTS: Record<string, ComponentType> = {
@@ -112,6 +112,17 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
     document.querySelectorAll(".screen").forEach((screen) => {
       screen.classList.toggle("active", screen.id === currentScreen);
     });
+    if (currentScreen === MAIN_SCREEN) {
+      document.querySelectorAll<HTMLElement>(".global-panel").forEach((panel) => {
+        panel.classList.remove("show", "closing");
+        panel.setAttribute("aria-hidden", "true");
+      });
+      document.querySelectorAll<HTMLElement>("#globalOverlay, #overlay").forEach((overlay) => {
+        overlay.classList.remove("show");
+      });
+      document.querySelector<HTMLElement>("#evidenceBagPop")?.classList.remove("open", "closing");
+      document.body.classList.remove("tool-cursor-active");
+    }
     window.dispatchEvent(
       new CustomEvent("samunmong:screen-change", { detail: { screenId: currentScreen } })
     );
@@ -176,6 +187,12 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
   return (
     <div
       className="game-viewport"
+      onDragStartCapture={(event) => {
+        const target = event.target;
+        if (!(target instanceof HTMLElement) || !target.closest('[draggable="true"]')) {
+          event.preventDefault();
+        }
+      }}
       ref={(viewport) => {
         if (!viewport) return;
         const scale = Math.min(window.innerWidth / 1600, window.innerHeight / 900, 1);

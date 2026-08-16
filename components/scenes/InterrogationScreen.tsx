@@ -168,7 +168,10 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
           <div className="question-box">
             <div className="question-meta">
               <span className="presented-mini">
-                제시할 증거: <strong id="presentedEvidence">없음</strong>
+                <img id="presentedEvidenceImage" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" hidden />
+                <span>제시할 증거</span>
+                <strong id="presentedEvidence">없음</strong>
+                <b id="presentedEvidenceRole" hidden>단서</b>
               </span>
               <span className="question-limit-mini" id="questionLimitStatus" aria-live="polite">
                 남은 질문: 50회
@@ -187,6 +190,10 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
           </button>
           <span id="aiModeBadge">AI 대기</span>
           <p id="suspectReplyText">질문을 보내면 용의자가 답합니다.</p>
+          <div className="evidence-response-marker" id="evidenceResponseMarker" hidden>
+            <img id="responseEvidenceImage" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" />
+            <span><b id="responseEvidenceRole">증거 대면</b><small id="responseEvidenceMeaning">진술과 비교해 보십시오</small></span>
+          </div>
         </div>
 
         <div className="overlay" id="overlay" />
@@ -224,7 +231,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
         <button className="inspect-close" id="closeGenericEvidenceInspect" type="button" aria-label="단서 팝업 닫기">
           ×
         </button>
-        <img id="genericEvidenceImage" src="/samunmong/assets/evidence-wooden-tag.webp" alt="" />
+        <img id="genericEvidenceImage" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" />
         <div>
           <strong id="genericEvidenceTitle">단서 발견</strong>
           <p id="genericEvidenceText">단서를 확인했습니다.</p>
@@ -249,11 +256,70 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
               ×
             </button>
           </div>
+          <div className="evidence-story-nav" aria-label="사건 흐름별 증거 보기">
+            <span>사건 흐름</span>
+            <div className="evidence-story-filters" id="evidenceStoryFilters">
+              <button className="active" type="button" data-story-filter="all" aria-pressed="true">전체</button>
+              <button type="button" data-story-filter="동기" aria-pressed="false">동기</button>
+              <button type="button" data-story-filter="동선" aria-pressed="false">동선</button>
+              <button type="button" data-story-filter="누명" aria-pressed="false">누명</button>
+              <button type="button" data-story-filter="수법" aria-pressed="false">수법·상흔</button>
+              <button type="button" data-story-filter="진술" aria-pressed="false">진술</button>
+            </div>
+            <button className="evidence-thread-open" id="openEvidenceThread" type="button">
+              사건 줄거리 <b id="evidenceThreadCount">0</b>
+            </button>
+          </div>
           <div className="evidence-location-tabs" id="evidenceLocationTabs" aria-label="증거 장소 선택" />
           <div className="evidence-list evidence-grid" id="evidenceList">
             <div className="evidence-empty" id="emptyInterrogationEvidence">
               보따리에 담긴 증거가 없습니다.
             </div>
+          </div>
+          <div className="evidence-story-preview" id="evidenceStoryPreview" hidden>
+            <button className="evidence-story-preview-close" id="closeEvidenceStoryPreview" type="button" aria-label="증거 흐름 닫기">×</button>
+            <div className="evidence-story-preview-head">
+              <span id="evidencePreviewKind">현장 증거</span>
+              <strong id="evidencePreviewTitle">증거 이름</strong>
+            </div>
+            <div className="evidence-story-path" aria-label="증거가 말하는 사건 흐름">
+              <div className="evidence-story-node evidence-story-object">
+                <img id="evidencePreviewImage" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" />
+                <small>발견물</small>
+                <b id="evidencePreviewObject">증거</b>
+              </div>
+              <span className="evidence-story-arrow" aria-hidden="true">→</span>
+              <div className="evidence-story-node evidence-story-fact">
+                <small>확인된 사실</small>
+                <b id="evidencePreviewFact">흔적 확인</b>
+              </div>
+              <span className="evidence-story-arrow" aria-hidden="true">→</span>
+              <div className="evidence-story-node evidence-story-meaning">
+                <small id="evidencePreviewRole">사건 의미</small>
+                <b id="evidencePreviewMeaning">사건과 연결</b>
+              </div>
+            </div>
+            <div className="evidence-people-row" id="evidencePeopleRow" aria-label="이 증거와 관련된 인물" />
+            <div className="evidence-related-row" id="evidenceRelatedRow" aria-label="이어 볼 증거" />
+            <div className="evidence-connection-result" id="evidenceConnectionResult" hidden>
+              <div className="evidence-connection-images">
+                <img id="connectionImageA" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" />
+                <span aria-hidden="true">＋</span>
+                <img id="connectionImageB" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" />
+              </div>
+              <span>실마리 연결</span>
+              <strong id="evidenceConnectionText">두 증거가 하나의 사실을 가리킵니다.</strong>
+            </div>
+            <button className="evidence-present-confirm" id="confirmEvidencePresent" type="button">이 증거를 심문에 제시</button>
+          </div>
+          <div className="evidence-thread-panel" id="evidenceThreadPanel" hidden>
+            <button className="evidence-story-preview-close" id="closeEvidenceThread" type="button" aria-label="사건 줄거리 닫기">×</button>
+            <div className="evidence-thread-head">
+              <span>사또가 밝혀낸 연결</span>
+              <strong>사건 줄거리</strong>
+              <p>직접 이어 붙인 증거만 기록됩니다.</p>
+            </div>
+            <div className="evidence-thread-list" id="evidenceThreadList" />
           </div>
         </aside>
       </EvidenceInventory>
@@ -268,28 +334,52 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
         ) : null}
         <div className="global-panel-head">
           <div>
-            <p className="tool-panel-kicker">{isSpaceTheme ? "신호 분석" : "증거 분석"}</p>
-            <h2>{isSpaceTheme ? "스캔 도구" : "수사 도구"}</h2>
+            <p className="tool-panel-kicker">{isSpaceTheme ? "신호 분석" : "사또의 감식상"}</p>
+            <h2>{isSpaceTheme ? "스캔 도구" : "증거 감식"}</h2>
           </div>
           <button className="close-button global-close" type="button" aria-label={isSpaceTheme ? "스캔 도구 닫기" : "수사 도구 닫기"}>
             닫기
           </button>
         </div>
-        <p>{isSpaceTheme ? "스캔 장비를 먼저 고른 뒤 증거를 선택하면 잔류 신호를 확인할 수 있습니다." : "도구를 먼저 고른 뒤 증거를 선택하면 추가 단서를 확인할 수 있습니다."}</p>
+        <p>{isSpaceTheme ? "스캔 장비를 고른 뒤 증거를 확인하십시오." : "단서 하나와 도구 하나를 골라 증거 위에 놓으세요."}</p>
+        {!isSpaceTheme ? (
+          <ol className="tool-flow-guide" aria-label="증거 감식 순서">
+            <li><b>1</b><span>증거 고르기</span></li>
+            <li><b>2</b><span>도구 고르기</span></li>
+            <li><b>3</b><span>그림대로 한 번 조작</span></li>
+          </ol>
+        ) : null}
         <div className="tool-workbench">
           <div className="tool-evidence-list" id="toolEvidenceList">
             <div className="evidence-empty">아직 분석할 증거가 없습니다.</div>
           </div>
           <section className="tool-preview" aria-live="polite">
             <div className="tool-preview-image">
-              <img id="toolPreviewImage" src="/samunmong/assets/evidence-wooden-tag.webp" alt="" draggable={false} />
+              <img className="tool-workbench-plate" src="/samunmong/assets/interactions/evidence-tools/examination-workbench-v1.webp" alt="" aria-hidden="true" />
+              <img id="toolPreviewImage" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" draggable={false} />
+              <img id="toolRevealImage" className="tool-reveal-image" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" aria-hidden="true" draggable={false} />
+              <div className="tool-reaction-layer" id="toolReactionLayer" aria-hidden="true">
+                <img id="toolReactionPrimary" src="/samunmong/assets/interactions/evidence-tools/wood-dust-stroke.png" alt="" />
+                <img id="toolReactionSecondary" src="/samunmong/assets/interactions/evidence-tools/fiber-highlight.png" alt="" />
+              </div>
+              <div className="tool-analysis-progress" id="toolAnalysisProgress" aria-hidden="true">
+                <span id="toolAnalysisProgressFill" />
+              </div>
+              <span className="tool-analysis-stage" id="toolAnalysisStage">조사 준비</span>
+              <span className="tool-gesture-guide" id="toolGestureGuide">아래 도구 중 하나를 올려놓으세요</span>
             </div>
             <div className="tool-preview-copy">
-              <span className="tool-panel-kicker">선택한 증거</span>
+              <span className="tool-panel-kicker">지금 살펴볼 증거</span>
               <h3 id="toolPreviewTitle">증거를 선택하세요</h3>
               <p id="toolPreviewNote">왼쪽 목록에서 분석할 증거를 고르면 이곳에 크게 표시됩니다.</p>
               <div className="analysis-target">
-                분석 대상: <strong id="analysisTarget">선택 안 됨</strong>
+                감식 진행: <strong id="analysisTarget">선택 안 됨</strong>
+              </div>
+              <div className="tool-conclusion" id="toolConclusion" hidden>
+                <span className="tool-conclusion-seal" id="toolConclusionRole">동선</span>
+                <div><small>확인된 사실</small><strong id="toolConclusionFact">새로운 흔적을 확인했습니다.</strong></div>
+                <i aria-hidden="true">→</i>
+                <div><small>사건에서의 의미</small><b id="toolConclusionMeaning">사건 흐름과 이어집니다.</b></div>
               </div>
             </div>
           </section>
@@ -299,13 +389,206 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
 
       <aside className="global-panel tool-result-panel" id="toolResultPopup" aria-hidden="true" aria-live="polite">
         <div className="arcane-result-sigil" aria-hidden="true" />
-        <p className="tool-panel-kicker" id="toolResultKicker">도구 분석</p>
+        <p className="tool-panel-kicker" id="toolResultKicker">새 단서</p>
         <h2 id="toolResultTitle">증거 분석 결과</h2>
         <p id="toolResultText">새로운 정보가 드러났습니다.</p>
-        <button className="button primary" id="closeToolResult" type="button">
-          확인
-        </button>
+        <div className="evidence-result-story" id="toolResultStory">
+          <b id="toolResultStoryRole">단서</b>
+          <span id="toolResultStoryBeat">사건과 연결</span>
+        </div>
+        <div className="evidence-result-context">
+          <span id="toolResultLocation">발견 장소</span>
+          <div className="evidence-result-people" id="toolResultPeople" aria-label="관련 인물" />
+        </div>
+        <div className="evidence-acquisition-visual" aria-hidden="true">
+          <img className="evidence-acquisition-crest" src="/samunmong/assets/interactions/evidence-acquisition/acquisition-crest-v1.png" alt="" />
+          <span className="evidence-source-token">
+            <img id="toolResultSourceImage" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" />
+          </span>
+          <span className="evidence-transform-mark">→</span>
+          <img id="toolResultImage" className="evidence-acquisition-object" src="/samunmong/assets/interactions/evidence-tools/expanded/result-evidence-confirmed.png" alt="" width="320" />
+          <img className="evidence-acquisition-seal" src="/samunmong/assets/interactions/sato-skills/official-seal/objects/seal-imprint.png" alt="" />
+          <img className="evidence-acquisition-parcel" src="/samunmong/assets/interactions/evidence-collection/sealed-evidence-parcel.webp" alt="" />
+        </div>
+        <div className="evidence-result-actions">
+          <button className="button" id="openResultInBag" type="button">보따리에서 보기</button>
+          <button className="button primary" id="closeToolResult" type="button">계속</button>
+        </div>
       </aside>
+
+      {!isSpaceTheme && !isMagicTheme ? (
+        <aside className="global-panel" id="documentAssemblyPanel" aria-hidden="true" aria-live="polite">
+          <div className="global-panel-head">
+            <div>
+              <p className="tool-panel-kicker">문서 복원</p>
+              <h2 id="documentAssemblyTitle">찢어진 조각 맞추기</h2>
+            </div>
+            <button className="close-button global-close" type="button">그만두기</button>
+          </div>
+          <p id="documentAssemblyGuide">조각을 끌어 윤곽에 맞추십시오 · 짧게 누르면 회전</p>
+          <div className="document-assembly-stage" id="documentAssemblyStage" aria-label="찢어진 문서 조각 맞춤판">
+            {[
+              ["a", "fragment-a-v2.png"], ["b", "fragment-b-v2.png"], ["c", "fragment-c-v2.png"],
+            ].map(([pieceId, fileName]) => (
+              <div className="document-target" data-document-target={pieceId} key={`target-${pieceId}`}><img src={`/samunmong/assets/interactions/document-puzzle/drag-pieces/${fileName}`} alt="" /></div>
+            ))}
+            <img className="document-assembly-board" id="documentAssemblyBoard" src="/samunmong/assets/interactions/document-puzzle/board-empty.webp" alt="문서 맞춤판" />
+            {[
+              ["a", "fragment-a-v2.png"], ["b", "fragment-b-v2.png"], ["c", "fragment-c-v2.png"],
+            ].map(([pieceId, fileName]) => (
+              <button className="document-piece" type="button" data-document-piece={pieceId} key={pieceId} aria-label={`문서 조각 ${pieceId.toUpperCase()} 옮기기`}>
+                <img src={`/samunmong/assets/interactions/document-puzzle/drag-pieces/${fileName}`} alt={`문서 조각 ${pieceId.toUpperCase()}`} draggable={false} />
+              </button>
+            ))}
+          </div>
+        </aside>
+      ) : null}
+
+      {!isSpaceTheme && !isMagicTheme ? (
+        <>
+          <aside className="global-panel tactile-puzzle-panel" id="rubbingPuzzlePanel" aria-hidden="true" aria-live="polite">
+            <div className="global-panel-head">
+              <div><p className="tool-panel-kicker">장부 검험</p><h2>지워진 출입 기록 압흔 뜨기</h2></div>
+              <button className="close-button global-close" type="button">그만두기</button>
+            </div>
+            <p id="rubbingPuzzleGuide">붉은 손가락 고리가 달린 먹뭉치를 잡아 장부를 덮은 한지 위로 길게 문지르십시오.</p>
+            <div className="tactile-puzzle-stage" id="rubbingPuzzleStage">
+              <img id="rubbingPuzzleImage" src="/samunmong/assets/interactions/ledger-rubbing-puzzle/state-1-v1.png" alt="지워진 출입 기록 위에 한지를 고정한 장부 탁본 작업판" draggable={false} />
+              <span className="rubbing-lane active" data-rubbing-lane="1"><i>→</i></span>
+              <span className="rubbing-lane" data-rubbing-lane="2"><i>←</i></span>
+              <span className="rubbing-lane" data-rubbing-lane="3"><i>→</i></span>
+              <button className="rubbing-charcoal" id="rubbingCharcoal" type="button" aria-label="먹뭉치를 잡아 탁본하기">
+                <img src="/samunmong/assets/interactions/hand-tools-generated/joseon-rubbing-pad-v2.png" alt="조선식 탁본 먹뭉치" draggable={false} />
+              </button>
+            </div>
+          </aside>
+
+          <aside className="global-panel tactile-puzzle-panel" id="knotPuzzlePanel" aria-hidden="true" aria-live="polite">
+            <div className="global-panel-head">
+              <div><p className="tool-panel-kicker">손끝 채증</p><h2>매듭 풀기</h2></div>
+              <button className="close-button global-close" type="button">그만두기</button>
+            </div>
+            <p id="knotPuzzleGuide">느슨한 고리부터 차례로 당기십시오.</p>
+            <div className="tactile-puzzle-stage knot-puzzle-stage" id="knotPuzzleStage">
+              <img id="knotPuzzleImage" src="/samunmong/assets/interactions/knot-puzzle/state-1.png" alt="옷고름 매듭" draggable={false} />
+              <button className="knot-drag-handle knot-center" type="button" data-knot-loop="1" aria-label="가운데 고리 당기기"><span>↓</span></button>
+              <button className="knot-drag-handle knot-left" type="button" data-knot-loop="2" aria-label="왼쪽 고리 당기기"><span>←</span></button>
+              <button className="knot-drag-handle knot-right" type="button" data-knot-loop="3" aria-label="오른쪽 고리 당기기"><span>→</span></button>
+            </div>
+          </aside>
+
+          <aside className="global-panel tactile-puzzle-panel" id="footprintPuzzlePanel" aria-hidden="true" aria-live="polite">
+            <div className="global-panel-head">
+              <div><p className="tool-panel-kicker">흔적 대조</p><h2>짚신 밑창 포개기</h2></div>
+              <button className="close-button global-close" type="button">그만두기</button>
+            </div>
+            <p id="footprintPuzzleGuide">짚신을 흔적 쪽으로 끌어 정확히 포개십시오.</p>
+            <div className="tactile-puzzle-stage footprint-match-stage" id="footprintPuzzleStage">
+              <img id="footprintPuzzleImage" src="/samunmong/assets/interactions/footprint-puzzle/state-1.png" alt="발자국 대조판" draggable={false} />
+              <span className="footprint-drop-target" id="footprintDropTarget" aria-hidden="true" />
+              <button className="footprint-shoe-piece" id="footprintShoePiece" type="button" aria-label="짚신 밑창을 끌어 발자국에 포개기">
+                <img src="/samunmong/assets/interactions/evidence-reverse/muddy-straw-shoe-sole-v2.png" alt="" draggable={false} />
+                <span>짚신 밑창</span>
+              </button>
+              <span className="footprint-measure-target" id="footprintMeasureTarget" aria-hidden="true">발끝부터 뒤꿈치까지</span>
+              <button className="footprint-measure-tool" id="footprintMeasureTool" type="button" aria-label="실측줄을 발자국 길이에 맞춰 놓기">
+                <img src="/samunmong/assets/interactions/evidence-tools/expanded/tool-footprint-measuring-cord.png" alt="조선식 발자국 실측줄" draggable={false} />
+                <span>실측줄 놓기</span>
+              </button>
+            </div>
+          </aside>
+
+          <aside className="global-panel tactile-puzzle-panel" id="materialPuzzlePanel" aria-hidden="true" aria-live="polite">
+            <div className="global-panel-head">
+              <div><p className="tool-panel-kicker" id="materialPuzzleKicker">손끝 감식</p><h2 id="materialPuzzleTitle">증거 살피기</h2></div>
+              <button className="close-button global-close" type="button">그만두기</button>
+            </div>
+            <p id="materialPuzzleGuide">흔적을 직접 확인하십시오.</p>
+            <div className="tactile-puzzle-stage material-puzzle-stage" id="materialPuzzleStage">
+              <img id="materialPuzzleImage" src="/samunmong/assets/interactions/focus-puzzle/state-1.png" alt="증거 감식 작업판" draggable={false} />
+              <span className="tactile-hand-guide" id="materialPuzzleGesture">천천히 움직이기</span>
+              <div className="material-direct-layer" id="materialDirectLayer" hidden>
+                <span className="material-path-target active" data-material-target="1" />
+                <span className="material-path-target" data-material-target="2" />
+                <span className="material-path-target" data-material-target="3" />
+                <button className="material-hand-tool" id="materialHandTool" type="button" aria-label="감식 도구를 잡아 빛나는 지점으로 옮기기">
+                  <img id="materialHandToolImage" src="/samunmong/assets/mudeok-interaction/tool-magnifying-glass.webp" alt="조선식 돋보기" draggable={false} />
+                  <span className="visually-hidden" id="materialHandToolName">돋보기</span>
+                </button>
+              </div>
+              <div className="sample-touch-points" id="sampleTouchPoints" hidden>
+                <span className="sample-drop-zone active" data-sample-target="1">첫 자리</span>
+                <span className="sample-drop-zone" data-sample-target="2">둘째 자리</span>
+                <span className="sample-drop-zone" data-sample-target="3">판정 자리</span>
+                <button type="button" data-sample-point="1" data-label="가" aria-label="첫 번째 표본 끌기">
+                  <img data-sample-image alt="" draggable={false} />
+                </button>
+                <button type="button" data-sample-point="2" data-label="나" aria-label="두 번째 표본 끌기">
+                  <img data-sample-image alt="" draggable={false} />
+                </button>
+                <button type="button" data-sample-point="3" data-label="고정" aria-label="겹치는 지점 끌기">
+                  <img data-sample-image alt="" draggable={false} />
+                </button>
+              </div>
+            </div>
+          </aside>
+
+          <aside className="global-panel tactile-puzzle-panel" id="specialEvidencePuzzlePanel" aria-hidden="true" aria-live="polite">
+            <div className="global-panel-head">
+              <div><p className="tool-panel-kicker" id="specialPuzzleKicker">증거 복원</p><h2 id="specialPuzzleTitle">흔적 연결하기</h2></div>
+              <button className="close-button global-close" type="button">그만두기</button>
+            </div>
+            <p id="specialPuzzleGuide">조각을 순서대로 연결하십시오.</p>
+            <div className="tactile-puzzle-stage special-puzzle-stage" id="specialPuzzleStage">
+              <img id="specialPuzzleImage" src="/samunmong/assets/interactions/red-thread-puzzle/state-1.png" alt="증거 연결 작업판" draggable={false} />
+              <span className="tactile-hand-guide" id="specialPuzzleGesture">핀 연결하기</span>
+              <div className="sample-touch-points special-touch-points" id="specialTouchPoints">
+                <button type="button" data-special-point="1" aria-label="첫 번째 연결점" />
+                <button type="button" data-special-point="2" aria-label="두 번째 연결점" />
+                <button type="button" data-special-point="3" aria-label="세 번째 연결점" />
+              </div>
+              <button className="special-explorer-tool" id="specialExplorerTool" type="button" hidden>
+                <img id="specialExplorerReaction" className="special-explorer-reaction" src="/samunmong/assets/interactions/evidence-tools/candle-bloom.png" alt="" draggable={false} aria-hidden="true" />
+                <img id="specialExplorerToolImage" className="special-explorer-tool-image" src="/samunmong/assets/interactions/hand-tools-generated/joseon-candle-holder-v2.png" alt="장부를 비출 촛대" draggable={false} />
+              </button>
+              <button className="special-surface-handle" id="specialSurfaceHandle" type="button" hidden>
+                <img id="specialSurfaceToolImage" src="/samunmong/assets/interactions/hand-tools-generated/joseon-bamboo-sieve-v2.png" alt="조선식 대나무 체" draggable={false} />
+                <span className="surface-direction" id="specialSurfaceDirection">↔</span>
+              </button>
+            </div>
+          </aside>
+
+          <aside className="global-panel tactile-puzzle-panel" id="evidenceConfrontationPanel" aria-hidden="true" aria-live="polite">
+            <div className="global-panel-head">
+              <div><p className="tool-panel-kicker">심문 대면</p><h2 id="confrontationTitle">증거를 심문상에 올리기</h2></div>
+              <button className="close-button global-close" type="button">대면 취소</button>
+            </div>
+            <p id="confrontationGuide">증거패를 심문상에 올린 뒤 관인을 끌어 찍으십시오.</p>
+            <div className="tactile-puzzle-stage ritual-drag-stage" id="confrontationStage">
+              <img id="confrontationImage" src="/samunmong/assets/interactions/confrontation-puzzle/state-1.png" alt="증거 대면 심문상" draggable={false} />
+              <span className="ritual-drop-target confrontation-target-one" data-ritual-target="confrontation-1" aria-hidden="true" />
+              <span className="ritual-drop-target confrontation-target-three" data-ritual-target="confrontation-2" aria-hidden="true" />
+              <button className="ritual-drag-piece evidence-tablet active" type="button" data-ritual-kind="confrontation" data-ritual-step="1"><strong>증거패</strong><span id="confrontationEvidenceName">선택 증거</span></button>
+              <button className="ritual-drag-piece official-seal" type="button" data-ritual-kind="confrontation" data-ritual-step="2"><strong>관인</strong><span>끌어 찍기</span></button>
+            </div>
+          </aside>
+
+          <aside className="global-panel tactile-puzzle-panel" id="sleeveInspectionPanel" aria-hidden="true" aria-live="polite">
+            <div className="global-panel-head">
+              <div><p className="tool-panel-kicker">신체 확인</p><h2 id="sleeveInspectionTitle">소매 아래 확인</h2></div>
+              <button className="close-button global-close" type="button">확인 취소</button>
+            </div>
+            <p id="sleeveInspectionGuide">손목 끈을 풀고 소매를 올려 팔의 흔적을 확인하십시오.</p>
+            <div className="tactile-puzzle-stage ritual-drag-stage sleeve-drag-stage" id="sleeveInspectionStage">
+              <img id="sleeveInspectionImage" src="/samunmong/assets/interactions/sleeve-inspection-puzzle/state-1.png" alt="소매 확인 작업판" draggable={false} />
+              <span className="ritual-drop-target sleeve-target-one" data-ritual-target="sleeve-1" aria-hidden="true" />
+              <span className="ritual-drop-target sleeve-target-two" data-ritual-target="sleeve-2" aria-hidden="true" />
+              <button className="ritual-drag-piece wrist-cord active" type="button" data-ritual-kind="sleeve" data-ritual-step="1"><strong>손목 끈</strong><span>옆으로 당기기</span></button>
+              <button className="ritual-drag-piece sleeve-fold" type="button" data-ritual-kind="sleeve" data-ritual-step="2"><strong>소매 끝</strong><span>위로 밀기</span></button>
+            </div>
+          </aside>
+        </>
+      ) : null}
 
       <InvestigationNote>
         <aside className="global-panel investigation-note-panel conversation-note" id="fieldNotePanel" aria-hidden="true" style={notePanelStyle}>
@@ -378,7 +661,14 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
         </div>
       </aside>
 
-      <div className="toast" id="toast" role="status" aria-live="polite" />
+      <div className="toast" id="toast" role="status" aria-live="polite">
+        <button className="toast-close" id="closeToast" type="button" aria-label="알림 닫기" hidden>×</button>
+        <img className="toast-evidence-image" id="toastEvidenceImage" alt="" hidden />
+        <span className="toast-copy">
+          <strong className="toast-title" id="toastTitle" hidden />
+          <span className="toast-message" id="toastMessage" />
+        </span>
+      </div>
       <div className="fade" id="fade">
         이동 중...
       </div>
