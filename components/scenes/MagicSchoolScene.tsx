@@ -1,25 +1,7 @@
 import { magicSchoolScenes } from "@/lib/gameData";
-import type { CSSProperties } from "react";
+import { hotspotStyle } from "./hotspotStyle";
 
 type MagicScene = (typeof magicSchoolScenes)[number];
-
-type HotspotStyle = CSSProperties & {
-  "--x": string;
-  "--y": string;
-  "--w": string;
-  "--h": string;
-  "--rot"?: string;
-};
-
-function hotspotStyle(hotspot: MagicScene["hotspots"][number]): HotspotStyle {
-  return {
-    "--x": hotspot.x,
-    "--y": hotspot.y,
-    "--w": hotspot.w,
-    "--h": hotspot.h,
-    "--rot": hotspot.rot
-  };
-}
 
 export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
   return (

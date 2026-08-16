@@ -107,7 +107,7 @@ export const fieldOneScene = {
   props: [] as SceneProp[],
   hotspots: [
     { evidenceName: "찢어진 약속 편지", ariaLabel: "찢어진 약속 편지 조사", x: "70.6%", y: "88.6%", w: "10.2%", h: "8.8%", clipPath: "polygon(7% 35%, 44% 8%, 94% 24%, 98% 76%, 32% 96%, 2% 70%)", radius: "12px", rot: "7deg" },
-    { id: "hopaeHotspot", evidenceName: "호패 조각", className: "hopae-glow", ariaLabel: "호패 조각 조사", x: "56.6%", y: "87.0%", w: "7.2%", h: "8.8%", clipPath: "polygon(26% 6%, 75% 8%, 96% 58%, 70% 96%, 24% 90%, 3% 43%)", radius: "14px", rot: "-10deg" }
+    { id: "hopaeHotspot", className: "hopae-glow", evidenceName: "호패 조각", ariaLabel: "호패 조각 조사", x: "56.6%", y: "87.0%", w: "7.2%", h: "8.8%", clipPath: "polygon(26% 6%, 75% 8%, 96% 58%, 70% 96%, 24% 90%, 3% 43%)", radius: "14px", rot: "-10deg" }
   ] satisfies SceneHotspot[],
   dock: [
     { id: "openMapFromField", ...investigationDock[0], className: "map-chip" },
@@ -121,7 +121,9 @@ export const fieldOneScene = {
     id: "hopaeInspect",
     image: "/samunmong/assets/evidence-wooden-tag.webp",
     title: "호패 조각",
-    text: "특정 도구를 이용해 자세히 알아봐야 할 것 같다."
+    text: "특정 도구를 이용해 자세히 알아봐야 할 것 같다.",
+    closeButtonId: "closeHopaeInspect",
+    closeButtonLabel: "호패 조각 팝업 닫기"
   }
 } as const;
 
@@ -132,7 +134,7 @@ export const chunwolRoomScene = {
   props: [] as SceneProp[],
   hotspots: [
     { evidenceName: "헐거워진 노리개", ariaLabel: "헐거워진 노리개 조사", x: "56.0%", y: "76.0%", w: "7.6%", h: "6.8%", clipPath: "ellipse(46% 38% at 50% 54%)", radius: "999px", rot: "-8deg" },
-    { id: "portraitHotspot", evidenceName: "돌쇠의 그림", className: "portrait-glow", ariaLabel: "돌쇠의 그림 조사", x: "63.0%", y: "59.8%", w: "8.0%", h: "20.5%", clipPath: "polygon(18% 4%, 92% 16%, 81% 98%, 8% 84%)", radius: "8px", rot: "4deg" }
+    { id: "portraitHotspot", className: "portrait-glow", evidenceName: "돌쇠의 그림", ariaLabel: "돌쇠의 그림 조사", x: "63.0%", y: "59.8%", w: "8.0%", h: "20.5%", clipPath: "polygon(18% 4%, 92% 16%, 81% 98%, 8% 84%)", radius: "8px", rot: "4deg" }
   ] satisfies SceneHotspot[],
   dock: [
     { id: "openMapFromRoom", ...investigationDock[0], className: "map-chip" },

@@ -42,3 +42,24 @@ export type SceneProp = {
   w: string;
   rot?: string;
 };
+
+export type SceneInspect = {
+  id: string;
+  image: string;
+  title: string;
+  text: string;
+  buttonId?: string;
+  buttonLabel?: string;
+  closeButtonId?: string;
+  closeButtonLabel?: string;
+};
+
+export type InvestigationSceneData = {
+  id: string;
+  image: string;
+  alt: string;
+  props: readonly SceneProp[];
+  hotspots: readonly SceneHotspot[];
+  dock: readonly SceneDockAction[];
+  inspect?: SceneInspect;
+};
