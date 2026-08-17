@@ -362,6 +362,7 @@ function TypewriterLines({ lines, onType }: { lines: readonly string[]; onType?:
 export default function ResultScreen() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const resultRouteState = searchParams.toString();
   const { playButtonSfx, playTypingSfx } = useResultAudio();
   const theme = (searchParams.get("theme") === "spaceStation" ? "spaceStation" : searchParams.get("theme") === "magicSchool" ? "magicSchool" : "joseon") satisfies ResultTheme;
   const activeSuspects = theme === "spaceStation" ? spaceSuspects : suspects;
@@ -379,6 +380,7 @@ export default function ResultScreen() {
   const [showLoading, setShowLoading] = useState(false);
   const [showSealRitual, setShowSealRitual] = useState(false);
   const [sealStep, setSealStep] = useState<"ready" | "inked" | "pressed">("ready");
+  const loadingTimerRef = useRef<number | null>(null);
 
   const selectedSuspect = activeSuspects.find((suspect) => suspect.id === selectedSuspectId) ?? activeSuspects[0];
   const missingEvidence = useMemo(() => {
@@ -392,6 +394,22 @@ export default function ResultScreen() {
     }
   }, [missingEvidence.length, searchParams]);
 
+  useEffect(() => {
+    if (loadingTimerRef.current !== null) {
+      window.clearTimeout(loadingTimerRef.current);
+      loadingTimerRef.current = null;
+    }
+    setShowLoading(false);
+  }, [resultRouteState]);
+
+  useEffect(() => {
+    return () => {
+      if (loadingTimerRef.current !== null) {
+        window.clearTimeout(loadingTimerRef.current);
+      }
+    };
+  }, []);
+
   function handleResultClick(event: MouseEvent<HTMLElement>) {
     const target = event.target;
     if (target instanceof Element && target.closest("button, a")) {
@@ -400,8 +418,14 @@ export default function ResultScreen() {
   }
 
   function withLoading(action: () => void, delay = loadingDuration) {
+    if (loadingTimerRef.current !== null) {
+      window.clearTimeout(loadingTimerRef.current);
+    }
     setShowLoading(true);
-    window.setTimeout(action, delay);
+    loadingTimerRef.current = window.setTimeout(() => {
+      loadingTimerRef.current = null;
+      action();
+    }, delay);
   }
 
   function navigateWithLoading(path: string, beforeNavigate?: () => void) {
