@@ -44,6 +44,12 @@
     let fieldGuideNextButton = document.querySelector("#nextFieldGuide");
     let fieldGuideSkipButton = document.querySelector("#skipFieldGuide");
     let selectedEvidence = "";
+    const defaultInterrogationPrompts = [
+      "이 증거를 본 적 있나?",
+      "사건 직전 어디에 있었지?",
+      "이 물건이 왜 여기 있지?",
+      "숨긴 말이 더 있나?"
+    ];
     let currentToolResultEvidence = "";
     let isAskingAi = false;
     const interrogationHistories = new Map();
@@ -2683,12 +2689,34 @@
       });
     }
 
+    function clearPresentedEvidence() {
+      selectedEvidence = "";
+      document.querySelectorAll("#evidenceList .evidence.active").forEach((item) => item.classList.remove("active"));
+      const presented = document.querySelector("#presentedEvidence");
+      const image = document.querySelector("#presentedEvidenceImage");
+      const roleBadge = document.querySelector("#presentedEvidenceRole");
+      if (presented) presented.textContent = "없음";
+      if (image) {
+        image.hidden = true;
+        image.alt = "";
+      }
+      if (roleBadge) roleBadge.hidden = true;
+      if (themeId === "joseon") {
+        document.querySelectorAll(".prompt-line").forEach((button, index) => {
+          button.hidden = false;
+          button.textContent = defaultInterrogationPrompts[index] || defaultInterrogationPrompts[0];
+          button.classList.remove("evidence-question");
+        });
+      }
+    }
+
     function showEvidenceResponseMarker(name) {
       const marker = document.querySelector("#evidenceResponseMarker");
-      if (!marker || themeId !== "joseon" || !name) return;
+      if (!marker) return;
+      marker.hidden = themeId !== "joseon" || !name;
+      if (marker.hidden) return;
       const data = evidenceData[name] || {};
       const [role] = getEvidenceStoryCue(name, data);
-      marker.hidden = false;
       document.querySelector("#responseEvidenceImage").src = getEvidenceImage(name);
       document.querySelector("#responseEvidenceImage").alt = getEvidenceSource(name);
       document.querySelector("#responseEvidenceRole").textContent = `${role} 증거와 대면`;
@@ -6113,6 +6141,7 @@
         showToast("AI 답변을 받지 못했습니다.");
       } finally {
         isAskingAi = false;
+        clearPresentedEvidence();
         updateInterrogationQuestionLimitUI();
       }
     }
