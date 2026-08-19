@@ -325,7 +325,7 @@ export default function BriefingScreen({ initialTheme }: { initialTheme?: "magic
                 <button type="button" data-briefing-next-zone aria-label="다음 마력 흔적" />
               </div>
             </figure>
-            <p className="briefing-caption strong">점순이는 어떻게 숨졌는가</p>
+            <p className="briefing-caption strong">점순이는 어떻게 죽었는가</p>
             <div className="briefing-death-layout">
               <div className="briefing-evidence-stack">
                 <figure className="briefing-evidence-photo">
@@ -337,9 +337,9 @@ export default function BriefingScreen({ initialTheme }: { initialTheme?: "magic
                 <p className="briefing-evidence-caption">검안 기록</p>
               </div>
               <div className="briefing-death-copy">
-                <p>사또님, 검안 결과를 살펴보니 <strong>목 주변의 희미한 압박 흔적</strong>이 먼저 보입니다.</p>
+                <p>사또님, 검안 결과를 살펴보니 <br />목에 <strong>희미한 끈 자국</strong>이 보입니다.</p>
                 <p>또한 점순이의 손톱 밑에는 <strong>살점으로 보이는 흔적</strong>이 남아 있었습니다.</p>
-                <p>이는 누군가 천으로 점순이의 목을 조른 정황으로 보입니다.</p>
+                <p>이는 누군가 점순이의 목을 조른 정황으로 보입니다.</p>
               </div>
             </div>
           </div>
