@@ -2702,9 +2702,21 @@
       pointer-events: none;
     }
 
+    .field-onboarding[data-guide-step="map-click"]::before {
+      background:
+        radial-gradient(
+          circle at calc(2.2% + 44px) calc(97% - 36px),
+          transparent 0 58px,
+          rgba(0,0,0,.48) 70px
+        );
+      opacity: 1;
+    }
+
     #fieldOne:has(.field-onboarding[data-guide-step="map-click"]:not([hidden]))
       .scene-chip:not(.field-guide-highlight),
     #fieldOne:has(.field-onboarding[data-guide-step="room"]:not([hidden]))
+      .scene-chip:not(.field-guide-highlight),
+    #fieldOne:has(.field-onboarding[data-guide-step="suspects"]:not([hidden]))
       .scene-chip:not(.field-guide-highlight),
     #fieldOne:has(.field-onboarding[data-guide-step="tools"]:not([hidden]))
       .scene-chip:not(.field-guide-highlight) {
@@ -2721,14 +2733,19 @@
         radial-gradient(
           circle at calc(2.2% + 136px) calc(97% - 36px),
           transparent 0 58px,
-          rgba(0,0,0,.54) 70px,
-          rgba(0,0,0,.66) 100px
+          rgba(0,0,0,.48) 70px
         );
+      opacity: 1;
+    }
+
+    .field-onboarding[data-guide-step="suspects"]::before {
+      background: rgba(0,0,0,.48);
+      opacity: 1;
     }
 
     .field-onboarding[data-guide-step="tools"]::before {
-      background:
-        linear-gradient(180deg, rgba(0,0,0,.58), rgba(0,0,0,.26) 52%, rgba(0,0,0,.46));
+      background: rgba(0,0,0,.48);
+      opacity: 1;
     }
 
     .field-guide-card {
@@ -2777,13 +2794,78 @@
       left: 2.2%;
       top: auto;
       bottom: 19%;
-      width: min(860px, 90vw);
-      padding: 30px 36px;
+      width: min(740px, 90vw);
+      padding: 30px 36px 6px;
       transform: none;
     }
 
     .field-onboarding[data-guide-step="room"] .field-guide-card h2 {
       white-space: nowrap;
+    }
+
+    .field-onboarding[data-guide-step="suspects"] .field-guide-card {
+      top: 50%;
+      width: min(980px, 94vw);
+      padding: 32px 36px 34px;
+      translate: -50% -50%;
+    }
+
+    .field-onboarding[data-guide-step="suspects"] .field-guide-card h2 {
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    .field-guide-suspects {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      width: 94%;
+      margin: 0 auto;
+    }
+
+    .field-guide-suspects figure {
+      position: relative;
+      height: clamp(180px, 25.5vw, 315px);
+      margin: 0;
+      overflow: hidden;
+      border: 1px solid rgba(217,178,104,.34);
+      border-radius: 10px;
+      background: rgba(35,20,12,.38);
+      box-shadow: inset 0 0 24px rgba(0,0,0,.3);
+    }
+
+    .field-guide-suspects img {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 215%;
+      max-width: none;
+      transform: translate(-50%, -50%);
+      filter: drop-shadow(7px 11px 9px rgba(0,0,0,.46)) sepia(.08) brightness(.94);
+    }
+
+    .field-guide-suspects figure:nth-child(2) img {
+      left: 62%;
+    }
+
+    .field-guide-suspects figure:nth-child(4) img {
+      left: 56.5%;
+    }
+
+    .field-guide-suspects figcaption {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      box-sizing: border-box;
+      height: 60px;
+      padding: 9px 6px;
+      color: #f6e0b4;
+      background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,.68)), #4a2d1d;
+      font-family: "ChilgokLjh", "ChosunNm", serif;
+      font-size: clamp(19px, 2.1vw, 28px);
+      text-align: center;
+      text-shadow: 0 2px 0 rgba(0,0,0,.78);
     }
 
     .field-onboarding[data-guide-step="tools"] .field-guide-card {
@@ -2846,6 +2928,10 @@
       margin-top: 18px;
     }
 
+    .field-onboarding[data-guide-step="room"] .field-guide-actions {
+      transform: translateY(-20px);
+    }
+
     .field-guide-skip,
     .field-guide-next {
       min-height: 42px;
@@ -2873,21 +2959,14 @@
       animation: fieldGuidePulse 1.18s ease-in-out infinite;
     }
 
-    #fieldOne:has(.field-onboarding[data-guide-step="room"]:not([hidden])) .scene-dock,
     #fieldOne:has(.field-onboarding[data-guide-step="tools"]:not([hidden])) .scene-dock {
       z-index: 63;
     }
 
-    #fieldOne:has(.field-onboarding[data-guide-step="room"]:not([hidden]))
-      .scene-chip:not(.field-guide-highlight) {
-      opacity: .38;
-      filter: brightness(.46) saturate(.72);
-    }
-
     #fieldOne:has(.field-onboarding[data-guide-step="tools"]:not([hidden]))
       .scene-chip:not(.field-guide-highlight) {
-      opacity: .38;
-      filter: brightness(.46) saturate(.72);
+      opacity: 1;
+      filter: brightness(.52);
     }
 
     #fieldOne:has(.field-onboarding[data-guide-step="tools"]:not([hidden]))

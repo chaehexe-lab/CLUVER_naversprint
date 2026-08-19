@@ -22,10 +22,31 @@ export default function FieldOneScene() {
           <div className="field-guide-panel" data-field-guide-panel="room" aria-hidden="true">
             <h2>용의자에게 사건에 대해 질문해 보십시오</h2>
             <p>
-              취조실에서는 <strong>네 명의 용의자</strong>를 불러 신문할 수 있습니다.
+              취조실에서 <strong>용의자</strong>를 불러 신문할 수 있습니다.
               <br />
               수집한 <strong>증거를 함께 제시</strong>하며 질문할 수도 있습니다.
             </p>
+          </div>
+          <div className="field-guide-panel" data-field-guide-panel="suspects" aria-hidden="true">
+            <h2>용의자는 총 4명입니다</h2>
+            <div className="field-guide-suspects" aria-label="용의자 4명">
+              <figure>
+                <img src="/samunmong/assets/suspects/dolsoe-seated.webp" alt="돌쇠" />
+                <figcaption>돌쇠</figcaption>
+              </figure>
+              <figure>
+                <img src="/samunmong/assets/suspects/chunwol-seated.webp" alt="최춘월" />
+                <figcaption>최춘월</figcaption>
+              </figure>
+              <figure>
+                <img src="/samunmong/assets/suspects/yoomunseok-seated.webp" alt="유문석" />
+                <figcaption>유문석</figcaption>
+              </figure>
+              <figure>
+                <img src="/samunmong/assets/suspects/mudeok-seated.webp" alt="무덕" />
+                <figcaption>무덕</figcaption>
+              </figure>
+            </div>
           </div>
           <div className="field-guide-panel" data-field-guide-panel="tools" aria-hidden="true">
             <p className="field-guide-kicker">현장 도구</p>

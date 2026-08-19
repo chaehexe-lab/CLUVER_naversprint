@@ -1454,7 +1454,7 @@
     }
 
     function isFieldGuideBlockingControls() {
-      return Boolean(fieldGuide && !fieldGuide.hidden && ["room", "tools"].includes(fieldGuideStep));
+      return Boolean(fieldGuide && !fieldGuide.hidden && ["room", "suspects", "tools"].includes(fieldGuideStep));
     }
 
     function startFieldGuide() {
@@ -2017,6 +2017,10 @@
         return;
       }
       if (fieldGuideStep === "room") {
+        setFieldGuideStep("suspects");
+        return;
+      }
+      if (fieldGuideStep === "suspects") {
         setFieldGuideStep("tools");
         return;
       }
