@@ -2788,6 +2788,7 @@
 
     .field-onboarding[data-guide-step="map-click"] .field-guide-card p:not(.field-guide-kicker) {
       font-weight: 500;
+      font-size: clamp(21px, 2.2vw, 23px);
     }
 
     .field-onboarding[data-guide-step="room"] .field-guide-card {
@@ -2870,6 +2871,15 @@
 
     .field-onboarding[data-guide-step="tools"] .field-guide-card {
       top: 10%;
+      width: min(650px, 90vw);
+      padding-top: 34px;
+      padding-left: 34px;
+      padding-right: 30px;
+    }
+
+    .field-onboarding[data-guide-step="tools"] .field-guide-card h2,
+    .field-onboarding[data-guide-step="tools"] .field-guide-card li {
+      white-space: nowrap;
     }
 
     .field-guide-panel {
@@ -2894,7 +2904,7 @@
       margin: 0 0 12px;
       color: #fff2d7;
       font-family: "ChilgokLjh", "NanumBareunJeongsin", serif;
-      font-size: clamp(26px, 3vw, 38px);
+      font-size: clamp(24px, 2.65vw, 34px);
       font-weight: 400;
       line-height: 1.2;
     }
@@ -2902,8 +2912,8 @@
     .field-guide-card p,
     .field-guide-card li {
       color: rgba(247,236,216,.86);
-      font-family: "NanumBareunJeongsin", "Noto Serif KR", serif;
-      font-size: clamp(19px, 2.1vw, 26px);
+      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
+      font-size: clamp(21px, 2.2vw, 23px);
       line-height: 1.48;
       word-break: keep-all;
     }
@@ -2940,7 +2950,7 @@
       border-radius: 999px;
       color: #f7ecd8;
       background: rgba(17, 8, 5, .72);
-      font-family: "NanumBareunJeongsin", "Noto Serif KR", serif;
+      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
       font-size: 18px;
     }
 
@@ -5978,6 +5988,15 @@
     .field-guide-card p,
     .field-guide-card li {
       color: rgba(49, 28, 17, .88);
+    }
+
+    #fieldOne .field-onboarding .field-guide-card h2 {
+      font-size: clamp(24px, 2.65vw, 34px);
+    }
+
+    #fieldOne .field-onboarding .field-guide-card p,
+    #fieldOne .field-onboarding .field-guide-card li {
+      font-size: clamp(21px, 2.2vw, 23px);
     }
 
     .field-guide-card strong {

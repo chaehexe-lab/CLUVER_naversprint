@@ -49,13 +49,12 @@ export default function FieldOneScene() {
             </div>
           </div>
           <div className="field-guide-panel" data-field-guide-panel="tools" aria-hidden="true">
-            <p className="field-guide-kicker">현장 도구</p>
             <h2>네 가지 도구를 함께 활용하십시오</h2>
             <ul>
-              <li><strong>사건일지</strong>: 처음 전달받은 사건 내용을 다시 확인합니다.</li>
-              <li><strong>기록장</strong>: 용의자별 질문과 답변을 대화처럼 남깁니다.</li>
-              <li><strong>보따리</strong>: 수집한 증거를 다시 확인합니다.</li>
-              <li><strong>도구</strong>: 돋보기와 붓으로 증거를 더 자세히 봅니다.</li>
+              <li><strong>사건일지</strong> : 처음 전달받은 사건 내용을 다시 확인합니다.</li>
+              <li><strong>기록장</strong> : 용의자별 질문과 답변을 대화처럼 남깁니다.</li>
+              <li><strong>보따리</strong> : 수집한 증거를 다시 확인합니다.</li>
+              <li><strong>도구</strong> : 돋보기와 붓으로 증거를 더 자세히 봅니다.</li>
             </ul>
           </div>
           <div className="field-guide-actions">
