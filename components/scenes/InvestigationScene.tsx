@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import JoseonSceneRig3D from "@/components/effects/JoseonSceneRig3D";
 import type { InvestigationSceneData } from "@/lib/gameTypes";
 import { hotspotStyle, propStyle } from "./hotspotStyle";
 
@@ -18,6 +19,7 @@ export default function InvestigationScene({
   return (
     <section className="screen" id={scene.id}>
       <img className="plate" src={scene.image} alt={scene.alt} />
+      <JoseonSceneRig3D sceneId={scene.id} imageUrl={scene.image} />
       <div className="shade" />
 
       {scene.props.map((prop) => (

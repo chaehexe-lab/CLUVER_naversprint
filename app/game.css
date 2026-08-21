@@ -7613,7 +7613,7 @@
       filter: brightness(1.2) contrast(1.03) saturate(1.04);
     }
 
-    html[data-samunmong-theme="magicSchool"] .magic-school-screen .magic-shade {
+html[data-samunmong-theme="magicSchool"] .magic-school-screen .magic-shade {
       background: radial-gradient(circle at 52% 50%, rgba(255, 238, 198, .06), rgba(10, 7, 5, .18) 72%);
       pointer-events: none;
     }
@@ -7829,6 +7829,96 @@ html[data-samunmong-theme="magicSchool"] .tool-evidence-option {
   }
   .cinematic-feedback-layer.active .cinematic-flash {
     animation-duration: .12s;
+  }
+}
+
+.magic-crystal-rig-3d,
+.joseon-scene-rig,
+.joseon-scene-rig-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.magic-crystal-rig-3d {
+  z-index: 2;
+  display: block;
+  pointer-events: none;
+}
+
+.joseon-scene-rig {
+  z-index: 4;
+  pointer-events: none;
+}
+
+.joseon-scene-rig-canvas {
+  display: block;
+  pointer-events: none;
+}
+
+.joseon-object-hitbox {
+  position: absolute;
+  z-index: 2;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: transparent;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  outline: 0;
+}
+
+.joseon-object-hitbox::after {
+  content: "";
+  position: absolute;
+  inset: 8%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 220, 151, .12), transparent 68%);
+  filter: blur(9px);
+  opacity: 0;
+  transition: opacity .22s ease;
+}
+
+.joseon-object-hitbox:hover::after,
+.joseon-object-hitbox:focus-visible::after {
+  opacity: .72;
+}
+
+.joseon-object-comment {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  bottom: 12.5%;
+  max-width: min(560px, 72%);
+  margin: 0;
+  padding: 10px 18px;
+  border: 1px solid rgba(199, 161, 105, .48);
+  border-radius: 4px;
+  color: #f2e3c5;
+  background: rgba(19, 13, 9, .88);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .48);
+  font-family: "Nanum BareunJeongsin", serif;
+  font-size: clamp(14px, 1.2vw, 18px);
+  line-height: 1.45;
+  text-align: center;
+  letter-spacing: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, 8px);
+  transition: opacity .2s ease, transform .24s ease;
+}
+
+.joseon-object-comment.show {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .joseon-object-hitbox::after,
+  .joseon-object-comment {
+    transition: none;
   }
 }
 
