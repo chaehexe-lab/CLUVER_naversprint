@@ -173,6 +173,9 @@
     let fieldGuideStep = "";
     let fieldGuideMapTimer = 0;
     let briefingReturnScreenId = "fieldOne";
+    let interrogationReactionTimer = 0;
+    let interrogationThinkingSoundTimer = 0;
+    let newFactToastTimer = 0;
 
     const joseonLocationMeta = {
       tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
@@ -653,6 +656,34 @@
       const sound = new Audio(sfxPaths[key]);
       sound.volume = Math.max(0, Math.min(1, getAudioLevel() * volumeScale));
       sound.play().catch(() => {});
+    }
+
+    const decisiveEvidenceNames = new Set([
+      "찢어진 약속 편지", "찢어진 옷고름", "긁힌 팔 흔적", "돌쇠의 팔 상처",
+      "돌쇠의 그림", "도망 보따리", "호패 조각", "끊어진 호패끈",
+      "빈 호패 주머니", "무덕의 번진 일기", "혼서 조각"
+    ]);
+
+    function getEvidenceMaterial(name = "") {
+      if (/(편지|일기|장부|혼서|기록|그림|책)/.test(name)) return "paper";
+      if (/(호패|쇠|금속|도끼|룬|수정구|수정|지팡이)/.test(name)) return "metal";
+      if (/(옷고름|비단|붕대|보따리|옷|소매)/.test(name)) return "cloth";
+      if (/(상처|피|발자국)/.test(name)) return "organic";
+      return "wood";
+    }
+
+    function dispatchEvidenceFeedback(name, target, forceCritical = false) {
+      const rect = target?.getBoundingClientRect?.();
+      const shellRect = document.querySelector(".game-shell")?.getBoundingClientRect();
+      window.dispatchEvent(new CustomEvent("samunmong:evidence-feedback", {
+        detail: {
+          name,
+          importance: forceCritical || decisiveEvidenceNames.has(name) ? "critical" : "standard",
+          material: getEvidenceMaterial(name),
+          x: rect ? rect.left + rect.width / 2 : shellRect ? shellRect.left + shellRect.width / 2 : window.innerWidth / 2,
+          y: rect ? rect.top + rect.height / 2 : shellRect ? shellRect.top + shellRect.height / 2 : window.innerHeight / 2
+        }
+      }));
     }
 
     function playButtonSfx(volumeScale = 0.58) {
@@ -2564,6 +2595,7 @@
       selectedEvidence = button.dataset.evidence;
       document.querySelector("#presentedEvidence").textContent = selectedEvidence;
       setEvidenceBag(false);
+      dispatchEvidenceFeedback(selectedEvidence, button);
       playSfx("buttonAlt", 0.62);
       showToast(`증거 제시: ${selectedEvidence}`);
     }
@@ -2759,6 +2791,7 @@
       }
       hopaeCollected = true;
       document.querySelector("#hopaeHotspot")?.classList.add("collected");
+      dispatchEvidenceFeedback("호패 조각", document.querySelector("#hopaeHotspot"));
       playSfx("evidence", 0.85);
       addEvidenceToBag("호패 조각");
       addEvidenceToNote("호패 조각");
@@ -2772,6 +2805,7 @@
       portraitCollected = true;
       document.querySelector("#collectPortrait").textContent = "수집 완료";
       document.querySelector("#portraitHotspot")?.classList.add("collected");
+      dispatchEvidenceFeedback("돌쇠의 그림", document.querySelector("#portraitHotspot"));
       playSfx("evidence", 0.85);
       addEvidenceToBag("돌쇠의 그림");
       addEvidenceToNote("돌쇠의 그림");
@@ -2785,6 +2819,7 @@
       const alreadyCollected = hotspot.classList.contains("collected");
       if (!alreadyCollected) {
         markEvidenceCollectedInScene(name);
+        dispatchEvidenceFeedback(name, hotspot);
         playSfx("evidence", 0.85);
         addEvidenceToBag(name);
         addEvidenceToNote(name);
@@ -2856,7 +2891,13 @@
       const suspect = suspects[suspectIndex];
       document.querySelector("#suspectName").textContent = suspect.name;
       document.querySelector("#suspectStage").dataset.suspect = suspect.id;
-      document.querySelector("#interrogationPlate").src = suspect.scene;
+      const interrogationScreen = document.querySelector("#interrogationScreen");
+      if (isMagicTheme || isSpaceTheme) {
+        document.querySelector("#interrogationPlate").src = suspect.scene;
+      } else {
+        document.querySelector("#interrogationPlate").src = "/samunmong/assets/scene-interrogation-room-empty.png";
+        interrogationScreen.dataset.characterScene = sleeveCheckedSuspects.has(suspect.id) ? suspect.sleeveScene : suspect.scene;
+      }
       const suspectSprite = document.querySelector("#suspectSprite");
       if ((isMagicTheme || isSpaceTheme) && suspectSprite && suspect.sprite) {
         suspectSprite.src = suspect.sprite;
@@ -3138,6 +3179,69 @@
       if (badge) badge.textContent = text;
     }
 
+    const newFactTitles = {
+      CHUNWOL_HEARD_ESCAPE_PLAN: "춘월은 두 사람의 도망 가능성을 들었다",
+      CHUNWOL_HIDDEN_PORTRAIT: "춘월이 숨긴 돌쇠의 초상",
+      CHUNWOL_LETTER_ACCESS: "양반가의 종이와 정중한 편지 말투",
+      CHUNWOL_RIBBON_MATERIAL: "점순의 목 흔적과 맞는 고급 비단",
+      CHUNWOL_ARM_SCRATCH: "춘월의 소매 아래 긁힌 상처",
+      CHUNWOL_HOPAE_POWDER: "호패에 남은 향 섞인 분가루",
+      DOLSOE_ESCAPE_PLAN: "돌쇠와 점순의 도망 계획",
+      DOLSOE_LETTER_MISMATCH: "돌쇠의 말투와 다른 약속 편지",
+      YOOMUNSEOK_MISSING_HOPAE: "사건 전날 사라진 유문석의 호패",
+      MUDEOK_TOLD_CHUNWOL: "무덕이 춘월에게 흘린 점순의 행방",
+      MUDEOK_FOUND_RIBBON: "무덕이 집 근처에서 주운 옷고름"
+    };
+
+    function stopInterrogationThinkingSound() {
+      window.clearInterval(interrogationThinkingSoundTimer);
+      interrogationThinkingSoundTimer = 0;
+    }
+
+    function setInterrogationReaction(reaction = "calm", holdMs = 0) {
+      const screen = document.querySelector("#interrogationScreen");
+      const candle = document.querySelector("#interrogationCandle");
+      const normalized = ["calm", "thinking", "attentive", "avoid", "nervous", "shocked", "silent"].includes(reaction)
+        ? reaction
+        : "calm";
+
+      window.clearTimeout(interrogationReactionTimer);
+      screen?.setAttribute("data-interrogation-reaction", normalized);
+      candle?.setAttribute("data-state", normalized);
+
+      if (normalized === "thinking") {
+        stopInterrogationThinkingSound();
+        playSfx("type1", 0.1);
+        interrogationThinkingSoundTimer = window.setInterval(() => {
+          if (!document.hidden) playSfx("type1", 0.08);
+        }, 850);
+      } else {
+        stopInterrogationThinkingSound();
+      }
+
+      if (holdMs > 0 && normalized !== "calm") {
+        interrogationReactionTimer = window.setTimeout(() => setInterrogationReaction("calm"), holdMs);
+      }
+    }
+
+    function showNewFactDiscovery(factId) {
+      if (!factId) return;
+      const toast = document.querySelector("#newFactToast");
+      const title = document.querySelector("#newFactTitle");
+      if (!toast || !title) return;
+
+      window.clearTimeout(newFactToastTimer);
+      title.textContent = newFactTitles[factId] || "새로운 사실이 기록되었습니다";
+      dispatchEvidenceFeedback(title.textContent, toast, true);
+      toast.classList.add("show");
+      toast.setAttribute("aria-hidden", "false");
+      playSfx("evidence", 0.48);
+      newFactToastTimer = window.setTimeout(() => {
+        toast.classList.remove("show");
+        toast.setAttribute("aria-hidden", "true");
+      }, 3600);
+    }
+
     function showSuspectReply(text, mode = "답변") {
       const reply = document.querySelector("#suspectReply");
       const replyText = document.querySelector("#suspectReplyText");
@@ -3186,6 +3290,7 @@
       askButton.disabled = true;
       askButton.textContent = "답변 중";
       showSuspectReply("답을 고르는 중", "답변 중");
+      setInterrogationReaction("thinking");
 
       try {
         const response = await fetch("/api/interrogate/", {
@@ -3211,6 +3316,8 @@
         while (history.length > 8) history.shift();
         addInterrogationAnswer(suspect, answer, data.source, data.warning);
         maybeCollectInterrogationEvidence(suspect, answer, data.usedEvidenceNames);
+        setInterrogationReaction(data.reaction || "attentive", data.newFactId ? 4200 : 3000);
+        if (data.newFactId) showNewFactDiscovery(data.newFactId);
         if (data.newFactId) {
           const knownFactIds = new Set(readStoredNames(interrogationKnownFactsKey));
           knownFactIds.add(data.newFactId);
@@ -3221,11 +3328,15 @@
         }
         showToast(data.source === "rag" || data.source === "openai" ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
       } catch (error) {
+        setInterrogationReaction("calm");
         if (suspects[suspectIndex]?.id === suspect.id) {
           showSuspectReply("지금은 답하기 어려워 보입니다.", "오류");
         }
         showToast("AI 답변을 받지 못했습니다.");
       } finally {
+        if (document.querySelector("#interrogationCandle")?.getAttribute("data-state") === "thinking") {
+          setInterrogationReaction("calm");
+        }
         isAskingAi = false;
         updateInterrogationQuestionLimitUI();
       }
@@ -3249,7 +3360,11 @@
       if (/소매/.test(question) && /(걷|올리|보|확인|드러|살펴)/.test(question)) {
         const suspect = suspects[suspectIndex];
         sleeveCheckedSuspects.add(suspect.id);
-        document.querySelector("#interrogationPlate").src = suspect.sleeveScene;
+        if (isMagicTheme || isSpaceTheme) {
+          document.querySelector("#interrogationPlate").src = suspect.sleeveScene;
+        } else {
+          document.querySelector("#interrogationScreen").dataset.characterScene = suspect.sleeveScene;
+        }
         if (isMagicTheme && suspect.sprite) document.querySelector("#suspectSprite").src = suspect.sprite;
         if (suspect.id === "chunwol") {
           addEvidenceToBag("긁힌 팔 흔적");
@@ -3269,7 +3384,12 @@
         }
       } else {
         const suspect = suspects[suspectIndex];
-        document.querySelector("#interrogationPlate").src = suspect.scene;
+        if (isMagicTheme || isSpaceTheme) {
+          document.querySelector("#interrogationPlate").src = suspect.scene;
+        } else {
+          document.querySelector("#interrogationPlate").src = "/samunmong/assets/scene-interrogation-room-empty.png";
+          document.querySelector("#interrogationScreen").dataset.characterScene = sleeveCheckedSuspects.has(suspect.id) ? suspect.sleeveScene : suspect.scene;
+        }
         if (isMagicTheme && suspect.sprite) document.querySelector("#suspectSprite").src = suspect.sprite;
         showToast(`${suspect.name}에게 질문을 던졌습니다.`);
       }
@@ -3282,6 +3402,15 @@
         event.preventDefault();
         document.querySelector("#askButton").click();
       }
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) stopInterrogationThinkingSound();
+    });
+    window.addEventListener("pagehide", () => {
+      stopInterrogationThinkingSound();
+      window.clearTimeout(interrogationReactionTimer);
+      window.clearTimeout(newFactToastTimer);
     });
 
     function applyContentImages() {

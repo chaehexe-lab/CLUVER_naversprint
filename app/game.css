@@ -532,6 +532,303 @@
       background: #05070b;
     }
 
+    .main-clean-plate {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      background: #05070b;
+    }
+
+    #mainScreen {
+      --far-x: 0px;
+      --far-y: 0px;
+      --mid-x: 0px;
+      --mid-y: 0px;
+      --near-x: 0px;
+      --near-y: 0px;
+    }
+
+    .main-2d-scene {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none;
+      isolation: isolate;
+    }
+
+    .main-realtime-rig {
+      position: absolute;
+      right: auto;
+      bottom: auto;
+      z-index: 1;
+      display: block;
+      pointer-events: none;
+    }
+
+    .main-depth {
+      position: absolute;
+      inset: -1.5%;
+      pointer-events: none;
+      transition: transform .34s cubic-bezier(.2, .68, .28, 1);
+      will-change: transform;
+    }
+
+    .main-depth-far {
+      z-index: 1;
+      transform: translate3d(var(--far-x), var(--far-y), 0);
+    }
+
+    .main-depth-mid {
+      z-index: 2;
+      transform: translate3d(var(--mid-x), var(--mid-y), 0);
+    }
+
+    .main-depth-near {
+      z-index: 3;
+      transform: translate3d(var(--near-x), var(--near-y), 0);
+    }
+
+    .main-mist {
+      position: absolute;
+      display: block;
+      width: 118%;
+      aspect-ratio: 3.15 / 1;
+      background: url("/samunmong/assets/interactions/atmosphere/joseon-night-mist.png") center / contain no-repeat;
+      mix-blend-mode: screen;
+      opacity: 0;
+      will-change: transform, opacity;
+    }
+
+    .main-moon-cloud {
+      left: -8%;
+      top: -8%;
+      width: 59%;
+      z-index: 2;
+      filter: blur(1.8px) brightness(.7) saturate(.42);
+      animation: main-moon-cloud-drift 19s ease-in-out infinite alternate;
+    }
+
+    .main-mist-far {
+      left: -20%;
+      top: 3%;
+      filter: blur(4px) brightness(.48) saturate(.54);
+      animation: main-mist-far-drift 34s ease-in-out infinite alternate;
+    }
+
+    .main-mist-mid {
+      right: -30%;
+      top: 29%;
+      width: 106%;
+      filter: blur(2.2px) brightness(.42) saturate(.46);
+      transform: scaleX(-1);
+      animation: main-mist-mid-drift 27s ease-in-out infinite alternate;
+    }
+
+    .main-mist-near {
+      left: -24%;
+      bottom: -13%;
+      width: 132%;
+      filter: blur(7px) brightness(.34) saturate(.42);
+      animation: main-mist-near-drift 22s ease-in-out infinite alternate;
+    }
+
+    .main-water-reflections {
+      position: absolute;
+      inset: 1.5%;
+      width: 97%;
+      height: 97%;
+      object-fit: contain;
+      mix-blend-mode: screen;
+      opacity: .66;
+      filter: brightness(.82) saturate(.78) blur(.25px);
+      transform-origin: 50% 84%;
+      animation: main-water-shimmer 4.8s ease-in-out infinite;
+      will-change: transform, opacity, filter;
+    }
+
+    .main-lantern-lights {
+      position: absolute;
+      inset: 1.5%;
+    }
+
+    .main-lantern {
+      position: absolute;
+      left: var(--lamp-x);
+      top: var(--lamp-y);
+      width: clamp(7px, .72vw, 11px);
+      aspect-ratio: .7;
+      background: url("/samunmong/assets/interactions/interrogation-candle/candle-flame-idle-12.png") 0 0 / 1200% 100% no-repeat;
+      filter: brightness(.9) saturate(.74) drop-shadow(0 0 5px rgba(232, 137, 52, .72));
+      transform: translate(-50%, -72%) scale(var(--lamp-scale, 1));
+      transform-origin: 50% 100%;
+      animation:
+        main-lantern-frames 1.72s steps(11, end) infinite,
+        main-lantern-breathe 2.9s ease-in-out infinite;
+    }
+
+    .main-lantern::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 58%;
+      width: 780%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(230, 127, 43, .2), rgba(186, 77, 24, .07) 38%, transparent 72%);
+      mix-blend-mode: screen;
+      filter: blur(4px);
+      transform: translate(-50%, -50%);
+      animation: main-lantern-glow 3.1s ease-in-out infinite;
+    }
+
+    .main-lantern-one {
+      --lamp-x: 40.7%;
+      --lamp-y: 68.5%;
+      --lamp-scale: 1.05;
+    }
+
+    .main-lantern-two {
+      --lamp-x: 36.1%;
+      --lamp-y: 59.8%;
+      --lamp-scale: .62;
+      animation-delay: -.46s, -.8s;
+    }
+
+    .main-lantern-three {
+      --lamp-x: 64.5%;
+      --lamp-y: 60.5%;
+      --lamp-scale: .72;
+      animation-delay: -.93s, -1.35s;
+    }
+
+    .main-lantern-four {
+      --lamp-x: 72.4%;
+      --lamp-y: 62.2%;
+      --lamp-scale: .64;
+      animation-delay: -1.27s, -.36s;
+    }
+
+    .main-branch,
+    .main-ornament-clip,
+    .main-ornament-clip img {
+      position: absolute;
+      inset: 1.5%;
+      width: 97%;
+      height: 97%;
+      object-fit: contain;
+      pointer-events: none;
+    }
+
+    .main-branch {
+      filter: brightness(.74) saturate(.72) drop-shadow(0 12px 18px rgba(0, 0, 0, .38));
+      transform-origin: 96% 3%;
+      animation: main-branch-sway 8.6s ease-in-out infinite alternate;
+      will-change: transform;
+    }
+
+    .main-ornament-clip {
+      overflow: visible;
+      transform-origin: var(--ornament-origin);
+      will-change: transform;
+    }
+
+    .main-ornament-clip img {
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      filter: brightness(.65) saturate(.66) drop-shadow(0 9px 8px rgba(0, 0, 0, .46));
+    }
+
+    .main-ornament-left {
+      --ornament-origin: 65% 0%;
+      clip-path: inset(0 26% 0 55%);
+      animation: main-ornament-left-sway 5.8s ease-in-out infinite alternate;
+    }
+
+    .main-ornament-right {
+      --ornament-origin: 80% 0%;
+      clip-path: inset(0 10% 0 75%);
+      animation: main-ornament-right-sway 6.7s ease-in-out -1.8s infinite alternate;
+    }
+
+    #mainScreen:not(.active) .main-mist,
+    #mainScreen:not(.active) .main-water-reflections,
+    #mainScreen:not(.active) .main-lantern,
+    #mainScreen:not(.active) .main-lantern::after,
+    #mainScreen:not(.active) .main-branch,
+    #mainScreen:not(.active) .main-ornament-clip {
+      animation-play-state: paused;
+    }
+
+    @keyframes main-mist-far-drift {
+      0% { opacity: .11; transform: translate3d(-4%, 0, 0) scale(1.02); }
+      48% { opacity: .18; }
+      100% { opacity: .1; transform: translate3d(14%, 1.5%, 0) scale(1.08); }
+    }
+
+    @keyframes main-moon-cloud-drift {
+      0% { opacity: .19; transform: translate3d(-4%, 1%, 0) scale(.94); }
+      45% { opacity: .31; }
+      100% { opacity: .17; transform: translate3d(11%, -1%, 0) scale(1.02); }
+    }
+
+    @keyframes main-mist-mid-drift {
+      0% { opacity: .08; transform: translate3d(7%, 0, 0) scaleX(-1) scale(1.04); }
+      55% { opacity: .15; }
+      100% { opacity: .07; transform: translate3d(-15%, -2%, 0) scaleX(-1) scale(1.1); }
+    }
+
+    @keyframes main-mist-near-drift {
+      0% { opacity: .07; transform: translate3d(-5%, 2%, 0) scale(1.08); }
+      52% { opacity: .13; }
+      100% { opacity: .06; transform: translate3d(12%, -2%, 0) scale(1.14); }
+    }
+
+    @keyframes main-water-shimmer {
+      0%, 100% { opacity: .5; transform: translateY(0) scaleX(.997); filter: brightness(.72) saturate(.72) blur(.25px); }
+      34% { opacity: .7; transform: translateY(-1px) scaleX(1.004); filter: brightness(.9) saturate(.82) blur(.4px); }
+      68% { opacity: .58; transform: translateY(1px) scaleX(.993); filter: brightness(.78) saturate(.76) blur(.2px); }
+    }
+
+    @keyframes main-lantern-frames {
+      from { background-position: 0 0; }
+      to { background-position: 100% 0; }
+    }
+
+    @keyframes main-lantern-breathe {
+      0%, 100% { opacity: .68; }
+      48% { opacity: .98; }
+      74% { opacity: .78; }
+    }
+
+    @keyframes main-lantern-glow {
+      0%, 100% { opacity: .42; transform: translate(-50%, -50%) scale(.9); }
+      52% { opacity: .76; transform: translate(-50%, -50%) scale(1.08); }
+    }
+
+    @keyframes main-branch-sway {
+      0% { transform: rotate(-.16deg) translate3d(-1px, 0, 0); }
+      46% { transform: rotate(.08deg) translate3d(0, 1px, 0); }
+      100% { transform: rotate(.22deg) translate3d(2px, -1px, 0); }
+    }
+
+    @keyframes main-ornament-left-sway {
+      0% { transform: rotate(-.65deg) translateX(-1px); }
+      48% { transform: rotate(.18deg) translateX(0); }
+      100% { transform: rotate(.78deg) translateX(1px); }
+    }
+
+    @keyframes main-ornament-right-sway {
+      0% { transform: rotate(.58deg) translateX(1px); }
+      52% { transform: rotate(-.12deg) translateX(0); }
+      100% { transform: rotate(-.72deg) translateX(-1px); }
+    }
+
     #dreamScreen {
       background:
         radial-gradient(ellipse at 50% 24%, rgba(116, 38, 32, .2), transparent 36%),
@@ -4099,6 +4396,280 @@
       display: none;
     }
 
+    .interrogation-character-rig {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .interrogation-candle-patch {
+      position: absolute;
+      inset: 0;
+      z-index: 7;
+      pointer-events: none;
+      background: url("/samunmong/assets/interactions/interrogation-candle/interrogation-candle-desk-clean.webp") center / cover no-repeat;
+    }
+
+    .interrogation-candle {
+      position: absolute;
+      left: 65.1%;
+      bottom: 6.7%;
+      z-index: 8;
+      width: clamp(44px, 4vw, 60px);
+      aspect-ratio: 249 / 662;
+      transform: translateX(-50%);
+      transform-origin: 50% 100%;
+      pointer-events: none;
+      isolation: isolate;
+    }
+
+    .interrogation-candle::after {
+      content: "";
+      position: absolute;
+      left: 48%;
+      bottom: 7.2%;
+      z-index: -1;
+      width: 76%;
+      height: 2.8%;
+      border-radius: 50%;
+      background: radial-gradient(ellipse, rgba(73, 39, 20, .72) 0 38%, rgba(217, 126, 48, .16) 52%, transparent 76%);
+      filter: blur(1.4px);
+      transform: translateX(-50%) skewX(-16deg);
+    }
+
+    .interrogation-candle-3d {
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
+    .candle-body {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      background-image: url("/samunmong/assets/interactions/interrogation-candle/candle-brass-calm.png");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+      clip-path: inset(16.5% 0 0 0);
+      filter: brightness(.68) saturate(.7) drop-shadow(0 10px 10px rgba(0, 0, 0, .62));
+    }
+
+    .candle-flame {
+      position: absolute;
+      left: 50%;
+      top: -.7%;
+      z-index: 3;
+      width: 34%;
+      height: 19.5%;
+      background-image: url("/samunmong/assets/interactions/interrogation-candle/candle-flame-idle-12.png");
+      background-repeat: no-repeat;
+      background-size: 1200% 100%;
+      background-position: 0 0;
+      filter: brightness(.92) saturate(.86) drop-shadow(0 0 3px rgba(224, 140, 54, .42));
+      transform: translateX(-50%);
+      transform-origin: 50% 100%;
+      animation: interrogation-candle-idle-frames 1.8s steps(11, end) infinite;
+    }
+
+    .candle-light {
+      position: absolute;
+      left: 50%;
+      top: -9%;
+      z-index: 0;
+      width: 185%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(224, 133, 48, .2), rgba(173, 86, 28, .08) 34%, transparent 70%);
+      mix-blend-mode: screen;
+      filter: blur(3px);
+      transform: translateX(-50%);
+      animation: interrogation-candle-light 3.2s ease-in-out infinite;
+    }
+
+    .interrogation-candle[data-state="thinking"] .candle-flame {
+      animation:
+        interrogation-candle-idle-frames .82s steps(11, end) infinite,
+        interrogation-candle-thinking-motion .24s ease-in-out infinite alternate;
+    }
+
+    .interrogation-candle[data-state="attentive"] .candle-flame {
+      filter: brightness(1.06) saturate(.92) drop-shadow(0 0 5px rgba(229, 151, 65, .52));
+      animation:
+        interrogation-candle-idle-frames 1.38s steps(11, end) infinite,
+        interrogation-candle-attentive 1.2s ease-in-out infinite;
+    }
+
+    .interrogation-candle[data-state="avoid"] .candle-flame {
+      filter: brightness(.76) saturate(.74) drop-shadow(-3px 1px 4px rgba(0, 0, 0, .48));
+      animation:
+        interrogation-candle-idle-frames 2.1s steps(11, end) infinite,
+        interrogation-candle-avoid 1.6s ease-in-out infinite;
+    }
+
+    .interrogation-candle[data-state="nervous"] .candle-flame,
+    .interrogation-candle[data-state="shocked"] .candle-flame {
+      filter: brightness(1.12) saturate(.98) drop-shadow(0 0 7px rgba(215, 120, 43, .55));
+      animation:
+        interrogation-candle-idle-frames .68s steps(11, end) infinite,
+        interrogation-candle-nervous .28s ease-in-out infinite alternate;
+    }
+
+    .interrogation-candle[data-state="shocked"] .candle-flame {
+      animation: interrogation-candle-shocked .52s ease-out 1 both;
+    }
+
+    .interrogation-candle[data-state="silent"] .candle-flame {
+      filter: brightness(.54) saturate(.62);
+      opacity: .34;
+      animation: interrogation-candle-idle-frames 3.6s steps(11, end) infinite;
+    }
+
+    .interrogation-candle[data-state="silent"] .candle-light {
+      opacity: .18;
+      animation: none;
+    }
+
+    html[data-samunmong-theme="magicSchool"] .interrogation-candle-patch,
+    html[data-samunmong-theme="spaceStation"] .interrogation-candle-patch,
+    html[data-samunmong-theme="magicSchool"] .interrogation-candle,
+    html[data-samunmong-theme="spaceStation"] .interrogation-candle,
+    .game-shell[data-initial-theme="magicSchool"] .interrogation-candle-patch,
+    .game-shell[data-initial-theme="spaceStation"] .interrogation-candle-patch,
+    .game-shell[data-initial-theme="magicSchool"] .interrogation-candle,
+    .game-shell[data-initial-theme="spaceStation"] .interrogation-candle {
+      display: none;
+    }
+
+    #interrogationScreen .shade,
+    #interrogationScreen .suspect-stage,
+    #interrogationScreen .suspect-sprite {
+      transition: opacity .45s ease, filter .45s ease, transform .45s ease, background .45s ease;
+    }
+
+    #interrogationScreen[data-interrogation-reaction="avoid"] .shade {
+      background: linear-gradient(90deg, rgba(0, 0, 0, .14), rgba(0, 0, 0, .42));
+    }
+
+    #interrogationScreen[data-interrogation-reaction="avoid"] .suspect-stage {
+      transform: translateX(-48%);
+      filter: brightness(.75) saturate(.78);
+    }
+
+    #interrogationScreen[data-interrogation-reaction="nervous"] .suspect-stage {
+      animation: interrogation-suspect-breath .86s ease-in-out 3;
+      filter: brightness(.88) saturate(.9);
+    }
+
+    #interrogationScreen[data-interrogation-reaction="shocked"] .shade,
+    #interrogationScreen[data-interrogation-reaction="silent"] .shade {
+      background: rgba(0, 0, 0, .52);
+    }
+
+    #interrogationScreen[data-interrogation-reaction="shocked"] .suspect-stage,
+    #interrogationScreen[data-interrogation-reaction="silent"] .suspect-stage {
+      filter: brightness(.58) saturate(.62);
+    }
+
+    .new-fact-toast {
+      position: absolute;
+      top: 8.5%;
+      right: 3.5%;
+      z-index: 30;
+      width: min(340px, 31vw);
+      padding: 13px 17px 14px;
+      border-left: 3px solid rgba(212, 166, 84, .92);
+      background: linear-gradient(90deg, rgba(27, 18, 12, .96), rgba(17, 12, 9, .9));
+      box-shadow: 0 14px 34px rgba(0, 0, 0, .48);
+      color: #f2e6cc;
+      opacity: 0;
+      transform: translateY(-12px);
+      transition: opacity .28s ease, transform .28s ease;
+      pointer-events: none;
+    }
+
+    .new-fact-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .new-fact-toast span {
+      display: block;
+      margin-bottom: 4px;
+      color: #cfa45e;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .new-fact-toast strong {
+      display: block;
+      font-size: 14px;
+      line-height: 1.45;
+      letter-spacing: 0;
+    }
+
+    @keyframes interrogation-candle-idle-frames {
+      from { background-position: 0 0; }
+      to { background-position: 100% 0; }
+    }
+
+    @keyframes interrogation-candle-light {
+      0%, 100% { opacity: .38; transform: translateX(-50%) scale(.96); }
+      44% { opacity: .5; transform: translateX(-50%) scale(1.035); }
+      72% { opacity: .42; transform: translateX(-50%) scale(.985); }
+    }
+
+    @keyframes interrogation-candle-thinking-motion {
+      from { transform: translateX(calc(-50% - 1px)) rotate(-.8deg); }
+      to { transform: translateX(calc(-50% + 1px)) rotate(.8deg); }
+    }
+
+    @keyframes interrogation-candle-attentive {
+      0%, 100% { transform: translateX(-50%) rotate(0) scale(1); }
+      52% { transform: translateX(-50%) rotate(-.45deg) scale(1.01); }
+    }
+
+    @keyframes interrogation-candle-avoid {
+      0%, 100% { transform: translateX(calc(-50% - 1px)) rotate(-.7deg) scaleX(.88); }
+      50% { transform: translateX(-50%) rotate(.3deg) scaleX(.92); }
+    }
+
+    @keyframes interrogation-candle-nervous {
+      from { transform: translateX(calc(-50% - 2px)) rotate(-1.3deg) scale(.99, 1.01); }
+      to { transform: translateX(calc(-50% + 2px)) rotate(1.1deg) scale(1.015, .985); }
+    }
+
+    @keyframes interrogation-candle-shocked {
+      0% { transform: translateX(-50%) scale(.94, .9); filter: brightness(.82); }
+      38% { transform: translateX(-50%) scale(1.08, 1.12); filter: brightness(1.24); }
+      100% { transform: translateX(-50%) scale(1); filter: brightness(1); }
+    }
+
+    @keyframes interrogation-suspect-breath {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-3px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .main-mist,
+      .candle-flame,
+      .candle-light,
+      #interrogationScreen .suspect-stage,
+      #interrogationScreen .suspect-sprite,
+      .new-fact-toast {
+        animation: none !important;
+        transition-duration: .01ms !important;
+      }
+    }
+
     html[data-samunmong-theme="magicSchool"] .interrogation-desk-foreground,
     .game-shell[data-initial-theme="magicSchool"] .interrogation-desk-foreground {
       display: block;
@@ -6520,6 +7091,189 @@ html[data-samunmong-theme="magicSchool"] .tool-evidence-option {
     inset 0 0 0 1px rgba(255, 255, 255, .06),
     inset 0 0 18px rgba(129, 74, 199, .18);
   text-shadow: 0 0 8px rgba(103, 215, 255, .5);
+}
+
+/* Shared cinematic evidence feedback */
+.cinematic-feedback-layer {
+  --impact-x: 50%;
+  --impact-y: 50%;
+  position: absolute;
+  inset: 0;
+  z-index: 120;
+  overflow: hidden;
+  pointer-events: none;
+  opacity: 0;
+  isolation: isolate;
+}
+
+.cinematic-feedback-layer.active {
+  opacity: 1;
+}
+
+.cinematic-vignette,
+.cinematic-flash,
+.cinematic-glitch,
+.cinematic-shockwave,
+.cinematic-impact-core,
+.cinematic-particle {
+  position: absolute;
+  pointer-events: none;
+}
+
+.cinematic-vignette,
+.cinematic-flash,
+.cinematic-glitch {
+  inset: 0;
+}
+
+.cinematic-vignette {
+  background: radial-gradient(circle at var(--impact-x) var(--impact-y), transparent 13%, rgba(22, 0, 2, .08) 42%, rgba(20, 0, 2, .78) 100%);
+  opacity: 0;
+}
+
+.cinematic-feedback-layer[data-importance="critical"].active .cinematic-vignette {
+  animation: evidence-vignette-pulse .64s ease-out both;
+}
+
+.cinematic-flash {
+  background: radial-gradient(circle at var(--impact-x) var(--impact-y), rgba(255, 247, 222, .66), rgba(228, 214, 183, .12) 19%, transparent 48%);
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+
+.cinematic-feedback-layer.active .cinematic-flash {
+  animation: evidence-impact-flash .34s ease-out both;
+}
+
+.cinematic-feedback-layer[data-importance="critical"].active .cinematic-flash {
+  animation-duration: .5s;
+}
+
+.cinematic-shockwave,
+.cinematic-impact-core,
+.cinematic-particle {
+  left: var(--impact-x);
+  top: var(--impact-y);
+}
+
+.cinematic-shockwave {
+  width: 28px;
+  aspect-ratio: 1;
+  border: 2px solid rgba(235, 221, 188, .72);
+  border-radius: 50%;
+  box-shadow: 0 0 18px rgba(202, 153, 91, .28), inset 0 0 14px rgba(255, 246, 219, .16);
+  transform: translate(-50%, -50%) scale(.2);
+  opacity: 0;
+}
+
+.cinematic-feedback-layer.active .cinematic-shockwave {
+  animation: evidence-shockwave .48s cubic-bezier(.12, .62, .22, 1) both;
+}
+
+.cinematic-impact-core {
+  width: 12px;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: #fff4d5;
+  box-shadow: 0 0 20px rgba(255, 229, 173, .86);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+
+.cinematic-feedback-layer.active .cinematic-impact-core {
+  animation: evidence-core-pop .3s ease-out both;
+}
+
+.cinematic-particle {
+  width: 3px;
+  height: 8px;
+  border-radius: 1px;
+  background: linear-gradient(#fff4d4, #b47a43);
+  box-shadow: 0 0 5px rgba(231, 177, 93, .65);
+  transform: translate(-50%, -50%);
+  opacity: 0;
+}
+
+.cinematic-feedback-layer.active .cinematic-particle {
+  animation: evidence-particle-burst .42s ease-out var(--particle-delay) both;
+}
+
+.cinematic-glitch {
+  background:
+    repeating-linear-gradient(0deg, transparent 0 7px, rgba(235, 242, 233, .065) 8px, transparent 10px),
+    linear-gradient(90deg, rgba(126, 8, 18, .12), transparent 34%, rgba(26, 92, 104, .1));
+  mix-blend-mode: screen;
+  opacity: 0;
+}
+
+.cinematic-feedback-layer[data-importance="critical"].active .cinematic-glitch-a {
+  animation: evidence-glitch-a .48s steps(2, end) both;
+}
+
+.cinematic-feedback-layer[data-importance="critical"].active .cinematic-glitch-b {
+  animation: evidence-glitch-b .5s steps(3, end) both;
+}
+
+.game-shell.cinematic-hitstop .screen.active > * {
+  animation-play-state: paused !important;
+  transition-duration: 0s !important;
+}
+
+@keyframes evidence-vignette-pulse {
+  0% { opacity: 0; transform: scale(1.1); }
+  18% { opacity: 1; transform: scale(1); }
+  58% { opacity: .68; }
+  100% { opacity: 0; transform: scale(1.035); }
+}
+
+@keyframes evidence-impact-flash {
+  0% { opacity: 0; }
+  8% { opacity: .86; }
+  26% { opacity: .16; }
+  100% { opacity: 0; }
+}
+
+@keyframes evidence-shockwave {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.2); }
+  14% { opacity: .88; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(7.4); }
+}
+
+@keyframes evidence-core-pop {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.2); }
+  18% { opacity: 1; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(2.3); }
+}
+
+@keyframes evidence-particle-burst {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(.4) rotate(0); }
+  20% { opacity: .9; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--particle-x)), calc(-50% + var(--particle-y))) scale(.1) rotate(130deg); }
+}
+
+@keyframes evidence-glitch-a {
+  0%, 100% { opacity: 0; transform: translate(0); clip-path: inset(0); }
+  12% { opacity: .45; transform: translate(5px, -1px); clip-path: inset(11% 0 68% 0); }
+  28% { opacity: .18; transform: translate(-7px, 2px); clip-path: inset(52% 0 26% 0); }
+  43% { opacity: .36; transform: translate(3px, 0); clip-path: inset(76% 0 8% 0); }
+}
+
+@keyframes evidence-glitch-b {
+  0%, 100% { opacity: 0; filter: hue-rotate(0); }
+  16% { opacity: .34; filter: hue-rotate(42deg) contrast(1.4); }
+  34% { opacity: .12; filter: hue-rotate(-35deg); }
+  52% { opacity: .26; filter: hue-rotate(18deg) contrast(1.2); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinematic-glitch,
+  .cinematic-particle,
+  .cinematic-vignette {
+    display: none;
+  }
+  .cinematic-feedback-layer.active .cinematic-flash {
+    animation-duration: .12s;
+  }
 }
 
 html[data-samunmong-theme="magicSchool"] .button::before,

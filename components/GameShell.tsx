@@ -10,6 +10,7 @@ import MainScreen from "@/components/front/MainScreen";
 import TeamIntro from "@/components/front/TeamIntro";
 import TutorialScreen from "@/components/front/TutorialScreen";
 import LocationIndicator from "@/components/LocationIndicator";
+import CinematicEvidenceFeedback from "@/components/effects/CinematicEvidenceFeedback";
 import BackGateCourtyardScene from "@/components/scenes/BackGateCourtyardScene";
 import ChunwolRoomScene from "@/components/scenes/ChunwolRoomScene";
 import DolsoeQuartersScene from "@/components/scenes/DolsoeQuartersScene";
@@ -23,7 +24,7 @@ import { magicSchoolScenes, spaceStationScenes } from "@/lib/gameData";
 import { STARTABLE_SCREENS } from "@/lib/gameState";
 
 const CONTENT_SCRIPT = "/samunmong/content.js";
-const PROTOTYPE_SCRIPT = "/samunmong/prototype.js";
+const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=3d-rig-20260822";
 const MAIN_SCREEN = "mainScreen";
 
 const INVESTIGATION_SCENE_COMPONENTS: Record<string, ComponentType> = {
@@ -193,6 +194,7 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
         <LocationIndicator initialScreen={initialScreen} initialTheme={initialTheme} />
         <GameSettingsOverlay />
         <ButtonGuideLayer />
+        <CinematicEvidenceFeedback />
       </main>
     </div>
   );
