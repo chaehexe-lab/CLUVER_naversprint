@@ -162,6 +162,7 @@
     };
     const themeStorageSuffix = isSpaceTheme ? "space-station" : isMagicTheme ? "magic-school" : "joseon";
     const collectedEvidenceKey = `samunmong-collected-evidence-${themeStorageSuffix}`;
+    const unreadEvidenceKey = `samunmong-unread-evidence-${themeStorageSuffix}`;
     const analyzedEvidenceKey = `samunmong-analyzed-evidence-${themeStorageSuffix}`;
     const examinedCluesKey = `samunmong-examined-clues-${themeStorageSuffix}`;
     const linkedEvidenceKey = `samunmong-linked-evidence-${themeStorageSuffix}`;
@@ -398,6 +399,7 @@
       const normalizedTheme = normalizeThemeName(theme);
       const suffix = themeSuffixes[normalizedTheme] || themeSuffixes.joseon;
       localStorage.removeItem(`samunmong-collected-evidence-${suffix}`);
+      localStorage.removeItem(`samunmong-unread-evidence-${suffix}`);
       localStorage.removeItem(`samunmong-analyzed-evidence-${suffix}`);
       localStorage.removeItem(`samunmong-examined-clues-${suffix}`);
       localStorage.removeItem(`samunmong-linked-evidence-${suffix}`);
@@ -448,9 +450,30 @@
 
     function saveCollectedEvidence(name) {
       const collected = new Set(readStoredNames(collectedEvidenceKey));
+      const isNewEvidence = !collected.has(name);
       collected.add(name);
       localStorage.setItem(collectedEvidenceKey, JSON.stringify([...collected]));
+      if (isNewEvidence) markEvidenceBagUnread();
     }
+
+    function syncEvidenceBagUnreadIndicator() {
+      const hasUnreadEvidence = localStorage.getItem(unreadEvidenceKey) === "1";
+      document.querySelectorAll(".bag-chip").forEach((button) => {
+        button.classList.toggle("has-unread-evidence", hasUnreadEvidence);
+      });
+    }
+
+    function markEvidenceBagUnread() {
+      localStorage.setItem(unreadEvidenceKey, "1");
+      syncEvidenceBagUnreadIndicator();
+    }
+
+    function clearEvidenceBagUnread() {
+      localStorage.removeItem(unreadEvidenceKey);
+      syncEvidenceBagUnreadIndicator();
+    }
+
+    window.addEventListener("samunmong:screen-change", syncEvidenceBagUnreadIndicator);
 
     function hasSeenFieldGuide() {
       return localStorage.getItem(fieldGuideSeenKey) === "1";
@@ -894,6 +917,7 @@
       const closeButton = document.querySelector("#closeToast");
       const hasEvidence = Boolean(options.image && options.title);
 
+      clearTimeout(closeToast.cleanupTimer);
       toast.classList.toggle("evidence-toast", hasEvidence);
       toast.classList.toggle("dismissible", Boolean(options.dismissible));
       toast.setAttribute("role", hasEvidence ? "dialog" : "status");
@@ -917,9 +941,14 @@
 
     function closeToast() {
       clearTimeout(showToast.timer);
-      toast.classList.remove("show", "dismissible", "evidence-toast");
-      toast.setAttribute("role", "status");
-      document.querySelector("#closeToast")?.setAttribute("hidden", "");
+      clearTimeout(closeToast.cleanupTimer);
+      toast.classList.remove("show");
+      closeToast.cleanupTimer = setTimeout(() => {
+        if (toast.classList.contains("show")) return;
+        toast.classList.remove("dismissible", "evidence-toast");
+        toast.setAttribute("role", "status");
+        document.querySelector("#closeToast")?.setAttribute("hidden", "");
+      }, 200);
     }
 
     document.querySelector("#closeToast")?.addEventListener("click", closeToast);
@@ -5569,10 +5598,11 @@
       addEvidenceToBag(name);
       addEvidenceToNote(name);
       if (evidenceData[name]?.tool) setAnalysisTarget(name);
-      showToast("보따리에 들어갔습니다", {
+      showToast("", {
         image: getEvidenceImage(name),
         title: name,
-        dismissible: true,
+        dismissible: false,
+        duration: 2000,
       });
       pendingEvidenceName = "";
       pendingEvidenceHotspot = null;
@@ -5845,7 +5875,10 @@
     const toggleEvidenceBag = document.querySelector("#toggleEvidenceBag");
     function setEvidenceBag(open) {
       if (open && isFieldGuideBlockingControls()) return;
-      if (open) evidenceBagPop.classList.remove("closing");
+      if (open) {
+        evidenceBagPop.classList.remove("closing");
+        clearEvidenceBagUnread();
+      }
       if (!open && evidenceBagPop.classList.contains("open")) {
         evidenceBagPop.classList.add("closing");
         setTimeout(() => evidenceBagPop.classList.remove("closing"), 360);
@@ -6339,6 +6372,7 @@
     renderTools();
     restoreConversationNotes();
     restoreSavedInvestigation();
+    syncEvidenceBagUnreadIndicator();
     renderConversationNotes();
     setupButtonGuides();
     showInitialScreenFromSetup();

@@ -3102,6 +3102,20 @@
       content: none;
     }
 
+    .scene-chip.bag-chip.has-unread-evidence::after {
+      content: "";
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      width: 9px;
+      height: 9px;
+      border: 1px solid #f3d49b;
+      border-radius: 50%;
+      background: #c91f1f;
+      box-shadow: 0 0 0 2px rgba(38, 12, 8, .7);
+      pointer-events: none;
+    }
+
     .scene-chip.tool-chip::before {
       width: 58px;
       height: 52px;
