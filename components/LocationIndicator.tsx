@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { screenLocationLabels, type ScreenLocationId } from "@/lib/gameState";
+import type { GameTheme } from "@/lib/gameTheme";
 
 type LocationIndicatorProps = {
   initialScreen?: string;
-  initialTheme?: "magicSchool" | "spaceStation";
+  initialTheme?: GameTheme;
 };
 
 const LOCATION_KICKER = "\uD604\uC7AC \uC704\uCE58";

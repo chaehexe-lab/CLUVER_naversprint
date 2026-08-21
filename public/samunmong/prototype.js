@@ -219,25 +219,6 @@
       interrogationScreen: { name: "비상 조사실", x: "50%", y: "78%" }
     };
     const locationMeta = isSpaceTheme ? spaceLocationMeta : isMagicTheme ? magicLocationMeta : joseonLocationMeta;
-    const magicMapPins = [
-      { goTo: "magicAlchemyLab", label: "제1 연금술 실습실로 이동", text: "제1 연금술 실습실", x: "23.4%", y: "27.6%", rot: "0deg" },
-      { goTo: "magicCleaningCloset", label: "청소도구함으로 이동", text: "청소도구함", x: "44.0%", y: "27.2%", rot: "0deg" },
-      { goTo: "magicLibrary", label: "도서관으로 이동", text: "도서관", x: "65.7%", y: "23.8%", rot: "0deg" },
-      { goTo: "magicRecordCrystalRoom", label: "기록 수정구실로 이동", text: "기록 수정구실", x: "78.4%", y: "47.4%", rot: "0deg" },
-      { goTo: "magicDormHallway", label: "학생들 기숙사로 이동", text: "학생들 기숙사", x: "27.3%", y: "61.0%", rot: "0deg" },
-      { goTo: "interrogationScreen", label: "교무 조사실로 이동", text: "교무 조사실", x: "70.3%", y: "73.6%", rot: "0deg" }
-    ];
-    const spaceMapPins = [
-      { screen: "spaceAirlock", goTo: "spaceAirlock", label: "에어록으로 이동", text: "에어록", x: "18%", y: "25%", rot: "0deg" },
-      { screen: "spaceMedicalBay", goTo: "spaceMedicalBay", label: "의료실로 이동", text: "의료실", x: "18%", y: "39%", rot: "0deg" },
-      { screen: "spaceOxygenGenerator", goTo: "spaceOxygenGenerator", label: "산소 발생기실로 이동", text: "산소 발생기실", x: "18%", y: "55%", rot: "0deg" },
-      { screen: "spaceDataCore", goTo: "spaceDataCore", label: "데이터실로 이동", text: "데이터실", x: "18%", y: "72%", rot: "0deg" },
-      { screen: "spaceScienceLab", goTo: "spaceScienceLab", label: "과학 실험실로 이동", text: "과학 실험실", x: "82%", y: "25%", rot: "0deg" },
-      { screen: "spaceGalleyCorridor", goTo: "spaceGalleyCorridor", label: "주방 복도로 이동", text: "주방 복도", x: "82%", y: "39%", rot: "0deg" },
-      { screen: "spaceSuitPrep", goTo: "spaceSuitPrep", label: "외부 작업 준비실로 이동", text: "외부 작업 준비실", x: "82%", y: "55%", rot: "0deg" },
-      { screen: "spaceObservation", label: "관측 구역 위치", text: "관측 구역", x: "82%", y: "72%", rot: "0deg" },
-      { screen: "interrogationScreen", goTo: "interrogationScreen", label: "비상 조사실로 이동", text: "비상 조사실", x: "50%", y: "78%", rot: "0deg" }
-    ];
     const soundBase = "/samunmong/sound";
     const bgmTracks = {
       main: document.querySelector("#mainBgm") || new Audio(`${soundBase}/bgm/main.mp3`),
@@ -1210,66 +1191,16 @@
       });
     }
 
-    function applyThemeMap() {
-      if (!isMagicTheme && !isSpaceTheme) return;
-      const mapConfig = isSpaceTheme
-        ? {
-          src: "/assets/space-station/maps/orbit-13-blueprint.webp",
-          alt: "우주정거장 오르빗-13 조사 구역 도면",
-          pins: spaceMapPins,
-          labelOffset: "0%"
-        }
-        : {
-          src: "/samunmong/assets/magic-school/ui/school-map.webp",
-          alt: "마법학교 조사 장소가 표시된 학교 지도",
-          pins: magicMapPins,
-          labelOffset: "-12%"
-        };
-      const mapImage = document.querySelector("#mapPanel .map-board img");
-      if (mapImage) {
-        mapImage.src = mapConfig.src;
-        mapImage.alt = mapConfig.alt;
-      }
-
-      const labels = [...document.querySelectorAll(".map-label")];
-      const pins = [...document.querySelectorAll(".map-pin-button")];
-      mapConfig.pins.forEach((item, index) => {
-        const label = labels[index];
-        if (label) {
-          label.hidden = false;
-          label.textContent = item.text;
-          label.dataset.locationScreen = item.screen || item.goTo;
-          label.style.setProperty("--x", item.x);
-          label.style.setProperty("--y", `calc(${item.y} + ${mapConfig.labelOffset})`);
-          label.style.setProperty("--rot", item.rot);
-        }
-        const pin = pins[index];
-        if (pin) {
-          pin.hidden = false;
-          if (item.goTo) {
-            pin.dataset.mapGo = item.goTo;
-            pin.disabled = false;
-          } else {
-            delete pin.dataset.mapGo;
-            pin.disabled = true;
-          }
-          pin.setAttribute("aria-label", item.label);
-          pin.style.setProperty("--x", item.x);
-          pin.style.setProperty("--y", item.y);
-        }
-      });
-
-      labels.slice(mapConfig.pins.length).forEach((label) => { label.hidden = true; });
-      pins.slice(mapConfig.pins.length).forEach((pin) => { pin.hidden = true; });
-    }
-
     function applyMagicUiCopies() {
       if (!isMagicTheme) return;
 
-      document.querySelector(".briefing-card h2").textContent = "마법학교 방화사건";
-      document.querySelector(".briefing-kicker").textContent = "기억 수정구";
+      const magicBriefingTitle = document.querySelector(".briefing-card h2");
+      if (magicBriefingTitle) magicBriefingTitle.textContent = "마법학교 방화사건";
+      const magicBriefingKicker = document.querySelector(".briefing-kicker");
+      if (magicBriefingKicker) magicBriefingKicker.textContent = "기억 수정구";
       setStartCaseLabel("조사 시작");
-      document.querySelector("[data-briefing-panel='1'] .briefing-caption").textContent = "실습실의 불은 어떻게 번졌는가";
+      const magicBriefingCaption = document.querySelector("[data-briefing-panel='1'] .briefing-caption");
+      if (magicBriefingCaption) magicBriefingCaption.textContent = "실습실의 불은 어떻게 번졌는가";
 
       const evidenceStack = document.querySelector(".briefing-evidence-stack");
       if (evidenceStack) {
@@ -1347,13 +1278,16 @@
       if (hintChip) hintChip.src = "/samunmong/assets/magic-school/ui/icon-mana-hint.webp";
       const hintLabel = document.querySelector("#interrogationHint .sr-only");
       if (hintLabel) hintLabel.textContent = "마력 감지";
-      document.querySelector("#evidenceBagPop .bag-pop-head strong").textContent = "차원 주머니";
+      const magicBagTitle = document.querySelector("#evidenceBagPop .bag-pop-head strong");
+      if (magicBagTitle) magicBagTitle.textContent = "차원 주머니";
       const bagGuide = document.querySelector("#evidenceBagPop .bag-pop-guide");
       if (bagGuide) bagGuide.textContent = "차원 주머니에서 떠오른 증거를 선택해 심문에 제시합니다.";
       const emptyBag = document.querySelector("#emptyInterrogationEvidence");
       if (emptyBag) emptyBag.textContent = "차원 주머니에 떠오른 증거가 없습니다.";
-      document.querySelector("#toolPanel h2").textContent = "마력 도구";
-      document.querySelector("#toolPanel .tool-panel-kicker").textContent = "마력 분석";
+      const magicToolTitle = document.querySelector("#toolPanel h2");
+      if (magicToolTitle) magicToolTitle.textContent = "마력 도구";
+      const magicToolKicker = document.querySelector("#toolPanel .tool-panel-kicker");
+      if (magicToolKicker) magicToolKicker.textContent = "마력 분석";
       const toolPanelLead = document.querySelector("#toolPanel > p");
       if (toolPanelLead) toolPanelLead.textContent = "마력 도구를 먼저 고른 뒤 증거를 선택하면 잔류 마법의 의미를 확인할 수 있습니다.";
       document.querySelectorAll(".investigation-note-panel h2").forEach((heading) => {
@@ -1877,7 +1811,6 @@
     const defaultSettings = { volume: 70, highContrast: false };
     applySettings({ ...defaultSettings, ...readStored(settingsKey, {}) });
     if (briefingTitle && isSpaceTheme) briefingTitle.textContent = "우주정거장 살인사건";
-    applyThemeMap();
     applyMagicUiCopies();
     setMagicRecordTab("0");
     updateMagicStudentPage(0);

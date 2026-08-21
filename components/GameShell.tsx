@@ -22,9 +22,15 @@ import SpaceStationScene from "@/components/scenes/SpaceStationScene";
 import YoomunseokSarangbangScene from "@/components/scenes/YoomunseokSarangbangScene";
 import { magicSchoolScenes, spaceStationScenes } from "@/lib/gameData";
 import { STARTABLE_SCREENS } from "@/lib/gameState";
+import {
+  getThemeEntryHref,
+  getThemeForScreen,
+  normalizeGameTheme,
+  type GameTheme
+} from "@/lib/gameTheme";
 
 const CONTENT_SCRIPT = "/samunmong/content.js?v=20260816-interactions-v91";
-const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260822-3d-evidence-v111";
+const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260822-theme-isolation-v112";
 const MAIN_SCREEN = "mainScreen";
 
 const INVESTIGATION_SCENE_COMPONENTS: Record<string, ComponentType> = {
@@ -45,8 +51,19 @@ const SPACE_SCENES_BY_ID = new Map<string, (typeof spaceStationScenes)[number]>(
 
 type GameShellProps = {
   initialScreen?: string;
-  initialTheme?: "magicSchool" | "spaceStation";
+  initialTheme?: GameTheme;
 };
+
+function getThemeFromHref(href: string): GameTheme | undefined {
+  const destination = new URL(href, window.location.href);
+  const requestedTheme = destination.searchParams.get("theme");
+  if (requestedTheme === "joseon" || requestedTheme === "magicSchool" || requestedTheme === "spaceStation") {
+    return requestedTheme;
+  }
+
+  const requestedScreen = destination.searchParams.get("start") ?? "";
+  return getThemeForScreen(requestedScreen);
+}
 
 function requestScreen(screenId: string) {
   window.dispatchEvent(
@@ -79,13 +96,27 @@ function ActiveInvestigationScene({ screenId }: { screenId: string }) {
 export default function GameShell({ initialScreen, initialTheme }: GameShellProps) {
   const router = useRouter();
   const skipIntro = Boolean(initialScreen);
+  const renderedTheme = initialTheme ?? getThemeForScreen(initialScreen) ?? "joseon";
   const [currentScreen, setCurrentScreen] = useState(
     initialScreen && STARTABLE_SCREENS.has(initialScreen) ? initialScreen : MAIN_SCREEN
   );
 
   useEffect(() => {
     const navigationWindow = window as Window & { samunmongNavigate?: (href: string) => void };
-    const navigate = (href: string) => router.push(href);
+    const navigate = (href: string) => {
+      const destinationTheme = getThemeFromHref(href);
+      const mountedTheme = normalizeGameTheme(document.documentElement.dataset.samunmongTheme);
+      const hasExplicitTheme = new URL(href, window.location.href).searchParams.has("theme");
+
+      // prototype.js owns global listeners and theme-specific data. A full reload is
+      // required when dreams change so listeners from the previous theme cannot survive.
+      if (destinationTheme && (destinationTheme !== mountedTheme || hasExplicitTheme)) {
+        window.location.assign(href);
+        return;
+      }
+
+      router.push(href);
+    };
     navigationWindow.samunmongNavigate = navigate;
 
     return () => {
@@ -100,6 +131,14 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
       const screenEvent = event as CustomEvent<{ screenId?: string }>;
       const screenId = screenEvent.detail?.screenId;
       if (!screenId || (screenId !== MAIN_SCREEN && !STARTABLE_SCREENS.has(screenId))) return;
+
+      const destinationTheme = getThemeForScreen(screenId);
+      const mountedTheme = normalizeGameTheme(document.documentElement.dataset.samunmongTheme);
+      if (destinationTheme && destinationTheme !== mountedTheme) {
+        event.preventDefault();
+        window.location.assign(getThemeEntryHref(screenId, destinationTheme));
+        return;
+      }
 
       event.preventDefault();
       setCurrentScreen(screenId);
@@ -151,12 +190,14 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
   useEffect(() => {
     let cancelled = false;
     const loadedScripts: HTMLScriptElement[] = [];
-    if (initialTheme) {
+    const requestedTheme = new URLSearchParams(window.location.search).get("theme");
+    const screenTheme = getThemeForScreen(initialScreen);
+    if (screenTheme) {
+      window.localStorage.setItem("samunmong-current-theme", screenTheme);
+    } else if (requestedTheme === "joseon" || requestedTheme === "magicSchool" || requestedTheme === "spaceStation") {
+      window.localStorage.setItem("samunmong-current-theme", requestedTheme);
+    } else if (initialTheme) {
       window.localStorage.setItem("samunmong-current-theme", initialTheme);
-    } else if (initialScreen?.startsWith("magic")) {
-      window.localStorage.setItem("samunmong-current-theme", "magicSchool");
-    } else if (initialScreen?.startsWith("space")) {
-      window.localStorage.setItem("samunmong-current-theme", "spaceStation");
     }
 
     const loadScript = (src: string) =>
@@ -200,15 +241,15 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
         viewport.style.setProperty("--game-scale", String(scale));
       }}
     >
-      <main className="game-shell" data-start-screen={initialScreen} data-initial-theme={initialTheme}>
+      <main className="game-shell" data-start-screen={initialScreen} data-initial-theme={renderedTheme}>
         <TeamIntro disabled={skipIntro} />
         <MainScreen active={currentScreen === MAIN_SCREEN} />
         <TutorialScreen />
         <DreamSelectScreen />
-        <BriefingScreen initialTheme={initialTheme} />
+        <BriefingScreen initialTheme={renderedTheme} />
         <ActiveInvestigationScene screenId={currentScreen} />
-        <InterrogationScreen initialTheme={initialTheme} />
-        <LocationIndicator initialScreen={initialScreen} initialTheme={initialTheme} />
+        <InterrogationScreen initialTheme={renderedTheme} />
+        <LocationIndicator initialScreen={initialScreen} initialTheme={renderedTheme} />
         <GameSettingsOverlay />
         <ButtonGuideLayer />
         <CinematicEvidenceFeedback />

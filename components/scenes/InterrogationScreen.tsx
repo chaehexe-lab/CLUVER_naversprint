@@ -3,6 +3,7 @@ import EvidenceInventory from "@/components/EvidenceInventory";
 import InvestigationNote from "@/components/InvestigationNote";
 import InterrogationCandle3D from "@/components/effects/InterrogationCandle3D";
 import InterrogationCharacterRig3D from "@/components/effects/InterrogationCharacterRig3D";
+import type { GameTheme } from "@/lib/gameTheme";
 import type { CSSProperties } from "react";
 
 type PinStyle = CSSProperties & {
@@ -20,27 +21,126 @@ const promptLines = [
   "숨긴 말이 더 있나?"
 ] as const;
 
-const mapLabels = [
-  { screen: "fieldOne", text: "유문석 집 앞", x: "29%", y: "24%", rot: "-4deg" },
-  { screen: "chunwolRoom", text: "춘월의 방", x: "67%", y: "17%", rot: "4deg" },
-  { screen: "mudeokServantRoom", text: "무덕의 하인방", x: "63%", y: "36%", rot: "-4deg" },
-  { screen: "yoomunseokSarangbang", text: "유문석 사랑방", x: "50%", y: "25%", rot: "4deg" },
-  { screen: "dolsoeQuarters", text: "돌쇠 처소", x: "24%", y: "60%", rot: "-6deg" },
-  { screen: "backGateCourtyard", text: "뒷문 마당", x: "48%", y: "78%", rot: "3deg" },
-  { screen: "interrogationScreen", text: "취조실", x: "73%", y: "70%", rot: "-3deg" }
-] as const;
+type MapLocation = {
+  screen: string;
+  goTo?: string;
+  text: string;
+  label: string;
+  x: string;
+  y: string;
+  labelY?: string;
+  rot?: string;
+};
 
-const mapPins = [
-  { goTo: "fieldOne", label: "유문석 집 앞 현장으로 이동", x: "29%", y: "32%" },
-  { goTo: "chunwolRoom", label: "춘월의 방으로 이동", x: "67%", y: "25%" },
-  { goTo: "mudeokServantRoom", label: "무덕의 하인방으로 이동", x: "63%", y: "44%" },
-  { goTo: "yoomunseokSarangbang", label: "유문석 사랑방으로 이동", x: "50%", y: "33%" },
-  { goTo: "dolsoeQuarters", label: "돌쇠 처소로 이동", x: "24%", y: "68%" },
-  { goTo: "backGateCourtyard", label: "뒷문 마당으로 이동", x: "48%", y: "86%" },
-  { goTo: "interrogationScreen", label: "취조실로 이동", x: "73%", y: "78%" }
-] as const;
+const THEME_MAPS: Record<GameTheme, { image: string; alt: string; locations: MapLocation[] }> = {
+  joseon: {
+    image: "/samunmong/assets/joseon-village-map-seven-locations-v2.webp",
+    alt: "조사 장소가 붉은 인장으로 표시된 조선시대 수사 지도",
+    locations: [
+      { screen: "fieldOne", goTo: "fieldOne", text: "유문석 집 앞", label: "유문석 집 앞 현장으로 이동", x: "29%", y: "32%", labelY: "24%", rot: "-4deg" },
+      { screen: "chunwolRoom", goTo: "chunwolRoom", text: "춘월의 방", label: "춘월의 방으로 이동", x: "67%", y: "25%", labelY: "17%", rot: "4deg" },
+      { screen: "mudeokServantRoom", goTo: "mudeokServantRoom", text: "무덕의 하인방", label: "무덕의 하인방으로 이동", x: "63%", y: "44%", labelY: "36%", rot: "-4deg" },
+      { screen: "yoomunseokSarangbang", goTo: "yoomunseokSarangbang", text: "유문석 사랑방", label: "유문석 사랑방으로 이동", x: "50%", y: "33%", labelY: "25%", rot: "4deg" },
+      { screen: "dolsoeQuarters", goTo: "dolsoeQuarters", text: "돌쇠 처소", label: "돌쇠 처소로 이동", x: "24%", y: "68%", labelY: "60%", rot: "-6deg" },
+      { screen: "backGateCourtyard", goTo: "backGateCourtyard", text: "뒷문 마당", label: "뒷문 마당으로 이동", x: "48%", y: "86%", labelY: "78%", rot: "3deg" },
+      { screen: "interrogationScreen", goTo: "interrogationScreen", text: "취조실", label: "취조실로 이동", x: "73%", y: "78%", labelY: "70%", rot: "-3deg" }
+    ]
+  },
+  magicSchool: {
+    image: "/samunmong/assets/magic-school/ui/school-map.webp",
+    alt: "마법학교 조사 장소가 표시된 학교 지도",
+    locations: [
+      { screen: "magicAlchemyLab", goTo: "magicAlchemyLab", text: "제1 연금술 실습실", label: "제1 연금술 실습실로 이동", x: "23.4%", y: "27.6%", labelY: "15.6%" },
+      { screen: "magicCleaningCloset", goTo: "magicCleaningCloset", text: "청소도구함", label: "청소도구함으로 이동", x: "44%", y: "27.2%", labelY: "15.2%" },
+      { screen: "magicLibrary", goTo: "magicLibrary", text: "도서관", label: "도서관으로 이동", x: "65.7%", y: "23.8%", labelY: "11.8%" },
+      { screen: "magicRecordCrystalRoom", goTo: "magicRecordCrystalRoom", text: "기록 수정구실", label: "기록 수정구실로 이동", x: "78.4%", y: "47.4%", labelY: "35.4%" },
+      { screen: "magicDormHallway", goTo: "magicDormHallway", text: "학생들 기숙사", label: "학생들 기숙사로 이동", x: "27.3%", y: "61%", labelY: "49%" },
+      { screen: "interrogationScreen", goTo: "interrogationScreen", text: "교무 조사실", label: "교무 조사실로 이동", x: "70.3%", y: "73.6%", labelY: "61.6%" }
+    ]
+  },
+  spaceStation: {
+    image: "/assets/space-station/maps/orbit-13-blueprint.webp",
+    alt: "우주정거장 오르빗-13 조사 구역 도면",
+    locations: [
+      { screen: "spaceAirlock", goTo: "spaceAirlock", text: "에어록", label: "에어록으로 이동", x: "18%", y: "25%" },
+      { screen: "spaceMedicalBay", goTo: "spaceMedicalBay", text: "의료실", label: "의료실로 이동", x: "18%", y: "39%" },
+      { screen: "spaceOxygenGenerator", goTo: "spaceOxygenGenerator", text: "산소 발생기실", label: "산소 발생기실로 이동", x: "18%", y: "55%" },
+      { screen: "spaceDataCore", goTo: "spaceDataCore", text: "데이터실", label: "데이터실로 이동", x: "18%", y: "72%" },
+      { screen: "spaceScienceLab", goTo: "spaceScienceLab", text: "과학 실험실", label: "과학 실험실로 이동", x: "82%", y: "25%" },
+      { screen: "spaceGalleyCorridor", goTo: "spaceGalleyCorridor", text: "주방 복도", label: "주방 복도로 이동", x: "82%", y: "39%" },
+      { screen: "spaceSuitPrep", goTo: "spaceSuitPrep", text: "외부 작업 준비실", label: "외부 작업 준비실로 이동", x: "82%", y: "55%" },
+      { screen: "spaceObservation", text: "관측 구역", label: "관측 구역 위치", x: "82%", y: "72%" },
+      { screen: "interrogationScreen", goTo: "interrogationScreen", text: "비상 조사실", label: "비상 조사실로 이동", x: "50%", y: "78%" }
+    ]
+  }
+};
 
-const extraMapSlots = [0, 1] as const;
+const THEME_INTERROGATION_COPY: Record<GameTheme, {
+  map: string;
+  note: string;
+  noteKicker: string;
+  noteLead: string;
+  journal: string;
+  bag: string;
+  tools: string;
+  toolKicker: string;
+  toolTitle: string;
+  suspects: Array<{ id: string; name: string }>;
+}> = {
+  joseon: {
+    map: "마을 지도",
+    note: "기록장",
+    noteKicker: "대화 기록",
+    noteLead: "등장인물별로 나눈 질문과 답변을 대화처럼 확인합니다.",
+    journal: "사건 일지",
+    bag: "보따리",
+    tools: "수사 도구",
+    toolKicker: "사또의 감식상",
+    toolTitle: "증거 감식",
+    suspects: [
+      { id: "dolsoe", name: "돌쇠" },
+      { id: "chunwol", name: "최춘월" },
+      { id: "yoomunseok", name: "유문석" },
+      { id: "mudeok", name: "무덕" }
+    ]
+  },
+  magicSchool: {
+    map: "학교 지도",
+    note: "수사 일지",
+    noteKicker: "마법 진술 기록",
+    noteLead: "교직원과 학생별 질문과 답변을 수사 일지에서 확인합니다.",
+    journal: "사건 기록",
+    bag: "마법 가방",
+    tools: "마력 도구",
+    toolKicker: "마력 감식대",
+    toolTitle: "잔류 마력 분석",
+    suspects: [
+      { id: "gandalf", name: "건달프" },
+      { id: "dunguldoor", name: "덩쿨도어" },
+      { id: "malpoil", name: "말포일" },
+      { id: "malpoi", name: "말포이" },
+      { id: "malposam", name: "말포삼" }
+    ]
+  },
+  spaceStation: {
+    map: "궤도 도면",
+    note: "로그 기록",
+    noteKicker: "통신 로그",
+    noteLead: "대원별 질문과 답변을 통신 기록처럼 확인합니다.",
+    journal: "최종 보고서",
+    bag: "증거 보관함",
+    tools: "스캔 도구",
+    toolKicker: "신호 분석",
+    toolTitle: "스캔 분석",
+    suspects: [
+      { id: "harry", name: "해리" },
+      { id: "mers", name: "메르스" },
+      { id: "aladdindin", name: "알라딘딘" },
+      { id: "ansungjyejyei", name: "안성줴줴이" },
+      { id: "einspanner", name: "아인슈페너" }
+    ]
+  }
+};
 
 function mapPositionStyle(item: { x: string; y: string; rot?: string }): PinStyle {
   return {
@@ -59,9 +159,11 @@ function mapPinStyle(item: { x: string; y: string }): PinStyle {
   };
 }
 
-export default function InterrogationScreen({ initialTheme }: { initialTheme?: "magicSchool" | "spaceStation" }) {
+export default function InterrogationScreen({ initialTheme }: { initialTheme: GameTheme }) {
   const isMagicTheme = initialTheme === "magicSchool";
   const isSpaceTheme = initialTheme === "spaceStation";
+  const themeMap = THEME_MAPS[initialTheme];
+  const copy = THEME_INTERROGATION_COPY[initialTheme];
   const initialPlate = isMagicTheme
     ? "/samunmong/assets/magic-school/interrogation/office-empty.webp"
     : isSpaceTheme
@@ -70,13 +172,13 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
   const initialSuspect = isSpaceTheme ? "harry" : isMagicTheme ? "gandalf" : "dolsoe";
   const initialSprite = isSpaceTheme ? "/assets/space-station/characters/harry-upper-transparent.webp" : isMagicTheme ? "/samunmong/assets/magic-school/interrogation/gandalf-sprite.webp" : "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707";
   const initialName = isSpaceTheme ? "해리" : isMagicTheme ? "건달프" : "";
-  const mapIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/orbit-blueprint.webp" : "/samunmong/assets/labels/transparent/tool-village-map.webp";
-  const noteIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/log-record.webp" : "/samunmong/assets/labels/transparent/tool-note-short.webp";
-  const journalIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/final-report.webp" : "/samunmong/assets/ui-generated/tool-case-journal.webp";
-  const bagIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/evidence-vault.webp" : "/samunmong/assets/labels/transparent/tool-bag-short.webp";
-  const toolIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/scan-tool.webp" : "/samunmong/assets/labels/transparent/tool-investigation-tools.webp";
-  const hintIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/hint-beacon.webp" : "/samunmong/assets/ui-generated/tool-hint.webp";
-  const accuseIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/accuse-target.webp" : "/samunmong/assets/labels/transparent/tool-accuse-short.webp";
+  const mapIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/orbit-blueprint.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-school-map.webp" : "/samunmong/assets/labels/transparent/tool-village-map.webp";
+  const noteIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/log-record.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/labels/transparent/tool-note-short.webp";
+  const journalIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/final-report.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/ui-generated/tool-case-journal.webp";
+  const bagIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/evidence-vault.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-magic-bag.webp" : "/samunmong/assets/labels/transparent/tool-bag-short.webp";
+  const toolIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/scan-tool.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-mana-tools.webp" : "/samunmong/assets/labels/transparent/tool-investigation-tools.webp";
+  const hintIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/hint-beacon.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-mana-hint.webp" : "/samunmong/assets/ui-generated/tool-hint.webp";
+  const accuseIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/accuse-target.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-final-accuse.webp" : "/samunmong/assets/labels/transparent/tool-accuse-short.webp";
   const bagPanelStyle = isSpaceTheme
     ? ({ backgroundImage: "url('/assets/space-station/panels/evidence-vault-panel-v2.webp')" } satisfies CSSProperties)
     : undefined;
@@ -108,11 +210,15 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
           />
         </div>
         <div className="interrogation-desk-foreground" aria-hidden="true" />
-        <div className="interrogation-candle-patch" aria-hidden="true" />
-        <div className="interrogation-candle" id="interrogationCandle" data-state="calm" aria-hidden="true">
-          <span className="candle-light" />
-          <InterrogationCandle3D />
-        </div>
+        {!isMagicTheme && !isSpaceTheme ? (
+          <>
+            <div className="interrogation-candle-patch" aria-hidden="true" />
+            <div className="interrogation-candle" id="interrogationCandle" data-state="calm" aria-hidden="true">
+              <span className="candle-light" />
+              <InterrogationCandle3D />
+            </div>
+          </>
+        ) : null}
 
         <div className="new-fact-toast" id="newFactToast" role="status" aria-live="polite" aria-hidden="true">
           <span>수사 노트</span>
@@ -132,31 +238,31 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
         </div>
 
         <nav className="hud scene-dock interrogation-tools" aria-label="취조실 도구">
-          <button className="scene-chip map-chip" id="openMapFromInterrogation" type="button" aria-label={isSpaceTheme ? "궤도 도면 열기" : "마을 지도 열기"}>
+          <button className="scene-chip map-chip" id="openMapFromInterrogation" type="button" aria-label={`${copy.map} 열기`}>
             <img src={mapIcon} alt="" />
-            <span className="sr-only">{isSpaceTheme ? "궤도 도면" : "마을 지도"}</span>
+            <span className="sr-only">{copy.map}</span>
           </button>
-          <button className="scene-chip note-chip" id="openNoteProp" type="button" aria-label={isSpaceTheme ? "로그 기록 보기" : "기록장 보기"}>
+          <button className="scene-chip note-chip" id="openNoteProp" type="button" aria-label={`${copy.note} 보기`}>
             <img src={noteIcon} alt="" />
-            <span className="sr-only">{isSpaceTheme ? "로그 기록" : "기록장"}</span>
+            <span className="sr-only">{copy.note}</span>
           </button>
-          <button className="scene-chip journal-chip" data-go="briefingScreen" type="button" aria-label={isSpaceTheme ? "최종 보고서 다시 보기" : "사건 일지 다시 보기"}>
+          <button className="scene-chip journal-chip" data-go="briefingScreen" type="button" aria-label={`${copy.journal} 다시 보기`}>
             <img src={journalIcon} alt="" />
-            <span className="sr-only">{isSpaceTheme ? "최종 보고서" : "사건 일지"}</span>
+            <span className="sr-only">{copy.journal}</span>
           </button>
           <button
             className="scene-chip bag-chip"
             id="toggleEvidenceBag"
             type="button"
             aria-expanded="false"
-            aria-label={isSpaceTheme ? "증거 보관함 열기" : "보따리 열기"}
+            aria-label={`${copy.bag} 열기`}
           >
             <img src={bagIcon} alt="" />
-            <span className="sr-only">{isSpaceTheme ? "증거 보관함" : "보따리"}</span>
+            <span className="sr-only">{copy.bag}</span>
           </button>
-          <button className="scene-chip tool-chip open-tool-panel" type="button" aria-label={isSpaceTheme ? "스캔 도구 열기" : "수사 도구 열기"}>
+          <button className="scene-chip tool-chip open-tool-panel" type="button" aria-label={`${copy.tools} 열기`}>
             <img src={toolIcon} alt="" />
-            <span className="sr-only">{isSpaceTheme ? "스캔 도구" : "도구"}</span>
+            <span className="sr-only">{copy.tools}</span>
           </button>
           <button className="tool-prop hint-prop" id="interrogationHint" type="button" aria-label="심문 힌트">
             <img src={hintIcon} alt="" />
@@ -214,20 +320,19 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
         {/* 사이드 서랍형 기록장 패널 */}
         <InvestigationNote>
           <aside className="note-drawer investigation-note-panel conversation-note" id="noteDrawer" aria-hidden="true" style={notePanelStyle}>
-            <button className="close-button note-close" id="closeNote" type="button" aria-label={isSpaceTheme ? "로그 기록 닫기" : "기록장 닫기"}>
+            <button className="close-button note-close" id="closeNote" type="button" aria-label={`${copy.note} 닫기`}>
               ×
             </button>
-            <p className="note-kicker">{isSpaceTheme ? "통신 로그" : "대화 기록"}</p>
-            <h2>{isSpaceTheme ? "로그 기록" : "기록장"}</h2>
-            <p className="note-lead">{isSpaceTheme ? "대원별 질문과 답변을 통신 기록처럼 확인합니다." : "등장인물별로 나눈 질문과 답변을 대화처럼 확인합니다."}</p>
+            <p className="note-kicker">{copy.noteKicker}</p>
+            <h2>{copy.note}</h2>
+            <p className="note-lead">{copy.noteLead}</p>
             <div className="note-suspect-tabs" data-note-tabs aria-label="기록할 등장인물 선택">
-              <button className="note-suspect-tab active" type="button" data-suspect-id="dolsoe">돌쇠</button>
-              <button className="note-suspect-tab" type="button" data-suspect-id="chunwol">최춘월</button>
-              <button className="note-suspect-tab" type="button" data-suspect-id="yoomunseok">유문석</button>
-              <button className="note-suspect-tab" type="button" data-suspect-id="mudeok">무덕</button>
+              {copy.suspects.map((suspect, index) => (
+                <button className={`note-suspect-tab${index === 0 ? " active" : ""}`} type="button" data-suspect-id={suspect.id} key={suspect.id}>{suspect.name}</button>
+              ))}
             </div>
             <p className="note-conversation-meta">
-              현재 기록: <span className="note-current-suspect" id="noteSuspect">돌쇠</span>
+              현재 기록: <span className="note-current-suspect" id="noteSuspect">{copy.suspects[0].name}</span>
             </p>
             <div className="conversation-log" id="interrogationSummary" data-note-log aria-live="polite">
               <p className="conversation-empty">아직 이 인물과 나눈 대화가 없습니다.</p>
@@ -256,7 +361,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
       {/* 현장과 취조실이 함께 사용하는 보따리 팝업 */}
       <EvidenceInventory>
         <aside className="hud evidence-bag-pop" id="evidenceBagPop" aria-hidden="true" style={bagPanelStyle}>
-          {!isSpaceTheme ? (
+          {isMagicTheme ? (
             <div className="dimensional-pouch-aura" aria-hidden="true">
               <span className="pouch-ring pouch-ring-outer" />
               <span className="pouch-ring pouch-ring-middle" />
@@ -264,8 +369,8 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
             </div>
           ) : null}
           <div className="bag-pop-head">
-            <strong>{isSpaceTheme ? "증거 보관함" : "보따리"}</strong>
-            <button className="close-button mini-close" id="closeEvidenceBag" type="button" aria-label={isSpaceTheme ? "증거 보관함 닫기" : "보따리 닫기"}>
+            <strong>{copy.bag}</strong>
+            <button className="close-button mini-close" id="closeEvidenceBag" type="button" aria-label={`${copy.bag} 닫기`}>
               ×
             </button>
           </div>
@@ -286,7 +391,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
           <div className="evidence-location-tabs" id="evidenceLocationTabs" aria-label="증거 장소 선택" />
           <div className="evidence-list evidence-grid" id="evidenceList">
             <div className="evidence-empty" id="emptyInterrogationEvidence">
-              보따리에 담긴 증거가 없습니다.
+              {copy.bag}에 담긴 증거가 없습니다.
             </div>
           </div>
           <div className="evidence-story-preview" id="evidenceStoryPreview" hidden>
@@ -328,7 +433,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
           <div className="evidence-thread-panel" id="evidenceThreadPanel" hidden>
             <button className="evidence-story-preview-close" id="closeEvidenceThread" type="button" aria-label="사건 줄거리 닫기">×</button>
             <div className="evidence-thread-head">
-              <span>사또가 밝혀낸 연결</span>
+              <span>{initialTheme === "joseon" ? "사또가 밝혀낸 연결" : initialTheme === "magicSchool" ? "교사가 밝혀낸 연결" : "조사관이 밝혀낸 연결"}</span>
               <strong>사건 줄거리</strong>
               <p>직접 이어 붙인 증거만 기록됩니다.</p>
             </div>
@@ -338,7 +443,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
       </EvidenceInventory>
 
       <aside className="global-panel tool-panel" id="toolPanel" aria-hidden="true" style={toolPanelStyle}>
-        {!isSpaceTheme ? (
+        {isMagicTheme ? (
           <div className="arcane-panel-aura" aria-hidden="true">
             <span />
             <span />
@@ -347,20 +452,20 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
         ) : null}
         <div className="global-panel-head">
           <div>
-            <p className="tool-panel-kicker">{isSpaceTheme ? "신호 분석" : "사또의 감식상"}</p>
-            <h2>{isSpaceTheme ? "스캔 도구" : "증거 감식"}</h2>
+            <p className="tool-panel-kicker">{copy.toolKicker}</p>
+            <h2>{copy.toolTitle}</h2>
           </div>
           {!isSpaceTheme && !isMagicTheme ? (
             <p className="tool-panel-guide">알맞은 도구로 증거를 감식해 숨겨진 사실을 밝혀내세요.</p>
           ) : null}
-          <button className="close-button global-close" type="button" aria-label={isSpaceTheme ? "스캔 도구 닫기" : "수사 도구 닫기"}>
+          <button className="close-button global-close" type="button" aria-label={`${copy.tools} 닫기`}>
             닫기
           </button>
         </div>
         {isSpaceTheme || isMagicTheme ? (
           <p>{isSpaceTheme ? "스캔 장비를 고른 뒤 증거를 확인하십시오." : "단서 하나와 도구 하나를 골라 증거 위에 놓으세요."}</p>
         ) : null}
-        {!isSpaceTheme ? (
+        {!isSpaceTheme && !isMagicTheme ? (
           <ol className="tool-flow-guide" aria-label="증거 감식 순서">
             <li><b>1</b><span>증거 고르기</span></li>
             <li><b>2</b><span>도구 고르기</span></li>
@@ -406,7 +511,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
       </aside>
 
       <aside className="global-panel tool-result-panel" id="toolResultPopup" aria-hidden="true" aria-live="polite">
-        <div className="arcane-result-sigil" aria-hidden="true" />
+        {isMagicTheme ? <div className="arcane-result-sigil" aria-hidden="true" /> : null}
         <p className="tool-panel-kicker" id="toolResultKicker">새 단서</p>
         <h2 id="toolResultTitle">증거 분석 결과</h2>
         <p id="toolResultText">새로운 정보가 드러났습니다.</p>
@@ -425,11 +530,15 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
           </span>
           <span className="evidence-transform-mark">→</span>
           <img id="toolResultImage" className="evidence-acquisition-object" src="/samunmong/assets/interactions/evidence-tools/expanded/result-evidence-confirmed.png" alt="" width="320" />
-          <img className="evidence-acquisition-seal" src="/samunmong/assets/interactions/sato-skills/official-seal/objects/seal-imprint.png" alt="" />
-          <img className="evidence-acquisition-parcel" src="/samunmong/assets/interactions/evidence-collection/sealed-evidence-parcel.webp" alt="" />
+          {!isMagicTheme && !isSpaceTheme ? (
+            <>
+              <img className="evidence-acquisition-seal" src="/samunmong/assets/interactions/sato-skills/official-seal/objects/seal-imprint.png" alt="" />
+              <img className="evidence-acquisition-parcel" src="/samunmong/assets/interactions/evidence-collection/sealed-evidence-parcel.webp" alt="" />
+            </>
+          ) : null}
         </div>
         <div className="evidence-result-actions">
-          <button className="button" id="openResultInBag" type="button">보따리에서 보기</button>
+          <button className="button" id="openResultInBag" type="button">{copy.bag}에서 보기</button>
           <button className="button primary" id="closeToolResult" type="button">계속</button>
         </div>
       </aside>
@@ -612,22 +721,21 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
         <aside className="global-panel investigation-note-panel conversation-note" id="fieldNotePanel" aria-hidden="true" style={notePanelStyle}>
           <div className="global-panel-head">
             <div>
-              <p className="note-kicker">{isSpaceTheme ? "통신 로그" : "대화 기록"}</p>
-              <h2>{isSpaceTheme ? "로그 기록" : "기록장"}</h2>
+              <p className="note-kicker">{copy.noteKicker}</p>
+              <h2>{copy.note}</h2>
             </div>
-            <button className="close-button note-close global-close" type="button" aria-label={isSpaceTheme ? "로그 기록 닫기" : "기록장 닫기"}>
+            <button className="close-button note-close global-close" type="button" aria-label={`${copy.note} 닫기`}>
               ×
             </button>
           </div>
-          <p className="note-lead">{isSpaceTheme ? "대원별 질문과 답변을 통신 기록처럼 확인합니다." : "등장인물별로 나눈 질문과 답변을 대화처럼 확인합니다."}</p>
+          <p className="note-lead">{copy.noteLead}</p>
           <div className="note-suspect-tabs" data-note-tabs aria-label="기록할 등장인물 선택">
-            <button className="note-suspect-tab active" type="button" data-suspect-id="dolsoe">돌쇠</button>
-            <button className="note-suspect-tab" type="button" data-suspect-id="chunwol">최춘월</button>
-            <button className="note-suspect-tab" type="button" data-suspect-id="yoomunseok">유문석</button>
-            <button className="note-suspect-tab" type="button" data-suspect-id="mudeok">무덕</button>
+            {copy.suspects.map((suspect, index) => (
+              <button className={`note-suspect-tab${index === 0 ? " active" : ""}`} type="button" data-suspect-id={suspect.id} key={suspect.id}>{suspect.name}</button>
+            ))}
           </div>
           <p className="note-conversation-meta">
-            현재 기록: <span className="note-current-suspect">돌쇠</span>
+            현재 기록: <span className="note-current-suspect">{copy.suspects[0].name}</span>
           </p>
           <div className="conversation-log" data-note-log aria-live="polite">
             <p className="conversation-empty">아직 이 인물과 나눈 대화가 없습니다.</p>
@@ -636,44 +744,25 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
       </InvestigationNote>
 
       <aside className="global-panel map-panel" id="mapPanel" aria-hidden="true">
-        <button className="close-button global-close map-floating-close" type="button" aria-label={isSpaceTheme ? "궤도 도면 닫기" : "마을 지도 닫기"}>
+        <button className="close-button global-close map-floating-close" type="button" aria-label={`${copy.map} 닫기`}>
           닫기
         </button>
         <div className="map-board">
-          <img src="/samunmong/assets/joseon-village-map-seven-locations-v2.webp" alt="조사 장소가 붉은 인장으로 표시된 조선시대 수사 지도" />
-          {mapLabels.map((label) => (
-            <span className="map-label" data-location-screen={label.screen} style={mapPositionStyle(label)} key={label.text}>
-              {label.text}
+          <img src={themeMap.image} alt={themeMap.alt} />
+          {themeMap.locations.map((location) => (
+            <span className="map-label" data-location-screen={location.screen} style={mapPositionStyle({ x: location.x, y: location.labelY ?? location.y, rot: location.rot })} key={location.screen}>
+              {location.text}
             </span>
           ))}
-          {mapPins.map((pin) => (
+          {themeMap.locations.map((location) => (
             <button
               className="map-pin-button"
               type="button"
-              data-map-go={pin.goTo}
-              style={mapPinStyle(pin)}
-              aria-label={pin.label}
-              key={pin.goTo}
-            />
-          ))}
-          {extraMapSlots.map((slot) => (
-            <span
-              className="map-label"
-              data-location-screen=""
-              style={mapPositionStyle({ x: "0%", y: "0%", rot: "0deg" })}
-              hidden
-              key={`extra-map-label-${slot}`}
-            />
-          ))}
-          {extraMapSlots.map((slot) => (
-            <button
-              className="map-pin-button"
-              type="button"
-              style={mapPinStyle({ x: "0%", y: "0%" })}
-              aria-label=""
-              disabled
-              hidden
-              key={`extra-map-pin-${slot}`}
+              data-map-go={location.goTo}
+              style={mapPinStyle(location)}
+              aria-label={location.label}
+              disabled={!location.goTo}
+              key={`pin-${location.screen}`}
             />
           ))}
         </div>
