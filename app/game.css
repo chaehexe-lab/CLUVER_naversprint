@@ -7761,16 +7761,18 @@ html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-card span { f
 
 /* Joseon guided evidence inspection: one readable action at a time */
 html[data-samunmong-theme="joseon"] .global-panel.tool-panel {
-  width: min(980px, calc(100vw - 32px));
-  height: min(740px, calc(100vh - 24px));
-  max-width: calc(100vw - 32px);
-  max-height: calc(100vh - 24px);
+  width: 980px;
+  height: 710px;
+  max-width: 980px;
+  max-height: 710px;
   padding: 14px 18px 16px;
   border: 0;
   background:
-    linear-gradient(180deg, rgba(56, 30, 18, .035), rgba(42, 20, 13, .16)),
+    linear-gradient(180deg, rgba(255, 252, 234, .28), rgba(255, 236, 190, .14)),
     url("/samunmong/assets/ui/joseon-paper-panel-clean-bg.webp") center / 100% 100% no-repeat;
-  box-shadow: 0 30px 118px rgba(0,0,0,.8), inset 0 0 32px rgba(48,21,11,.24);
+  box-shadow:
+    0 24px 66px rgba(0,0,0,.48),
+    inset 0 0 0 1px rgba(92, 52, 25, .2);
 }
 html[data-samunmong-theme="joseon"] .global-panel.tool-panel .global-panel-head h2 {
   color: #321a13;
@@ -13244,15 +13246,31 @@ html[data-samunmong-theme="joseon"] .global-panel.tool-panel .global-panel-head 
   display: none !important;
 }
 html[data-samunmong-theme="joseon"] .global-panel.tool-panel .global-panel-head {
-  margin: 12px 18px 2px !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 24px !important;
+  margin: 30px 25px 2px !important;
 }
 html[data-samunmong-theme="joseon"] .global-panel.tool-panel .global-panel-head h2 {
   color: #210d08 !important;
-  font-family: "ChilgokLjh", "NanumBareunJeongsin", "Noto Serif KR", serif !important;
-  font-size: clamp(32px, 3.5vw, 46px) !important;
-  font-weight: 400 !important;
+  font-family: "VitroPride", "Noto Serif KR", "Batang", serif !important;
+  font-size: clamp(32px, 3.5vw, 38px) !important;
+  font-weight: 600 !important;
   letter-spacing: 0 !important;
-  text-shadow: 0 1px 0 #fff1c9 !important;
+  text-shadow: none !important;
+}
+html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-panel-guide {
+  margin: 0 !important;
+  color: #352016 !important;
+  font-family: "VitroPride", "Noto Serif KR", "Batang", serif !important;
+  font-size: 17px !important;
+  font-weight: 400 !important;
+  line-height: 1.35 !important;
+  white-space: nowrap;
+  opacity: 1 !important;
+  pointer-events: none;
+  transform: translate(-8px, 8px)
 }
 html[data-samunmong-theme="joseon"] .global-panel.tool-panel > p {
   margin-left: 18px !important;
@@ -13263,10 +13281,13 @@ html[data-samunmong-theme="joseon"] .global-panel.tool-panel > p {
   opacity: 1 !important;
 }
 html[data-samunmong-theme="joseon"] .global-panel.tool-panel .close-button {
+  position: relative;
+  z-index: 2;
   color: #6f1d19 !important;
   border-color: #8b2c25 !important;
   background: #f0ddb3 !important;
   font-weight: 600 !important;
+  pointer-events: auto !important;
 }
 html[data-samunmong-theme="joseon"] .tool-flow-guide li {
   color: #2c160e !important;
@@ -13362,32 +13383,61 @@ html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-card.active {
   background: #f6e4bd !important;
   box-shadow: inset 0 0 0 2px #fff0c4,0 5px 14px #4b201b44 !important;
 }
+html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-card.option:not(:disabled):hover,
+html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-card.option:not(:disabled):focus-visible {
+  border: 3px solid #9e3329 !important;
+  box-shadow: inset 0 0 0 2px #fff0c4, 0 5px 14px #4b201b44 !important;
+}
+html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-card.option:disabled,
+html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-card.option:disabled:hover,
+html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-card.option:disabled:focus-visible {
+  border: 1px solid #86634a !important;
+  background: #eddbb4 !important;
+  box-shadow: inset 0 0 0 1px rgba(255,246,213,.22) !important;
+  filter: grayscale(.85);
+  opacity: .45 !important;
+  cursor: not-allowed;
+}
 html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-grid {
-  height: 100px !important;
-  grid-auto-rows: 92px !important;
+  height: 92px !important;
+  grid-template-columns: repeat(3, 62px) !important;
+  grid-auto-rows: 62px !important;
+  justify-content: center !important;
+  column-gap: 72px !important;
 }
 html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-card.option {
-  height: 92px !important;
-  min-height: 92px !important;
-  max-height: 92px !important;
-  grid-template-columns: 86px minmax(0, 1fr) !important;
-  grid-template-rows: 1fr !important;
-  gap: 10px !important;
-  padding: 6px 14px !important;
-  text-align: left !important;
+  position: relative;
+  width: 62px !important;
+  height: 62px !important;
+  min-height: 62px !important;
+  max-height: 62px !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  place-items: center !important;
+  gap: 0 !important;
+  padding: 4px !important;
+  overflow: visible !important;
+  text-align: center !important;
 }
 html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-card.option img {
-  width: 80px !important;
-  height: 80px !important;
-  max-width: 80px !important;
-  max-height: 80px !important;
+  width: 52px !important;
+  height: 52px !important;
+  max-width: 52px !important;
+  max-height: 52px !important;
   object-fit: contain !important;
 }
 html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-card.option > strong {
+  position: absolute;
+  top: 68px;
+  left: 50%;
   color: #24120c !important;
-  font-size: 17px !important;
+  font-family: "VitroPride", "Noto Serif KR", "Batang", serif !important;
+  font-size: 15px !important;
   font-weight: 600 !important;
   line-height: 1.25 !important;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  pointer-events: none;
 }
 html[data-samunmong-theme="joseon"] .tool-analysis-stage {
   color: #fff0c8 !important;
@@ -13479,10 +13529,13 @@ html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-flow-guide {
   flex: 0 0 auto;
 }
 html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-workbench {
-  flex: 1 1 auto !important;
-  height: auto !important;
-  min-height: 0 !important;
-  margin-top: 10px !important;
+  flex: 0 0 460px !important;
+  width: 88% !important;
+  height: 460px !important;
+  min-height: 460px !important;
+  align-self: center !important;
+  grid-template-columns: 190px minmax(0, 1fr) !important;
+  margin-top: 18px !important;
   overflow: hidden;
 }
 html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-evidence-list,
@@ -13493,23 +13546,22 @@ html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-preview-image
   max-height: none !important;
 }
 html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-grid {
-  flex: 0 0 100px !important;
-  height: 100px !important;
-  min-height: 100px !important;
-  margin-top: 10px !important;
-  margin-bottom: 0 !important;
+  flex: 0 0 92px !important;
+  height: 92px !important;
+  min-height: 92px !important;
+  margin: 10px 0 0 !important;
 }
 @media (max-height: 760px) {
   html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-grid {
-    flex-basis: 86px !important;
-    height: 86px !important;
-    min-height: 86px !important;
-    grid-auto-rows: 80px !important;
+    flex-basis: 88px !important;
+    height: 88px !important;
+    min-height: 88px !important;
+    grid-auto-rows: 62px !important;
   }
   html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-card.option {
-    height: 80px !important;
-    min-height: 80px !important;
-    max-height: 80px !important;
+    height: 62px !important;
+    min-height: 62px !important;
+    max-height: 62px !important;
   }
 }
 

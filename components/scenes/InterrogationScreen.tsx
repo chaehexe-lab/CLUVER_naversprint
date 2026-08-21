@@ -337,11 +337,16 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
             <p className="tool-panel-kicker">{isSpaceTheme ? "신호 분석" : "사또의 감식상"}</p>
             <h2>{isSpaceTheme ? "스캔 도구" : "증거 감식"}</h2>
           </div>
+          {!isSpaceTheme && !isMagicTheme ? (
+            <p className="tool-panel-guide">알맞은 도구로 증거를 감식해 숨겨진 사실을 밝혀내세요.</p>
+          ) : null}
           <button className="close-button global-close" type="button" aria-label={isSpaceTheme ? "스캔 도구 닫기" : "수사 도구 닫기"}>
             닫기
           </button>
         </div>
-        <p>{isSpaceTheme ? "스캔 장비를 고른 뒤 증거를 확인하십시오." : "단서 하나와 도구 하나를 골라 증거 위에 놓으세요."}</p>
+        {isSpaceTheme || isMagicTheme ? (
+          <p>{isSpaceTheme ? "스캔 장비를 고른 뒤 증거를 확인하십시오." : "단서 하나와 도구 하나를 골라 증거 위에 놓으세요."}</p>
+        ) : null}
         {!isSpaceTheme ? (
           <ol className="tool-flow-guide" aria-label="증거 감식 순서">
             <li><b>1</b><span>증거 고르기</span></li>

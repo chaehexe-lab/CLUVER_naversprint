@@ -3557,6 +3557,19 @@
         });
         grid.appendChild(button);
       });
+      syncToolChoiceState();
+    }
+
+    function syncToolChoiceState() {
+      const hasLockedChoice = isJoseonToolInteraction && Boolean(selectedToolForAnalysis);
+      document.querySelectorAll("#toolGrid .tool-card").forEach((item) => {
+        const isSelected = item.dataset.tool === selectedToolForAnalysis;
+        const isDisabled = hasLockedChoice && !isSelected;
+        item.classList.toggle("active", isSelected);
+        item.classList.toggle("tool-disabled", isDisabled);
+        item.disabled = isDisabled;
+        item.setAttribute("aria-disabled", String(isDisabled));
+      });
     }
 
     function activateTool(name) {
@@ -3564,7 +3577,7 @@
       resetToolInteraction(false);
       syncToolInteractionMode();
       updateToolCursor();
-      document.querySelectorAll(".tool-card").forEach((item) => item.classList.toggle("active", item.dataset.tool === name));
+      syncToolChoiceState();
     }
 
     const toolReactionAssets = {
@@ -3707,7 +3720,11 @@
       preview?.classList.remove("swiping", "wrong-tool", "tool-reacting");
       preview?.removeAttribute("data-tool-mode");
       document.querySelector("#toolReactionLayer")?.classList.remove("show", "wrong", "success");
-      if (clearTool) selectedToolForAnalysis = "";
+      if (clearTool) {
+        selectedToolForAnalysis = "";
+        syncToolChoiceState();
+        updateToolCursor();
+      }
       syncToolInteractionMode();
     }
 
@@ -5992,6 +6009,13 @@
       } else if (target.closest(".open-note-panel, #openNoteFromField, #openNoteFromRoom, #openNoteFromMudeokRoom")) {
         openGlobalPanel("fieldNotePanel");
       }
+    });
+    document.querySelector("#toolPanel")?.addEventListener("click", (event) => {
+      if (!isJoseonToolInteraction || !selectedToolForAnalysis) return;
+      const target = event.target instanceof Element ? event.target : null;
+      if (!target) return;
+      if (target.closest("button, a, input, select, textarea, [contenteditable='true'], .tool-preview-image, [draggable='true']")) return;
+      resetToolInteraction(true);
     });
     document.addEventListener("keydown", (event) => {
       const target = event.target;
