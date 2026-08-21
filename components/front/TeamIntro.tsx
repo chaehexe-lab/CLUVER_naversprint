@@ -83,7 +83,7 @@ export default function TeamIntro({ disabled = false }: TeamIntroProps) {
 
         <div className="intro-search" aria-hidden="true">
           <span className="search-lens" />
-          <span className="search-type">https://cluver</span>
+          <span className="search-type">https://cluver.com</span>
           <span className="search-submit" />
         </div>
 
