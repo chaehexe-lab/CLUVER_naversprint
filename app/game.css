@@ -811,6 +811,75 @@
       white-space: nowrap;
     }
 
+    html[data-samunmong-theme="joseon"] .location-indicator {
+      box-sizing: border-box;
+      width: min(260px, 42vw);
+      min-width: 0;
+      min-height: 80px;
+      gap: 6px;
+      padding: 13px 20px 12px 18px;
+      border: 1px solid rgba(190, 144, 66, .72);
+      border-radius: 8px;
+      background: linear-gradient(145deg, rgba(15, 13, 11, .9), rgba(4, 4, 4, .84));
+      box-shadow:
+        0 16px 36px rgba(0, 0, 0, .46),
+        inset 0 0 0 3px rgba(7, 6, 5, .72),
+        inset 0 0 0 4px rgba(190, 144, 66, .2);
+      backdrop-filter: blur(8px);
+    }
+
+    html[data-samunmong-theme="joseon"] .location-indicator::before {
+      content: none;
+    }
+
+    html[data-samunmong-theme="joseon"] .location-indicator__kicker {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #d0a452;
+      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
+      font-size: clamp(11px, 1vw, 14px);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: 0;
+    }
+
+    html[data-samunmong-theme="joseon"] .location-indicator__kicker::before {
+      content: "";
+      position: relative;
+      top: -1px;
+      width: 10px;
+      height: 10px;
+      flex: 0 0 10px;
+      border-radius: 50% 50% 50% 0;
+      background: radial-gradient(circle at 50% 50%, #17110c 0 1.5px, #d7ad5c 2px);
+      box-shadow: 0 2px 6px rgba(215, 173, 92, .22);
+      transform: rotate(-45deg);
+    }
+
+    html[data-samunmong-theme="joseon"] .location-indicator strong {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      color: #f0e4cf;
+      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
+      font-size: clamp(19px, 1.6vw, 25px);
+      font-weight: 400;
+      line-height: 1.1;
+      text-shadow: 0 3px 10px rgba(0, 0, 0, .68);
+    }
+
+    html[data-samunmong-theme="joseon"] .location-indicator strong::after {
+      content: "";
+      min-width: 40px;
+      height: 1px;
+      flex: 1;
+      background:
+        linear-gradient(90deg, transparent, rgba(190, 144, 66, .55) 12%, rgba(190, 144, 66, .32) 88%, transparent);
+      box-shadow: 0 0 6px rgba(190, 144, 66, .14);
+    }
+
     .button {
       min-height: 30px;
       border: 1px solid rgba(190,159,111,.42);
