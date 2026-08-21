@@ -48,6 +48,27 @@ type GameShellProps = {
   initialTheme?: "magicSchool" | "spaceStation";
 };
 
+type GameTheme = "joseon" | "magicSchool" | "spaceStation";
+
+function normalizeTheme(theme: string | null | undefined): GameTheme {
+  if (theme === "magicSchool" || theme === "spaceStation") return theme;
+  return "joseon";
+}
+
+function getThemeFromHref(href: string): GameTheme | undefined {
+  const destination = new URL(href, window.location.href);
+  const requestedTheme = destination.searchParams.get("theme");
+  if (requestedTheme === "joseon" || requestedTheme === "magicSchool" || requestedTheme === "spaceStation") {
+    return requestedTheme;
+  }
+
+  const requestedScreen = destination.searchParams.get("start") ?? "";
+  if (requestedScreen.startsWith("magic")) return "magicSchool";
+  if (requestedScreen.startsWith("space")) return "spaceStation";
+  if (INVESTIGATION_SCENE_COMPONENTS[requestedScreen]) return "joseon";
+  return undefined;
+}
+
 function requestScreen(screenId: string) {
   window.dispatchEvent(
     new CustomEvent("samunmong:screen-request", {
@@ -85,7 +106,19 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
 
   useEffect(() => {
     const navigationWindow = window as Window & { samunmongNavigate?: (href: string) => void };
-    const navigate = (href: string) => router.push(href);
+    const navigate = (href: string) => {
+      const destinationTheme = getThemeFromHref(href);
+      const mountedTheme = normalizeTheme(document.documentElement.dataset.samunmongTheme);
+
+      // prototype.js owns global listeners and theme-specific data. A full reload is
+      // required when dreams change so listeners from the previous theme cannot survive.
+      if (destinationTheme && destinationTheme !== mountedTheme) {
+        window.location.assign(href);
+        return;
+      }
+
+      router.push(href);
+    };
     navigationWindow.samunmongNavigate = navigate;
 
     return () => {
@@ -151,12 +184,17 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
   useEffect(() => {
     let cancelled = false;
     const loadedScripts: HTMLScriptElement[] = [];
-    if (initialTheme) {
+    const requestedTheme = new URLSearchParams(window.location.search).get("theme");
+    if (requestedTheme === "joseon" || requestedTheme === "magicSchool" || requestedTheme === "spaceStation") {
+      window.localStorage.setItem("samunmong-current-theme", requestedTheme);
+    } else if (initialTheme) {
       window.localStorage.setItem("samunmong-current-theme", initialTheme);
     } else if (initialScreen?.startsWith("magic")) {
       window.localStorage.setItem("samunmong-current-theme", "magicSchool");
     } else if (initialScreen?.startsWith("space")) {
       window.localStorage.setItem("samunmong-current-theme", "spaceStation");
+    } else if (initialScreen && INVESTIGATION_SCENE_COMPONENTS[initialScreen]) {
+      window.localStorage.setItem("samunmong-current-theme", "joseon");
     }
 
     const loadScript = (src: string) =>
