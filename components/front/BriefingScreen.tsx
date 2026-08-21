@@ -1,4 +1,5 @@
 import { briefing } from "@/lib/gameData";
+import type { GameTheme } from "@/lib/gameTheme";
 
 const magicRecordCards = [
   {
@@ -231,16 +232,18 @@ function SpaceStationBriefingScreen() {
   );
 }
 
-export default function BriefingScreen({ initialTheme }: { initialTheme?: "magicSchool" | "spaceStation" }) {
+export default function BriefingScreen({ initialTheme }: { initialTheme: GameTheme }) {
   if (initialTheme === "spaceStation") {
     return <SpaceStationBriefingScreen />;
   }
 
   const isMagicTheme = initialTheme === "magicSchool";
+  const briefingTitle = isMagicTheme ? "마법학교 방화사건" : briefing.title;
+  const briefingKicker = isMagicTheme ? "기억 수정구" : "사건기록";
 
   return (
     <section className="screen briefing-screen" id="briefingScreen">
-      <div className="magic-memory-stage">
+      {isMagicTheme ? <div className="magic-memory-stage">
         <div className="magic-summon-circle magic-summon-circle-outer" />
         <div className="magic-summon-circle magic-summon-circle-inner" />
         <button className="memory-orb-trigger" id="memoryOrbTrigger" type="button" aria-label="기억 수정구를 눌러 봉인된 기억 복원하기">
@@ -261,8 +264,8 @@ export default function BriefingScreen({ initialTheme }: { initialTheme?: "magic
           <span />
           <span />
         </div>
-      </div>
-      <div className="memory-restore-ritual" aria-hidden="true">
+      </div> : null}
+      {isMagicTheme ? <div className="memory-restore-ritual" aria-hidden="true">
         <span className="memory-beam" />
         <span className="memory-beam-core" />
         <span className="memory-forming-cloud" />
@@ -274,20 +277,20 @@ export default function BriefingScreen({ initialTheme }: { initialTheme?: "magic
         <span className="memory-forming-spark spark-b" />
         <span className="memory-forming-spark spark-c" />
         <span className="memory-forming-spark spark-d" />
-      </div>
+      </div> : null}
       <article className="hud briefing-card" data-briefing-step="0">
-        <MagicBriefingPopupFrame />
+        {isMagicTheme ? <MagicBriefingPopupFrame /> : null}
         <div className="briefing-card-content">
-          <div className="memory-shard-nav" aria-hidden="true">
+          {isMagicTheme ? <div className="memory-shard-nav" aria-hidden="true">
             <span data-memory-shard="0">사건 잔상</span>
             <span data-memory-shard="1">숨은 단서</span>
             <span data-memory-shard="2">관계자</span>
-          </div>
-          <p className="briefing-kicker">사건기록</p>
-          <h2>{briefing.title}</h2>
+          </div> : null}
+          <p className="briefing-kicker">{briefingKicker}</p>
+          <h2>{briefingTitle}</h2>
 
           <div className="briefing-step active" data-briefing-panel="0">
-            <section className="memory-trace-sequence" data-memory-trace-state="intro" aria-label="사건 잔상 복원">
+            {isMagicTheme ? <section className="memory-trace-sequence" data-memory-trace-state="intro" aria-label="사건 잔상 복원">
               <div className="memory-trace-frame">
                 <img src="/samunmong/assets/magic-school/intro/memory-trace/memory-trace-frame.webp" alt="마법학교 방화사건 기억 프레임과 사건 현장" draggable={false} />
                 <div className="memory-trace-photo-zone" data-memory-draw-zone>
@@ -313,35 +316,41 @@ export default function BriefingScreen({ initialTheme }: { initialTheme?: "magic
                   </button>
                 </div>
               </div>
-            </section>
+            </section> : null}
             <div className="briefing-copy" id="briefingCopy" aria-live="polite" />
           </div>
 
           <div className="briefing-step" data-briefing-panel="1" aria-hidden="true">
-            <figure className="magic-case-file-visual">
-              <img src="/samunmong/assets/magic-school/intro/rebuilt/case-page-02.webp" alt="마법학교 방화사건 마력 잔흔 분석 기록" draggable={false} />
-              <div className="magic-case-click-zones" aria-label="마력 흔적 넘기기">
-                <button type="button" data-briefing-prev-zone aria-label="이전 마력 흔적" />
-                <button type="button" data-briefing-next-zone aria-label="다음 마력 흔적" />
-              </div>
-            </figure>
-            <p className="briefing-caption strong">점순이는 어떻게 죽었는가</p>
-            <div className="briefing-death-layout">
-              <div className="briefing-evidence-stack">
-                <figure className="briefing-evidence-photo">
-                  <img src="/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.webp" alt="점순 초기 검안 기록" draggable={false} />
-                </figure>
-                <figure className="briefing-evidence-photo briefing-evidence-photo-small">
-                  <img src="/samunmong/assets/mudeok-interaction/evidence-jeomsun-hand-exam-paper.webp" alt="점순이 손끝 밑 살점 검안 종이" draggable={false} />
-                </figure>
-                <p className="briefing-evidence-caption">검안 기록</p>
-              </div>
-              <div className="briefing-death-copy">
-                <p>사또님, 검안 결과를 살펴보니 <br />목에 <strong>희미한 끈 자국</strong>이 보입니다.</p>
-                <p>또한 점순이의 손톱 밑에는 <strong>살점으로 보이는 흔적</strong>이 남아 있었습니다.</p>
-                <p>이는 누군가 점순이의 목을 조른 정황으로 보입니다.</p>
-              </div>
-            </div>
+            {isMagicTheme ? <>
+              <p className="briefing-caption strong">실습실의 불은 어떻게 번졌는가</p>
+              <figure className="magic-case-file-visual">
+                <img src="/samunmong/assets/magic-school/intro/rebuilt/case-page-02.webp" alt="마법학교 방화사건 마력 잔흔 분석 기록" draggable={false} />
+                <div className="magic-case-click-zones" aria-label="마력 흔적 넘기기">
+                  <button type="button" data-briefing-prev-zone aria-label="이전 마력 흔적" />
+                  <button type="button" data-briefing-next-zone aria-label="다음 마력 흔적" />
+                </div>
+              </figure>
+            </> : (
+              <>
+                <p className="briefing-caption strong">점순이는 어떻게 죽었는가</p>
+                <div className="briefing-death-layout">
+                  <div className="briefing-evidence-stack">
+                    <figure className="briefing-evidence-photo">
+                      <img src="/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.webp" alt="점순 초기 검안 기록" draggable={false} />
+                    </figure>
+                    <figure className="briefing-evidence-photo briefing-evidence-photo-small">
+                      <img src="/samunmong/assets/mudeok-interaction/evidence-jeomsun-hand-exam-paper.webp" alt="점순이 손끝 밑 살점 검안 종이" draggable={false} />
+                    </figure>
+                    <p className="briefing-evidence-caption">검안 기록</p>
+                  </div>
+                  <div className="briefing-death-copy">
+                    <p>사또님, 검안 결과를 살펴보니 <br />목에 <strong>희미한 끈 자국</strong>이 보입니다.</p>
+                    <p>또한 점순이의 손톱 밑에는 <strong>살점으로 보이는 흔적</strong>이 남아 있었습니다.</p>
+                    <p>이는 누군가 점순이의 목을 조른 정황으로 보입니다.</p>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           {isMagicTheme ? (
