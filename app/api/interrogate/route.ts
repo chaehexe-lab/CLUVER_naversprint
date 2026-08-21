@@ -1,4 +1,10 @@
 import { evidenceCatalog, getSuspectSpecialAnswer, suspectPersonas, type EvidenceReaction, type SuspectPersona } from "@/lib/suspectPersonas";
+import {
+  retrieveInterrogationFacts,
+  selectNewFactId,
+  type InterrogationFact,
+  type InterrogationReaction
+} from "@/lib/interrogationFacts";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -10,7 +16,9 @@ type OpenAIMessage = {
   content: string;
 };
 
-type OpenAIAnswerResult = { ok: true; answer: string } | { ok: false; error: string };
+type OpenAIAnswerResult =
+  | { ok: true; answer: string; inputTokens?: number; outputTokens?: number }
+  | { ok: false; error: string };
 
 type InterrogateRequest = {
   suspectId?: string;
@@ -21,6 +29,8 @@ type InterrogateRequest = {
   collectedEvidenceIds?: string[];
   collectedEvidenceNames?: string[];
   conversationHistory?: ChatMessage[];
+  knownFactIds?: string[];
+  revealedFactIds?: string[];
 };
 
 const OPENAI_RESPONSES_ENDPOINT = "https://api.openai.com/v1/responses";
@@ -39,6 +49,11 @@ const CHUNWOL_DIRECT_PRESSURE_PATTERNS = [
 ] as const;
 const QUESTION_CHAR_LIMIT = 60;
 const LONG_QUESTION_NOTICE = "질문이 길어서 전부 알아듣지는 못했지만, 앞부분에 대해 답하겠습니다.";
+const NEVER_CLAIM_PATTERNS = [
+  /(?:내가|제가|나는|저는).{0,12}(?:점순을|그 아이를).{0,12}(?:죽였|살해했|목을 졸랐)/,
+  /(?:내가|제가|나는|저는).{0,12}(?:편지를 썼|창고로 불렀|호패를 두었)/,
+  /(?:범인은|진범은).{0,8}(?:춘월|최춘월)/
+];
 
 function unique(values: string[]) {
   return [...new Set(values.filter(Boolean))];
@@ -145,7 +160,53 @@ function countBreakEvidence(persona: SuspectPersona, evidenceNames: string[]) {
   return persona.breakEvidenceNames.filter((name) => evidenceSet.has(name)).length;
 }
 
-function buildSystemPrompt(persona: SuspectPersona, evidenceNames: string[], reactions: EvidenceReaction[]) {
+function formatRetrievedFacts(facts: InterrogationFact[]) {
+  if (!facts.length) return "질문과 직접 연결되는 확인된 사실이 없다.";
+  return facts.map((fact) => `- [${fact.id}] ${fact.fact}`).join("\n");
+}
+
+function getInterrogationReaction(persona: SuspectPersona, evidenceNames: string[], facts: InterrogationFact[], question: string): InterrogationReaction {
+  const pressure = Math.max(0, ...facts.map((fact) => fact.pressure || 0));
+  const breakEvidenceCount = countBreakEvidence(persona, evidenceNames);
+
+  if (persona.id === "chunwol" && breakEvidenceCount > 0 && /(죽였|살해|범인|목\s*졸|창고로\s*불)/.test(question)) return "silent";
+  if (breakEvidenceCount >= 2 || pressure >= 3) return "shocked";
+  if (breakEvidenceCount === 1 || pressure === 2) return "nervous";
+  if (facts.some((fact) => fact.responseMode === "avoid")) return "avoid";
+  if (facts.some((fact) => fact.responseMode === "attentive") || facts.length > 0) return "attentive";
+  return "calm";
+}
+
+function candleEffectFor(reaction: InterrogationReaction) {
+  return {
+    calm: "steady",
+    attentive: "long_flicker",
+    avoid: "thin_shadow",
+    nervous: "uneven_flare",
+    shocked: "blue_flicker",
+    silent: "dim"
+  }[reaction];
+}
+
+function hasNeverClaim(answer: string) {
+  const normalized = answer.replace(/\s+/g, " ");
+  return NEVER_CLAIM_PATTERNS.some((pattern) => pattern.test(normalized));
+}
+
+function safeSilentAnswer(persona: SuspectPersona) {
+  return persona.id === "chunwol" ? "....(대답하지 못한다)" : "그 일은 지금 말씀드리기 어렵습니다.";
+}
+
+function buildResponseMeta(facts: InterrogationFact[], reaction: InterrogationReaction, knownFactIds: string[]) {
+  return {
+    reaction,
+    candleEffect: candleEffectFor(reaction),
+    usedFactIds: facts.map((fact) => fact.id),
+    newFactId: selectNewFactId(facts, knownFactIds)
+  };
+}
+
+function buildSystemPrompt(persona: SuspectPersona, evidenceNames: string[], reactions: EvidenceReaction[], retrievedFacts: InterrogationFact[]) {
   const pressureCount = countBreakEvidence(persona, evidenceNames);
   const isMagicPersona = MAGIC_SUSPECT_IDS.has(persona.id);
   const isSpacePersona = SPACE_SUSPECT_IDS.has(persona.id);
@@ -219,6 +280,15 @@ ${evidenceNames.length ? evidenceNames.join(", ") : "없음"}
 증거별 반응 지침:
 ${formatReactions(reactions)}
 
+질문과 관련해 검색된 확인 사실:
+${formatRetrievedFacts(retrievedFacts)}
+
+검색 사실 사용 규칙:
+- 위 목록에 없는 사건 사실은 새로 만들어내지 않는다.
+- 질문에 필요한 사실만 골라 자연스럽게 답하고 사실 식별자는 대사에 쓰지 않는다.
+- 목록이 비어 있으면 고정 알리바이와 겉으로 말하는 입장 안에서만 답한다.
+- 숨겨진 범행 전말이나 범인의 정체를 추측해 말하지 않는다.
+
 압박 상태:
 ${pressureGuide}
 
@@ -277,7 +347,13 @@ async function requestOpenAIAnswer(apiKey: string, messages: OpenAIMessage[]): P
   }
 
   const data = await response.json();
-  return { ok: true, answer: extractOpenAIText(data) };
+  const usage = (data as { usage?: { input_tokens?: number; output_tokens?: number } }).usage;
+  return {
+    ok: true,
+    answer: extractOpenAIText(data),
+    inputTokens: usage?.input_tokens,
+    outputTokens: usage?.output_tokens
+  };
 }
 
 function fallbackAnswer(
@@ -286,7 +362,8 @@ function fallbackAnswer(
   reactions: EvidenceReaction[],
   reason: string,
   question = "",
-  wasQuestionTruncated = false
+  wasQuestionTruncated = false,
+  meta?: ReturnType<typeof buildResponseMeta>
 ) {
   const guide = reactions[0]?.responseGuide;
   const evidenceText = evidenceNames[0] ? ` ${evidenceNames[0]} 말씀이십니까.` : "";
@@ -301,7 +378,8 @@ function fallbackAnswer(
   return {
     answer: applyLongQuestionNotice(answer, wasQuestionTruncated),
     source: "fallback",
-    warning: reason
+    warning: reason,
+    ...meta
   };
 }
 
@@ -317,7 +395,14 @@ export async function POST(req: Request) {
 
   const specialAnswer = getSuspectSpecialAnswer(question, persona.id);
   if (specialAnswer) {
-    return Response.json({ answer: applyLongQuestionNotice(specialAnswer, questionState.wasTruncated), source: "special" });
+    return Response.json({
+      answer: applyLongQuestionNotice(specialAnswer, questionState.wasTruncated),
+      source: "special",
+      reaction: "calm",
+      candleEffect: "steady",
+      usedFactIds: [],
+      newFactId: null
+    });
   }
 
   const presentedEvidence = resolveEvidenceNames([...(body.presentedEvidenceNames || []), ...(body.presentedEvidenceIds || [])]);
@@ -326,15 +411,33 @@ export async function POST(req: Request) {
   const personaPressureEvidence = inferPersonaPressureEvidenceNames(persona, question);
   const usableEvidence = unique([...presentedEvidence, ...inferredEvidence, ...personaPressureEvidence]);
   const reactions = getRelevantReactions(persona, usableEvidence);
+  const knownFactIds = unique((body.knownFactIds || []).filter((value): value is string => typeof value === "string"));
+  const retrievedFacts = retrieveInterrogationFacts({
+    persona,
+    question,
+    evidenceNames: usableEvidence,
+    collectedEvidenceNames: collectedEvidence,
+    revealedFactIds: unique((body.revealedFactIds || []).filter((value): value is string => typeof value === "string"))
+  });
+  const reaction = getInterrogationReaction(persona, usableEvidence, retrievedFacts, question);
+  const responseMeta = buildResponseMeta(retrievedFacts, reaction, knownFactIds);
   const apiKey = process.env.OPENAI_API_KEY;
 
   if (!apiKey) {
     return Response.json(
-      fallbackAnswer(persona, usableEvidence, reactions, "OPENAI_API_KEY가 설정되지 않아 임시 답변을 반환했습니다.", question, questionState.wasTruncated)
+      fallbackAnswer(
+        persona,
+        usableEvidence,
+        reactions,
+        "OPENAI_API_KEY가 설정되지 않아 임시 답변을 반환했습니다.",
+        question,
+        questionState.wasTruncated,
+        responseMeta
+      )
     );
   }
 
-  const systemPrompt = buildSystemPrompt(persona, usableEvidence, reactions);
+  const systemPrompt = buildSystemPrompt(persona, usableEvidence, reactions, retrievedFacts);
   const questionGuide = questionState.wasTruncated
     ? `\n\n현재 질문 처리:\n- 플레이어의 질문이 길어서 앞 ${QUESTION_CHAR_LIMIT}자만 전달되었다.\n- 답변 첫 부분에 "${LONG_QUESTION_NOTICE}"라는 뜻의 안내를 자연스럽게 포함한다.\n- 전달된 앞부분 질문에 대해서만 답하고, 뒤에 더 있었을 내용은 추측하지 않는다.`
     : "";
@@ -347,7 +450,10 @@ export async function POST(req: Request) {
   try {
     const firstAnswer = await requestOpenAIAnswer(apiKey, messages);
     if (!firstAnswer.ok) {
-      return Response.json(fallbackAnswer(persona, usableEvidence, reactions, firstAnswer.error, question, questionState.wasTruncated), { status: 200 });
+      return Response.json(
+        fallbackAnswer(persona, usableEvidence, reactions, firstAnswer.error, question, questionState.wasTruncated, responseMeta),
+        { status: 200 }
+      );
     }
 
     let answer = firstAnswer.answer;
@@ -371,20 +477,48 @@ export async function POST(req: Request) {
 
     if (!answer || hasForeignText(answer)) {
       return Response.json(
-        fallbackAnswer(persona, usableEvidence, reactions, "외국어가 섞인 응답을 걸러 임시 답변을 반환했습니다.", question, questionState.wasTruncated),
+        fallbackAnswer(
+          persona,
+          usableEvidence,
+          reactions,
+          "외국어가 섞인 응답을 걸러 임시 답변을 반환했습니다.",
+          question,
+          questionState.wasTruncated,
+          responseMeta
+        ),
         {
           status: 200
         }
       );
     }
 
+    const blockedNeverClaim = hasNeverClaim(answer);
+    if (blockedNeverClaim) {
+      answer = safeSilentAnswer(persona);
+    }
+
+    if (process.env.NODE_ENV !== "production") {
+      console.info("[interrogate-rag]", {
+        suspectId: persona.id,
+        usedFactIds: responseMeta.usedFactIds,
+        inputTokens: firstAnswer.inputTokens,
+        outputTokens: firstAnswer.outputTokens
+      });
+    }
+
     return Response.json({
       answer: applyLongQuestionNotice(answer, questionState.wasTruncated),
-      source: "openai",
-      usedEvidenceNames: usableEvidence
+      source: "rag",
+      usedEvidenceNames: usableEvidence,
+      ...responseMeta,
+      reaction: blockedNeverClaim ? "silent" : responseMeta.reaction,
+      candleEffect: blockedNeverClaim ? "dim" : responseMeta.candleEffect
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "알 수 없는 오류";
-    return Response.json(fallbackAnswer(persona, usableEvidence, reactions, `OpenAI API 오류: ${message}`, question, questionState.wasTruncated), { status: 200 });
+    return Response.json(
+      fallbackAnswer(persona, usableEvidence, reactions, `OpenAI API 오류: ${message}`, question, questionState.wasTruncated, responseMeta),
+      { status: 200 }
+    );
   }
 }

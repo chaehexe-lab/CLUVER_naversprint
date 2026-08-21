@@ -1,6 +1,8 @@
 import AccuseSuspect from "@/components/AccuseSuspect";
 import EvidenceInventory from "@/components/EvidenceInventory";
 import InvestigationNote from "@/components/InvestigationNote";
+import InterrogationCandle3D from "@/components/effects/InterrogationCandle3D";
+import InterrogationCharacterRig3D from "@/components/effects/InterrogationCharacterRig3D";
 import type { CSSProperties } from "react";
 
 type PinStyle = CSSProperties & {
@@ -64,7 +66,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
     ? "/samunmong/assets/magic-school/interrogation/office-empty.webp"
     : isSpaceTheme
       ? "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp"
-    : "/samunmong/assets/main-screen-v2.webp";
+    : "/samunmong/assets/scene-interrogation-room-empty.png";
   const initialSuspect = isSpaceTheme ? "harry" : isMagicTheme ? "gandalf" : "dolsoe";
   const initialSprite = isSpaceTheme ? "/assets/space-station/characters/harry-upper-transparent.webp" : isMagicTheme ? "/samunmong/assets/magic-school/interrogation/gandalf-sprite.webp" : "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707";
   const initialName = isSpaceTheme ? "해리" : isMagicTheme ? "건달프" : "";
@@ -94,6 +96,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
           src={initialPlate}
           alt="취조실"
         />
+        {!isMagicTheme && !isSpaceTheme ? <InterrogationCharacterRig3D initialTexture={initialSprite} /> : null}
         <div className="shade" />
 
         <div className="suspect-stage" id="suspectStage" data-suspect={initialSuspect} aria-hidden="true">
@@ -105,6 +108,16 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme?: "
           />
         </div>
         <div className="interrogation-desk-foreground" aria-hidden="true" />
+        <div className="interrogation-candle-patch" aria-hidden="true" />
+        <div className="interrogation-candle" id="interrogationCandle" data-state="calm" aria-hidden="true">
+          <span className="candle-light" />
+          <InterrogationCandle3D />
+        </div>
+
+        <div className="new-fact-toast" id="newFactToast" role="status" aria-live="polite" aria-hidden="true">
+          <span>수사 노트</span>
+          <strong id="newFactTitle">새로운 사실이 기록되었습니다</strong>
+        </div>
 
         <div className="hud suspect-name" id="suspectName">
           {initialName}

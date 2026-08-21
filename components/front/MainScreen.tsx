@@ -1,5 +1,8 @@
+"use client";
+
 import { mainMenu, screenImages } from "@/lib/gameData";
 import type { CSSProperties } from "react";
+import MainRealtimeRig from "@/components/front/MainRealtimeRig";
 
 type MenuButtonStyle = CSSProperties & {
   "--menu-y": string;
@@ -14,6 +17,23 @@ export default function MainScreen({ active = false }: MainScreenProps) {
     <section className={`screen${active ? " active" : ""}`} id="mainScreen">
       <audio id="mainBgm" src="/samunmong/sound/bgm/main.mp3" autoPlay loop preload="metadata" playsInline />
       <img className="plate" src={screenImages.mainScreen} alt="삼운몽 세 개의 꿈 메인 화면" />
+      <img
+        className="main-clean-plate"
+        src="/samunmong/assets/interactions/main-2d/main-static-clean.png"
+        alt=""
+        aria-hidden="true"
+      />
+      <div className="main-2d-scene" aria-hidden="true">
+        <MainRealtimeRig />
+        <div className="main-depth main-depth-mid">
+          <div className="main-lantern-lights">
+            <span className="main-lantern main-lantern-one" />
+            <span className="main-lantern main-lantern-two" />
+            <span className="main-lantern main-lantern-three" />
+            <span className="main-lantern main-lantern-four" />
+          </div>
+        </div>
+      </div>
       {mainMenu.map((item) => (
         <button
           key={item.id}
