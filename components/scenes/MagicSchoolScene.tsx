@@ -1,4 +1,5 @@
 import { magicSchoolScenes } from "@/lib/gameData";
+import MagicCrystalRig3D from "@/components/effects/MagicCrystalRig3D";
 import { hotspotStyle } from "./hotspotStyle";
 
 type MagicScene = (typeof magicSchoolScenes)[number];
@@ -7,6 +8,7 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
   return (
     <section className="screen magic-school-screen" id={scene.id}>
       <img className="plate" src={scene.image} alt={scene.alt} />
+      <MagicCrystalRig3D sceneId={scene.id} />
       <div className="shade magic-shade" />
 
       {scene.hotspots.map((hotspot) => {
