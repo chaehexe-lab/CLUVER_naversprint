@@ -728,11 +728,45 @@
       clearTimeout(briefingRestoreTimer);
     }
 
+    function renderBriefingText(text) {
+      if (!briefingCopy || !isSpaceTheme) {
+        if (briefingCopy) briefingCopy.textContent = text;
+        return;
+      }
+
+      const roleText = "당신은 이 꿈에서 정거장 사고 조사관입니다.";
+      const roleStart = briefingText.indexOf(roleText);
+      if (roleStart < 0 || text.length <= roleStart) {
+        briefingCopy.textContent = text;
+        return;
+      }
+
+      const roleEnd = roleStart + roleText.length;
+      const visibleRoleText = text.slice(roleStart, roleEnd);
+      const roleLine = document.createElement("span");
+      roleLine.className = "space-briefing-role-line";
+      const emphasisText = "정거장 사고 조사관";
+      const emphasisStart = roleText.indexOf(emphasisText);
+      const emphasisEnd = emphasisStart + emphasisText.length;
+      const emphasis = document.createElement("strong");
+      emphasis.textContent = visibleRoleText.slice(emphasisStart, emphasisEnd);
+      roleLine.append(
+        document.createTextNode(visibleRoleText.slice(0, emphasisStart)),
+        emphasis,
+        document.createTextNode(visibleRoleText.slice(emphasisEnd))
+      );
+      briefingCopy.replaceChildren(
+        document.createTextNode(text.slice(0, roleStart)),
+        roleLine,
+        document.createTextNode(text.slice(roleEnd))
+      );
+    }
+
     function finishBriefingTyping() {
       clearInterval(typeBriefing.timer);
       clearTimeout(typeBriefing.decodeTimer);
       if (briefingCopy) {
-        briefingCopy.textContent = briefingText;
+        renderBriefingText(briefingText);
         briefingCopy.classList.add("done");
         briefingCopy.classList.remove("rune-decoding");
       }
@@ -1742,7 +1776,7 @@
 
       const writeDecodedText = () => {
         typeBriefing.timer = setInterval(() => {
-        briefingCopy.textContent = briefingText.slice(0, index);
+        renderBriefingText(briefingText.slice(0, index));
         if (briefingText[index] && !/\s/.test(briefingText[index]) && index % 3 === 0) {
           playTypeSfx();
         }

@@ -161,7 +161,7 @@ function MagicStartCaseButtonArt({ label }: { label: string }) {
 
 function SpaceStationBriefingScreen() {
   return (
-    <section className="screen briefing-screen" id="briefingScreen">
+    <section className="screen briefing-screen space-station-briefing-screen" id="briefingScreen">
       <img
         className="plate"
         src="/assets/space-station/backgrounds/space-briefing-room.webp"
@@ -176,7 +176,8 @@ function SpaceStationBriefingScreen() {
           minHeight: "auto",
           left: "50%",
           top: "50%",
-          padding: "34px 44px 38px",
+          gap: "12px",
+          padding: "34px 44px 10px",
           border: "1px solid rgba(160, 207, 229, .36)",
           borderRadius: "22px",
           color: "#eaf6ff",
@@ -200,34 +201,31 @@ function SpaceStationBriefingScreen() {
             조사 시작
           </button>
         </div>
+        <button
+          id="spaceBriefingNext"
+          type="button"
+          data-go="spaceAirlock"
+          aria-label="다음 화면으로 이동"
+          style={{
+            justifySelf: "center",
+            width: "clamp(155px, 16.2vw, 234px)",
+            aspectRatio: "420 / 132",
+            padding: 0,
+            border: 0,
+            background: "transparent",
+            cursor: "pointer",
+            zIndex: 8,
+            filter: "drop-shadow(0 18px 28px rgba(0,0,0,.48))"
+          }}
+        >
+          <img
+            src="/assets/space-station/ui-buttons/space-next-button.svg"
+            alt="다음"
+            draggable={false}
+            style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+          />
+        </button>
       </article>
-      <button
-        id="spaceBriefingNext"
-        type="button"
-        data-go="spaceAirlock"
-        aria-label="다음 화면으로 이동"
-        style={{
-          position: "absolute",
-          left: "50%",
-          bottom: "9.2%",
-          transform: "translateX(-50%)",
-          width: "clamp(172px, 18vw, 260px)",
-          aspectRatio: "420 / 132",
-          padding: 0,
-          border: 0,
-          background: "transparent",
-          cursor: "pointer",
-          zIndex: 8,
-          filter: "drop-shadow(0 18px 28px rgba(0,0,0,.48))"
-        }}
-      >
-        <img
-          src="/assets/space-station/ui-buttons/space-next-button.svg"
-          alt="다음"
-          draggable={false}
-          style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
-        />
-      </button>
     </section>
   );
 }

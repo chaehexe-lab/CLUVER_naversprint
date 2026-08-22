@@ -2032,6 +2032,50 @@
       display: none;
     }
 
+    .space-station-briefing-screen .briefing-card[data-briefing-step="0"] h2 {
+      color: inherit;
+      font-size: 50px;
+    }
+
+    .space-station-briefing-screen .briefing-card[data-briefing-step="0"] .briefing-kicker {
+      border-color: #eaf6ff;
+      color: #eaf6ff;
+      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
+      font-size: 13px;
+    }
+
+    .space-station-briefing-screen .briefing-card h2::after {
+      content: none;
+    }
+
+    .space-station-briefing-screen .briefing-copy {
+      display: block;
+      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
+      font-size: 25px;
+    }
+
+    .space-station-briefing-screen .briefing-copy::after {
+      color: #eaf6ff;
+    }
+
+    .space-station-briefing-screen .briefing-copy strong {
+      font-weight: 700;
+    }
+
+    .space-station-briefing-screen .space-briefing-role-line {
+      white-space: nowrap;
+    }
+
+    .space-station-briefing-screen .briefing-card[data-briefing-step="0"] .briefing-step {
+      margin-top: 36px;
+      margin-bottom: 33px;
+      min-height: 0;
+    }
+
+    .space-station-briefing-screen .briefing-actions {
+      display: none;
+    }
+
     .button.primary.briefing-start {
       position: relative;
       min-width: 178px;
