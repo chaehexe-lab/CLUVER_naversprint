@@ -852,6 +852,16 @@
     }
 
     function getMemoryDrawPoint(event) {
+      const drawingSvg = memoryDrawPath?.ownerSVGElement;
+      const screenMatrix = drawingSvg?.getScreenCTM();
+      if (drawingSvg && screenMatrix) {
+        const svgPoint = drawingSvg.createSVGPoint();
+        svgPoint.x = event.clientX;
+        svgPoint.y = event.clientY;
+        const localPoint = svgPoint.matrixTransform(screenMatrix.inverse());
+        return { x: localPoint.x, y: localPoint.y };
+      }
+
       const rect = memoryDrawZone?.getBoundingClientRect();
       if (!rect) return null;
       return {
@@ -1995,9 +2005,12 @@
 
     memoryDrawZone?.addEventListener("pointermove", (event) => {
       if (memoryTraceComplete || !memoryDrawZone.hasPointerCapture?.(event.pointerId)) return;
-      const point = getMemoryDrawPoint(event);
-      if (!point) return;
-      memoryTracePoints.push(point);
+      const pointerEvents = event.getCoalescedEvents?.() || [];
+      const sampledEvents = pointerEvents.length > 0 ? pointerEvents : [event];
+      sampledEvents.forEach((sampledEvent) => {
+        const point = getMemoryDrawPoint(sampledEvent);
+        if (point) memoryTracePoints.push(point);
+      });
       updateMemoryDrawPath();
       if (isMemoryCircleComplete()) completeMemoryTrace();
     });
