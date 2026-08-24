@@ -4557,7 +4557,10 @@
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 24px 26px rgba(0,0,0,.66)) saturate(.9) brightness(.92);
+      /* Keep raster character art crisp; lighting and motion carry reactions. */
+      filter: none;
+      image-rendering: auto;
+      backface-visibility: hidden;
       transform: translateX(-50%) scale(var(--suspect-scale, 1));
       transform-origin: bottom center;
       transition: opacity .18s ease, transform .18s ease;
@@ -4649,7 +4652,7 @@
 
     html[data-samunmong-theme="spaceStation"] .suspect-sprite,
     .game-shell[data-initial-theme="spaceStation"] .suspect-sprite {
-      filter: drop-shadow(0 26px 28px rgba(0,0,0,.7)) saturate(.86) brightness(.96);
+      filter: none;
     }
 
     .interrogation-desk-foreground {
@@ -4809,10 +4812,13 @@
       display: none;
     }
 
-    #interrogationScreen .shade,
+    #interrogationScreen .shade {
+      transition: opacity .45s ease, background .45s ease;
+    }
+
     #interrogationScreen .suspect-stage,
     #interrogationScreen .suspect-sprite {
-      transition: opacity .45s ease, filter .45s ease, transform .45s ease, background .45s ease;
+      transition: opacity .45s ease, transform .45s ease;
     }
 
     #interrogationScreen[data-interrogation-reaction="avoid"] .shade {
@@ -4821,22 +4827,15 @@
 
     #interrogationScreen[data-interrogation-reaction="avoid"] .suspect-stage {
       transform: translateX(-48%);
-      filter: brightness(.75) saturate(.78);
     }
 
     #interrogationScreen[data-interrogation-reaction="nervous"] .suspect-stage {
       animation: interrogation-suspect-breath .86s ease-in-out 3;
-      filter: brightness(.88) saturate(.9);
     }
 
     #interrogationScreen[data-interrogation-reaction="shocked"] .shade,
     #interrogationScreen[data-interrogation-reaction="silent"] .shade {
       background: rgba(0, 0, 0, .52);
-    }
-
-    #interrogationScreen[data-interrogation-reaction="shocked"] .suspect-stage,
-    #interrogationScreen[data-interrogation-reaction="silent"] .suspect-stage {
-      filter: brightness(.58) saturate(.62);
     }
 
     .new-fact-toast {
