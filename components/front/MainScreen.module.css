@@ -1,0 +1,27 @@
+.retroDialogButton {
+  position: relative !important;
+  overflow: visible !important;
+  border: 4px solid #1e1e1e !important;
+  border-radius: 0 !important;
+  color: #1e1e1e !important;
+  background: #edede8 !important;
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.34) !important;
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.retroDialogButton::before,
+.retroDialogButton::after {
+  content: none !important;
+  display: none !important;
+}
+
+.retroDialogButton:hover,
+.retroDialogButton:focus-visible {
+  color: #111 !important;
+  background: #fffdf2 !important;
+  box-shadow: 7px 7px 0 rgba(0, 0, 0, 0.38) !important;
+  outline: 2px solid #1e1e1e !important;
+  outline-offset: 3px !important;
+  transform: translate(-1px, -1px);
+}

@@ -3,6 +3,7 @@
 import { mainMenu, screenImages } from "@/lib/gameData";
 import type { CSSProperties } from "react";
 import MainRealtimeRig from "@/components/front/MainRealtimeRig";
+import styles from "./MainScreen.module.css";
 
 type MenuButtonStyle = CSSProperties & {
   "--menu-y": string;
@@ -81,38 +82,19 @@ export default function MainScreen({ active = false }: MainScreenProps) {
             </button>
           </div>
           <div className="dream-notice-actions">
-            <button className="button primary" id="closeSaveSlotDialog" type="button">
+            <button className={`button ${styles.retroDialogButton}`} id="closeSaveSlotDialog" type="button">
               닫기
             </button>
           </div>
         </div>
       </aside>
 
-      <aside
-        className="dream-notice-dialog exit-dialog"
-        id="exitDialog"
-        aria-hidden="true"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="exitTitle"
-      >
-        <div className="dream-notice-panel exit-dialog-panel">
-          <div className="dream-notice-titlebar">
-            <span>EXIT_GAME</span>
-            <button className="dream-notice-close" id="cancelExit" type="button" aria-label="종료 창 닫기">
-              ×
-            </button>
-          </div>
-          <span className="dream-notice-seal" aria-hidden="true">▶</span>
-          <p className="dream-notice-kicker">DREAM SYSTEM</p>
+      <div className="main-dialog" id="exitDialog" role="dialog" aria-modal="true" aria-labelledby="exitTitle">
+        <div className="main-dialog-panel">
           <h2 id="exitTitle">꿈을 떠나시겠습니까?</h2>
           <p className="exit-message">현재 진행 위치는 자동으로 저장됩니다.</p>
-          <div className="dream-notice-actions">
-            <button
-              className="button"
-              type="button"
-              onClick={() => document.querySelector("#exitDialog")?.classList.remove("open")}
-            >
+          <div className="dialog-actions">
+            <button className="button" id="cancelExit" type="button">
               취소
             </button>
             <button className="button primary" id="confirmExit" type="button">
@@ -120,7 +102,7 @@ export default function MainScreen({ active = false }: MainScreenProps) {
             </button>
           </div>
         </div>
-      </aside>
+      </div>
     </section>
   );
 }
