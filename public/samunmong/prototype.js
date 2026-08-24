@@ -1,4 +1,6 @@
 ﻿(() => {
+    if (window.__SAMUNMONG_PROTOTYPE_BOOTED__) return;
+    window.__SAMUNMONG_PROTOTYPE_BOOTED__ = true;
 
     const knownScreenIds = new Set([
       "mainScreen", "tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne",
@@ -1424,7 +1426,11 @@
       const evidenceHotspots = [...screen.querySelectorAll(".hotspot[data-evidence-name], #hopaeHotspot, #portraitHotspot")];
       evidenceHotspots.forEach((hotspot) => hotspot.classList.add("evidence-hotspot"));
       readStoredNames(collectedEvidenceKey).forEach((name) => {
-        screen.querySelectorAll(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((item) => item.classList.add("collected"));
+        screen.querySelectorAll(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((item) => {
+          item.classList.add("collected");
+          if (item instanceof HTMLButtonElement) item.disabled = true;
+          item.setAttribute("aria-disabled", "true");
+        });
       });
       readStoredNames(analyzedEvidenceKey).forEach((name) => {
         screen.querySelectorAll(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((item) => item.classList.add("analyzed"));
@@ -2532,7 +2538,7 @@
       },
       "찢어진 약속 편지": {
         note: "점순의 손에서 발견된 찢어진 약속 편지. 정중한 말투가 돌쇠의 평소 말투와 맞지 않는다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.webp"
+        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg"
       }
     };
 
@@ -2552,7 +2558,7 @@
       "긁힌 팔 흔적": "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp",
       "작은 발자국": "/samunmong/assets/evidence-transparent/evidence-small-footprints.webp",
       "끊어진 호패끈": "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.webp",
-      "찢어진 약속 편지": "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.webp"
+      "찢어진 약속 편지": "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg"
     };
 
     function getEvidenceImage(name, fallback = "/samunmong/assets/evidence-wooden-tag.webp") {
@@ -3162,7 +3168,11 @@
     }
 
     function markEvidenceCollectedInScene(name) {
-      document.querySelectorAll(`[data-evidence-name="${name}"]`).forEach((item) => item.classList.add("collected"));
+      document.querySelectorAll(`[data-evidence-name="${name}"]`).forEach((item) => {
+        item.classList.add("collected");
+        if (item instanceof HTMLButtonElement) item.disabled = true;
+        item.setAttribute("aria-disabled", "true");
+      });
       const propSelectors = {
         "작은 발자국": ".footprints-prop",
         "끊어진 호패끈": ".cord-prop"
@@ -5731,11 +5741,10 @@
       addEvidenceToBag(name);
       addEvidenceToNote(name);
       if (evidenceData[name]?.tool) setAnalysisTarget(name);
-      showToast("", {
+      showToast("보따리에 담았습니다.", {
         image: getEvidenceImage(name),
         title: getEvidenceDisplayName(name),
-        dismissible: false,
-        duration: 2000,
+        dismissible: true,
       });
       pendingEvidenceName = "";
       pendingEvidenceHotspot = null;
@@ -5756,6 +5765,9 @@
 
       const hotspot = target.closest("[data-evidence-name], #hopaeHotspot, #portraitHotspot");
       if (!hotspot) return;
+      if (hotspot.classList.contains("collected") || hotspot.getAttribute("aria-disabled") === "true") return;
+      if (event.__samunmongEvidenceHandled) return;
+      event.__samunmongEvidenceHandled = true;
       if (hotspot.id === "hopaeHotspot") {
         const hasHopae = readStoredNames(collectedEvidenceKey).includes("호패 조각");
         if (!hasHopae) {
@@ -5896,12 +5908,15 @@
       }
     }
 
-    document.querySelector("#prevSuspect").addEventListener("click", () => {
-      suspectIndex = (suspectIndex - 1 + suspects.length) % suspects.length;
-      updateSuspect();
-    });
-    document.querySelector("#nextSuspect").addEventListener("click", () => {
-      suspectIndex = (suspectIndex + 1) % suspects.length;
+    window.addEventListener("samunmong:suspect-request", (event) => {
+      const direction = event.detail?.direction;
+      if (direction === "previous") {
+        suspectIndex = (suspectIndex - 1 + suspects.length) % suspects.length;
+      } else if (direction === "next") {
+        suspectIndex = (suspectIndex + 1) % suspects.length;
+      } else {
+        return;
+      }
       updateSuspect();
     });
 
@@ -6269,17 +6284,23 @@
       }
     }
 
+    function getJoseonExpressionOnlyReaction(reaction = "calm") {
+      if (isMagicTheme || isSpaceTheme) return reaction;
+      return ["avoid", "nervous", "shocked", "silent", "lie"].includes(reaction) ? "lie" : reaction;
+    }
+
     function setInterrogationReaction(reaction = "calm", holdMs = 0) {
       const screen = document.querySelector("#interrogationScreen");
       const candle = document.querySelector("#interrogationCandle");
       const normalized = ["calm", "lie", "thinking", "attentive", "avoid", "nervous", "shocked", "silent"].includes(reaction)
         ? reaction
         : "calm";
+      const visualReaction = getJoseonExpressionOnlyReaction(normalized);
 
       window.clearTimeout(interrogationReactionTimer);
-      screen?.setAttribute("data-interrogation-reaction", normalized);
-      candle?.setAttribute("data-state", normalized);
-      setLieExpressionOverlay(normalized === "lie");
+      screen?.setAttribute("data-interrogation-reaction", visualReaction);
+      candle?.setAttribute("data-state", visualReaction);
+      setLieExpressionOverlay(visualReaction === "lie");
 
       if (normalized === "thinking") {
         stopInterrogationThinkingSound();
@@ -6290,7 +6311,7 @@
       } else {
         stopInterrogationThinkingSound();
       }
-      if (normalized === "lie") {
+      if (visualReaction === "lie") {
         playSfx("lie", 0.34);
       }
 
@@ -6303,10 +6324,8 @@
       const normalizedAnswer = answer.replace(/\s+/g, " ");
       const lieOrEvasionPattern =
         /(모릅니다|모르겠|기억(?:이)?\s*(?:안|나지|없)|본\s*적\s*없|들은\s*적\s*없|간\s*적\s*없|제\s*것(?:이)?\s*아닙|아닙니다|그런\s*적\s*없|말씀드리기\s*어렵|답하기\s*어렵|글쎄|어찌\s*알겠|알\s*수\s*없)/;
-
       if (lieOrEvasionPattern.test(normalizedAnswer)) return "lie";
-      if (["avoid", "nervous", "shocked", "silent"].includes(reaction)) return reaction;
-      return reaction;
+      return getJoseonExpressionOnlyReaction(reaction);
     }
 
     function showNewFactDiscovery(factId) {
@@ -6317,7 +6336,6 @@
 
       window.clearTimeout(newFactToastTimer);
       title.textContent = newFactTitles[factId] || "새로운 사실이 기록되었습니다";
-      dispatchEvidenceFeedback(title.textContent, toast, true);
       toast.classList.add("show");
       toast.setAttribute("aria-hidden", "false");
       playSfx("evidence", 0.48);

@@ -203,6 +203,10 @@ export default function GameSettingsOverlay() {
           type="button"
           data-open-settings="true"
           aria-label="설정 열기"
+          onClick={() => {
+            setConfirmReset(false);
+            document.querySelector<HTMLElement>("#settingsDialog")?.classList.add("open");
+          }}
         >
           <span aria-hidden="true">⚙</span>
         </button>

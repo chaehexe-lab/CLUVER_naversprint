@@ -64,6 +64,10 @@
     button, input { font: inherit; }
     button { cursor: pointer; }
 
+    /* The Next.js dev overlay portal spans the viewport in development and can
+       otherwise intercept clicks intended for the game HUD. */
+    nextjs-portal { pointer-events: none !important; }
+
     .game-viewport {
       --game-base-width: 1600px;
       --game-base-height: 900px;
@@ -75,6 +79,20 @@
       height: 100dvh;
       overflow: hidden;
       background: #050403;
+    }
+
+    /* CSS fallback for cases where the client-side scale has not hydrated yet. */
+    @media (max-width: 1599px), (max-height: 899px) {
+      .game-viewport { --game-scale: .8; }
+    }
+    @media (max-width: 1279px), (max-height: 719px) {
+      .game-viewport { --game-scale: .64; }
+    }
+    @media (max-width: 1023px), (max-height: 575px) {
+      .game-viewport { --game-scale: .5; }
+    }
+    @media (max-width: 799px), (max-height: 449px) {
+      .game-viewport { --game-scale: .4; }
     }
 
     .game-shell {
@@ -854,6 +872,114 @@
       background:
         radial-gradient(circle at 50% 45%, transparent 0 42%, rgba(0,0,0,.3) 74%, rgba(0,0,0,.56)),
         linear-gradient(180deg, rgba(0,0,0,.04), rgba(0,0,0,.45));
+    }
+
+    .scene-state-backgrounds,
+    .scene-state-background {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .scene-state-backgrounds {
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .screen[data-evidence-state-ready="true"] .scene-state-backgrounds {
+      opacity: 1;
+    }
+
+    .scene-state-background {
+      display: none;
+      object-fit: cover;
+    }
+
+    #fieldOne > .plate,
+    #chunwolRoom > .plate,
+    #mudeokServantRoom > .plate,
+    #yoomunseokSarangbang > .plate,
+    #dolsoeQuarters > .plate,
+    #backGateCourtyard > .plate {
+      display: none;
+    }
+
+    #fieldOne .scene-state-background[data-scene-state="all"],
+    #chunwolRoom .scene-state-background[data-scene-state="all"],
+    #mudeokServantRoom .scene-state-background[data-scene-state="all"],
+    #yoomunseokSarangbang .scene-state-background[data-scene-state="all"],
+    #dolsoeQuarters .scene-state-background[data-scene-state="all"],
+    #backGateCourtyard .scene-state-background[data-scene-state="all"] {
+      display: block;
+    }
+
+    #fieldOne:has(.field-letter-evidence.collected):not(:has(.field-hopae-evidence.collected))
+      .scene-state-background[data-scene-state="hopae-only"],
+    #fieldOne:has(.field-hopae-evidence.collected):not(:has(.field-letter-evidence.collected))
+      .scene-state-background[data-scene-state="letter-only"],
+    #fieldOne:has(.field-letter-evidence.collected):has(.field-hopae-evidence.collected)
+      .scene-state-background[data-scene-state="none"] {
+      display: block;
+    }
+
+    #fieldOne:has(.field-letter-evidence.collected)
+      .scene-state-background[data-scene-state="all"],
+    #fieldOne:has(.field-hopae-evidence.collected)
+      .scene-state-background[data-scene-state="all"] {
+      display: none;
+    }
+
+    /* Integrated evidence scenes: a collected object disappears from the room itself. */
+    #chunwolRoom:has(.hanging-norigae.collected) .scene-state-background[data-scene-state="all"],
+    #chunwolRoom:has(.portrait-glow.collected) .scene-state-background[data-scene-state="all"],
+    #dolsoeQuarters:has(.dolsoe-bandage-evidence.collected) .scene-state-background[data-scene-state="all"],
+    #dolsoeQuarters:has(.dolsoe-bundle-evidence.collected) .scene-state-background[data-scene-state="all"],
+    #backGateCourtyard:has(.backgate-footprints-evidence.collected) .scene-state-background[data-scene-state="all"],
+    #backGateCourtyard:has(.backgate-cord-evidence.collected) .scene-state-background[data-scene-state="all"] {
+      display: none;
+    }
+
+    #chunwolRoom:has(.hanging-norigae.collected):not(:has(.portrait-glow.collected)) .scene-state-background[data-scene-state="portrait-only"],
+    #chunwolRoom:has(.portrait-glow.collected):not(:has(.hanging-norigae.collected)) .scene-state-background[data-scene-state="norigae-only"],
+    #chunwolRoom:has(.hanging-norigae.collected):has(.portrait-glow.collected) .scene-state-background[data-scene-state="none"],
+    #dolsoeQuarters:has(.dolsoe-bandage-evidence.collected):not(:has(.dolsoe-bundle-evidence.collected)) .scene-state-background[data-scene-state="bundle-only"],
+    #dolsoeQuarters:has(.dolsoe-bundle-evidence.collected):not(:has(.dolsoe-bandage-evidence.collected)) .scene-state-background[data-scene-state="bandage-only"],
+    #dolsoeQuarters:has(.dolsoe-bandage-evidence.collected):has(.dolsoe-bundle-evidence.collected) .scene-state-background[data-scene-state="none"],
+    #backGateCourtyard:has(.backgate-footprints-evidence.collected):not(:has(.backgate-cord-evidence.collected)) .scene-state-background[data-scene-state="cord-only"],
+    #backGateCourtyard:has(.backgate-cord-evidence.collected):not(:has(.backgate-footprints-evidence.collected)) .scene-state-background[data-scene-state="footprints-only"],
+    #backGateCourtyard:has(.backgate-footprints-evidence.collected):has(.backgate-cord-evidence.collected) .scene-state-background[data-scene-state="none"] {
+      display: block;
+    }
+
+    #mudeokServantRoom:has(.mudeok-diary-evidence.collected) .scene-state-background[data-scene-state="all"],
+    #mudeokServantRoom:has(.mudeok-shoes-evidence.collected) .scene-state-background[data-scene-state="all"],
+    #mudeokServantRoom:has(.mudeok-tie-evidence.collected) .scene-state-background[data-scene-state="all"],
+    #yoomunseokSarangbang:has(.yoomunseok-holder-evidence.collected) .scene-state-background[data-scene-state="all"],
+    #yoomunseokSarangbang:has(.yoomunseok-ledger-evidence.collected) .scene-state-background[data-scene-state="all"],
+    #yoomunseokSarangbang:has(.yoomunseok-marriage-evidence.collected) .scene-state-background[data-scene-state="all"] {
+      display: none;
+    }
+
+    #mudeokServantRoom:has(.mudeok-tie-evidence.collected):not(:has(.mudeok-diary-evidence.collected)):not(:has(.mudeok-shoes-evidence.collected)) .scene-state-background[data-scene-state="diary-shoes"],
+    #mudeokServantRoom:has(.mudeok-shoes-evidence.collected):not(:has(.mudeok-diary-evidence.collected)):not(:has(.mudeok-tie-evidence.collected)) .scene-state-background[data-scene-state="diary-tie"],
+    #mudeokServantRoom:has(.mudeok-diary-evidence.collected):not(:has(.mudeok-shoes-evidence.collected)):not(:has(.mudeok-tie-evidence.collected)) .scene-state-background[data-scene-state="shoes-tie"],
+    #mudeokServantRoom:has(.mudeok-shoes-evidence.collected):has(.mudeok-tie-evidence.collected):not(:has(.mudeok-diary-evidence.collected)) .scene-state-background[data-scene-state="diary-only"],
+    #mudeokServantRoom:has(.mudeok-diary-evidence.collected):has(.mudeok-tie-evidence.collected):not(:has(.mudeok-shoes-evidence.collected)) .scene-state-background[data-scene-state="shoes-only"],
+    #mudeokServantRoom:has(.mudeok-diary-evidence.collected):has(.mudeok-shoes-evidence.collected):not(:has(.mudeok-tie-evidence.collected)) .scene-state-background[data-scene-state="tie-only"],
+    #mudeokServantRoom:has(.mudeok-diary-evidence.collected):has(.mudeok-shoes-evidence.collected):has(.mudeok-tie-evidence.collected) .scene-state-background[data-scene-state="none"] {
+      display: block;
+    }
+
+    #yoomunseokSarangbang:has(.yoomunseok-marriage-evidence.collected):not(:has(.yoomunseok-holder-evidence.collected)):not(:has(.yoomunseok-ledger-evidence.collected)) .scene-state-background[data-scene-state="holder-ledger"],
+    #yoomunseokSarangbang:has(.yoomunseok-ledger-evidence.collected):not(:has(.yoomunseok-holder-evidence.collected)):not(:has(.yoomunseok-marriage-evidence.collected)) .scene-state-background[data-scene-state="holder-marriage"],
+    #yoomunseokSarangbang:has(.yoomunseok-holder-evidence.collected):not(:has(.yoomunseok-ledger-evidence.collected)):not(:has(.yoomunseok-marriage-evidence.collected)) .scene-state-background[data-scene-state="ledger-marriage"],
+    #yoomunseokSarangbang:has(.yoomunseok-ledger-evidence.collected):has(.yoomunseok-marriage-evidence.collected):not(:has(.yoomunseok-holder-evidence.collected)) .scene-state-background[data-scene-state="holder-only"],
+    #yoomunseokSarangbang:has(.yoomunseok-holder-evidence.collected):has(.yoomunseok-marriage-evidence.collected):not(:has(.yoomunseok-ledger-evidence.collected)) .scene-state-background[data-scene-state="ledger-only"],
+    #yoomunseokSarangbang:has(.yoomunseok-holder-evidence.collected):has(.yoomunseok-ledger-evidence.collected):not(:has(.yoomunseok-marriage-evidence.collected)) .scene-state-background[data-scene-state="marriage-only"],
+    #yoomunseokSarangbang:has(.yoomunseok-holder-evidence.collected):has(.yoomunseok-ledger-evidence.collected):has(.yoomunseok-marriage-evidence.collected) .scene-state-background[data-scene-state="none"] {
+      display: block;
     }
 
     .scene-prop {
@@ -2930,24 +3056,24 @@
     .evidence-hotspot:not(.collected):hover::before,
     .evidence-hotspot:not(.collected):focus-visible::before {
       background:
-        radial-gradient(ellipse at 50% 52%, rgba(255, 219, 142, .22), rgba(226, 167, 96, .12) 44%, rgba(140, 49, 35, .05) 68%, transparent 90%);
+        radial-gradient(ellipse at 50% 52%, rgba(255, 219, 142, .14), rgba(226, 167, 96, .07) 44%, rgba(140, 49, 35, .03) 68%, transparent 90%);
       filter:
         blur(1.5px)
         drop-shadow(0 0 12px rgba(224, 166, 90, .42))
         drop-shadow(0 0 24px rgba(164, 64, 43, .16));
-      opacity: .66;
+      opacity: .46;
       animation: hoverEvidenceGlow 1.35s ease-in-out infinite alternate;
     }
 
     .evidence-hotspot:not(.collected):hover::after,
     .evidence-hotspot:not(.collected):focus-visible::after {
       background:
-        radial-gradient(ellipse at 50% 54%, rgba(255, 235, 178, .34), rgba(217, 178, 104, .18) 50%, transparent 84%);
+        radial-gradient(ellipse at 50% 54%, rgba(255, 235, 178, .21), rgba(217, 178, 104, .1) 50%, transparent 84%);
       filter:
         blur(2px)
         drop-shadow(0 0 10px rgba(255, 224, 165, .68))
         drop-shadow(0 0 20px rgba(217, 178, 104, .42));
-      opacity: .88;
+      opacity: .58;
       animation: hoverEvidenceGlow 1.35s ease-in-out infinite alternate;
     }
 
@@ -2971,12 +3097,12 @@
     .screen.hint-active .evidence-hotspot:not(.collected)::before {
       inset: 0;
       background:
-        radial-gradient(ellipse at 50% 52%, rgba(255, 219, 142, .34), rgba(226, 167, 96, .18) 44%, rgba(140, 49, 35, .08) 68%, transparent 90%);
+        radial-gradient(ellipse at 50% 52%, rgba(255, 219, 142, .23), rgba(226, 167, 96, .11) 44%, rgba(140, 49, 35, .05) 68%, transparent 90%);
       filter:
         blur(2px)
         drop-shadow(0 0 16px rgba(224, 166, 90, .52))
         drop-shadow(0 0 34px rgba(164, 64, 43, .22));
-      opacity: .76;
+      opacity: .58;
       animation: hintEvidenceGlow 2.4s ease-in-out both;
     }
 
@@ -2984,11 +3110,11 @@
       inset: 0;
       border: 0;
       background:
-        radial-gradient(ellipse at 50% 54%, rgba(255, 239, 175, .18), rgba(212, 123, 72, .08) 54%, transparent 88%);
+        radial-gradient(ellipse at 50% 54%, rgba(255, 239, 175, .12), rgba(212, 123, 72, .05) 54%, transparent 88%);
       filter:
         blur(4px)
         drop-shadow(0 0 22px rgba(255, 224, 165, .38));
-      opacity: .58;
+      opacity: .42;
       animation: hintEvidenceGlow 2.4s ease-in-out both;
     }
 
@@ -3064,6 +3190,11 @@
       background: radial-gradient(ellipse at 50% 52%, rgba(126,154,107,.055), rgba(126,154,107,.025) 42%, transparent 76%);
       box-shadow: 0 0 10px rgba(126,154,107,.045);
       animation: none;
+    }
+
+    .hotspot.collected {
+      pointer-events: none;
+      cursor: default;
     }
 
     .hotspot.analyzed::after {
@@ -6948,6 +7079,14 @@
     .briefing-card[data-briefing-step="0"] #startCase,
     .briefing-card[data-briefing-step="1"] #startCase {
       display: none;
+    }
+
+    .joseon-briefing-card[data-briefing-step="1"] #briefingNext {
+      display: none;
+    }
+
+    .joseon-briefing-card[data-briefing-step="1"] #startCase {
+      display: inline-grid;
     }
 
     .briefing-card.journal-mode #briefingPrev,
@@ -14705,12 +14844,12 @@ html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-preview-image
 .hotspot.hanging-evidence .hotspot-evidence-visual { position:absolute; left:50%; top:0; width:100%; height:100%; object-fit:contain; opacity:.84; filter:brightness(.86) saturate(.8) drop-shadow(0 7px 7px rgba(0,0,0,.62)); transform:translateX(-50%) rotate(-1.5deg); transform-origin:50% 4%; pointer-events:none; animation:hangingEvidenceSway 4.6s ease-in-out infinite alternate; }
 .hotspot.hanging-evidence.collected .hotspot-evidence-visual { opacity:0; animation:none; }
 .hotspot.scene-evidence-object { overflow:visible; }
-.hotspot.scene-evidence-object .hotspot-evidence-visual { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; opacity:.82; filter:brightness(.82) saturate(.76) drop-shadow(0 5px 5px rgba(0,0,0,.66)); pointer-events:none; animation:none; }
+.hotspot.scene-evidence-object .hotspot-evidence-visual { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; opacity:.58; filter:brightness(.66) contrast(.94) saturate(.58) sepia(.08) drop-shadow(0 3px 4px rgba(0,0,0,.42)); pointer-events:none; animation:none; }
 .hotspot.scene-evidence-object.collected .hotspot-evidence-visual { opacity:0; }
-.hotspot.backgate-footprints-evidence .hotspot-evidence-visual { opacity:.88; filter:brightness(.98) contrast(1.08) saturate(.72) drop-shadow(0 4px 4px rgba(0,0,0,.72)); }
-.hotspot.backgate-cord-evidence .hotspot-evidence-visual { opacity:.94; filter:brightness(.9) saturate(.9) drop-shadow(0 4px 5px rgba(0,0,0,.74)); }
+.hotspot.backgate-footprints-evidence .hotspot-evidence-visual { opacity:.64; filter:brightness(.72) contrast(.98) saturate(.48) drop-shadow(0 3px 4px rgba(0,0,0,.46)); }
+.hotspot.backgate-cord-evidence .hotspot-evidence-visual { opacity:.68; filter:brightness(.68) saturate(.58) drop-shadow(0 3px 4px rgba(0,0,0,.48)); }
 .hotspot.field-letter-evidence .hotspot-evidence-visual,
-.hotspot.field-hopae-evidence .hotspot-evidence-visual { opacity:.9; filter:brightness(.9) saturate(.82) drop-shadow(0 4px 5px rgba(0,0,0,.72)); }
+.hotspot.field-hopae-evidence .hotspot-evidence-visual { opacity:.5; filter:brightness(.56) contrast(.9) saturate(.48) sepia(.14) drop-shadow(0 2px 3px rgba(0,0,0,.38)); }
 @keyframes sceneLanternBreathe { 0%,100%{opacity:.38;transform:translate(-50%,-50%) scale(.88)} 34%{opacity:.9;transform:translate(-50%,-50%) scale(1.06)} 51%{opacity:.56;transform:translate(-50%,-50%) scale(.97)} 76%{opacity:1;transform:translate(-50%,-50%) scale(1.1)} }
 @keyframes sceneLanternSpriteFrames { from{background-position:0 0} to{background-position:100% 0} }
 @keyframes hangingEvidenceSway { 0%{transform:translateX(-50%) rotate(-2.1deg)} 52%{transform:translateX(-50%) rotate(.35deg)} 100%{transform:translateX(-50%) rotate(2deg)} }

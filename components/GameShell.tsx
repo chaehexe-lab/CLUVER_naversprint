@@ -29,8 +29,6 @@ import {
   type GameTheme
 } from "@/lib/gameTheme";
 
-const CONTENT_SCRIPT = "/samunmong/content.js?v=20260816-interactions-v91";
-const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260822-theme-isolation-v112";
 const MAIN_SCREEN = "mainScreen";
 
 const INVESTIGATION_SCENE_COMPONENTS: Record<string, ComponentType> = {
@@ -197,8 +195,6 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
-    const loadedScripts: HTMLScriptElement[] = [];
     const requestedTheme = new URLSearchParams(window.location.search).get("theme");
     const screenTheme = getThemeForScreen(initialScreen);
     if (screenTheme) {
@@ -209,30 +205,7 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
       window.localStorage.setItem("samunmong-current-theme", initialTheme);
     }
 
-    const loadScript = (src: string) =>
-      new Promise<void>((resolve, reject) => {
-        const script = document.createElement("script");
-        script.src = src;
-        script.async = false;
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error(`Failed to load ${src}`));
-        document.body.appendChild(script);
-        loadedScripts.push(script);
-      });
-
-    async function bootScripts() {
-      await loadScript(CONTENT_SCRIPT);
-      if (cancelled) return;
-      await loadScript(PROTOTYPE_SCRIPT);
-      ensureRequestedStartScreen(initialScreen);
-    }
-
-    bootScripts().catch((error) => console.error(error));
-
-    return () => {
-      cancelled = true;
-      loadedScripts.forEach((script) => script.remove());
-    };
+    ensureRequestedStartScreen(initialScreen);
   }, [initialScreen, initialTheme]);
 
   return (

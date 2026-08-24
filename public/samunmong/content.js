@@ -199,7 +199,7 @@
       logic: "점순은 돌쇠가 보낸 쪽지라고 믿고 창고로 향했지만, 말투가 돌쇠답지 않다. 누군가 돌쇠를 흉내 내 점순을 유인했을 가능성이 크다.",
       relatedSuspects: ["돌쇠", "춘월", "무덕"],
       contradiction: "도망 보따리와 맞물리면 돌쇠의 계획을 누군가 이용했을 가능성이 생긴다.",
-      img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.webp",
+      img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg",
       reverseImg: "/samunmong/assets/interactions/evidence-reverse/torn-promise-letter-back-v2.png",
       tool: "문서 맞춤판",
       toolResult: "찢긴 가장자리를 맞추자 ‘오늘 밤 창고에서 기다리시오, 함께 떠납시다’라는 문장이 온전히 이어진다.",

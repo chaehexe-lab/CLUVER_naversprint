@@ -10,7 +10,7 @@ const truthUnlockKey = "samunmong-truth-unlocked";
 const evidence = [
   {
     name: "찢어진 약속 편지",
-    image: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.webp",
+    image: "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg",
     text: "돌쇠의 투박한 말투와 달리 지나치게 정중했다. 춘월이 돌쇠인 척 써 점순을 창고로 불러낸 미끼였다."
   },
   {

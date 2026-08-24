@@ -1,3 +1,5 @@
+"use client";
+
 import AccuseSuspect from "@/components/AccuseSuspect";
 import EvidenceInventory from "@/components/EvidenceInventory";
 import InvestigationNote from "@/components/InvestigationNote";
@@ -167,7 +169,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
     : "/samunmong/assets/scene-interrogation-room-empty.png";
   const initialSuspect = isSpaceTheme ? "harry" : isMagicTheme ? "gandalf" : "dolsoe";
   const initialSprite = isSpaceTheme ? "/assets/space-station/characters/harry-upper-transparent.webp" : isMagicTheme ? "/samunmong/assets/magic-school/interrogation/gandalf-sprite.webp" : "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707";
-  const initialName = isSpaceTheme ? "해리" : isMagicTheme ? "건달프" : "";
+  const initialName = isSpaceTheme ? "해리" : isMagicTheme ? "건달프" : "돌쇠";
   const mapIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/orbit-blueprint.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-school-map.webp" : "/samunmong/assets/labels/transparent/tool-village-map.webp";
   const noteIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/log-record.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/labels/transparent/tool-note-short.webp";
   const journalIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/final-report.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/ui-generated/tool-case-journal.webp";
@@ -184,6 +186,23 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
   const notePanelStyle = isSpaceTheme
     ? ({ backgroundImage: "url('/assets/space-station/panels/log-record-panel-v2.webp')" } satisfies CSSProperties)
     : undefined;
+
+  const moveFromMap = (screenId?: string) => {
+    if (!screenId) return;
+    document.querySelector<HTMLElement>("#mapPanel")?.classList.remove("show", "closing");
+    document.querySelector<HTMLElement>("#mapPanel")?.setAttribute("aria-hidden", "true");
+    document.querySelector<HTMLElement>("#globalOverlay")?.classList.remove("show");
+    window.dispatchEvent(new CustomEvent("samunmong:screen-request", {
+      cancelable: true,
+      detail: { screenId }
+    }));
+  };
+
+  const switchSuspect = (direction: "previous" | "next") => {
+    window.dispatchEvent(new CustomEvent("samunmong:suspect-request", {
+      detail: { direction }
+    }));
+  };
 
   return (
     <>
@@ -225,10 +244,22 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           {initialName}
         </div>
         <div className="suspect-switch">
-          <button className="arrow" type="button" id="prevSuspect">
+          <button
+            className="arrow"
+            type="button"
+            id="prevSuspect"
+            aria-label="이전 등장인물"
+            onClick={() => switchSuspect("previous")}
+          >
             ←
           </button>
-          <button className="arrow" type="button" id="nextSuspect">
+          <button
+            className="arrow"
+            type="button"
+            id="nextSuspect"
+            aria-label="다음 등장인물"
+            onClick={() => switchSuspect("next")}
+          >
             →
           </button>
         </div>
@@ -683,7 +714,16 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
       </InvestigationNote>
 
       <aside className="global-panel map-panel" id="mapPanel" aria-hidden="true">
-        <button className="close-button global-close map-floating-close" type="button" aria-label={`${copy.map} 닫기`}>
+        <button
+          className="close-button global-close map-floating-close"
+          type="button"
+          aria-label={`${copy.map} 닫기`}
+          onClick={() => {
+            document.querySelector<HTMLElement>("#mapPanel")?.classList.remove("show", "closing");
+            document.querySelector<HTMLElement>("#mapPanel")?.setAttribute("aria-hidden", "true");
+            document.querySelector<HTMLElement>("#globalOverlay")?.classList.remove("show");
+          }}
+        >
           닫기
         </button>
         <div className="map-board">
@@ -701,6 +741,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               style={mapPinStyle(location)}
               aria-label={location.label}
               disabled={!location.goTo}
+              onClick={() => moveFromMap(location.goTo)}
               key={`pin-${location.screen}`}
             />
           ))}
