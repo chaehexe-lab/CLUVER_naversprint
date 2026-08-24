@@ -20,7 +20,7 @@ export default function MainScreen({ active = false }: MainScreenProps) {
       <img className="plate" src={screenImages.mainScreen} alt="삼운몽 세 개의 꿈 메인 화면" />
       <img
         className="main-clean-plate"
-        src="/samunmong/assets/interactions/main-2d/main-static-clean-v2.png"
+        src="/samunmong/assets/interactions/main-2d/main-static-clean-v3.png"
         alt=""
         aria-hidden="true"
       />
