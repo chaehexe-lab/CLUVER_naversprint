@@ -309,9 +309,9 @@ export const magicSchoolScenes = [
 const spaceDock = [
   {
     className: "map-chip open-map-panel",
-    ariaLabel: "궤도 도면 열기",
+    ariaLabel: "정거장 지도 열기",
     image: "/assets/space-station/ui-icons-v3/orbit-blueprint.webp",
-    label: "궤도 도면"
+    label: "정거장 지도"
   },
   {
     className: "bag-chip open-bag-panel",
@@ -333,9 +333,9 @@ const spaceDock = [
   },
   {
     className: "room-chip",
-    ariaLabel: "비상 조사실로 이동",
+    ariaLabel: "보안 조사실로 이동",
     image: "/assets/space-station/ui-icons-v2/emergency-investigation-v2.webp",
-    label: "비상 조사실",
+    label: "보안 조사실",
     goTo: "interrogationScreen"
   }
 ] satisfies SceneDockAction[];
@@ -343,86 +343,58 @@ const spaceDock = [
 export const spaceStationScenes = [
   {
     id: "spaceAirlock",
-    image: "/assets/space-station/backgrounds/orbit-13-airlock.webp",
+    image: "/assets/space-station/backgrounds/orbit-13-airlock-evidence-v3.webp",
     alt: "오르빗-13 에어록과 외부 작업 사고 현장",
-    props: [
-      { image: "/assets/space-station/evidence/frozen-lever-gel.webp", alt: "얼어붙은 레버 젤", x: "67%", y: "73%", w: "12%", rot: "-8deg" },
-      { image: "/assets/space-station/evidence/final-radio-log.webp", alt: "마지막 무전 로그", x: "82%", y: "82%", w: "10%", rot: "6deg" }
-    ] satisfies SceneProp[],
+    props: [] as SceneProp[],
     hotspots: [
-      { evidenceName: "얼어붙은 추진 레버 젤", ariaLabel: "얼어붙은 추진 레버 젤 조사", x: "67%", y: "73%", w: "12%", h: "13%", clipPath: "ellipse(45% 42% at 50% 52%)", radius: "999px", rot: "-8deg" },
-      { evidenceName: "마지막 무전 로그", ariaLabel: "마지막 무전 로그 조사", x: "82%", y: "82%", w: "10%", h: "12%", clipPath: "polygon(8% 12%, 90% 6%, 98% 82%, 20% 96%)", radius: "12px", rot: "6deg" }
+      { evidenceName: "엔지니어 공구 클램프", ariaLabel: "엔지니어 공구 클램프 조사", x: "30.9%", y: "87.8%", w: "11%", h: "10%", clipPath: "polygon(2% 36%, 85% 12%, 98% 68%, 18% 96%)", radius: "999px", rot: "5deg" },
+      { evidenceName: "얼어붙은 추진 레버 젤", ariaLabel: "얼어붙은 추진 레버 젤 조사", x: "61%", y: "42%", w: "7%", h: "17%", clipPath: "polygon(18% 4%, 82% 8%, 96% 92%, 8% 96%)", radius: "16px", rot: "0deg" },
+      { evidenceName: "마지막 무전 로그", ariaLabel: "마지막 무전 로그 조사", x: "96.5%", y: "35.4%", w: "7%", h: "17%", clipPath: "polygon(12% 4%, 88% 8%, 98% 92%, 4% 96%)", radius: "14px", rot: "0deg" }
     ] satisfies SceneHotspot[],
     dock: spaceDock
   },
   {
     id: "spaceMedicalBay",
-    image: "/assets/space-station/backgrounds/medical-bay.webp",
+    image: "/assets/space-station/backgrounds/medical-bay-evidence-v2.webp",
     alt: "오르빗-13 의료실",
-    props: [
-      { image: "/assets/space-station/evidence/disinfectant-cloth-glove.webp", alt: "소독천과 장갑", x: "41%", y: "76%", w: "13%", rot: "-3deg" },
-      { image: "/assets/space-station/evidence/deleted-medical-record.webp", alt: "삭제된 의료 기록", x: "62%", y: "68%", w: "13%", rot: "4deg" }
-    ] satisfies SceneProp[],
+    props: [] as SceneProp[],
     hotspots: [
-      { evidenceName: "소독천과 장갑", ariaLabel: "소독천과 장갑 조사", x: "41%", y: "76%", w: "13%", h: "12%", clipPath: "ellipse(45% 39% at 50% 52%)", radius: "999px", rot: "-3deg" },
-      { evidenceName: "삭제된 의료 기록", ariaLabel: "삭제된 의료 기록 조사", x: "62%", y: "68%", w: "13%", h: "15%", clipPath: "polygon(6% 8%, 92% 12%, 96% 86%, 10% 92%)", radius: "12px", rot: "4deg" }
+      { evidenceName: "소독천과 장갑", ariaLabel: "소독천과 장갑 조사", x: "10.8%", y: "71.4%", w: "11%", h: "9.5%", clipPath: "polygon(4% 28%, 90% 8%, 98% 78%, 14% 96%)", radius: "14px", rot: "0deg" },
+      { evidenceName: "삭제된 의료 기록", ariaLabel: "삭제된 의료 기록 조사", x: "77.3%", y: "53%", w: "6%", h: "13%", clipPath: "polygon(8% 4%, 90% 8%, 96% 94%, 6% 98%)", radius: "10px", rot: "0deg" }
     ] satisfies SceneHotspot[],
     dock: spaceDock
   },
   {
     id: "spaceOxygenGenerator",
-    image: "/assets/space-station/backgrounds/oxygen-generator.webp",
+    image: "/assets/space-station/backgrounds/oxygen-generator-evidence-v2.webp",
     alt: "오르빗-13 산소 발생기실",
-    props: [
-      { image: "/assets/space-station/evidence/damaged-pressure-sensor.webp", alt: "손상된 압력 센서", x: "54%", y: "67%", w: "12%", rot: "2deg" }
-    ] satisfies SceneProp[],
+    props: [] as SceneProp[],
     hotspots: [
-      { evidenceName: "손상된 압력 센서", ariaLabel: "손상된 압력 센서 조사", x: "54%", y: "67%", w: "12%", h: "12%", clipPath: "ellipse(45% 42% at 50% 50%)", radius: "999px", rot: "2deg" }
+      { evidenceName: "조작된 지연 타이머", ariaLabel: "조작된 지연 타이머 조사", x: "17.5%", y: "54%", w: "7%", h: "8%", clipPath: "polygon(6% 10%, 94% 8%, 98% 88%, 8% 96%)", radius: "12px", rot: "0deg" },
+      { evidenceName: "손상된 압력 센서", ariaLabel: "손상된 압력 센서 조사", x: "65%", y: "46%", w: "7%", h: "11%", clipPath: "ellipse(46% 44% at 50% 50%)", radius: "999px", rot: "0deg" }
     ] satisfies SceneHotspot[],
     dock: spaceDock
   },
   {
     id: "spaceDataCore",
-    image: "/assets/space-station/backgrounds/data-core.webp",
+    image: "/assets/space-station/backgrounds/data-core-evidence-v2.webp",
     alt: "오르빗-13 데이터 코어",
-    props: [
-      { image: "/assets/space-station/evidence/access-keycard-chip.webp", alt: "접속 키카드 칩", x: "58%", y: "74%", w: "10%", rot: "-7deg" }
-    ] satisfies SceneProp[],
+    props: [] as SceneProp[],
     hotspots: [
-      { evidenceName: "접속 키카드 칩", ariaLabel: "접속 키카드 칩 조사", x: "58%", y: "74%", w: "10%", h: "11%", clipPath: "polygon(8% 18%, 86% 8%, 96% 70%, 24% 96%)", radius: "12px", rot: "-7deg" }
-    ] satisfies SceneHotspot[],
-    dock: spaceDock
-  },
-  {
-    id: "spaceSuitPrep",
-    image: "/assets/space-station/backgrounds/suit-prep.webp",
-    alt: "오르빗-13 외부 작업 준비실",
-    props: [
-      { image: "/assets/space-station/evidence/engineer-tool-clamp.webp", alt: "엔지니어 공구 클램프", x: "43%", y: "80%", w: "13%", rot: "9deg" }
-    ] satisfies SceneProp[],
-    hotspots: [
-      { evidenceName: "엔지니어 공구 클램프", ariaLabel: "엔지니어 공구 클램프 조사", x: "43%", y: "80%", w: "13%", h: "10%", clipPath: "polygon(6% 38%, 88% 14%, 98% 54%, 18% 88%)", radius: "999px", rot: "9deg" }
-    ] satisfies SceneHotspot[],
-    dock: spaceDock
-  },
-  {
-    id: "spaceGalleyCorridor",
-    image: "/assets/space-station/backgrounds/galley-corridor.webp",
-    alt: "오르빗-13 주방 복도",
-    props: [
-      { image: "/assets/space-station/evidence/coffee-tumbler.webp", alt: "커피 텀블러", x: "66%", y: "79%", w: "8%", rot: "-5deg" }
-    ] satisfies SceneProp[],
-    hotspots: [
-      { evidenceName: "커피 텀블러", ariaLabel: "커피 텀블러 조사", x: "66%", y: "79%", w: "8%", h: "12%", clipPath: "ellipse(38% 48% at 50% 50%)", radius: "999px", rot: "-5deg" }
+      { evidenceName: "접속 키카드 칩", ariaLabel: "접속 키카드 칩 조사", x: "28%", y: "79%", w: "10%", h: "10%", clipPath: "polygon(5% 20%, 88% 8%, 98% 72%, 18% 96%)", radius: "12px", rot: "0deg" },
+      { evidenceName: "암호화된 연구 보상 계약", ariaLabel: "암호화된 연구 보상 계약 조사", x: "75.2%", y: "57%", w: "14%", h: "18%", clipPath: "polygon(9% 7%, 92% 8%, 96% 88%, 4% 94%)", radius: "12px", rot: "0deg" }
     ] satisfies SceneHotspot[],
     dock: spaceDock
   },
   {
     id: "spaceScienceLab",
-    image: "/assets/space-station/backgrounds/science-lab.webp",
+    image: "/assets/space-station/backgrounds/science-lab-evidence-v2.webp",
     alt: "오르빗-13 과학 실험실",
     props: [] as SceneProp[],
-    hotspots: [] as SceneHotspot[],
+    hotspots: [
+      { evidenceName: "커피 텀블러", ariaLabel: "커피 텀블러 조사", x: "38%", y: "55.7%", w: "5%", h: "13%", clipPath: "polygon(23% 2%, 76% 2%, 87% 96%, 14% 96%)", radius: "18px", rot: "0deg" },
+      { evidenceName: "미승인 약물 앰풀", ariaLabel: "미승인 약물 앰풀 조사", x: "66.7%", y: "62.3%", w: "6.2%", h: "13.3%", clipPath: "polygon(28% 2%, 75% 4%, 94% 91%, 7% 96%)", radius: "999px", rot: "0deg" }
+    ] satisfies SceneHotspot[],
     dock: spaceDock
   }
 ] as const;

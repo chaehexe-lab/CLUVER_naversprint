@@ -26,7 +26,7 @@ export default function LocationIndicator({ initialScreen, initialTheme }: Locat
     ? initialTheme === "magicSchool" && activeScreen === "interrogationScreen"
       ? "교무 조사실"
       : initialTheme === "spaceStation" && activeScreen === "interrogationScreen"
-        ? "비상 조사실"
+        ? "보안 조사실"
       : screenLocationLabels[activeScreen]
     : null;
 

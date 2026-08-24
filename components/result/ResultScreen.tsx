@@ -52,45 +52,36 @@ const spaceSuspects = [
     id: "harry",
     name: "해리",
     image: "/assets/space-station/characters/harry-upper.webp",
-    slot: { left: "9.5%", top: "38.5%", width: "12.5%", height: "30%" },
-    nameLeft: "15.5%",
-    stampLeft: "18%",
+    slot: { left: "13.22%", top: "38.5%", width: "13.5%", height: "30%" },
+    nameLeft: "19.9%",
+    stampLeft: "23.8%",
     offsetX: "0%"
   },
   {
     id: "mers",
     name: "메르스",
     image: "/assets/space-station/characters/mers-upper.webp",
-    slot: { left: "26%", top: "37%", width: "12.5%", height: "31%" },
-    nameLeft: "32%",
-    stampLeft: "34.5%",
+    slot: { left: "32.78%", top: "37%", width: "13.5%", height: "31%" },
+    nameLeft: "39.5%",
+    stampLeft: "43.4%",
     offsetX: "0%"
   },
   {
     id: "aladdindin",
     name: "알라딘딘",
     image: "/assets/space-station/characters/aladdindin-upper.webp",
-    slot: { left: "42.5%", top: "37.8%", width: "12.5%", height: "30.4%" },
-    nameLeft: "48.5%",
-    stampLeft: "51%",
-    offsetX: "0%"
-  },
-  {
-    id: "ansungjyejyei",
-    name: "안성줴줴이",
-    image: "/assets/space-station/characters/ansungjyejyei-upper.webp",
-    slot: { left: "59%", top: "38.2%", width: "12.5%", height: "30%" },
-    nameLeft: "65%",
-    stampLeft: "67.5%",
+    slot: { left: "52.57%", top: "37.8%", width: "13.5%", height: "30.4%" },
+    nameLeft: "59.3%",
+    stampLeft: "63.2%",
     offsetX: "0%"
   },
   {
     id: "einspanner",
     name: "아인슈페너",
     image: "/assets/space-station/characters/einspanner-upper.webp",
-    slot: { left: "75.5%", top: "38.2%", width: "12.5%", height: "30%" },
-    nameLeft: "81.5%",
-    stampLeft: "84%",
+    slot: { left: "72.01%", top: "38.2%", width: "13.5%", height: "30%" },
+    nameLeft: "78.7%",
+    stampLeft: "82.6%",
     offsetX: "0%"
   }
 ] as const;
@@ -112,8 +103,10 @@ const joseonRequiredAnalysisSteps = [
 const spaceRequiredEvidence = [
   "얼어붙은 추진 레버 젤",
   "손상된 압력 센서",
+  "조작된 지연 타이머",
   "삭제된 의료 기록",
   "접속 키카드 칩",
+  "암호화된 연구 보상 계약",
   "마지막 무전 로그"
 ] as const;
 
@@ -631,7 +624,7 @@ export default function ResultScreen() {
             이 자를 지목한다
           </button>
           <Link className="wood-result-button" href={backToInterrogationHref}>
-            {theme === "spaceStation" ? "비상 조사실로 돌아간다" : "취조실로 돌아간다"}
+            {theme === "spaceStation" ? "보안 조사실로 돌아간다" : "취조실로 돌아간다"}
           </Link>
         </div>
       </section>

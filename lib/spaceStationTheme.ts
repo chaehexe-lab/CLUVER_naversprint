@@ -1,46 +1,37 @@
 export const spaceStationTheme = {
   id: "spaceStation",
   title: "우주정거장 살인사건",
-  subtitle: "오르빗-13 존엄 계약 사건",
+  subtitle: "오르빗-13 임상 은폐 살인 사건",
   playerRole: "비상 조사관",
   culpritId: "mers",
   victim: {
     id: "david",
     name: "데이비드",
     role: "수석 엔지니어",
-    truth: "우주 방사선 유발성 퇴행성 근위축증 말기 환자였고, 메르스에게 순직처럼 보이는 마지막 임무를 부탁했다."
+    truth: "메르스가 몰래 투여한 미승인 근육 재생 약물로 건강이 악화됐고, 불법 임상시험을 폭로하려다 살해당했다."
   },
   assets: {
-    map: "/assets/space-station/maps/orbit-13-blueprint.webp"
+    map: "/assets/space-station/maps/orbit-13-six-location-map.webp"
   },
   ui: {
-    map: "궤도 도면",
+    map: "정거장 지도",
     inventory: "증거 보관함",
     tools: "스캔 키트",
     journal: "로그 기록",
-    interrogation: "비상 조사실",
+    interrogation: "보안 조사실",
     hint: "센서 알림",
     accusation: "최종 보고",
     resultButton: "해몽하기"
   },
   suspects: [
     {
-      id: "ansungjyejyei",
-      name: "안성줴줴이",
-      role: "요리사",
-      persona: "완벽주의자이자 결벽증이 심해 손을 정확히 13번 씻는다.",
-      suspicion: "사건 직후 손을 지나치게 씻어 증거 인멸처럼 보인다.",
-      hiddenTruth: "커피 냄새 아래 섞인 소독약/의료 젤 냄새를 기억한 핵심 목격자다.",
-      evidenceShift: "냄새 증언을 물으면 메르스 쪽 단서로 이어진다."
-    },
-    {
       id: "mers",
       name: "메르스",
       role: "주치의",
       persona: "차분하고 냉정한 의료진. 항상 마스크를 쓰고 메스를 지닌다.",
       suspicion: "메스, 의료용 젤, 의료 기록 삭제, 산소 발생기 조작이 모두 연결된다.",
-      hiddenTruth: "데이비드의 부탁으로 사고처럼 보이는 죽음을 설계했다.",
-      evidenceShift: "의료 기록 조각과 밀봉 젤 잔류물을 제시하면 직접 부정하지 못하고 흔들린다."
+      hiddenTruth: "불법 임상시험과 약물 부작용을 숨기고 연구 보상과 지구 귀환 특혜를 차지하려 데이비드를 살해했다.",
+      evidenceShift: "약물 투여 기록과 밀봉 젤 잔류물을 제시하면 의료 사고라는 변명이 무너진다."
     },
     {
       id: "aladdindin",
@@ -71,32 +62,34 @@ export const spaceStationTheme = {
     }
   ],
   locations: [
-    { id: "spaceAirlock", name: "에어록", purpose: "첫 현장. 안전 로프, 마지막 외부 작업 기록, 로봇 팔 충돌 흔적 확인." },
-    { id: "spaceSuitPrep", name: "외부 작업 준비실", purpose: "우주복 레버 홈 잔류물과 커피 향 잔류 확인." },
-    { id: "spaceMedbay", name: "의료실", purpose: "수술용 밀봉 젤, 메스, 삭제된 의료 기록 단서 확인." },
-    { id: "spaceOxygenGenerator", name: "산소 발생기실", purpose: "압력 밸브 센서 손상과 정전 시점 계산." },
-    { id: "spaceDataCore", name: "데이터실", purpose: "해리 계정 접속 로그와 삭제된 의료 기록 조각 복구." },
-    { id: "spaceLab", name: "과학 실험실", purpose: "아인슈페너의 환각 실험과 커피 텀블러 확인." },
-    { id: "spaceGalleyCorridor", name: "주방 복도", purpose: "안성줴줴이의 냄새 증언과 냄새 이동 경로 확인." }
+    { id: "spaceAirlock", name: "에어록", purpose: "첫 현장과 외부 작업 준비 구역. 레버 젤, 마지막 무전, 공구 점검 흔적 확인." },
+    { id: "spaceMedicalBay", name: "의료실", purpose: "수술용 밀봉 젤, 메스, 삭제된 의료 기록 단서 확인." },
+    { id: "spaceOxygenGenerator", name: "산소 발생기실", purpose: "압력 밸브 센서 손상과 조작된 지연 타이머 확인." },
+    { id: "spaceDataCore", name: "데이터실", purpose: "해리 계정 접속 로그와 암호화된 연구 보상 계약 복구." },
+    { id: "spaceScienceLab", name: "과학 실험실", purpose: "아인슈페너의 커피 텀블러와 숨겨진 미승인 약물 앰풀 확인." }
   ],
   evidence: [
-    { name: "얼어붙은 레버 홈 잔류물", role: "결정타 증거", location: "외부 작업 준비실", logic: "Shadow Zone에서만 굳는 수술용 밀봉 젤 성분. 알라딘딘이 내부 점검에서 못 본 이유를 설명한다." },
-    { name: "산소 발생기 압력 센서 손상", role: "결정타 증거", location: "산소 발생기실", logic: "메스로 생긴 미세 손상. 정전 당시 알리바이를 무력화한다." },
-    { name: "삭제된 데이비드 의료 기록 조각", role: "동기 증거", location: "데이터실", logic: "데이비드의 말기 질환과 메르스의 은폐 동기를 밝힌다." },
-    { name: "데이비드의 마지막 무전", role: "반전 증거", location: "에어록", logic: "구조 요청처럼 들리지만 메르스에게 보내는 성공 신호였다." },
-    { name: "아인슈페너의 커피 텀블러", role: "미끼 증거", location: "과학 실험실", logic: "아인슈페너를 강하게 의심하게 하지만 최종 수법과 맞지 않는다." },
-    { name: "알라딘딘의 공구 흔적", role: "미끼 증거", location: "에어록", logic: "엔지니어 범행처럼 보이지만 레버 봉인 수법과 맞지 않는다." },
-    { name: "해리 계정 접속 기록", role: "알리바이 파괴 증거", location: "데이터실", logic: "해리가 아니라 메르스가 계정을 도용했음을 보여준다." },
-    { name: "안성줴줴이의 냄새 증언", role: "증언 증거", location: "주방 복도", logic: "커피 아래 소독약/의료 젤 냄새가 있었음을 증명한다." }
+    { name: "얼어붙은 추진 레버 젤", role: "수법 증거", location: "에어록", logic: "의료용 젤이 극저온에서 굳어 비상 추진 레버를 막았음을 보여준다." },
+    { name: "마지막 무전 로그", role: "결정타 증거", location: "에어록", logic: "메르스가 데이비드의 구조 요청을 수신하고도 채널을 차단했음을 보여준다." },
+    { name: "엔지니어 공구 클램프", role: "무혐의 증거", location: "에어록", logic: "공구에 젤 흔적이 없어 알라딘딘의 장비 조작 의혹을 약화한다." },
+    { name: "소독천과 장갑", role: "연결 증거", location: "의료실", logic: "레버 젤과 메르스의 의료용 소독제를 연결한다." },
+    { name: "삭제된 의료 기록", role: "동기 증거", location: "의료실", logic: "미승인 약물 투여와 심각한 부작용을 숨긴 사실을 밝힌다." },
+    { name: "손상된 압력 센서", role: "수법 증거", location: "산소 발생기실", logic: "메스와 같은 얇은 날붙이로 센서가 고의 손상됐음을 보여준다." },
+    { name: "조작된 지연 타이머", role: "알리바이 파괴 증거", location: "산소 발생기실", logic: "정전이 외부 작업 시간에 맞춰 예약됐고 설정 신호가 의료실 단말에서 왔음을 보여준다." },
+    { name: "접속 키카드 칩", role: "계정 도용 증거", location: "데이터실", logic: "해리 계정을 이용한 삭제가 의료실 단말에서 실행됐음을 보여준다." },
+    { name: "암호화된 연구 보상 계약", role: "결정적 동기 증거", location: "데이터실", logic: "메르스가 임상 자료 대가로 연구 보상과 우선 귀환권을 약속받았음을 밝힌다." },
+    { name: "커피 텀블러", role: "미끼 증거", location: "과학 실험실", logic: "아인슈페너를 의심하게 하지만 살인 수법과 직접 연결되지 않는다." },
+    { name: "미승인 약물 앰풀", role: "위장 및 동기 증거", location: "과학 실험실", logic: "메르스가 불법 약물을 숨기고 아인슈페너에게 책임을 씌우려 한 정황을 보여준다." },
   ],
   deductionRoute: [
     "알라딘딘의 공구와 로봇 팔 때문에 엔지니어 범행처럼 보인다.",
     "아인슈페너의 커피와 화학약품 때문에 과학자 범행처럼 보인다.",
     "해리의 삭제 로그 때문에 데이터 은폐 범행처럼 보인다.",
     "하지만 산소 발생기 센서 손상과 수술용 밀봉 젤은 의료실 물품과 연결된다.",
-    "해리 계정으로 삭제된 것은 연구 로그가 아니라 데이비드의 의료 기록이었다.",
-    "데이비드가 말기 환자였다는 사실이 밝혀진다.",
-    "마지막 무전은 구조 요청이 아니라 메르스와 데이비드 사이의 약속된 신호였다.",
+    "조작된 지연 타이머로 정전이 의료실 단말에서 예약됐다는 사실이 확인된다.",
+    "해리 계정으로 삭제된 것은 데이비드에게 미승인 약물을 투여한 의료 기록이었다.",
+    "암호화된 계약으로 메르스가 연구 보상과 우선 귀환권을 대가로 임상 자료를 넘기려 했다는 동기가 밝혀진다.",
+    "마지막 무전에서 데이비드는 메르스에게 구조를 요청했지만 개인 채널은 고의로 차단됐다.",
     "최종 지목은 메르스다."
   ]
 } as const;
