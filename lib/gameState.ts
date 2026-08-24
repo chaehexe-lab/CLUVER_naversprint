@@ -18,9 +18,6 @@ export const STARTABLE_SCREENS = new Set([
   "spaceOxygenGenerator",
   "spaceDataCore",
   "spaceScienceLab",
-  "spaceGalleyCorridor",
-  "spaceSuitPrep",
-  "spaceObservation",
   "interrogationScreen"
 ]);
 
@@ -42,8 +39,6 @@ export const routeInitialScreens = {
   "/space-oxygen-generator": "spaceOxygenGenerator",
   "/space-data-core": "spaceDataCore",
   "/space-science-lab": "spaceScienceLab",
-  "/space-galley-corridor": "spaceGalleyCorridor",
-  "/space-suit-prep": "spaceSuitPrep",
   "/interrogation": "interrogationScreen",
   "/tutorial": "tutorialScreen",
   "/dream": "dreamScreen",
@@ -73,9 +68,6 @@ export const screenLocationLabels = {
   spaceOxygenGenerator: "산소 발생기실",
   spaceDataCore: "데이터실",
   spaceScienceLab: "과학 실험실",
-  spaceGalleyCorridor: "주방 복도",
-  spaceSuitPrep: "외부 작업 준비실",
-  spaceObservation: "관측 구역",
   interrogationScreen: "\uCDE8\uC870\uC2E4"
 } as const;
 

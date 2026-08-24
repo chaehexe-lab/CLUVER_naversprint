@@ -61,18 +61,15 @@ const THEME_MAPS: Record<GameTheme, { image: string; alt: string; locations: Map
     ]
   },
   spaceStation: {
-    image: "/assets/space-station/maps/orbit-13-blueprint.webp",
-    alt: "우주정거장 오르빗-13 조사 구역 도면",
+    image: "/assets/space-station/maps/orbit-13-six-location-map.webp",
+    alt: "중앙 허브와 여섯 조사 장소가 연결된 우주정거장 오르빗-13 도면",
     locations: [
-      { screen: "spaceAirlock", goTo: "spaceAirlock", text: "에어록", label: "에어록으로 이동", x: "18%", y: "25%" },
-      { screen: "spaceMedicalBay", goTo: "spaceMedicalBay", text: "의료실", label: "의료실로 이동", x: "18%", y: "39%" },
-      { screen: "spaceOxygenGenerator", goTo: "spaceOxygenGenerator", text: "산소 발생기실", label: "산소 발생기실로 이동", x: "18%", y: "55%" },
-      { screen: "spaceDataCore", goTo: "spaceDataCore", text: "데이터실", label: "데이터실로 이동", x: "18%", y: "72%" },
-      { screen: "spaceScienceLab", goTo: "spaceScienceLab", text: "과학 실험실", label: "과학 실험실로 이동", x: "82%", y: "25%" },
-      { screen: "spaceGalleyCorridor", goTo: "spaceGalleyCorridor", text: "주방 복도", label: "주방 복도로 이동", x: "82%", y: "39%" },
-      { screen: "spaceSuitPrep", goTo: "spaceSuitPrep", text: "외부 작업 준비실", label: "외부 작업 준비실로 이동", x: "82%", y: "55%" },
-      { screen: "spaceObservation", text: "관측 구역", label: "관측 구역 위치", x: "82%", y: "72%" },
-      { screen: "interrogationScreen", goTo: "interrogationScreen", text: "비상 조사실", label: "비상 조사실로 이동", x: "50%", y: "78%" }
+      { screen: "spaceAirlock", goTo: "spaceAirlock", text: "에어록", label: "에어록으로 이동", x: "50.1%", y: "17%", labelY: "26.4%" },
+      { screen: "spaceMedicalBay", goTo: "spaceMedicalBay", text: "의료실", label: "의료실로 이동", x: "28.5%", y: "33%", labelY: "43.4%" },
+      { screen: "spaceOxygenGenerator", goTo: "spaceOxygenGenerator", text: "산소 발생기실", label: "산소 발생기실로 이동", x: "71.9%", y: "33%", labelY: "43.4%" },
+      { screen: "spaceDataCore", goTo: "spaceDataCore", text: "데이터실", label: "데이터실로 이동", x: "28.5%", y: "63.5%", labelY: "73.5%" },
+      { screen: "spaceScienceLab", goTo: "spaceScienceLab", text: "과학 실험실", label: "과학 실험실로 이동", x: "71.5%", y: "63%", labelY: "73.5%" },
+      { screen: "interrogationScreen", goTo: "interrogationScreen", text: "보안 조사실", label: "보안 조사실로 이동", x: "50.2%", y: "79%", labelY: "88.6%" }
     ]
   }
 };
@@ -125,7 +122,7 @@ const THEME_INTERROGATION_COPY: Record<GameTheme, {
     ]
   },
   spaceStation: {
-    map: "궤도 도면",
+    map: "정거장 지도",
     note: "로그 기록",
     noteKicker: "통신 로그",
     noteLead: "대원별 질문과 답변을 통신 기록처럼 확인합니다.",
@@ -138,7 +135,6 @@ const THEME_INTERROGATION_COPY: Record<GameTheme, {
       { id: "harry", name: "해리" },
       { id: "mers", name: "메르스" },
       { id: "aladdindin", name: "알라딘딘" },
-      { id: "ansungjyejyei", name: "안성줴줴이" },
       { id: "einspanner", name: "아인슈페너" }
     ]
   }
@@ -277,10 +273,12 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             <img src={noteIcon} alt="" />
             <span className="sr-only">{copy.note}</span>
           </button>
-          <button className="scene-chip journal-chip" data-go="briefingScreen" type="button" aria-label={`${copy.journal} 다시 보기`}>
-            <img src={journalIcon} alt="" />
-            <span className="sr-only">{copy.journal}</span>
-          </button>
+          {!isSpaceTheme ? (
+            <button className="scene-chip journal-chip" data-go="briefingScreen" type="button" aria-label={`${copy.journal} 다시 보기`}>
+              <img src={journalIcon} alt="" />
+              <span className="sr-only">{copy.journal}</span>
+            </button>
+          ) : null}
           <button
             className="scene-chip bag-chip"
             id="toggleEvidenceBag"
@@ -752,6 +750,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
 
       <div className="toast" id="toast" role="status" aria-live="polite">
         <button className="toast-close" id="closeToast" type="button" aria-label="알림 닫기" hidden>×</button>
+        <span className="toast-evidence-kicker" aria-hidden="true">▣ 증거 확보</span>
         <img className="toast-evidence-image" id="toastEvidenceImage" alt="" hidden />
         <span className="toast-copy">
           <strong className="toast-title" id="toastTitle" hidden />

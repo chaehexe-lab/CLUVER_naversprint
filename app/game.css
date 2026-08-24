@@ -140,9 +140,6 @@
     .game-shell[data-start-screen="spaceOxygenGenerator"] #spaceOxygenGenerator,
     .game-shell[data-start-screen="spaceDataCore"] #spaceDataCore,
     .game-shell[data-start-screen="spaceScienceLab"] #spaceScienceLab,
-    .game-shell[data-start-screen="spaceGalleyCorridor"] #spaceGalleyCorridor,
-    .game-shell[data-start-screen="spaceSuitPrep"] #spaceSuitPrep,
-    .game-shell[data-start-screen="spaceObservation"] #spaceObservation,
     .game-shell[data-start-screen="interrogationScreen"] #interrogationScreen {
       display: block;
     }
@@ -1329,6 +1326,19 @@
     html[data-samunmong-theme="spaceStation"] .location-indicator strong::after {
       background: linear-gradient(90deg, transparent, rgba(157, 220, 247, .62) 12%, rgba(157, 220, 247, .34) 88%, transparent);
       box-shadow: 0 0 7px rgba(157, 220, 247, .2);
+    }
+
+    html[data-samunmong-theme="spaceStation"] .button-guide-tooltip {
+      border: 1px solid rgba(157, 220, 247, .72);
+      border-radius: 8px;
+      color: #eaf6ff;
+      background: linear-gradient(145deg, rgba(7, 18, 29, .96), rgba(2, 7, 13, .94));
+      box-shadow:
+        0 16px 36px rgba(0, 0, 0, .5),
+        inset 0 0 0 3px rgba(2, 8, 14, .76),
+        inset 0 0 0 4px rgba(157, 220, 247, .2);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, .82);
+      backdrop-filter: blur(8px);
     }
 
     .button {
@@ -3262,6 +3272,10 @@
     .scene-dock .bag-chip { right: 2.4%; bottom: 14%; }
     .scene-dock .tool-chip { right: 2.4%; bottom: 3%; }
 
+    html[data-samunmong-theme="spaceStation"] .scene-dock .room-chip {
+      left: calc(2.2% + 116px);
+    }
+
     .field-onboarding {
       position: absolute;
       inset: 0;
@@ -3965,6 +3979,28 @@
       outline: none;
     }
 
+    html[data-samunmong-theme="spaceStation"] .map-floating-close {
+      color: #bcecff;
+      border-color: rgba(126, 213, 250, .68);
+      background: rgba(5, 22, 34, .88);
+      box-shadow:
+        0 0 12px rgba(94, 194, 238, .24),
+        inset 0 0 0 1px rgba(194, 238, 255, .1);
+      top: 18px;
+      right: 18px;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .map-floating-close:hover,
+    html[data-samunmong-theme="spaceStation"] .map-floating-close:focus-visible {
+      color: #effbff;
+      border-color: rgba(164, 229, 255, .9);
+      background: rgba(10, 43, 63, .94);
+      box-shadow:
+        0 0 16px rgba(99, 207, 255, .42),
+        inset 0 0 0 1px rgba(214, 245, 255, .16);
+      outline: none;
+    }
+
     .global-panel.bag-panel,
     .global-panel.tool-panel {
       top: 50%;
@@ -4572,6 +4608,8 @@
     }
 
     html[data-samunmong-theme="spaceStation"] .map-board {
+      overflow: hidden;
+      margin-top: 0;
       border-color: rgba(151, 198, 218, .28);
       background: #05080c;
       box-shadow:
@@ -4579,23 +4617,39 @@
         0 20px 64px rgba(0, 0, 0, .48);
     }
 
+    html[data-samunmong-theme="spaceStation"] .global-panel.map-panel {
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+    }
+
     html[data-samunmong-theme="spaceStation"] .map-label {
-      padding: 5px 10px;
-      border-color: rgba(138, 192, 216, .52);
+      box-sizing: border-box;
+      width: 14%;
+      height: 5%;
+      display: grid;
+      place-items: center;
+      padding: 0 6px;
+      overflow: hidden;
+      border: 0;
+      border-radius: 0;
       color: rgba(230, 247, 255, .88);
-      background: rgba(7, 15, 24, .76);
-      font-size: clamp(10px, .98vw, 14px);
-      letter-spacing: -.03em;
+      background: transparent;
+      box-shadow: none;
+      font-family: "VitroPride", "Noto Sans KR", sans-serif;
+      font-size: clamp(13px, 1.08vw, 17px);
+      letter-spacing: 0;
       text-shadow: 0 0 8px rgba(108, 204, 255, .28), 0 1px 8px rgba(0, 0, 0, .95);
       mix-blend-mode: normal;
-      box-shadow: inset 0 0 14px rgba(102, 196, 255, .12), 0 0 10px rgba(84, 169, 216, .16);
     }
 
     html[data-samunmong-theme="spaceStation"] .map-label.current {
-      color: #fff6cf;
-      border-color: rgba(255, 207, 92, .78);
-      background: rgba(50, 37, 13, .82);
-      box-shadow: inset 0 0 16px rgba(255, 210, 92, .18), 0 0 18px rgba(255, 198, 75, .35);
+      color: rgba(230, 247, 255, .88);
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      text-shadow: 0 0 8px rgba(108, 204, 255, .28), 0 1px 8px rgba(0, 0, 0, .95);
     }
 
     html[data-samunmong-theme="spaceStation"] .map-pin-button {
@@ -4604,15 +4658,39 @@
     }
 
     html[data-samunmong-theme="spaceStation"] .map-pin-button::before {
-      inset: -12%;
+      inset: -100% -100%;
       background:
         radial-gradient(circle at 50% 50%, rgba(143, 220, 255, .32), rgba(77, 139, 180, .16) 46%, transparent 72%);
-      filter: blur(10px);
+      filter: blur(14px);
     }
 
     html[data-samunmong-theme="spaceStation"] .map-pin-button.current::before {
+      inset: -100% -125%;
+      border: 0;
+      border-radius: 50%;
       background:
-        radial-gradient(circle at 50% 50%, rgba(255, 216, 105, .58), rgba(255, 173, 61, .24) 48%, transparent 76%);
+        radial-gradient(ellipse at 50% 50%, rgba(123, 222, 255, .38) 0%, rgba(73, 176, 222, .2) 38%, rgba(36, 111, 158, .08) 62%, transparent 78%);
+      box-shadow: none;
+      filter: blur(7px);
+      opacity: .86;
+      transform: scale(1);
+      animation: none;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .map-pin-button.current::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: -52%;
+      width: clamp(27px, 2.35vw, 36px);
+      height: clamp(38px, 3.4vw, 52px);
+      border: 0;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 88'%3E%3Cpath d='M32 2C15.43 2 2 15.43 2 32c0 22.5 30 54 30 54s30-31.5 30-54C62 15.43 48.57 2 32 2Z' fill='%237edcff' stroke='%23ddf8ff' stroke-width='3'/%3E%3Ccircle cx='32' cy='31' r='14' fill='%230b3045' stroke='%23d9f6ff' stroke-width='2'/%3E%3C/svg%3E") center / contain no-repeat;
+      filter:
+        drop-shadow(0 0 7px rgba(126, 222, 255, .82))
+        drop-shadow(0 0 14px rgba(78, 188, 235, .48));
+      transform: translateX(-50%);
+      pointer-events: none;
     }
 
     html[data-samunmong-theme="spaceStation"] .map-pin-button:disabled {
@@ -4689,7 +4767,10 @@
       max-width: 100%;
       max-height: 100%;
       object-fit: contain;
-      filter: drop-shadow(0 24px 26px rgba(0,0,0,.66)) saturate(.9) brightness(.92);
+      /* Keep raster character art crisp; lighting and motion carry reactions. */
+      filter: none;
+      image-rendering: auto;
+      backface-visibility: hidden;
       transform: translateX(-50%) scale(var(--suspect-scale, 1));
       transform-origin: bottom center;
       transition: opacity .18s ease, transform .18s ease;
@@ -4781,7 +4862,7 @@
 
     html[data-samunmong-theme="spaceStation"] .suspect-sprite,
     .game-shell[data-initial-theme="spaceStation"] .suspect-sprite {
-      filter: drop-shadow(0 26px 28px rgba(0,0,0,.7)) saturate(.86) brightness(.96);
+      filter: none;
     }
 
     .interrogation-desk-foreground {
@@ -4941,10 +5022,13 @@
       display: none;
     }
 
-    #interrogationScreen .shade,
+    #interrogationScreen .shade {
+      transition: opacity .45s ease, background .45s ease;
+    }
+
     #interrogationScreen .suspect-stage,
     #interrogationScreen .suspect-sprite {
-      transition: opacity .45s ease, filter .45s ease, transform .45s ease, background .45s ease;
+      transition: opacity .45s ease, transform .45s ease;
     }
 
     #interrogationScreen[data-interrogation-reaction="avoid"] .shade {
@@ -4953,22 +5037,15 @@
 
     #interrogationScreen[data-interrogation-reaction="avoid"] .suspect-stage {
       transform: translateX(-48%);
-      filter: brightness(.75) saturate(.78);
     }
 
     #interrogationScreen[data-interrogation-reaction="nervous"] .suspect-stage {
       animation: interrogation-suspect-breath .86s ease-in-out 3;
-      filter: brightness(.88) saturate(.9);
     }
 
     #interrogationScreen[data-interrogation-reaction="shocked"] .shade,
     #interrogationScreen[data-interrogation-reaction="silent"] .shade {
       background: rgba(0, 0, 0, .52);
-    }
-
-    #interrogationScreen[data-interrogation-reaction="shocked"] .suspect-stage,
-    #interrogationScreen[data-interrogation-reaction="silent"] .suspect-stage {
-      filter: brightness(.58) saturate(.62);
     }
 
     .new-fact-toast {
@@ -6710,10 +6787,24 @@
 
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+    .toast.hint-toast {
+      border-color: rgba(226, 231, 237, .34);
+      color: #e7eaee;
+      background: linear-gradient(180deg, rgba(42, 44, 48, .88), rgba(10, 11, 13, .92));
+      box-shadow:
+        inset 0 0 12px rgba(255, 255, 255, .06),
+        0 7px 18px rgba(0, 0, 0, .46);
+      text-shadow: 0 2px 8px rgba(0, 0, 0, .82);
+    }
+
     .toast-copy {
       display: grid;
       gap: 2px;
       min-width: 0;
+    }
+
+    .toast-evidence-kicker {
+      display: none;
     }
 
     .toast-title,
@@ -6781,6 +6872,91 @@
       font-size: 13px;
       font-weight: 800;
       line-height: 1.35;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .toast.evidence-toast {
+      width: min(400px, calc(100% - 28px));
+      aspect-ratio: auto;
+      min-width: 0;
+      min-height: 108px;
+      display: flex;
+      align-items: center;
+      gap: 0;
+      padding: 16px 22px;
+      border: 1px solid rgba(157, 220, 247, .72);
+      border-radius: 8px;
+      color: #eaf6ff;
+      background: linear-gradient(145deg, rgba(7, 18, 29, .96), rgba(2, 7, 13, .94));
+      clip-path: none;
+      box-shadow:
+        0 16px 36px rgba(0, 0, 0, .5),
+        inset 0 0 0 3px rgba(2, 8, 14, .76),
+        inset 0 0 0 4px rgba(157, 220, 247, .2);
+      filter: none;
+      backdrop-filter: blur(8px);
+      isolation: isolate;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .toast.evidence-toast::after {
+      content: none;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .toast.evidence-toast > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .toast-evidence-kicker {
+      display: none;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .toast.evidence-toast .toast-evidence-image {
+      display: block;
+      width: 68px;
+      height: 76px;
+      flex: 0 0 68px;
+      border: 0;
+      border-radius: 0;
+      object-fit: contain;
+      background: transparent;
+      box-shadow: none;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .toast:not(.evidence-toast) .toast-evidence-image,
+    html[data-samunmong-theme="spaceStation"] .toast-evidence-image[hidden] {
+      display: none;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .toast.evidence-toast .toast-copy {
+      width: 100%;
+      min-height: 72px;
+      margin-left: 17px;
+      padding-left: 18px;
+      border-left: 1px solid rgba(157, 220, 247, .42);
+      align-content: center;
+      gap: 10px;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .toast.evidence-toast .toast-title {
+      color: #f3f9ff;
+      font-family: "VitroPride", "Noto Sans KR", sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      line-height: 1.25;
+      text-shadow: 0 0 12px rgba(131, 218, 255, .14);
+    }
+
+    html[data-samunmong-theme="spaceStation"] .toast.evidence-toast .toast-message {
+      color: #bfd8e5;
+      font-family: "VitroPride", "Noto Sans KR", sans-serif;
+      font-size: 12px;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .toast.evidence-toast .toast-message::before {
+      content: "• ";
+      color: #62c8f3;
     }
 
     .fade {
@@ -7608,6 +7784,15 @@
       text-shadow: 0 2px 5px rgba(0, 0, 0, .82);
       transform: none;
       white-space: nowrap;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .scene-hint,
+    html[data-samunmong-theme="spaceStation"] .tool-prop.hint-prop .sr-only,
+    html[data-samunmong-theme="spaceStation"] .tool-prop.accuse-prop .sr-only {
+      font-family: "VitroPride", "Noto Serif KR", "Batang", serif;
+      font-size: clamp(16px, 1.55vw, 21px);
+      line-height: 1;
+      letter-spacing: .01em;
     }
 
     html[data-samunmong-theme="magicSchool"] .global-panel.tool-panel {
@@ -13604,6 +13789,9 @@ html[data-samunmong-theme="magicSchool"] .memory-trace-photo-zone {
 html[data-samunmong-theme="magicSchool"] .memory-trace-drawing {
   position: absolute;
   inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
   z-index: 12;
   overflow: visible;
   pointer-events: none;
