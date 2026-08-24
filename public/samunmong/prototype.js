@@ -115,10 +115,10 @@
       { name: "아인슈페너", id: "einspanner", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/einspanner-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/einspanner-upper-aligned.webp" }
     ];
     const suspects = isSpaceTheme ? spaceSuspects : isMagicTheme ? magicSuspects : window.SAMUNMONG_CONTENT?.suspects || [
-      { name: "돌쇠", id: "dolsoe", scene: "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-dolsoe-sleeve.webp?v=sleeve-20260707" },
-      { name: "최춘월", id: "chunwol", scene: "/samunmong/assets/scene-interrogation-chunwol.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-chunwol-sleeve.webp?v=sleeve-20260707" },
-      { name: "유문석", id: "yoomunseok", scene: "/samunmong/assets/scene-interrogation-yoomunseok.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-yoomunseok-sleeve.webp?v=sleeve-20260707" },
-      { name: "무덕", id: "mudeok", scene: "/samunmong/assets/scene-interrogation-mudeok.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-mudeok-sleeve.webp?v=sleeve-20260707" }
+      { name: "돌쇠", id: "dolsoe", scene: "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-dolsoe-sleeve.webp?v=sleeve-20260707", lieScene: "/samunmong/assets/interrogation-expressions/scene-interrogation-dolsoe-lie.png?v=lie-20260824" },
+      { name: "최춘월", id: "chunwol", scene: "/samunmong/assets/scene-interrogation-chunwol.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-chunwol-sleeve.webp?v=sleeve-20260707", lieScene: "/samunmong/assets/interrogation-expressions/scene-interrogation-chunwol-lie.png?v=lie-20260824" },
+      { name: "유문석", id: "yoomunseok", scene: "/samunmong/assets/scene-interrogation-yoomunseok.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-yoomunseok-sleeve.webp?v=sleeve-20260707", lieScene: "/samunmong/assets/interrogation-expressions/scene-interrogation-yoomunseok-lie.png?v=lie-20260824" },
+      { name: "무덕", id: "mudeok", scene: "/samunmong/assets/scene-interrogation-mudeok.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-mudeok-sleeve.webp?v=sleeve-20260707", lieScene: "/samunmong/assets/interrogation-expressions/scene-interrogation-mudeok-lie.png?v=lie-20260824" }
     ];
 
     function getInterrogationHistory(suspectId) {
@@ -5793,6 +5793,7 @@
       document.querySelector("#suspectName").textContent = suspect.name;
       document.querySelector("#suspectStage").dataset.suspect = suspect.id;
       const interrogationScreen = document.querySelector("#interrogationScreen");
+      setLieExpressionOverlay(false);
       if (isMagicTheme || isSpaceTheme) {
         document.querySelector("#interrogationPlate").src = suspect.scene;
       } else {
@@ -6153,16 +6154,48 @@
       interrogationThinkingSoundTimer = 0;
     }
 
+    function setLieExpressionOverlay(show = false) {
+      if (isMagicTheme || isSpaceTheme) return;
+      const screen = document.querySelector("#interrogationScreen");
+      const suspect = suspects[suspectIndex];
+      if (!screen || !suspect?.lieScene) return;
+
+      let overlay = document.querySelector("#interrogationLieExpression");
+      if (!overlay) {
+        overlay = document.createElement("img");
+        overlay.id = "interrogationLieExpression";
+        overlay.alt = "";
+        overlay.draggable = false;
+        overlay.setAttribute("aria-hidden", "true");
+        Object.assign(overlay.style, {
+          position: "absolute",
+          inset: "0",
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          opacity: "0",
+          pointerEvents: "none",
+          transition: "opacity 220ms ease",
+          zIndex: "3"
+        });
+        screen.appendChild(overlay);
+      }
+
+      overlay.src = suspect.lieScene;
+      overlay.style.opacity = show ? "1" : "0";
+    }
+
     function setInterrogationReaction(reaction = "calm", holdMs = 0) {
       const screen = document.querySelector("#interrogationScreen");
       const candle = document.querySelector("#interrogationCandle");
-      const normalized = ["calm", "thinking", "attentive", "avoid", "nervous", "shocked", "silent"].includes(reaction)
+      const normalized = ["calm", "lie", "thinking", "attentive", "avoid", "nervous", "shocked", "silent"].includes(reaction)
         ? reaction
         : "calm";
 
       window.clearTimeout(interrogationReactionTimer);
       screen?.setAttribute("data-interrogation-reaction", normalized);
       candle?.setAttribute("data-state", normalized);
+      setLieExpressionOverlay(normalized === "lie");
 
       if (normalized === "thinking") {
         stopInterrogationThinkingSound();
@@ -6177,6 +6210,15 @@
       if (holdMs > 0 && normalized !== "calm") {
         interrogationReactionTimer = window.setTimeout(() => setInterrogationReaction("calm"), holdMs);
       }
+    }
+
+    function getLieExpressionReaction(answer = "", reaction = "attentive") {
+      if (["avoid", "nervous", "shocked", "silent"].includes(reaction)) return reaction;
+      const normalizedAnswer = answer.replace(/\s+/g, " ");
+      const lieOrEvasionPattern =
+        /(모릅니다|모르겠|기억(?:이)?\s*(?:안|나지|없)|본\s*적\s*없|들은\s*적\s*없|간\s*적\s*없|제\s*것(?:이)?\s*아닙|아닙니다|그런\s*적\s*없|말씀드리기\s*어렵|답하기\s*어렵|글쎄|어찌\s*알겠|알\s*수\s*없)/;
+
+      return lieOrEvasionPattern.test(normalizedAnswer) ? "lie" : reaction;
     }
 
     function showNewFactDiscovery(factId) {
@@ -6272,7 +6314,7 @@
         while (history.length > 8) history.shift();
         addInterrogationAnswer(suspect, answer, data.source, data.warning);
         maybeCollectInterrogationEvidence(suspect, answer, data.usedEvidenceNames);
-        setInterrogationReaction(data.reaction || "attentive", data.newFactId ? 4200 : 3000);
+        setInterrogationReaction(getLieExpressionReaction(answer, data.reaction || "attentive"), data.newFactId ? 4200 : 3000);
         if (data.newFactId) showNewFactDiscovery(data.newFactId);
         if (data.newFactId) {
           const knownFactIds = new Set(readStoredNames(interrogationKnownFactsKey));
