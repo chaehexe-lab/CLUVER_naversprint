@@ -47,12 +47,7 @@
       img: "/samunmong/assets/evidence-transparent/evidence-portrait-concealed-v1.png",
       toolResultAsset: "/samunmong/assets/interactions/portrait-stroke-puzzle/state-2.png?v=portrait-reveal-v5",
       tool: "돋보기",
-      toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있다.\n그림 가장자리에는 지운 글씨 자국이 남아 있고, ‘떠나지 마라’로 보이는 획이 희미하다.\n우연한 초상이라기보다 오래 눌러 둔 마음에 가깝다.",
-      followUpTools: [{
-        tool: "먹빛 시험석",
-        result: "그림 가장자리의 먹을 시험지와 대조하자 인물 윤곽과 지운 문장이 서로 다른 농도로 번진다. 글귀는 그림을 완성한 뒤 나중에 덧썼다가 지운 것이다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/secondary/result-ink-diffusion.png"
-      }]
+      toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있다.\n그림 가장자리에는 지운 글씨 자국이 남아 있고, ‘떠나지 마라’로 보이는 획이 희미하다.\n우연한 초상이라기보다 오래 눌러 둔 마음에 가깝다."
     },
     "헐거워진 노리개": {
       note: "장식 고리가 느슨해진 노리개. 누가 급히 잡아챘거나 떨어뜨렸는지 확인해야 한다.",
@@ -61,15 +56,7 @@
       relatedSuspects: ["춘월"],
       contradiction: "춘월이 방을 떠난 적 없다고 말하면 장신구가 헐거워진 경위를 다시 물을 수 있다.",
       img: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.webp",
-      reverseImg: "/samunmong/assets/interactions/evidence-reverse/norigae-underside-v2.png",
-      tool: "돋보기",
-      toolResult: "확대해 보니 장식 고리는 오래 닳아 풀린 것이 아니라 한쪽으로 강하게 당겨져 벌어져 있다. 고리 사이에는 짙은 남색 섬유 한 올이 끼어 있다.",
-      toolResultAsset: "/samunmong/assets/interactions/evidence-tools/expanded/result-fiber-comparison.png",
-      followUpTools: [{
-        tool: "섬유 대조틀",
-        result: "끼어 있던 남색 섬유를 대조틀에 고정하자 노리개 술과는 꼬임과 광택이 다르다. 장식 자체에서 빠진 실이 아니라 다른 옷감이 스치며 남은 섬유다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/secondary/result-fiber-match.png"
-      }]
+      reverseImg: "/samunmong/assets/interactions/evidence-reverse/norigae-underside-v2.png"
     },
     "무덕의 번진 일기": {
       note: "먹이 번져 읽기 어려운 일기. 숨긴 문장을 추적할 수 있다.",
@@ -85,16 +72,7 @@
       img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.webp",
       reverseImg: "/samunmong/assets/interactions/evidence-reverse/diary-back-page-v2.png",
       tool: "촛불 비추기",
-      toolResult: "촛불을 비추자 번진 먹 아래 기록이 또렷해진다.",
-      followUpTools: [{
-        tool: "먹빛 시험석",
-        result: "번진 부분을 시험지에 옮기자 본문보다 물기가 많고 옅은 먹이 퍼진다. 같은 때 쓴 문장이 아니라 뒤늦게 덧대어 가리려 한 부분이 섞여 있다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/secondary/result-ink-diffusion.png"
-      }, {
-        tool: "압흔 탁본판",
-        result: "일기장을 탁본판에 놓자 현재 장 아래에서 눌린 붓 획이 떠오른다. 찢겨 나간 앞장에도 같은 날짜의 기록이 이어졌던 흔적이다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/hidden-structure/result-pressure-writing.webp"
-      }]
+      toolResult: "촛불을 비추자 번진 먹 아래 기록이 또렷해진다."
     },
     "진흙 묻은 짚신": {
       note: "문밖의 젖은 길과 같은 진흙이 묻은 짚신.",
@@ -106,13 +84,7 @@
       reverseImg: "/samunmong/assets/interactions/evidence-reverse/muddy-straw-shoe-sole-v2.png",
       tool: "발자국 실측줄",
       toolResult: "대나무 긁개로 밑창의 굳은 흙을 떼자 오래 눌린 짚 섬유와 젖은 마당 흙이 층으로 갈린다. 짚신 자체의 길이와 폭을 대조용 기록으로 남겼다.",
-      toolResultAsset: "/samunmong/assets/interactions/evidence-tools/expanded/result-footprint-comparison.png",
-      followUpTools: [{
-        tool: "흙 대조 접시",
-        requiresEvidence: ["작은 발자국"],
-        result: "짚신의 흙과 발자국 가장자리의 흙을 칸별로 거르자 알갱이 구성은 비슷하지만 짚 섬유의 양이 다르다. 같은 길을 지났어도 같은 신발이 남긴 흔적은 아니다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-footprint-soil-link.webp"
-      }]
+      toolResultAsset: "/samunmong/assets/interactions/evidence-tools/expanded/result-footprint-comparison.png"
     },
     "찢어진 옷고름": {
       note: "무덕의 방에서 발견된 찢어진 옷고름. 하인 옷감보다 고급스럽고, 목을 조를 때 쓰였을 가능성이 있다.",
@@ -124,12 +96,7 @@
       reverseImg: "/samunmong/assets/interactions/evidence-reverse/torn-collar-tie-back-v2.png",
       tool: "돋보기",
       toolResult: "찢긴 단면을 확대하자 거친 삼베가 아니라 촘촘한 비단실이 드러난다. 매듭 가까이는 마찰로 눌리고 늘어난 흔적이 선명하다.",
-      toolResultAsset: "/samunmong/assets/interactions/evidence-tools/expanded/result-fiber-comparison.png",
-      followUpTools: [{
-        tool: "섬유 대조틀",
-        result: "비단실을 대조틀에 걸자 끊어진 끝들이 한 방향으로 늘어나 있다. 날로 자른 것이 아니라 강하게 당겨져 끊긴 흔적이다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/secondary/result-cord-reconstruction.png"
-      }]
+      toolResultAsset: "/samunmong/assets/interactions/evidence-tools/expanded/result-fiber-comparison.png"
     },
     "빈 호패 주머니": {
       note: "호패가 빠진 주머니. 호패 조각과 함께 봐야 한다.",
@@ -138,15 +105,7 @@
       relatedSuspects: ["유문석", "춘월", "무덕"],
       contradiction: "호패 조각과 끊어진 호패끈을 함께 보면 유문석이 직접 떨어뜨린 것인지 의심할 수 있다.",
       img: "/samunmong/assets/evidence-transparent/evidence-empty-hopae-holder.webp",
-      reverseImg: "/samunmong/assets/interactions/evidence-reverse/empty-hopae-pouch-lining-v2.png",
-      tool: "돋보기",
-      toolResult: "주머니 입구의 실밥은 자연스럽게 풀린 것이 아니라 얇은 날에 한 번 잘린 자국이다. 안쪽에는 끊어진 호패끈과 같은 색의 섬유가 남아 있다.",
-      toolResultAsset: "/samunmong/assets/interactions/evidence-tools/expanded/result-fiber-comparison.png",
-      followUpTools: [{
-        tool: "섬유 대조틀",
-        result: "주머니 안쪽 섬유와 끊어진 호패끈을 나란히 놓자 색뿐 아니라 꼬인 방향과 굵기까지 이어진다. 두 물건은 원래 한 묶음이었을 가능성이 높다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/secondary/result-cord-reconstruction.png"
-      }]
+      reverseImg: "/samunmong/assets/interactions/evidence-reverse/empty-hopae-pouch-lining-v2.png"
     },
     "하인 장부": {
       note: "하인들의 출입과 심부름 기록을 적은 장부.",
@@ -155,19 +114,7 @@
       relatedSuspects: ["무덕", "유문석", "춘월"],
       contradiction: "출입 기록이 비어 있거나 지워졌다면 누군가 동선을 숨긴 정황이 된다.",
       img: "/samunmong/assets/evidence-transparent/evidence-servant-ledger.webp",
-      reverseImg: "/samunmong/assets/interactions/evidence-reverse/servant-ledger-back-page-v2.png",
-      tool: "촛불 비추기",
-      toolResult: "유월 그믐밤 장부에는 무덕·돌쇠·춘월·유문석이 각기 다른 용무로 오간 기록이 남아 있다. 이경 뒤 안채에서 뒷문으로 나간 마지막 한 줄만 이름이 다른 먹으로 덧칠되어 있다.",
-      toolResultAsset: "/samunmong/assets/interactions/evidence-tools/expanded/result-backlit-writing.png",
-      followUpTools: [{
-        tool: "먹빛 시험석",
-        result: "지운 칸의 먹과 주변 기록을 시험지에 옮기자 번짐과 윤기가 다르다. 출입 기록을 쓴 뒤 다른 먹으로 덮은 시차가 확인된다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/secondary/result-ink-diffusion.png"
-      }, {
-        tool: "압흔 탁본판",
-        result: "장부 아래 장을 탁본하자 지운 칸과 같은 위치에 반복해서 눌린 짧은 획이 나타난다. 해당 기록은 한 번이 아니라 여러 차례 고쳐 적혔다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/hidden-structure/result-pressure-writing.webp"
-      }]
+      reverseImg: "/samunmong/assets/interactions/evidence-reverse/servant-ledger-back-page-v2.png"
     },
     "혼서 조각": {
       note: "춘월의 혼인을 재촉하는 문서 조각. 집안이 춘월의 뜻보다 혼인을 앞세웠음을 보여 준다.",
@@ -175,19 +122,7 @@
       logic: "원치 않는 혼인 압박 속에서 춘월은 자기 삶을 통제하지 못했다. 그래서 돌쇠와 점순의 선택까지 붙잡으려 했는지 따져볼 수 있다.",
       relatedSuspects: ["춘월", "유문석"],
       contradiction: "춘월이 자신은 그저 혼인을 원치 않았을 뿐이라고 말하면, 돌쇠 초상화와 도망 계획을 함께 제시해 감정의 방향을 물을 수 있다.",
-      img: "/samunmong/assets/evidence-transparent/evidence-marriage-letter.webp",
-      tool: "문서 맞춤판",
-      toolResult: "문서 조각을 결 방향대로 고정하자 찢긴 순서와 접힌 자국이 이어진다. 한 번 접어 숨겼다가 급하게 찢은 흔적이 확인된다.",
-      toolResultAsset: "/samunmong/assets/interactions/evidence-tools/expanded/result-document-reconstruction.png",
-      followUpTools: [{
-        tool: "먹빛 시험석",
-        result: "본문과 가장자리의 덧쓴 먹을 비교하자 서로 다른 먹빛이 나온다. 문서를 받은 뒤 누군가 별도의 표시를 남겼다가 지운 흔적이다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/secondary/result-ink-diffusion.png"
-      }, {
-        tool: "문서 펼침칼",
-        result: "붙어 있던 접힌 층을 펼치자 안쪽에 바깥에서는 보이지 않던 눌림과 반복 접기 자국이 남아 있다. 문서를 작게 접어 오래 숨겨 둔 흔적이다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/hidden-structure/result-unfolded-document.webp"
-      }]
+      img: "/samunmong/assets/evidence-transparent/evidence-marriage-letter.webp"
     },
     "피 묻은 붕대": {
       note: "피로 보이는 얼룩이 남은 붕대. 상처의 흔적과 연결될 수 있다.",
@@ -221,25 +156,22 @@
       logic: "점순과 돌쇠가 떠나려 했다는 사실을 밝히고, 그 계획이 춘월에게 알려진 순간 동기가 생겼는지 이어 묻는 단서다.",
       relatedSuspects: ["돌쇠", "무덕", "춘월"],
       contradiction: "도망 계획을 숨긴 돌쇠의 진술은 약속 편지와 무덕의 일기 기록으로 압박할 수 있다.",
-      img: "/samunmong/assets/evidence-transparent/evidence-escape-bundle.webp",
-      tool: "먼지털이 붓",
-      toolResult: "밑면에는 젖은 마당 흙과 마른 창고 먼지가 겹쳐 있고, 옆 귀는 반대 방향으로 다시 묶여 있다. 누군가 준비된 보따리를 다른 장소에서 열어 본 흔적이다.",
-      toolResultAsset: "/samunmong/assets/interactions/evidence-tools/hidden-structure/result-loosened-knot-sequence.webp"
+      img: "/samunmong/assets/evidence-transparent/evidence-escape-bundle.webp"
     },
     "작은 발자국": {
-      note: "뒷문 마당과 현장 주변에 남은 작은 발자국.",
+      note: "뒷문 마당에 남은 작은 발자국.",
       location: "뒷문 마당",
       logic: "밤에 뒷문을 오간 사람이 남성 짚신이 아니라 여성의 신발을 신었을 가능성을 보여준다.",
       relatedSuspects: ["춘월", "무덕"],
       contradiction: "돌쇠만 뒷문을 오갔다는 추정과 맞지 않는 이동 흔적이다.",
       img: "/samunmong/assets/evidence-transparent/evidence-small-footprints.webp",
       tool: "발자국 실측줄",
-      toolResult: "기름 한지로 윤곽을 뜨자 발끝과 뒤꿈치가 선명해지고, 짧고 좁은 발 모양과 이동 방향을 대조용 기록으로 남길 수 있다.",
+      toolResult: "짧고 좁은 발 모양과 뒷문 쪽 이동 방향이 드러났다.",
       toolResultAsset: "/samunmong/assets/interactions/evidence-tools/expanded/result-footprint-comparison.png",
       followUpTools: [{
         tool: "흙 대조 접시",
         requiresEvidence: ["진흙 묻은 짚신"],
-        result: "발자국의 흙과 짚신 밑창의 흙을 나누어 보니 같은 마당 흙이지만 눌린 짚 부스러기 비율이 다르다. 발자국과 짚신은 별개의 이동 흔적이다.",
+        result: "흙 성분이 달라 짚신과는 별개의 흔적이다.",
         asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-footprint-soil-link.webp"
       }]
     },
@@ -266,10 +198,6 @@
         tool: "먹빛 시험석",
         result: "원문과 고쳐 쓴 표현의 먹을 각각 시험하자 번짐 속도가 다르다. 같은 붓을 한 번에 이어 쓴 문장이 아니라 나중에 말투를 고친 흔적이다.",
         asset: "/samunmong/assets/interactions/evidence-tools/secondary/result-ink-diffusion.png"
-      }, {
-        tool: "압흔 탁본판",
-        result: "편지를 탁본판에 고정하자 지운 문장 아래에 더 짧고 거친 필압이 남아 있다. 처음 문장을 쓴 뒤 표현을 고쳐 쓰며 종이를 강하게 눌렀다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/hidden-structure/result-pressure-writing.webp"
       }]
     },
     "긁힌 팔 흔적": {
