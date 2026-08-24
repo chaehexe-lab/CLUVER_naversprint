@@ -3,12 +3,12 @@
     mainScreen: "/samunmong/assets/main-screen-v2.webp",
     tutorialScreen: "/samunmong/assets/main-screen-v2.webp",
     dreamScreen: "/samunmong/assets/main-screen-v2.webp",
-    fieldOne: "/samunmong/assets/scenes-integrated/scene-field-one-evidence-integrated.webp",
-    chunwolRoom: "/samunmong/assets/scenes-integrated/scene-chunwol-room-evidence-integrated.webp",
-    mudeokServantRoom: "/samunmong/assets/scenes-integrated/scene-mudeok-servant-room-evidence-integrated.webp",
-    yoomunseokSarangbang: "/samunmong/assets/scenes-integrated/scene-yoomunseok-sarangbang-evidence-integrated.webp",
-    dolsoeQuarters: "/samunmong/assets/scenes-integrated/scene-dolsoe-quarters-evidence-integrated.webp",
-    backGateCourtyard: "/samunmong/assets/scenes-integrated/scene-back-gate-courtyard-evidence-integrated.webp",
+    fieldOne: "/samunmong/assets/scenes-integrated/scene-field-one-clean-v3.png",
+    chunwolRoom: "/samunmong/assets/scenes-integrated/scene-chunwol-room-clean-v3.png",
+    mudeokServantRoom: "/samunmong/assets/scenes-integrated/scene-mudeok-servant-room-clean-v3.png",
+    yoomunseokSarangbang: "/samunmong/assets/scenes-integrated/scene-yoomunseok-sarangbang-clean-v3.png",
+    dolsoeQuarters: "/samunmong/assets/scenes-integrated/scene-dolsoe-quarters-clean-v3.png",
+    backGateCourtyard: "/samunmong/assets/scenes-integrated/scene-back-gate-courtyard-clean-v3.png",
     interrogationScreen: "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707"
   },
 
@@ -39,7 +39,7 @@
       }]
     },
     "돌쇠의 그림": {
-      note: "춘월의 방에서 발견된 초상화. 단순한 호감보다 오래 숨겨 온 마음과 집착을 보여 주는 단서다.",
+      note: "춘월의 방에서 발견된 붉은 끈으로 단단히 묶인 두루마리. 펼치기 전에는 안의 그림을 알 수 없다.",
       location: "춘월의 방",
       logic: "춘월이 돌쇠를 마음에 두고 있었다면, 점순과 돌쇠가 함께 떠난다는 사실은 춘월에게 사랑을 빼앗기는 일처럼 느껴졌을 수 있다.",
       relatedSuspects: ["춘월", "돌쇠"],

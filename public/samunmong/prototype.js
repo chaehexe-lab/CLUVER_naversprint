@@ -70,13 +70,25 @@
     const requestedTheme = entryParams.get("theme");
     const requestedStart = entryParams.get("start") || "";
     const isMagicStart = requestedStart.startsWith("magic") || window.location.pathname.startsWith("/magic-");
+    const isSpaceStart = requestedStart.startsWith("space") || window.location.pathname.startsWith("/space-");
+    const hasExplicitTheme = requestedTheme === "magicSchool" || requestedTheme === "spaceStation" || requestedTheme === "joseon";
     if (requestedTheme === "magicSchool" || requestedTheme === "spaceStation" || requestedTheme === "joseon") {
       localStorage.setItem(themeKey, requestedTheme);
     } else if (isMagicStart) {
       localStorage.setItem(themeKey, "magicSchool");
+    } else if (isSpaceStart) {
+      localStorage.setItem(themeKey, "spaceStation");
+    } else if (!requestedStart && window.location.pathname === "/") {
+      localStorage.setItem(themeKey, "joseon");
     }
     const storedTheme = localStorage.getItem(themeKey);
-    const activeTheme = storedTheme === "magicSchool" || storedTheme === "spaceStation" ? storedTheme : "joseon";
+    const activeTheme = hasExplicitTheme
+      ? requestedTheme
+      : isMagicStart
+        ? "magicSchool"
+        : isSpaceStart
+          ? "spaceStation"
+          : "joseon";
     const isMagicTheme = activeTheme === "magicSchool";
     const isSpaceTheme = activeTheme === "spaceStation";
     if (isMagicTheme || isSpaceTheme) startCaseLabel = "조사 시작";
@@ -2408,7 +2420,7 @@
         toolResult: "먼지털이 붓으로 털자 긁힌 글자 홈 사이에 고운 분가루가 남아 있다.\n거칠게 굴러다닌 물건이라기보다, 누군가 손에 쥐고 옮긴 뒤 일부러 현장에 둔 듯하다."
       },
       "돌쇠의 그림": {
-        note: "최춘월의 방에서 발견된 숨겨둔 초상. 오래 숨긴 마음과 집착을 추적할 단서다.",
+        note: "최춘월의 방에서 발견된 붉은 끈으로 단단히 묶인 두루마리. 펼치기 전에는 안의 그림을 알 수 없다.",
         img: "/samunmong/assets/evidence-transparent/evidence-portrait-concealed-v1.png",
         toolResultAsset: "/samunmong/assets/interactions/portrait-stroke-puzzle/state-2.png?v=portrait-reveal-v5",
         tool: "돋보기",
@@ -2757,15 +2769,12 @@
     }
 
     function updateEvidenceThreadUI() {
-      const unlocked = getUnlockedStoryConnections();
-      const examined = readExaminedClues();
       const count = document.querySelector("#evidenceThreadCount");
-      if (count) count.textContent = String(unlocked.length + examined.length);
+      if (count) count.textContent = "0";
       const trigger = document.querySelector("#openEvidenceThread");
-      trigger?.classList.toggle("has-clues", unlocked.length + examined.length > 0);
+      trigger?.classList.remove("has-clues");
       document.querySelectorAll("#evidenceList .evidence[data-evidence]").forEach((card) => {
-        const source = getEvidenceSource(card.dataset.evidence);
-        card.classList.toggle("story-linked", examined.some((clue) => clue.source === source) || unlocked.some(([a, b]) => a === source || b === source));
+        card.classList.remove("story-linked");
       });
     }
 
@@ -2821,6 +2830,11 @@
       if (!data.tool) return true;
       const source = data.source || name;
       return readExaminedClues().some((clue) => clue.source === source);
+    }
+
+    function getEvidenceDisplayName(name) {
+      if (name === "돌쇠의 그림" && !isEvidenceMeaningRevealed(name)) return "의문의 그림";
+      return name;
     }
 
     function refreshEvidenceCard(name) {
@@ -2898,7 +2912,6 @@
     function evidenceCardHtml(name) {
       const data = evidenceData[name] || {};
       const summary = sentenceBreakText(data.note || "현장에서 발견된 단서입니다.").split("\n").find(Boolean) || "";
-      const [storyRole, storyBeat] = getEvidenceStoryCue(name, data);
       const meaningRevealed = isEvidenceMeaningRevealed(name, data);
       const stateFrame = data.derived
         ? data.isNew
@@ -2914,8 +2927,7 @@
         </span>
         <span class="evidence-card-copy">
           <span class="evidence-kind-mark">${data.derived ? data.isNew ? "새 증좌" : "검험 증좌" : meaningRevealed ? "감식 완료" : "미확인 증거"}</span>
-          <strong>${escapeHtml(name)}</strong>
-          <span class="evidence-story-cue"><b>${meaningRevealed ? `${escapeHtml(storyRole)} 증거` : "???"}</b><span>${meaningRevealed ? escapeHtml(storyBeat) : "감식하면 의미가 드러납니다"}</span></span>
+          <strong>${escapeHtml(getEvidenceDisplayName(name))}</strong>
           <span class="evidence-summary">${escapeHtml(summary)}</span>
         </span>`;
     }
@@ -3143,7 +3155,7 @@
       currentEvidenceForTool = name;
       evidenceFlipped = false;
       resetToolInteraction(true);
-      document.querySelector("#analysisTarget").textContent = name;
+      document.querySelector("#analysisTarget").textContent = getEvidenceDisplayName(name);
       document.querySelectorAll("#toolEvidenceList .tool-evidence-option").forEach((item) => {
         item.classList.toggle("selected", item.dataset.evidence === name);
       });
@@ -3205,7 +3217,7 @@
       button.type = "button";
       button.dataset.evidence = name;
       button.draggable = isJoseonToolInteraction;
-      button.innerHTML = `<img src="${escapeHtml(getEvidenceImage(name))}" alt=""><span><strong>${escapeHtml(name)}</strong></span>`;
+      button.innerHTML = `<img src="${escapeHtml(getEvidenceImage(name))}" alt=""><span><strong>${escapeHtml(getEvidenceDisplayName(name))}</strong></span>`;
       button.addEventListener("click", () => setAnalysisTarget(name));
       button.addEventListener("dragstart", (event) => {
         event.dataTransfer?.setData("text/x-samunmong-evidence", name);
@@ -3255,7 +3267,7 @@
       image.src = getEvidenceImage(name);
       if (revealImage) revealImage.src = image.src;
       image.alt = name ? `${name} 확대 이미지` : "";
-      title.textContent = name || "증거를 선택하세요";
+      title.textContent = name ? getEvidenceDisplayName(name) : "증거를 선택하세요";
       note.textContent = analyzed
         ? allStepsComplete
           ? "분석 완료 · 자세한 내용은 기록장에 저장됨"
@@ -3304,7 +3316,10 @@
       if (image) image.src = nextImage;
       if (revealImage) revealImage.src = nextImage;
       const title = document.querySelector("#toolPreviewTitle");
-      if (title) title.textContent = evidenceFlipped ? `${currentEvidenceForTool} · 뒷면` : currentEvidenceForTool;
+      if (title) {
+        const displayName = getEvidenceDisplayName(currentEvidenceForTool);
+        title.textContent = evidenceFlipped ? `${displayName} · 뒷면` : displayName;
+      }
       const note = document.querySelector("#toolPreviewNote");
       if (note) note.textContent = evidenceFlipped ? "뒷면의 흔적이 드러났습니다." : "앞면으로 되돌렸습니다.";
       playSfx("buttonAlt", 0.58);
@@ -3337,7 +3352,6 @@
       button.addEventListener("click", () => selectEvidence(button));
       sectionGrid.appendChild(button);
       updateEvidenceLocationCounts();
-      updateEvidenceThreadUI();
       setActiveEvidenceLocation(location);
     }
 
@@ -3357,7 +3371,10 @@
         button.querySelector(".evidence-state-frame").src = "/samunmong/assets/interactions/sato-skills/inventory-states/resolved.png";
       }
       playSfx("buttonAlt", 0.62);
-      showEvidenceStoryPreview(selectedEvidence);
+      const presented = document.querySelector("#presentedEvidence");
+      if (presented) presented.textContent = selectedEvidence;
+      updateEvidenceInterrogationUI(selectedEvidence);
+      showToast(`증거 선택: ${selectedEvidence}`);
     }
 
     function showEvidenceStoryPreview(name) {
@@ -3368,10 +3385,10 @@
       const meaningRevealed = isEvidenceMeaningRevealed(name, data);
       preview.hidden = false;
       document.querySelector("#evidencePreviewKind").textContent = data.derived ? "검험으로 얻은 증좌" : meaningRevealed ? `감식으로 확인한 ${role} 증거` : "아직 의미를 모르는 현장 증거";
-      document.querySelector("#evidencePreviewTitle").textContent = data.source || name;
+      document.querySelector("#evidencePreviewTitle").textContent = getEvidenceDisplayName(data.source || name);
       document.querySelector("#evidencePreviewImage").src = getEvidenceImage(name);
       document.querySelector("#evidencePreviewImage").alt = name;
-      document.querySelector("#evidencePreviewObject").textContent = data.source || name;
+      document.querySelector("#evidencePreviewObject").textContent = getEvidenceDisplayName(data.source || name);
       document.querySelector("#evidencePreviewFact").textContent = meaningRevealed ? fact : "도구함에서 이 증거를 감식하십시오.";
       document.querySelector("#evidencePreviewRole").textContent = meaningRevealed ? `${role} 증거` : "???";
       document.querySelector("#evidencePreviewMeaning").textContent = meaningRevealed ? getEvidenceStoryMeaning(name, data) : "감식을 마치면 사건에서의 의미가 열립니다.";
@@ -5212,7 +5229,7 @@
         if (previewNote) previewNote.textContent = sentenceBreakText(pending.comparison.result).split("\n").find(Boolean) || "두 증거의 관계를 확인했습니다.";
         showToolConclusion(pending.firstName, pending.comparison.result, storyConclusion);
         updateEvidenceThreadUI();
-        showToast("증거 연결 완료 · 사건 줄거리에 기록했습니다.");
+        showToast("증거 연결 완료");
       }, 420);
       playSfx("evidence", 0.86);
     }
@@ -5636,7 +5653,7 @@
       if (evidenceData[name]?.tool) setAnalysisTarget(name);
       showToast("", {
         image: getEvidenceImage(name),
-        title: name,
+        title: getEvidenceDisplayName(name),
         dismissible: false,
         duration: 2000,
       });
@@ -5785,8 +5802,10 @@
       const suspectSprite = document.querySelector("#suspectSprite");
       if ((isMagicTheme || isSpaceTheme) && suspectSprite && suspect.sprite) {
         suspectSprite.src = suspect.sprite;
+        suspectSprite.hidden = false;
       } else if (suspectSprite) {
         suspectSprite.src = suspect.sleeveScene || suspect.scene;
+        suspectSprite.hidden = false;
       }
       activeNoteSuspectId = suspect.id;
       renderConversationNotes();

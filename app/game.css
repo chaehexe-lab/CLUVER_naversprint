@@ -14508,3 +14508,25 @@ html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-preview-image
   content: none !important;
   display: none !important;
 }
+
+.scene-lantern-layer { position:absolute; z-index:2; inset:0; overflow:hidden; pointer-events:none; }
+.scene-lantern-light { --scene-light-strength:.32; position:absolute; aspect-ratio:1; border-radius:50%; background:radial-gradient(circle,rgba(255,220,145,var(--scene-light-strength)) 0 7%,rgba(222,141,55,.15) 25%,transparent 70%); filter:blur(5px); mix-blend-mode:screen; transform:translate(-50%,-50%) scale(.88); animation:sceneLanternBreathe 2.7s ease-in-out infinite; }
+.scene-lantern-light::before { content:""; position:absolute; left:50%; top:50%; width:12%; aspect-ratio:.7; background:url("/samunmong/assets/interactions/interrogation-candle/candle-flame-idle-12.png") 0 0/1200% 100% no-repeat; transform:translate(-50%,-58%); animation:sceneLanternSpriteFrames 1.35s steps(11,end) infinite; }
+.hotspot.hanging-evidence { overflow:visible; transform-origin:50% 0; }
+.hotspot.hanging-evidence .hotspot-evidence-visual { position:absolute; left:50%; top:0; width:100%; height:100%; object-fit:contain; opacity:.84; filter:brightness(.86) saturate(.8) drop-shadow(0 7px 7px rgba(0,0,0,.62)); transform:translateX(-50%) rotate(-1.5deg); transform-origin:50% 4%; pointer-events:none; animation:hangingEvidenceSway 4.6s ease-in-out infinite alternate; }
+.hotspot.hanging-evidence.collected .hotspot-evidence-visual { opacity:0; animation:none; }
+.hotspot.scene-evidence-object { overflow:visible; }
+.hotspot.scene-evidence-object .hotspot-evidence-visual { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; opacity:.82; filter:brightness(.82) saturate(.76) drop-shadow(0 5px 5px rgba(0,0,0,.66)); pointer-events:none; animation:none; }
+.hotspot.scene-evidence-object.collected .hotspot-evidence-visual { opacity:0; }
+.hotspot.backgate-footprints-evidence .hotspot-evidence-visual { opacity:.88; filter:brightness(.98) contrast(1.08) saturate(.72) drop-shadow(0 4px 4px rgba(0,0,0,.72)); }
+.hotspot.backgate-cord-evidence .hotspot-evidence-visual { opacity:.94; filter:brightness(.9) saturate(.9) drop-shadow(0 4px 5px rgba(0,0,0,.74)); }
+.hotspot.field-letter-evidence .hotspot-evidence-visual,
+.hotspot.field-hopae-evidence .hotspot-evidence-visual { opacity:.9; filter:brightness(.9) saturate(.82) drop-shadow(0 4px 5px rgba(0,0,0,.72)); }
+@keyframes sceneLanternBreathe { 0%,100%{opacity:.38;transform:translate(-50%,-50%) scale(.88)} 34%{opacity:.9;transform:translate(-50%,-50%) scale(1.06)} 51%{opacity:.56;transform:translate(-50%,-50%) scale(.97)} 76%{opacity:1;transform:translate(-50%,-50%) scale(1.1)} }
+@keyframes sceneLanternSpriteFrames { from{background-position:0 0} to{background-position:100% 0} }
+@keyframes hangingEvidenceSway { 0%{transform:translateX(-50%) rotate(-2.1deg)} 52%{transform:translateX(-50%) rotate(.35deg)} 100%{transform:translateX(-50%) rotate(2deg)} }
+@media (prefers-reduced-motion:reduce) {
+  .scene-lantern-light { animation:sceneLanternBreathe 4.5s ease-in-out infinite !important; }
+  .scene-lantern-light::before { animation:sceneLanternSpriteFrames 1.8s steps(11,end) infinite !important; }
+  .hotspot.hanging-evidence .hotspot-evidence-visual { animation:hangingEvidenceSway 7s ease-in-out infinite alternate !important; }
+}

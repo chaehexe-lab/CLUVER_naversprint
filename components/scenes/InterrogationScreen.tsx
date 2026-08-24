@@ -374,70 +374,11 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               ×
             </button>
           </div>
-          <div className="evidence-story-nav" aria-label="사건 흐름별 증거 보기">
-            <span>사건 흐름</span>
-            <div className="evidence-story-filters" id="evidenceStoryFilters">
-              <button className="active" type="button" data-story-filter="all" aria-pressed="true">전체</button>
-              <button type="button" data-story-filter="동기" aria-pressed="false">동기</button>
-              <button type="button" data-story-filter="동선" aria-pressed="false">동선</button>
-              <button type="button" data-story-filter="누명" aria-pressed="false">누명</button>
-              <button type="button" data-story-filter="수법" aria-pressed="false">수법·상흔</button>
-              <button type="button" data-story-filter="진술" aria-pressed="false">진술</button>
-            </div>
-            <button className="evidence-thread-open" id="openEvidenceThread" type="button">
-              사건 줄거리 <b id="evidenceThreadCount">0</b>
-            </button>
-          </div>
           <div className="evidence-location-tabs" id="evidenceLocationTabs" aria-label="증거 장소 선택" />
           <div className="evidence-list evidence-grid" id="evidenceList">
             <div className="evidence-empty" id="emptyInterrogationEvidence">
               {copy.bag}에 담긴 증거가 없습니다.
             </div>
-          </div>
-          <div className="evidence-story-preview" id="evidenceStoryPreview" hidden>
-            <button className="evidence-story-preview-close" id="closeEvidenceStoryPreview" type="button" aria-label="증거 흐름 닫기">×</button>
-            <div className="evidence-story-preview-head">
-              <span id="evidencePreviewKind">현장 증거</span>
-              <strong id="evidencePreviewTitle">증거 이름</strong>
-            </div>
-            <div className="evidence-story-path" aria-label="증거가 말하는 사건 흐름">
-              <div className="evidence-story-node evidence-story-object">
-                <img id="evidencePreviewImage" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" />
-                <small>발견물</small>
-                <b id="evidencePreviewObject">증거</b>
-              </div>
-              <span className="evidence-story-arrow" aria-hidden="true">→</span>
-              <div className="evidence-story-node evidence-story-fact">
-                <small>확인된 사실</small>
-                <b id="evidencePreviewFact">흔적 확인</b>
-              </div>
-              <span className="evidence-story-arrow" aria-hidden="true">→</span>
-              <div className="evidence-story-node evidence-story-meaning">
-                <small id="evidencePreviewRole">사건 의미</small>
-                <b id="evidencePreviewMeaning">사건과 연결</b>
-              </div>
-            </div>
-            <div className="evidence-people-row" id="evidencePeopleRow" aria-label="이 증거와 관련된 인물" />
-            <div className="evidence-related-row" id="evidenceRelatedRow" aria-label="이어 볼 증거" />
-            <div className="evidence-connection-result" id="evidenceConnectionResult" hidden>
-              <div className="evidence-connection-images">
-                <img id="connectionImageA" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" />
-                <span aria-hidden="true">＋</span>
-                <img id="connectionImageB" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" />
-              </div>
-              <span>실마리 연결</span>
-              <strong id="evidenceConnectionText">두 증거가 하나의 사실을 가리킵니다.</strong>
-            </div>
-            <button className="evidence-present-confirm" id="confirmEvidencePresent" type="button">이 증거를 심문에 제시</button>
-          </div>
-          <div className="evidence-thread-panel" id="evidenceThreadPanel" hidden>
-            <button className="evidence-story-preview-close" id="closeEvidenceThread" type="button" aria-label="사건 줄거리 닫기">×</button>
-            <div className="evidence-thread-head">
-              <span>{initialTheme === "joseon" ? "사또가 밝혀낸 연결" : initialTheme === "magicSchool" ? "교사가 밝혀낸 연결" : "조사관이 밝혀낸 연결"}</span>
-              <strong>사건 줄거리</strong>
-              <p>직접 이어 붙인 증거만 기록됩니다.</p>
-            </div>
-            <div className="evidence-thread-list" id="evidenceThreadList" />
           </div>
         </aside>
       </EvidenceInventory>

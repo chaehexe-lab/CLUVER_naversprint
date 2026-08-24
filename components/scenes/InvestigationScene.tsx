@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import type { InvestigationSceneData } from "@/lib/gameTypes";
 import { hotspotStyle, propStyle } from "./hotspotStyle";
 
@@ -20,6 +20,18 @@ export default function InvestigationScene({
       <img className="plate" src={scene.image} alt={scene.alt} />
       <div className="shade" />
 
+      {scene.lights && scene.lights.length > 0 && (
+        <div className="scene-lantern-layer" aria-hidden="true">
+          {scene.lights.map((light, index) => (
+            <i
+              key={`${scene.id}-light-${index}`}
+              className="scene-lantern-light"
+              style={{ left: light.x, top: light.y, width: light.size ?? "7%", "--scene-light-strength": light.strength ?? 0.32, animationDelay: light.delay ?? `${index * -0.63}s` } as CSSProperties}
+            />
+          ))}
+        </div>
+      )}
+
       {scene.props.map((prop) => (
         <img
           key={`${scene.id}-${prop.image}-${prop.x}-${prop.y}`}
@@ -40,7 +52,9 @@ export default function InvestigationScene({
           id={hotspot.id}
           type="button"
           aria-label={hotspot.ariaLabel}
-        />
+        >
+          {hotspot.image && <img className="hotspot-evidence-visual" src={hotspot.image} alt="" draggable={false} />}
+        </button>
       ))}
 
       <nav className="hud scene-dock" aria-label={dockAriaLabel}>

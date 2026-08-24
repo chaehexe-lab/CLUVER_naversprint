@@ -13,6 +13,7 @@ export type DreamOption = {
 export type SceneHotspot = {
   id?: string;
   className?: string;
+  image?: string;
   evidenceName?: string;
   ariaLabel: string;
   x: string;
@@ -22,6 +23,14 @@ export type SceneHotspot = {
   clipPath?: string;
   radius?: string;
   rot?: string;
+};
+
+export type SceneLight = {
+  x: string;
+  y: string;
+  size?: string;
+  strength?: number;
+  delay?: string;
 };
 
 export type SceneDockAction = {
@@ -60,6 +69,7 @@ export type InvestigationSceneData = {
   alt: string;
   props: readonly SceneProp[];
   hotspots: readonly SceneHotspot[];
+  lights?: readonly SceneLight[];
   dock: readonly SceneDockAction[];
   inspect?: SceneInspect;
 };

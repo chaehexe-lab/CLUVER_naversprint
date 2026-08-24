@@ -50,6 +50,9 @@ export default function InterrogationCharacterRig3D({ initialTexture }: { initia
       const texture = await loader.loadAsync(url);
       texture.colorSpace = THREE.SRGBColorSpace;
       texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      texture.generateMipmaps = false;
+      texture.minFilter = THREE.LinearFilter;
+      texture.magFilter = THREE.LinearFilter;
       resources.push(texture);
       return texture;
     };
@@ -59,7 +62,7 @@ export default function InterrogationCharacterRig3D({ initialTexture }: { initia
       const height = Math.max(1, screen.clientHeight);
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.4));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setSize(width, height, false);
     };
 
@@ -116,11 +119,14 @@ export default function InterrogationCharacterRig3D({ initialTexture }: { initia
             vec4 afterColor = texture2D(currentMap, vUv);
             float sleeveWipe = smoothstep(vUv.y - 0.18, vUv.y + 0.2, transition);
             vec4 characterColor = mix(beforeColor, afterColor, sleeveWipe);
-            float difference = distance(characterColor.rgb, emptyColor.rgb);
+            vec3 delta = abs(characterColor.rgb - emptyColor.rgb);
+            float difference = max(max(delta.r, delta.g), delta.b);
             float roi = smoothstep(0.12, 0.17, vUv.x) * smoothstep(0.47, 0.42, vUv.x)
               * smoothstep(0.06, 0.12, vUv.y) * smoothstep(0.9, 0.82, vUv.y);
-            float alpha = smoothstep(0.075, 0.19, difference) * roi;
-            if (alpha < 0.015) discard;
+            float matte = smoothstep(0.0025, 0.018, difference);
+            float alpha = roi * matte;
+            alpha = alpha > 0.035 ? 1.0 : alpha * 8.0;
+            if (alpha < 0.012) discard;
             gl_FragColor = vec4(characterColor.rgb, alpha);
           }
         `,

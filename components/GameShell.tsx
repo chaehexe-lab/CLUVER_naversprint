@@ -78,8 +78,10 @@ function ensureRequestedStartScreen(initialScreen?: string) {
   const startScreen = new URLSearchParams(window.location.search).get("start") || initialScreen;
   if (!startScreen || !STARTABLE_SCREENS.has(startScreen)) return;
 
-  document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
   requestScreen(startScreen);
+  window.setTimeout(() => {
+    document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
+  }, 0);
 }
 
 function ActiveInvestigationScene({ screenId }: { screenId: string }) {
@@ -100,6 +102,13 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
   const [currentScreen, setCurrentScreen] = useState(
     initialScreen && STARTABLE_SCREENS.has(initialScreen) ? initialScreen : MAIN_SCREEN
   );
+
+  useLayoutEffect(() => {
+    const requestedStart = new URLSearchParams(window.location.search).get("start") || initialScreen;
+    if (requestedStart && STARTABLE_SCREENS.has(requestedStart)) {
+      setCurrentScreen(requestedStart);
+    }
+  }, [initialScreen]);
 
   useEffect(() => {
     const navigationWindow = window as Window & { samunmongNavigate?: (href: string) => void };
