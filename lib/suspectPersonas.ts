@@ -49,6 +49,14 @@ export function getSuspectSpecialAnswer(question: string, suspectId?: string) {
 
 export const evidenceCatalog = [
   {
+    name: "점순의 목 압박 흔적",
+    aliases: ["목 압박 흔적", "목의 끈 자국", "검안 기록", "목 자국"]
+  },
+  {
+    name: "점순의 손톱 밑 흔적",
+    aliases: ["손톱 밑 흔적", "손톱 밑 살점", "저항 흔적", "손끝 검안"]
+  },
+  {
     name: "호패 조각",
     aliases: ["호패", "나무패", "신분패", "유문석 호패", "패", "분가루", "고운 가루", "이거", "이 물건"]
   },
@@ -70,7 +78,7 @@ export const evidenceCatalog = [
   },
   {
     name: "작은 발자국",
-    aliases: ["발자국", "작은 발", "고운 신", "여자 신발", "뒷문 발자국"]
+    aliases: ["발자국", "작은 발", "짧고 좁은 발", "뒷문 발자국"]
   },
   {
     name: "무덕의 번진 일기",
@@ -106,7 +114,7 @@ export const evidenceCatalog = [
   },
   {
     name: "피 묻은 붕대",
-    aliases: ["붕대", "피 묻은 천", "피", "손 상처"]
+    aliases: ["붕대", "피 묻은 천", "피", "팔 상처", "베인 상처"]
   },
   {
     name: "부러진 지팡이",

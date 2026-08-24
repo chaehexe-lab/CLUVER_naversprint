@@ -1,4 +1,6 @@
-﻿import { dreamOptions, screenImages } from "@/lib/gameData";
+﻿"use client";
+
+import { dreamOptions, screenImages } from "@/lib/gameData";
 import type { CSSProperties } from "react";
 
 type DreamStyle = CSSProperties & {
@@ -6,6 +8,18 @@ type DreamStyle = CSSProperties & {
 };
 
 export default function DreamSelectScreen() {
+  const chooseDream = (id?: string) => {
+    const themeById: Record<string, string> = {
+      chooseJoseon: "joseon",
+      chooseMagicSchool: "magicSchool",
+      chooseSpaceStation: "spaceStation"
+    };
+    const theme = id ? themeById[id] : undefined;
+    if (!theme) return;
+    window.localStorage.setItem("samunmong-current-theme", theme);
+    window.location.assign(`/?start=briefingScreen&theme=${theme}`);
+  };
+
   return (
     <section className="screen" id="dreamScreen">
       <img className="plate" src={screenImages.dreamScreen} alt="" />
@@ -24,6 +38,7 @@ export default function DreamSelectScreen() {
               data-dream-disabled={dream.disabled ? "true" : undefined}
               style={{ "--dream-image": `url('${dream.image}')` } as DreamStyle}
               aria-label={dream.ariaLabel}
+              onClick={() => chooseDream("id" in dream ? dream.id : undefined)}
             >
               <span className={`dream-state${dream.disabled ? "" : " playable"}`}>{dream.state}</span>
               <span className="dream-kicker">{dream.kicker}</span>

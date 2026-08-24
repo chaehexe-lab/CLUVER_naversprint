@@ -1,4 +1,6 @@
-import type { CSSProperties, ReactNode } from "react";
+"use client";
+
+import { useLayoutEffect, type CSSProperties, type ReactNode } from "react";
 import type { InvestigationSceneData } from "@/lib/gameTypes";
 import { hotspotStyle, propStyle } from "./hotspotStyle";
 
@@ -6,6 +8,7 @@ type InvestigationSceneProps = {
   scene: InvestigationSceneData;
   dockAriaLabel: string;
   propClassName?: string;
+  backgroundStates?: readonly { state: string; image: string }[];
   children?: ReactNode;
 };
 
@@ -13,11 +16,64 @@ export default function InvestigationScene({
   scene,
   dockAriaLabel,
   propClassName = "",
+  backgroundStates,
   children
 }: InvestigationSceneProps) {
+  useLayoutEffect(() => {
+    let collectedNames: string[] = [];
+    try {
+      const stored = window.localStorage.getItem("samunmong-collected-evidence-joseon");
+      const parsed = stored ? JSON.parse(stored) : [];
+      if (Array.isArray(parsed)) collectedNames = parsed.filter((name): name is string => typeof name === "string");
+    } catch {
+      collectedNames = [];
+    }
+
+    const screen = document.getElementById(scene.id);
+    if (!screen) return;
+    collectedNames.forEach((name) => {
+      screen.querySelectorAll<HTMLElement>(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((hotspot) => {
+        hotspot.classList.add("collected");
+        hotspot.setAttribute("aria-disabled", "true");
+        if (hotspot instanceof HTMLButtonElement) hotspot.disabled = true;
+      });
+    });
+    screen.dataset.evidenceStateReady = "true";
+  }, [scene.id]);
+
+  const openMap = () => {
+    const mapPanel = document.querySelector<HTMLElement>("#mapPanel");
+    const globalOverlay = document.querySelector<HTMLElement>("#globalOverlay");
+    if (!mapPanel || !globalOverlay) return;
+
+    document.querySelectorAll<HTMLElement>(".global-panel").forEach((panel) => {
+      const isMap = panel === mapPanel;
+      panel.classList.toggle("show", isMap);
+      panel.classList.remove("closing");
+      panel.setAttribute("aria-hidden", String(!isMap));
+    });
+    globalOverlay.classList.add("show");
+  };
+
   return (
     <section className="screen" id={scene.id}>
       <img className="plate" src={scene.image} alt={scene.alt} />
+      {backgroundStates && backgroundStates.length > 0 && (
+        <div className="scene-state-backgrounds" aria-hidden="true">
+          {backgroundStates.map((background) => (
+            <img
+              key={background.state}
+              className="scene-state-background"
+              data-scene-state={background.state}
+              src={background.image}
+              alt=""
+              draggable={false}
+              loading="eager"
+              fetchPriority="high"
+            />
+          ))}
+        </div>
+      )}
       <div className="shade" />
 
       {scene.lights && scene.lights.length > 0 && (
@@ -63,10 +119,11 @@ export default function InvestigationScene({
             key={action.id ?? `${scene.id}-${action.className}`}
             className={`scene-chip ${action.className}`}
             id={action.id}
-            data-go={action.goTo}
-            type="button"
-            aria-label={action.ariaLabel}
-          >
+          data-go={action.goTo}
+          type="button"
+          aria-label={action.ariaLabel}
+          onClick={action.className.includes("map-chip") ? openMap : undefined}
+        >
             <img src={action.image} alt="" draggable={false} />
             <span className="sr-only">{action.label}</span>
           </button>

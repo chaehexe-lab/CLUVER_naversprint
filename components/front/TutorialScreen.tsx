@@ -1,4 +1,6 @@
-﻿import { screenImages, tutorialCopy } from "@/lib/gameData";
+﻿"use client";
+
+import { screenImages, tutorialCopy } from "@/lib/gameData";
 
 export default function TutorialScreen() {
   return (
@@ -10,7 +12,12 @@ export default function TutorialScreen() {
         {tutorialCopy.paragraphs.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}
-        <button className="button primary" id="nextTutorial" type="button">
+        <button className="button primary" id="nextTutorial" type="button" onClick={() => {
+          window.dispatchEvent(new CustomEvent("samunmong:screen-request", {
+            cancelable: true,
+            detail: { screenId: "dreamScreen" }
+          }));
+        }}>
           계속
         </button>
       </article>

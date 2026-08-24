@@ -123,7 +123,7 @@ export const characterPersonas: CharacterPersona[] = [
     ageRange: "마흔 중반",
     socialPosition: "양반가의 주인",
     publicFace: "체면과 질서를 중시하는 엄격한 가장이다. 아랫사람에게 위계와 분수를 자주 강조한다.",
-    privateTruth: "점순을 크게 꾸짖은 일은 사실이지만, 살인은 하지 않았다. 사랑방의 빈 호패 보관함과 잘린 호패끈은 자신을 겨냥한 누명을 보여 준다.",
+    privateTruth: "점순을 크게 꾸짖은 일은 사실이지만, 살인은 하지 않았다. 사랑방의 빈 호패 주머니와 잘린 호패끈은 자신을 겨냥한 누명을 보여 준다.",
     motive: "집안의 체면을 해치는 일을 막으려 했다는 의심을 받는다.",
     relationshipToVictim: "주인과 몸종",
     speechStyle: "낮고 단호한 말투. 감정이 흔들려도 체면 때문에 쉽게 인정하지 않는다.",
@@ -134,7 +134,7 @@ export const characterPersonas: CharacterPersona[] = [
       "6월 29일 사랑방에서 점순을 크게 혼냈다.",
       "점순과 돌쇠의 관계를 불쾌하게 여겼다.",
       "호패가 사건 전날부터 없어졌다는 사실을 즉시 알리지 않았다.",
-      "하인 명부의 점순 이름 옆 표시 때문에 감시나 처벌 정황을 의심받는다."
+      "하인 장부의 점순 이름 옆 표시 때문에 감시나 처벌 정황을 의심받는다."
     ],
     alibiOrClaim: "사건 전날부터 호패를 찾지 못했고, 사건 당일 밤에는 사랑방 근처를 떠나지 않았다고 주장한다.",
     evidenceLinks: [
@@ -158,13 +158,13 @@ export const characterPersonas: CharacterPersona[] = [
       },
       {
         evidenceId: "empty-identity-tag-box",
-        evidenceName: "빈 호패 보관함",
+        evidenceName: "빈 호패 주머니",
         playerInference: "호패가 원래 사랑방에 보관되어 있었고, 최근 누군가 빼냈을 수 있다.",
         truth: "먼지 자국이 최근에 호패가 빠진 사실을 보여 주며, 유문석이 현장에서 흘린 물건이 아니라 누군가 가져간 물건임을 뒷받침한다."
       },
       {
         evidenceId: "servant-register",
-        evidenceName: "하인 명부",
+        evidenceName: "하인 장부",
         playerInference: "점순의 이름 옆 표시가 유문석의 감시나 처벌 동기처럼 보인다.",
         truth: "유문석에게 동기가 있어 보이게 하는 권력 관계 단서지만, 살인의 직접 증거는 아니다."
       },
@@ -197,7 +197,7 @@ export const characterPersonas: CharacterPersona[] = [
     ageRange: "스물셋 안팎",
     socialPosition: "집안의 머슴",
     publicFace: "무뚝뚝하고 힘이 좋다. 말보다 행동이 앞서 오해를 사기 쉽다.",
-    privateTruth: "점순과 서로 마음을 나누었고 함께 도망치기로 했다. 도망 보따리와 손 상처 때문에 의심받지만, 글씨와 상처의 성격이 약속 편지와 저항 흔적에서 벗어나게 해 준다.",
+    privateTruth: "점순과 서로 마음을 나누었고 함께 도망치기로 했다. 도망 보따리와 팔의 베인 상처 때문에 의심받지만, 편지의 말투와 상처의 성격이 약속 편지와 저항 흔적에서 벗어나게 해 준다.",
     motive: "점순과의 관계가 틀어졌거나 도망 계획이 실패해 다툰 것처럼 의심받는다.",
     relationshipToVictim: "연인",
     speechStyle: "짧고 투박하다. 점순에게도 정중한 문어체보다는 직접적인 말을 쓴다.",
@@ -207,7 +207,7 @@ export const characterPersonas: CharacterPersona[] = [
     secrets: [
       "6월 30일 밤 점순을 몰래 만났다.",
       "점순과 함께 도망치기로 했다.",
-      "손에 베인 상처가 있어 초반 의심을 받는다.",
+      "팔에 베인 상처가 있어 초반 의심을 받는다.",
       "글씨 연습지는 약속 편지의 단정한 필체와 다르다."
     ],
     alibiOrClaim: "점순과 뒷문 근처에서 도망 계획만 확인한 뒤 헤어졌다고 말한다.",
@@ -226,9 +226,9 @@ export const characterPersonas: CharacterPersona[] = [
       },
       {
         evidenceId: "cut-hand",
-        evidenceName: "돌쇠의 손 상처",
-        playerInference: "점순이 저항하며 돌쇠의 손을 다치게 했을 수 있다.",
-        truth: "상처는 베인 자국으로, 손톱으로 긁힌 흔적과 맞지 않는다."
+        evidenceName: "돌쇠의 팔 상처",
+        playerInference: "점순이 저항하며 돌쇠의 팔을 다치게 했을 수 있다.",
+        truth: "상처는 일하다 생긴 베인 자국으로, 손톱으로 긁힌 흔적과 맞지 않는다."
       },
       {
         evidenceId: "escape-bundle",
@@ -238,9 +238,9 @@ export const characterPersonas: CharacterPersona[] = [
       },
       {
         evidenceId: "bloodstained-cloth",
-        evidenceName: "피 묻은 천",
-        playerInference: "점순의 피를 감춘 천처럼 보인다.",
-        truth: "돌쇠의 베인 손을 감싼 천으로 볼 여지가 크며, 피해자의 저항 흔적과 일치하지 않는다."
+        evidenceName: "피 묻은 붕대",
+        playerInference: "점순의 피를 닦은 붕대처럼 보인다.",
+        truth: "돌쇠의 베인 팔을 감싼 붕대이며, 피해자가 남긴 긁힌 흔적과 일치하지 않는다."
       },
       {
         evidenceId: "dolsoe-writing-practice",
@@ -291,8 +291,8 @@ export const characterPersonas: CharacterPersona[] = [
       "호패끈을 날카로운 것으로 잘라 현장에 떨어뜨렸다.",
       "범행에 쓴 옷고름을 무덕의 집 근처에 버렸고, 무덕이 그것을 주워 방에 두었다.",
       "점순과 몸싸움을 벌이다 팔에 긁힌 자국이 생겼다.",
-      "춘월의 방에는 여러 번 고쳐 그린 돌쇠 초상화와 혼인 서찰이 있어, 오래 숨긴 집착과 원치 않는 혼인 압박이 함께 드러난다.",
-      "뒷문 마당의 작은 발자국은 무덕의 짚신이 아니라 고급 여성 신발 흔적에 가깝다."
+      "춘월의 방에는 여러 번 고쳐 그린 돌쇠 초상화와 혼서 조각이 있어, 오래 숨긴 집착과 원치 않는 혼인 압박이 함께 드러난다.",
+      "뒷문 마당의 작은 발자국은 무덕의 짚신보다 짧고 좁아 서로 다른 사람의 흔적이다."
     ],
     alibiOrClaim: "사건 당일 밤 방에 있었다고 말하며, 소란을 직접 보지 못했다고 주장한다.",
     evidenceLinks: [
@@ -334,7 +334,7 @@ export const characterPersonas: CharacterPersona[] = [
       },
       {
         evidenceId: "marriage-letter",
-        evidenceName: "혼인 서찰",
+        evidenceName: "혼서 조각",
         playerInference: "춘월이 원치 않는 혼인 압박을 받고 있었을 수 있다.",
         truth: "춘월이 자기 삶을 마음대로 정하지 못하던 압박을 보여 준다. 그 압박이 돌쇠와 점순의 선택을 통제하려는 마음으로 뒤틀렸지만, 범행을 정당화하지는 않는다."
       },
@@ -465,7 +465,7 @@ export const caseTimeline = [
     hiddenTruth: "돌쇠와 점순의 도망 계획을 춘월이 알게 된다."
   },
   {
-    date: "사건 당일 밤",
+    date: "7/1 밤",
     event: "점순이 '오늘 밤 창고에서 기다리시오, 함께 떠납시다'라는 편지를 믿고 창고로 향하고, 춘월의 옷고름으로 목이 졸린다.",
     exposedSuspicion: "돌쇠가 점순을 창고로 불렀다고 보인다.",
     hiddenTruth: "편지는 춘월이 돌쇠인 척 쓴 것이며, 찢어진 옷고름과 춘월의 팔 상처가 살해 방식과 접촉 흔적을 드러낸다."

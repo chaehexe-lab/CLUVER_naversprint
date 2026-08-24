@@ -3,7 +3,17 @@ import InvestigationScene from "./InvestigationScene";
 
 export default function FieldOneScene() {
   return (
-    <InvestigationScene scene={fieldOneScene} dockAriaLabel="현장 메뉴" propClassName="field-evidence-prop">
+    <InvestigationScene
+      scene={fieldOneScene}
+      dockAriaLabel="현장 메뉴"
+      propClassName="field-evidence-prop"
+      backgroundStates={[
+        { state: "all", image: "/samunmong/assets/scenes-integrated/scene-field-one-all-evidence-v6.png" },
+        { state: "letter-only", image: "/samunmong/assets/scenes-integrated/scene-field-one-letter-only-v6.png" },
+        { state: "hopae-only", image: "/samunmong/assets/scenes-integrated/scene-field-one-hopae-only-v6.png" },
+        { state: "none", image: "/samunmong/assets/scenes-integrated/scene-field-one-clean-v3.png" }
+      ]}
+    >
       <div className="field-onboarding" id="fieldOnboarding" data-guide-step="map-click" hidden>
         <article className="hud field-guide-card" aria-live="polite">
           <div className="field-guide-panel active" data-field-guide-panel="map-click">

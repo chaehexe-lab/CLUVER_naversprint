@@ -10,8 +10,13 @@ const truthUnlockKey = "samunmong-truth-unlocked";
 const evidence = [
   {
     name: "찢어진 약속 편지",
-    image: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.webp",
+    image: "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg",
     text: "돌쇠의 투박한 말투와 달리 지나치게 정중했다. 춘월이 돌쇠인 척 써 점순을 창고로 불러낸 미끼였다."
+  },
+  {
+    name: "찢어진 옷고름",
+    image: "/samunmong/assets/mudeok-interaction/evidence-torn-collar-tie.webp",
+    text: "비단 옷고름의 폭과 마찰 흔적이 점순의 목에 남은 좁은 압박 자국과 맞아 범행 수법을 드러냈다."
   },
   {
     name: "팔의 긁힌 자국",
@@ -110,7 +115,7 @@ export default function InterpretationScreen() {
             <span>三</span>
             <div>
               <p>거짓을 깬 흔적</p>
-              <h2 id="evidenceTitle">세 가지 결정적 증거</h2>
+              <h2 id="evidenceTitle">네 가지 결정적 증거</h2>
             </div>
           </div>
           <div className="interpretation-evidence-grid">
