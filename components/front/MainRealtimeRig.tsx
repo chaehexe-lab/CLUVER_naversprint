@@ -106,7 +106,9 @@ function createWaterMaterial(texture: THREE.Texture) {
         rippleUv += pointer * 0.0012 * lowerMask;
         vec4 color = texture2D(map, rippleUv);
         float pulse = 0.82 + sin(time * 2.2 + vUv.x * 18.0) * 0.12;
-        gl_FragColor = vec4(color.rgb * pulse, color.a * opacity * lowerMask);
+        float reflectionBrightness = max(max(color.r, color.g), color.b);
+        float reflectionMask = smoothstep(0.018, 0.16, reflectionBrightness);
+        gl_FragColor = vec4(color.rgb * pulse, color.a * opacity * lowerMask * reflectionMask);
       }
     `,
     transparent: true,
