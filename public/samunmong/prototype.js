@@ -245,6 +245,7 @@
       buttonAlt: `${soundBase}/sfx/button-alt.mp3`,
       dream: `${soundBase}/sfx/dream.mp3`,
       evidence: `${soundBase}/sfx/evidence.mp3`,
+      lie: "/samunmong/audio/joseon-dream-trace-sting-v1.wav",
       map: `${soundBase}/sfx/map.mp3`,
       move: `${soundBase}/sfx/move.mp3`,
       type1: `${soundBase}/sfx/type-1.mp3`,
@@ -6167,6 +6168,7 @@
       const screen = document.querySelector("#interrogationScreen");
       const suspect = suspects[suspectIndex];
       if (!screen || !suspect?.lieScene) return;
+      const characterRig = screen.querySelector(".interrogation-character-rig");
 
       let overlay = document.querySelector("#interrogationLieExpression");
       if (!overlay) {
@@ -6191,6 +6193,9 @@
 
       overlay.src = suspect.lieScene;
       overlay.style.opacity = show ? "1" : "0";
+      if (characterRig) {
+        characterRig.style.opacity = show ? "0" : "1";
+      }
     }
 
     function setInterrogationReaction(reaction = "calm", holdMs = 0) {
@@ -6214,6 +6219,9 @@
       } else {
         stopInterrogationThinkingSound();
       }
+      if (normalized === "lie") {
+        playSfx("lie", 0.34);
+      }
 
       if (holdMs > 0 && normalized !== "calm") {
         interrogationReactionTimer = window.setTimeout(() => setInterrogationReaction("calm"), holdMs);
@@ -6221,12 +6229,13 @@
     }
 
     function getLieExpressionReaction(answer = "", reaction = "attentive") {
-      if (["avoid", "nervous", "shocked", "silent"].includes(reaction)) return reaction;
       const normalizedAnswer = answer.replace(/\s+/g, " ");
       const lieOrEvasionPattern =
         /(모릅니다|모르겠|기억(?:이)?\s*(?:안|나지|없)|본\s*적\s*없|들은\s*적\s*없|간\s*적\s*없|제\s*것(?:이)?\s*아닙|아닙니다|그런\s*적\s*없|말씀드리기\s*어렵|답하기\s*어렵|글쎄|어찌\s*알겠|알\s*수\s*없)/;
 
-      return lieOrEvasionPattern.test(normalizedAnswer) ? "lie" : reaction;
+      if (lieOrEvasionPattern.test(normalizedAnswer)) return "lie";
+      if (["avoid", "nervous", "shocked", "silent"].includes(reaction)) return reaction;
+      return reaction;
     }
 
     function showNewFactDiscovery(factId) {

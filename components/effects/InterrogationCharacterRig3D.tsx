@@ -7,7 +7,7 @@ const EMPTY_ROOM = "/samunmong/assets/scene-interrogation-room-empty.png";
 
 const REACTION_TARGETS: Record<string, { turn: number; lean: number; recoil: number; tension: number }> = {
   calm: { turn: 0, lean: 0, recoil: 0, tension: 0.15 },
-  lie: { turn: 0, lean: 0, recoil: 0, tension: 0.72 },
+  lie: { turn: 0, lean: 0, recoil: 0, tension: 0.15 },
   thinking: { turn: -0.012, lean: 0.008, recoil: 0, tension: 0.28 },
   attentive: { turn: 0.01, lean: 0.014, recoil: 0, tension: 0.2 },
   avoid: { turn: -0.045, lean: -0.012, recoil: 0.006, tension: 0.42 },
