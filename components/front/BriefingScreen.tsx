@@ -277,6 +277,9 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
         <span className="memory-forming-spark spark-d" />
       </div> : null}
       <article className="hud briefing-card" data-briefing-step="0">
+        <button className="close-button briefing-journal-close" id="closeBriefingJournal" type="button" aria-label="사건 일지 닫기">
+          닫기
+        </button>
         {isMagicTheme ? <MagicBriefingPopupFrame /> : null}
         <div className="briefing-card-content">
           {isMagicTheme ? <div className="memory-shard-nav" aria-hidden="true">

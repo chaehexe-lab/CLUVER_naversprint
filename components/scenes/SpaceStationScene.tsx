@@ -27,11 +27,7 @@ export default function SpaceStationScene({ scene }: { scene: SpaceScene }) {
           type="button"
           data-evidence-name={hotspot.evidenceName}
           aria-label={hotspot.ariaLabel}
-          style={{
-            ...hotspotStyle(hotspot),
-            clipPath: hotspot.clipPath,
-            borderRadius: hotspot.radius
-          }}
+          style={hotspotStyle(hotspot)}
         />
       ))}
 

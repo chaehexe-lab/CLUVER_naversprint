@@ -20,6 +20,7 @@
     const memoryOrbTrigger = document.querySelector("#memoryOrbTrigger");
     const briefingPrevButton = document.querySelector("#briefingPrev");
     const briefingNextButton = document.querySelector("#briefingNext");
+    const briefingJournalCloseButton = document.querySelector("#closeBriefingJournal");
     const magicRecordIntro = document.querySelector(".magic-record-intro");
     const magicRecordTabs = [...document.querySelectorAll("[data-record-card-tab]")];
     const magicStudentPages = [...document.querySelectorAll("[data-record-card]")];
@@ -926,6 +927,21 @@
       } else {
         typeBriefing();
       }
+    }
+
+    function openBriefingJournal() {
+      briefingReturnScreenId = getActiveScreenId() || "fieldOne";
+      startBriefingSequence("deathOnly");
+      briefingScreen?.classList.add("journal-overlay-open");
+      briefingJournalCloseButton?.focus();
+      playSfx("buttonAlt", 0.62);
+    }
+
+    function closeBriefingJournal() {
+      briefingScreen?.classList.remove("journal-overlay-open");
+      setBriefingMode("full");
+      document.querySelector(`[data-go="briefingScreen"]`)?.focus();
+      playSfx("buttonAlt", 0.58);
     }
 
     function beginMemoryRestoration() {
@@ -2021,10 +2037,7 @@
     });
     on("#startCase", "click", () => {
       if (briefingCard?.dataset.briefingMode === "deathOnly") {
-        const returnScreen = knownScreenIds.has(briefingReturnScreenId)
-          ? briefingReturnScreenId
-          : (isMagicTheme ? "magicAlchemyLab" : "fieldOne");
-        go(returnScreen, "사건 일지를 덮는 중...");
+        closeBriefingJournal();
         return;
       }
 
@@ -2060,14 +2073,17 @@
       if (!button || isFieldGuideBlockingControls()) return;
       const target = button.dataset.go;
       const isJournalBriefing = target === "briefingScreen";
-      if (isJournalBriefing) {
-        briefingReturnScreenId = getActiveScreenId() || "fieldOne";
+      if (isJournalBriefing && !isMagicTheme && !isSpaceTheme) {
+        event.preventDefault();
+        openBriefingJournal();
+        return;
       }
       go(target, isJournalBriefing ? "사건 일지를 펼치는 중..." : "이동 중...");
-      if (target === "briefingScreen") {
+      if (isJournalBriefing) {
         setTimeout(() => startBriefingSequence("deathOnly"), 340);
       }
     });
+    briefingJournalCloseButton?.addEventListener("click", closeBriefingJournal);
     on("#accuseButton", "click", openResultPage);
 
     let hopaeCollected = false;

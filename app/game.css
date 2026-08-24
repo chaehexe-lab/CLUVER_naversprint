@@ -1108,7 +1108,7 @@
       white-space: nowrap;
     }
 
-    html[data-samunmong-theme="joseon"] .location-indicator {
+    html:is([data-samunmong-theme="joseon"], [data-samunmong-theme="spaceStation"]) .location-indicator {
       box-sizing: border-box;
       width: min(260px, 42vw);
       min-width: 0;
@@ -1125,11 +1125,11 @@
       backdrop-filter: blur(8px);
     }
 
-    html[data-samunmong-theme="joseon"] .location-indicator::before {
+    html:is([data-samunmong-theme="joseon"], [data-samunmong-theme="spaceStation"]) .location-indicator::before {
       content: none;
     }
 
-    html[data-samunmong-theme="joseon"] .location-indicator__kicker {
+    html:is([data-samunmong-theme="joseon"], [data-samunmong-theme="spaceStation"]) .location-indicator__kicker {
       display: flex;
       align-items: center;
       gap: 8px;
@@ -1141,7 +1141,7 @@
       letter-spacing: 0;
     }
 
-    html[data-samunmong-theme="joseon"] .location-indicator__kicker::before {
+    html:is([data-samunmong-theme="joseon"], [data-samunmong-theme="spaceStation"]) .location-indicator__kicker::before {
       content: "";
       position: relative;
       top: -1px;
@@ -1154,7 +1154,7 @@
       transform: rotate(-45deg);
     }
 
-    html[data-samunmong-theme="joseon"] .location-indicator strong {
+    html:is([data-samunmong-theme="joseon"], [data-samunmong-theme="spaceStation"]) .location-indicator strong {
       display: flex;
       align-items: center;
       gap: 12px;
@@ -1167,7 +1167,7 @@
       text-shadow: 0 3px 10px rgba(0, 0, 0, .68);
     }
 
-    html[data-samunmong-theme="joseon"] .location-indicator strong::after {
+    html:is([data-samunmong-theme="joseon"], [data-samunmong-theme="spaceStation"]) .location-indicator strong::after {
       content: "";
       min-width: 40px;
       height: 1px;
@@ -1175,6 +1175,33 @@
       background:
         linear-gradient(90deg, transparent, rgba(190, 144, 66, .55) 12%, rgba(190, 144, 66, .32) 88%, transparent);
       box-shadow: 0 0 6px rgba(190, 144, 66, .14);
+    }
+
+    html[data-samunmong-theme="spaceStation"] .location-indicator {
+      border-color: rgba(157, 220, 247, .72);
+      background: linear-gradient(145deg, rgba(7, 18, 29, .94), rgba(2, 7, 13, .9));
+      box-shadow:
+        0 16px 36px rgba(0, 0, 0, .5),
+        inset 0 0 0 3px rgba(2, 8, 14, .76),
+        inset 0 0 0 4px rgba(157, 220, 247, .2);
+    }
+
+    html[data-samunmong-theme="spaceStation"] .location-indicator__kicker {
+      color: #9ddcf7;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .location-indicator__kicker::before {
+      background: radial-gradient(circle at 50% 50%, #07131d 0 1.5px, #a8e4fb 2px);
+      box-shadow: 0 2px 7px rgba(168, 228, 251, .3);
+    }
+
+    html[data-samunmong-theme="spaceStation"] .location-indicator strong {
+      color: #eaf6ff;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .location-indicator strong::after {
+      background: linear-gradient(90deg, transparent, rgba(157, 220, 247, .62) 12%, rgba(157, 220, 247, .34) 88%, transparent);
+      box-shadow: 0 0 7px rgba(157, 220, 247, .2);
     }
 
     .button {
@@ -1367,10 +1394,10 @@
       height: 46px;
       display: grid;
       place-items: center;
-      border: 1px solid rgba(255, 245, 225, .34);
+      border: 1px solid rgba(226, 231, 237, .34);
       border-radius: 4px;
-      color: #f4e6c8;
-      background: linear-gradient(180deg, rgba(39, 31, 21, .88), rgba(10, 8, 6, .92));
+      color: #e7eaee;
+      background: linear-gradient(180deg, rgba(42, 44, 48, .88), rgba(10, 11, 13, .92));
       box-shadow:
         inset 0 0 12px rgba(255, 255, 255, .06),
         0 7px 18px rgba(0, 0, 0, .46);
@@ -1382,8 +1409,8 @@
 
     .game-settings-button:hover,
     .game-settings-button:focus-visible {
-      border-color: rgba(255, 248, 232, .52);
-      background: linear-gradient(180deg, rgba(53, 42, 27, .94), rgba(15, 12, 8, .96));
+      border-color: rgba(235, 239, 244, .56);
+      background: linear-gradient(180deg, rgba(57, 60, 65, .94), rgba(17, 18, 21, .96));
       filter: brightness(1.06);
       outline: none;
     }
@@ -2911,6 +2938,23 @@
         drop-shadow(0 0 20px rgba(217, 178, 104, .42));
       opacity: .88;
       animation: hoverEvidenceGlow 1.35s ease-in-out infinite alternate;
+    }
+
+    html[data-samunmong-theme="joseon"]
+      #fieldOne:has(.field-onboarding:not([hidden]))
+      .evidence-hotspot:not(.collected):hover::before,
+    html[data-samunmong-theme="joseon"]
+      #fieldOne:has(.field-onboarding:not([hidden]))
+      .evidence-hotspot:not(.collected):focus-visible::before,
+    html[data-samunmong-theme="joseon"]
+      #fieldOne:has(.field-onboarding:not([hidden]))
+      .evidence-hotspot:not(.collected):hover::after,
+    html[data-samunmong-theme="joseon"]
+      #fieldOne:has(.field-onboarding:not([hidden]))
+      .evidence-hotspot:not(.collected):focus-visible::after {
+      opacity: 0;
+      animation: none;
+      filter: none;
     }
 
     .screen.hint-active .evidence-hotspot:not(.collected)::before {
@@ -6730,12 +6774,38 @@
     }
 
     .briefing-card.journal-mode #briefingPrev,
-    .briefing-card.journal-mode #briefingNext {
+    .briefing-card.journal-mode #briefingNext,
+    .briefing-card.journal-mode #startCase,
+    .briefing-card.journal-mode .briefing-actions {
       display: none;
     }
 
-    .briefing-card.journal-mode #startCase {
-      display: inline-grid;
+    .briefing-journal-close {
+      display: none;
+    }
+
+    .briefing-card.journal-mode .briefing-journal-close {
+      position: absolute;
+      top: 48px;
+      right: 46px;
+      z-index: 4;
+      display: grid;
+    }
+
+    #briefingScreen.journal-overlay-open {
+      z-index: 30;
+      display: block;
+      background: transparent;
+    }
+
+    #briefingScreen.journal-overlay-open > .plate,
+    #briefingScreen.journal-overlay-open > .shade {
+      display: none;
+    }
+
+    #briefingScreen.journal-overlay-open::after {
+      display: block;
+      background: rgba(0, 0, 0, .48);
     }
 
     .briefing-card[data-briefing-step="0"],
@@ -8698,6 +8768,7 @@ html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-card.option s
   line-height: 1.2;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
 }
 html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-card.option span {
   min-width: 0;
