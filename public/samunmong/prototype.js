@@ -245,6 +245,7 @@
       buttonAlt: `${soundBase}/sfx/button-alt.mp3`,
       dream: `${soundBase}/sfx/dream.mp3`,
       evidence: `${soundBase}/sfx/evidence.mp3`,
+      lie: "/samunmong/audio/joseon-dream-trace-sting-v1.wav",
       map: `${soundBase}/sfx/map.mp3`,
       move: `${soundBase}/sfx/move.mp3`,
       type1: `${soundBase}/sfx/type-1.mp3`,
@@ -2482,7 +2483,7 @@
       },
       "찢어진 약속 편지": {
         note: "점순의 손에서 발견된 찢어진 약속 편지. 정중한 말투가 돌쇠의 평소 말투와 맞지 않는다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.webp"
+        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg"
       }
     };
 
@@ -2502,7 +2503,7 @@
       "긁힌 팔 흔적": "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp",
       "작은 발자국": "/samunmong/assets/evidence-transparent/evidence-small-footprints.webp",
       "끊어진 호패끈": "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.webp",
-      "찢어진 약속 편지": "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.webp"
+      "찢어진 약속 편지": "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg"
     };
 
     function getEvidenceImage(name, fallback = "/samunmong/assets/evidence-wooden-tag.webp") {
@@ -4095,6 +4096,14 @@
         image: "/samunmong/assets/interactions/dream-traces/straw-shoe-mismatch-v2.png",
         alt: "정체를 감춘 인물이 큰 짚신을 작은 발자국 옆에 내려놓는 몽흔"
       },
+      "찢어진 옷고름": {
+        image: "/samunmong/assets/interactions/dream-traces/torn-collar-struggle-v1.png",
+        alt: "두 인물이 실랑이를 벌이는 사이 짙은 비단 옷고름이 당겨져 찢어지는 몽흔"
+      },
+      "피 묻은 붕대": {
+        image: "/samunmong/assets/interactions/dream-traces/bandage-arm-wrap-v1.png",
+        alt: "정체를 감춘 인물이 자신의 팔에 붕대를 감는 몽흔"
+      },
       "헐거워진 노리개": {
         image: "/samunmong/assets/interactions/dream-traces/norigae-snag-v2.png",
         alt: "두 인물이 갈라지는 순간 노리개가 남색 소매에 걸려 찢기는 몽흔"
@@ -4112,8 +4121,8 @@
         alt: "정체를 감춘 인물이 돌쇠의 초상을 여러 번 덧그리는 몽흔"
       },
       "무덕의 번진 일기": {
-        image: "/samunmong/assets/interactions/dream-traces/escape-plan-overheard-v1.png",
-        alt: "두 사람의 도망 계획을 문밖의 누군가가 엿듣고 기록하는 몽흔"
+        image: "/samunmong/assets/interactions/dream-traces/diary-secret-record-v1.png",
+        alt: "무덕이 밤중에 목격한 움직임을 번진 일기에 급히 기록하는 몽흔"
       }
     };
 
@@ -6159,6 +6168,7 @@
       const screen = document.querySelector("#interrogationScreen");
       const suspect = suspects[suspectIndex];
       if (!screen || !suspect?.lieScene) return;
+      const characterRig = screen.querySelector(".interrogation-character-rig");
 
       let overlay = document.querySelector("#interrogationLieExpression");
       if (!overlay) {
@@ -6183,6 +6193,9 @@
 
       overlay.src = suspect.lieScene;
       overlay.style.opacity = show ? "1" : "0";
+      if (characterRig) {
+        characterRig.style.opacity = show ? "0" : "1";
+      }
     }
 
     function setInterrogationReaction(reaction = "calm", holdMs = 0) {
@@ -6206,6 +6219,9 @@
       } else {
         stopInterrogationThinkingSound();
       }
+      if (normalized === "lie") {
+        playSfx("lie", 0.34);
+      }
 
       if (holdMs > 0 && normalized !== "calm") {
         interrogationReactionTimer = window.setTimeout(() => setInterrogationReaction("calm"), holdMs);
@@ -6213,12 +6229,12 @@
     }
 
     function getLieExpressionReaction(answer = "", reaction = "attentive") {
-      if (["avoid", "nervous", "shocked", "silent"].includes(reaction)) return reaction;
       const normalizedAnswer = answer.replace(/\s+/g, " ");
       const lieOrEvasionPattern =
         /(모릅니다|모르겠|기억(?:이)?\s*(?:안|나지|없)|본\s*적\s*없|들은\s*적\s*없|간\s*적\s*없|제\s*것(?:이)?\s*아닙|아닙니다|그런\s*적\s*없|말씀드리기\s*어렵|답하기\s*어렵|글쎄|어찌\s*알겠|알\s*수\s*없)/;
-
-      return lieOrEvasionPattern.test(normalizedAnswer) ? "lie" : reaction;
+      if (lieOrEvasionPattern.test(normalizedAnswer)) return "lie";
+      if (["avoid", "nervous", "shocked", "silent"].includes(reaction)) return reaction;
+      return reaction;
     }
 
     function showNewFactDiscovery(factId) {
