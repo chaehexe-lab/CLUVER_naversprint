@@ -97,10 +97,16 @@ const spaceSuspects = [
 
 const joseonRequiredEvidence = [
   "호패 조각",
-  "돌쇠의 그림",
+  "점순의 목 압박 흔적",
+  "찢어진 옷고름",
   "긁힌 팔 흔적",
-  "작은 발자국",
   "찢어진 약속 편지"
+] as const;
+
+const joseonRequiredAnalysisSteps = [
+  ["호패 조각", "호패 조각 감식"],
+  ["찢어진 옷고름", "찢어진 옷고름 감식"],
+  ["찢어진 약속 편지::먹빛 시험석", "찢어진 약속 편지 먹빛 대조"]
 ] as const;
 
 const spaceRequiredEvidence = [
@@ -163,6 +169,17 @@ function readCollectedEvidence(theme: ResultTheme) {
 
   try {
     const parsed = JSON.parse(window.localStorage.getItem(getEvidenceStorageKey(theme)) || "[]");
+    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function readAnalyzedEvidence() {
+  if (typeof window === "undefined") return [] as string[];
+
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem("samunmong-analyzed-evidence-joseon") || "[]");
     return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
   } catch {
     return [];
@@ -385,7 +402,14 @@ export default function ResultScreen() {
   const selectedSuspect = activeSuspects.find((suspect) => suspect.id === selectedSuspectId) ?? activeSuspects[0];
   const missingEvidence = useMemo(() => {
     const collected = new Set(readCollectedEvidence(theme));
-    return requiredEvidence.filter((name) => !collected.has(name));
+    const missingCollected = requiredEvidence.filter((name) => !collected.has(name));
+    if (theme !== "joseon") return missingCollected;
+
+    const analyzed = new Set(readAnalyzedEvidence());
+    const missingAnalyzed = joseonRequiredAnalysisSteps
+      .filter(([storageName]) => !analyzed.has(storageName))
+      .map(([, label]) => label);
+    return [...missingCollected, ...missingAnalyzed];
   }, [requiredEvidence, showWarning, theme]);
 
   useEffect(() => {
