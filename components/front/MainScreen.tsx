@@ -19,7 +19,7 @@ export default function MainScreen({ active = false }: MainScreenProps) {
       <img className="plate" src={screenImages.mainScreen} alt="삼운몽 세 개의 꿈 메인 화면" />
       <img
         className="main-clean-plate"
-        src="/samunmong/assets/interactions/main-2d/main-static-clean.png"
+        src="/samunmong/assets/interactions/main-2d/main-static-clean-v2.png"
         alt=""
         aria-hidden="true"
       />
@@ -34,20 +34,25 @@ export default function MainScreen({ active = false }: MainScreenProps) {
           </div>
         </div>
       </div>
-      {mainMenu.map((item) => (
-        <button
-          key={item.id}
-          className="main-menu-button"
-          id={item.id}
-          type="button"
-          data-open-settings={item.id === "openSettings" ? "true" : undefined}
-          disabled={item.id === "continueDream"}
-          data-requires-save={item.id === "continueDream" ? "true" : undefined}
-          style={{ "--menu-y": item.menuY } as MenuButtonStyle}
-        >
-          {item.label}
-        </button>
-      ))}
+      {mainMenu.map((item) => {
+        const requiresSave = item.id === "continueDream";
+
+        return (
+          <button
+            key={item.id}
+            className="main-menu-button"
+            id={item.id}
+            type="button"
+            data-open-settings={item.id === "openSettings" ? "true" : undefined}
+            disabled={requiresSave}
+            aria-disabled={requiresSave}
+            data-requires-save={requiresSave ? "true" : undefined}
+            style={{ "--menu-y": item.menuY } as MenuButtonStyle}
+          >
+            {item.label}
+          </button>
+        );
+      })}
 
       <aside className="dream-notice-dialog save-slot-dialog" id="saveSlotDialog" aria-hidden="true" role="dialog" aria-labelledby="saveSlotTitle">
         <div className="dream-notice-panel save-slot-panel">
