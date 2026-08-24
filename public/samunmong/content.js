@@ -20,6 +20,22 @@
   ],
 
   evidenceData: {
+    "점순의 목 압박 흔적": {
+      note: "초기 검안에서 확인된 좁고 희미한 끈 자국.",
+      location: "초기 검안",
+      logic: "목을 누른 물건의 폭과 재질을 다른 물증과 대조할 기준이다.",
+      relatedSuspects: [],
+      contradiction: "압박 흔적과 일치하는 물건이 확인되기 전에는 범행 도구를 단정할 수 없다.",
+      img: "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.webp"
+    },
+    "점순의 손톱 밑 흔적": {
+      note: "초기 검안에서 점순의 손톱 밑에 남은 미세한 살점 흔적.",
+      location: "초기 검안",
+      logic: "마지막 몸싸움에서 상대에게 남긴 상처와 대조할 기준이다.",
+      relatedSuspects: [],
+      contradiction: "용의자의 상처 형태와 맞아야 직접 접촉의 근거가 된다.",
+      img: "/samunmong/assets/mudeok-interaction/evidence-jeomsun-hand-exam-paper.webp"
+    },
     "호패 조각": {
       note: "점순 옆에서 발견된 신분 단서. 유문석의 물건처럼 보이지만 일부 글자가 긁혀 있다.",
       location: "유문석 집 앞",
@@ -29,25 +45,25 @@
       img: "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp",
       reverseImg: "/samunmong/assets/interactions/evidence-reverse/hopae-fragment-back-v2.png",
       tool: "먼지털이 붓",
-      toolResult: "이름 홈의 가루를 털고 탁본을 뜨자 원래 새긴 획보다 나중에 긁은 자국이 얕게 찍힌다. 누군가 글자를 일부러 훼손한 뒤 현장에 놓은 호패다.",
+      toolResult: "이름 홈의 먼지를 털자 오래된 새김 위로 더 얕고 거친 새 긁힘이 드러난다.",
       toolResultAsset: "/samunmong/assets/interactions/evidence-tools/secondary/result-hopae-rubbing.png",
       followUpTools: [{
         tool: "증거 연결판",
         requiresEvidence: ["빈 호패 주머니", "끊어진 호패끈"],
-        result: "호패 조각, 끊어진 끈, 빈 주머니를 연결판에 놓자 잘린 섬유와 눌린 자리가 차례로 이어진다. 서로 다른 장소에서 발견됐지만 원래 한 묶음이었던 물건들이다.",
+        result: "호패 구멍의 마찰 홈과 끊어진 끈, 주머니 안쪽의 눌린 자리가 맞아 원래 한 묶음이었음이 확인된다.",
         asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-hopae-three-way-link.webp"
       }]
     },
     "돌쇠의 그림": {
       note: "춘월의 방에서 발견된 붉은 끈으로 단단히 묶인 두루마리. 펼치기 전에는 안의 그림을 알 수 없다.",
       location: "춘월의 방",
-      logic: "춘월이 돌쇠를 마음에 두고 있었다면, 점순과 돌쇠가 함께 떠난다는 사실은 춘월에게 사랑을 빼앗기는 일처럼 느껴졌을 수 있다.",
+      logic: "여러 번 고친 초상과 숨겨 둔 보관 방식은 그린 사람이 돌쇠에게 강한 감정을 품었음을 보여 준다.",
       relatedSuspects: ["춘월", "돌쇠"],
       contradiction: "춘월이 돌쇠에게 관심이 없다고 말하면, 여러 번 고쳐 그린 초상과 숨겨 둔 보관 방식이 맞지 않는다.",
       img: "/samunmong/assets/evidence-transparent/evidence-portrait-concealed-v1.png",
       toolResultAsset: "/samunmong/assets/interactions/portrait-stroke-puzzle/state-2.png?v=portrait-reveal-v5",
       tool: "돋보기",
-      toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있다.\n그림 가장자리에는 지운 글씨 자국이 남아 있고, ‘떠나지 마라’로 보이는 획이 희미하다.\n우연한 초상이라기보다 오래 눌러 둔 마음에 가깝다."
+      toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있고, 그림 가장자리에는 지운 글씨의 눌린 획이 남아 있다."
     },
     "헐거워진 노리개": {
       note: "장식 고리가 느슨해진 노리개. 누가 급히 잡아챘거나 떨어뜨렸는지 확인해야 한다.",
@@ -61,13 +77,13 @@
     "무덕의 번진 일기": {
       note: "먹이 번져 읽기 어려운 일기. 숨긴 문장을 추적할 수 있다.",
       location: "무덕의 하인방",
-      logic: "날짜별 기록을 보면 점순과 돌쇠의 도망 계획이 무덕을 거쳐 춘월에게 닿았고, 춘월의 감정이 그 계획과 충돌했음을 확인할 수 있다.",
+      logic: "날짜별 기록을 이어 보면 점순의 밤 이동이 알려진 순서와 사건 전후의 동선을 대조할 수 있다.",
       relatedSuspects: ["무덕", "유문석", "춘월", "돌쇠"],
       contradiction: "무덕의 기록은 각 용의자의 진술을 날짜별로 대조하게 만드는 기준점이다.",
       entries: [
         { date: "6/29", text: "점순이가 크게 혼나는 소리가 들렸다. 사랑방 쪽에서 난 소리였고, 문이 닫혀 있어 누구 목소리인지는 똑똑히 듣지 못했다. 한참 뒤 점순이가 눈가를 훔치며 마당을 지나갔다." },
         { date: "6/30", text: "밤늦게 점순이를 보러 누군가 온 것 같다. 뒷문이 잠깐 열리는 소리가 났고, 점순이는 한동안 돌아오지 않았다. 다음 날 아침 마당 끝에는 흙 묻은 발자국이 희미하게 남아 있었다." },
-        { date: "7/1", text: "아침에 춘월 아씨께 점순 누이가 밤에 누군가를 만난 듯하다고 말해 버렸다. 아씨는 한참 말이 없더니 돌쇠 이름을 되물었다. 그 뒤 길에서 아씨가 돌쇠 얼굴을 그리고 있는 것을 보았다. 그림 아래에는 미처 다 지우지 못한 ‘떠나지 마라’ 같은 글귀가 남아 있었다." }
+        { date: "7/1", text: "아침에 안채에 점순 누이가 밤에 누군가를 만난 듯하다고 말해 버렸다. 잠시 뒤 안쪽에서 돌쇠 이름을 되묻는 소리를 들었지만, 누가 물었는지는 보지 못했다." }
       ],
       img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.webp",
       reverseImg: "/samunmong/assets/interactions/evidence-reverse/diary-back-page-v2.png",
@@ -83,7 +99,7 @@
       img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-muddy-straw-shoes.webp",
       reverseImg: "/samunmong/assets/interactions/evidence-reverse/muddy-straw-shoe-sole-v2.png",
       tool: "발자국 실측줄",
-      toolResult: "대나무 긁개로 밑창의 굳은 흙을 떼자 오래 눌린 짚 섬유와 젖은 마당 흙이 층으로 갈린다. 짚신 자체의 길이와 폭을 대조용 기록으로 남겼다.",
+      toolResult: "실측줄로 짚신 밑창의 길이와 폭을 재어 대조용 기록으로 남겼다.",
       toolResultAsset: "/samunmong/assets/interactions/evidence-tools/expanded/result-footprint-comparison.png"
     },
     "찢어진 옷고름": {
@@ -143,7 +159,7 @@
       }]
     },
     "돌쇠의 팔 상처": {
-      note: "심문 중 돌쇠의 소매 아래에서 확인한 상처. 붕대를 감았던 흔적과 함께 봐야 한다.",
+      note: "심문 중 돌쇠의 소매 아래에서 확인한 베인 상처. 붕대를 감았던 흔적과 함께 봐야 한다.",
       location: "취조실",
       logic: "돌쇠가 언제 어디서 다쳤는지 확인하면, 점순과 헤어진 뒤의 행적을 더 따져볼 수 있다.",
       relatedSuspects: ["돌쇠"],
@@ -167,13 +183,7 @@
       img: "/samunmong/assets/evidence-transparent/evidence-small-footprints.webp",
       tool: "발자국 실측줄",
       toolResult: "짧고 좁은 발 모양과 뒷문 쪽 이동 방향이 드러났다.",
-      toolResultAsset: "/samunmong/assets/interactions/evidence-tools/expanded/result-footprint-comparison.png",
-      followUpTools: [{
-        tool: "흙 대조 접시",
-        requiresEvidence: ["진흙 묻은 짚신"],
-        result: "흙 성분이 달라 짚신과는 별개의 흔적이다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-footprint-soil-link.webp"
-      }]
+      toolResultAsset: "/samunmong/assets/interactions/evidence-tools/expanded/result-footprint-comparison.png"
     },
     "끊어진 호패끈": {
       note: "호패가 연결되어 있었을 법한 끊어진 끈.",
@@ -192,11 +202,11 @@
       img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.webp",
       reverseImg: "/samunmong/assets/interactions/evidence-reverse/torn-promise-letter-back-v2.png",
       tool: "문서 맞춤판",
-      toolResult: "찢긴 가장자리를 맞추자 문장이 한 번에 쓴 것이 아니라 서로 다른 먹 농도로 덧고쳐졌음이 드러난다. 처음 적힌 말투를 누군가 정중한 표현으로 바꿨다.",
+      toolResult: "찢긴 가장자리를 맞추자 ‘오늘 밤 창고에서 기다리시오, 함께 떠납시다’라는 문장이 온전히 이어진다.",
       toolResultAsset: "/samunmong/assets/interactions/evidence-tools/expanded/result-document-reconstruction.png",
       followUpTools: [{
         tool: "먹빛 시험석",
-        result: "원문과 고쳐 쓴 표현의 먹을 각각 시험하자 번짐 속도가 다르다. 같은 붓을 한 번에 이어 쓴 문장이 아니라 나중에 말투를 고친 흔적이다.",
+        result: "문장 일부의 먹은 번짐과 농도가 달라, 처음 쓴 뒤 다른 때에 고쳐 쓴 흔적임이 확인된다.",
         asset: "/samunmong/assets/interactions/evidence-tools/secondary/result-ink-diffusion.png"
       }]
     },

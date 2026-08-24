@@ -2054,6 +2054,8 @@
         return;
       }
 
+      ensureJoseonBriefingEvidence();
+
       if (isMagicTheme || isSpaceTheme || hasSeenFieldGuide()) {
         sessionStorage.removeItem(fieldGuidePendingKey);
       } else {
@@ -2418,21 +2420,21 @@
         note: "점순 옆에서 발견된 신분 단서. 유문석의 물건처럼 보이지만 일부 글자가 긁혀 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp",
         tool: "먼지털이 붓",
-        toolResult: "먼지털이 붓으로 털자 긁힌 글자 홈 사이에 고운 분가루가 남아 있다.\n거칠게 굴러다닌 물건이라기보다, 누군가 손에 쥐고 옮긴 뒤 일부러 현장에 둔 듯하다."
+        toolResult: "이름 홈의 먼지를 털자 오래된 새김 위로 더 얕고 거친 새 긁힘이 드러난다."
       },
       "돌쇠의 그림": {
         note: "최춘월의 방에서 발견된 붉은 끈으로 단단히 묶인 두루마리. 펼치기 전에는 안의 그림을 알 수 없다.",
         img: "/samunmong/assets/evidence-transparent/evidence-portrait-concealed-v1.png",
         toolResultAsset: "/samunmong/assets/interactions/portrait-stroke-puzzle/state-2.png?v=portrait-reveal-v5",
         tool: "돋보기",
-        toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있다.\n그림 가장자리에는 지운 글씨 자국이 남아 있고, ‘떠나지 마라’로 보이는 획이 희미하다.\n우연한 초상이라기보다 오래 눌러 둔 마음에 가깝다."
+        toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있고, 그림 가장자리에는 지운 글씨의 눌린 획이 남아 있다."
       },
       "헐거워진 노리개": {
         note: "끊어진 장식과 급히 잡아챈 듯한 흔적이 남은 노리개. 누가 지녔는지 확인해야 한다.",
         img: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.webp"
       },
       "무덕의 번진 일기": {
-        note: "먹이 번져 읽기 어려운 일기. 점순과 돌쇠의 도망 계획이 춘월에게 닿은 경로를 추적할 수 있다.",
+        note: "먹이 번져 읽기 어려운 일기. 사건 전 며칠의 밤 이동과 전달 경로를 추적할 수 있다.",
         img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.webp",
         tool: "촛불 비추기",
         toolResult: "촛불을 비추자 번진 먹 아래 기록이 또렷해진다."
@@ -2611,27 +2613,31 @@
     }
 
     const evidenceStoryCues = {
-      "호패 조각": ["누명", "유문석 ← 조작된 호패"],
-      "돌쇠의 그림": ["동기", "춘월 → 돌쇠를 향한 집착"],
-      "헐거워진 노리개": ["동선", "춘월의 급한 움직임"],
-      "무덕의 번진 일기": ["진술", "도망 계획 → 춘월"],
+      "점순의 목 압박 흔적": ["수법", "좁은 끈에 눌린 흔적"],
+      "점순의 손톱 밑 흔적": ["저항", "몸싸움 중 남은 흔적"],
+      "호패 조각": ["누명", "오래된 새김 위 새 긁힘"],
+      "돌쇠의 그림": ["동기", "여러 번 고쳐 그린 초상"],
+      "헐거워진 노리개": ["동선", "급하게 움직인 흔적"],
+      "무덕의 번진 일기": ["진술", "도망 계획을 아는 인물"],
       "진흙 묻은 짚신": ["동선", "짚신 ≠ 작은 발자국"],
       "찢어진 옷고름": ["수법", "비단 끈 → 목 졸림"],
       "빈 호패 주머니": ["누명", "방에서 사라진 호패"],
       "하인 장부": ["동선", "지워진 출입 기록"],
       "혼서 조각": ["동기", "강요된 혼인 → 압박"],
-      "피 묻은 붕대": ["상흔", "붕대 ↔ 돌쇠의 팔"],
+      "피 묻은 붕대": ["상흔", "누군가의 팔에 감았던 붕대"],
       "돌쇠의 팔 상처": ["상흔", "붕대를 감았던 자리"],
       "도망 보따리": ["동기", "점순·돌쇠의 도망"],
       "긁힌 팔 흔적": ["저항", "점순이 남긴 상처"],
       "작은 발자국": ["동선", "작은 발 → 뒷문"],
       "끊어진 호패끈": ["누명", "잘라낸 호패끈"],
-      "찢어진 약속 편지": ["진술", "말투 ≠ 돌쇠"]
+      "찢어진 약속 편지": ["진술", "평소와 다른 말투"]
     };
 
     const evidenceStoryMeanings = {
-      "호패 조각": "유문석에게 죄를 씌우려고 옮긴 흔적",
-      "돌쇠의 그림": "춘월이 돌쇠에게 품은 집착의 단서",
+      "점순의 목 압박 흔적": "범행 도구의 폭과 재질을 대조할 기준",
+      "점순의 손톱 밑 흔적": "상대에게 남긴 상처를 대조할 기준",
+      "호패 조각": "글자가 나중에 훼손된 흔적",
+      "돌쇠의 그림": "숨겨 둔 감정을 보여 주는 단서",
       "헐거워진 노리개": "급히 움직인 사람의 흔적",
       "무덕의 번진 일기": "도망 계획을 아는 사람이 있음",
       "진흙 묻은 짚신": "현장 발자국의 주인과 다름",
@@ -2649,14 +2655,15 @@
     };
 
     const evidenceConnections = [
-      ["호패 조각", "빈 호패 주머니", "호패는 우연히 떨어진 것이 아니라 누명을 위해 옮겨졌다."],
-      ["호패 조각", "끊어진 호패끈", "호패끈을 끊어 조각을 현장에 남긴 흔적이다."],
-      ["빈 호패 주머니", "끊어진 호패끈", "비어 있는 주머니와 잘린 끈이 호패 조작을 함께 가리킨다."],
+      ["호패 조각", "빈 호패 주머니", "주머니의 눌린 자리와 호패 크기가 맞아 원래 함께 보관됐던 물건임을 보여 준다."],
+      ["호패 조각", "끊어진 호패끈", "끈의 굵기와 호패 구멍의 마찰 홈이 맞아 원래 연결됐던 물건임을 보여 준다."],
+      ["빈 호패 주머니", "끊어진 호패끈", "주머니 안쪽의 붉은 섬유와 끊어진 끈의 결이 서로 맞는다."],
       ["진흙 묻은 짚신", "작은 발자국", "짚신의 크기와 현장의 작은 발자국이 서로 맞지 않는다."],
       ["피 묻은 붕대", "돌쇠의 팔 상처", "붕대를 감았던 자리와 돌쇠의 팔 상처가 맞아떨어진다."],
-      ["피 묻은 붕대", "긁힌 팔 흔적", "붕대는 몸싸움에서 생긴 긁힌 상처를 감추고 있었다."],
       ["도망 보따리", "무덕의 번진 일기", "도망 준비가 기록되어 있어 계획을 아는 사람이 있었음을 보여준다."],
-      ["찢어진 옷고름", "긁힌 팔 흔적", "찢어진 옷고름과 긁힌 팔은 마지막 몸싸움이 있었음을 가리킨다."]
+      ["찢어진 옷고름", "긁힌 팔 흔적", "찢어진 옷고름과 긁힌 팔은 마지막 몸싸움이 있었음을 가리킨다."],
+      ["찢어진 옷고름", "점순의 목 압박 흔적", "옷고름의 폭과 마찰 자국이 목에 남은 좁은 압박 흔적과 맞는다."],
+      ["긁힌 팔 흔적", "점순의 손톱 밑 흔적", "팔의 긁힌 방향과 손톱 밑 흔적이 마지막 몸싸움의 직접 접촉을 가리킨다."]
     ];
 
     function getEvidenceSource(name) {
@@ -3130,7 +3137,17 @@
       playSfx("bag", 0.7);
     }
 
+    function ensureJoseonBriefingEvidence() {
+      if (isMagicTheme || isSpaceTheme) return;
+      ["점순의 목 압박 흔적", "점순의 손톱 밑 흔적"].forEach((name) => {
+        if (readStoredNames(collectedEvidenceKey).includes(name)) return;
+        saveCollectedEvidence(name);
+        addEvidenceCardToInterrogation(name);
+      });
+    }
+
     function restoreSavedInvestigation() {
+      ensureJoseonBriefingEvidence();
       const collectedEvidence = readStoredNames(collectedEvidenceKey);
       const analyzedEvidence = new Set(readStoredNames(analyzedEvidenceKey));
 
@@ -3177,8 +3194,8 @@
         asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-hopae-three-way-link.webp"
       }],
       [["진흙 묻은 짚신", "작은 발자국"], {
-        result: "같은 마당 흙이지만 발의 길이와 짚 섬유 비율은 서로 다르다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-footprint-soil-link.webp"
+        result: "뒤꿈치를 맞춰 겹치자 짚신이 발자국보다 길고 폭도 넓다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/expanded/result-footprint-comparison.png"
       }],
       [["피 묻은 붕대", "돌쇠의 팔 상처"], {
         result: "붕대를 감은 방향과 상처의 피가 번진 중심이 맞물린다.",
@@ -3187,6 +3204,14 @@
       [["찢어진 옷고름", "긁힌 팔 흔적"], {
         result: "상처 끝에 남은 가는 섬유와 옷고름의 풀린 비단실이 같은 방향으로 꼬여 있다.",
         asset: "/samunmong/assets/interactions/evidence-tools/secondary/result-fiber-match.png"
+      }],
+      [["찢어진 옷고름", "점순의 목 압박 흔적"], {
+        result: "옷고름의 폭과 눌린 마찰 자국이 목에 남은 좁은 압박 흔적과 맞는다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/expanded/result-fiber-comparison.png"
+      }],
+      [["긁힌 팔 흔적", "점순의 손톱 밑 흔적"], {
+        result: "팔의 긁힌 방향과 손톱 밑에 남은 접촉 흔적이 서로 맞물린다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-bandage-wound-link.webp"
       }]
     ].map(([names, comparison]) => [evidencePairKey(names[0], names[1]), comparison]));
 
@@ -3937,8 +3962,11 @@
       if (!row) return;
       const data = evidenceData[name] || {};
       const sourceData = evidenceData[data.source || name] || data;
-      const people = Array.isArray(sourceData.relatedSuspects) ? sourceData.relatedSuspects : [];
+      const hasDreamTrace = Boolean(joseonDreamTraceByEvidence[data.source || name]);
+      row.hidden = hasDreamTrace;
       row.replaceChildren();
+      if (hasDreamTrace) return;
+      const people = Array.isArray(sourceData.relatedSuspects) ? sourceData.relatedSuspects : [];
       people.slice(0, 3).forEach((personName) => {
         const suspect = findJoseonSuspect(personName);
         if (!suspect) return;
@@ -4100,10 +4128,6 @@
         image: "/samunmong/assets/interactions/dream-traces/torn-collar-struggle-v1.png",
         alt: "두 인물이 실랑이를 벌이는 사이 짙은 비단 옷고름이 당겨져 찢어지는 몽흔"
       },
-      "피 묻은 붕대": {
-        image: "/samunmong/assets/interactions/dream-traces/bandage-arm-wrap-v1.png",
-        alt: "정체를 감춘 인물이 자신의 팔에 붕대를 감는 몽흔"
-      },
       "헐거워진 노리개": {
         image: "/samunmong/assets/interactions/dream-traces/norigae-snag-v2.png",
         alt: "두 인물이 갈라지는 순간 노리개가 남색 소매에 걸려 찢기는 몽흔"
@@ -4122,7 +4146,7 @@
       },
       "무덕의 번진 일기": {
         image: "/samunmong/assets/interactions/dream-traces/diary-secret-record-v1.png",
-        alt: "무덕이 밤중에 목격한 움직임을 번진 일기에 급히 기록하는 몽흔"
+        alt: "정체를 감춘 인물이 밤중에 목격한 움직임을 번진 일기에 기록하는 몽흔"
       }
     };
 
@@ -5176,14 +5200,14 @@
                     ? ["", "두 증거가 한 줄로 이어졌습니다. 위쪽 결론 매듭을 왼쪽으로 당겨 고정하십시오.", "두 증거의 공통 흔적이 하나의 사건 흐름으로 묶였습니다."][specialPuzzleStep]
         : specialPuzzleMode === "ledger"
           ? ["", "등잔의 배면광 아래 검은 덧칠보다 먼저 눌린 붓획이 한 줄 전체에 이어집니다. 이 칸은 처음부터 빈칸이 아니라 기록한 뒤 일부러 지운 자리입니다."][specialPuzzleStep]
-          : specialPuzzleMode === "diary"
-            ? ["", "6/29의 다툼, 6/30의 뒷문과 작은 발자국, 7/1 춘월이 돌쇠 이름을 알게 된 흐름이 이어집니다. 춘월은 도망 계획을 사건 전에 알고 있었습니다."][specialPuzzleStep]
+        : specialPuzzleMode === "diary"
+            ? ["", "날짜별 기록을 잇자 누군가 사건 전에 도망 계획을 알고 있었음이 드러납니다."][specialPuzzleStep]
             : specialPuzzleMode === "hopaeMark"
               ? ["", "탁본의 짙고 이어진 원래 홈 위로, 옅고 끊긴 새 긁힘이 겹칩니다. 누군가 이름 홈을 나중에 일부러 훼손했습니다."][specialPuzzleStep]
               : specialPuzzleMode === "shoeMud" ? ["", "진흙 본과 드러난 짚신 밑창에 같은 짜임이 남았습니다. 다른 발자국과 대조할 수 있는 밑창 무늬를 확보했습니다."][specialPuzzleStep]
               : specialPuzzleMode === "footprintTrace" ? ["", "기름 한지에 짧고 좁은 발 윤곽과 이동 방향이 그대로 남았습니다. 짚신 밑창 기록과 대조할 수 있습니다."][specialPuzzleStep]
           : specialPuzzleMode === "portrait"
-            ? ["", "묶인 초상 안에서 여러 번 고쳐 그린 돌쇠의 얼굴과 지우다 남은 ‘떠나지 마라’가 드러났습니다. 춘월이 오래 숨겨 둔 마음입니다."][specialPuzzleStep]
+            ? ["", "묶인 초상에서 여러 번 고친 얼굴과 가장자리의 지운 글씨 획이 드러났습니다."][specialPuzzleStep]
             : specialPuzzleMode === "ink"
               ? ["", "첫 먹은 천천히 번지고 가장자리가 고르게 마릅니다.", "다른 먹은 빠르게 퍼져 테두리가 짙게 남습니다.", "원문과 덧쓴 문장은 같은 때 쓴 것이 아니라, 다른 먹으로 나중에 고친 흔적입니다."][specialPuzzleStep]
           : specialPuzzleStep < 3 ? `한 단계 진행했습니다 · ${specialPuzzleStep}/3` : specialPuzzleMode === "norigae" ? "매듭 속 낯선 남색 섬유가 드러났습니다." : specialPuzzleMode === "bundle" ? "보따리 속 이동 준비물이 모두 드러났습니다." : specialPuzzleMode === "ink" ? "문서와 같은 먹 농도를 찾았습니다." : specialPuzzleMode === "portrait" ? "처음 그린 선과 지워진 흔적을 복원했습니다." : specialPuzzleMode === "hopaeThread" ? "끈 굵기와 오래된 마찰 홈이 정확히 맞습니다." : specialPuzzleMode === "stride" ? "짚신보다 발자국의 길이와 보폭이 짧습니다." : specialPuzzleMode === "silk" ? "비단실이 날이 아니라 강한 힘에 끊겼습니다." : "두 증거의 물리적 관계가 이어졌습니다.";

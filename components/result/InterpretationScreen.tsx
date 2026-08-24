@@ -14,6 +14,11 @@ const evidence = [
     text: "돌쇠의 투박한 말투와 달리 지나치게 정중했다. 춘월이 돌쇠인 척 써 점순을 창고로 불러낸 미끼였다."
   },
   {
+    name: "찢어진 옷고름",
+    image: "/samunmong/assets/mudeok-interaction/evidence-torn-collar-tie.webp",
+    text: "비단 옷고름의 폭과 마찰 흔적이 점순의 목에 남은 좁은 압박 자국과 맞아 범행 수법을 드러냈다."
+  },
+  {
     name: "팔의 긁힌 자국",
     image: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp",
     text: "점순은 목이 졸리는 마지막 순간까지 저항했다. 손톱 밑 흔적과 춘월의 상처가 그 몸싸움을 증명했다."
@@ -110,7 +115,7 @@ export default function InterpretationScreen() {
             <span>三</span>
             <div>
               <p>거짓을 깬 흔적</p>
-              <h2 id="evidenceTitle">세 가지 결정적 증거</h2>
+              <h2 id="evidenceTitle">네 가지 결정적 증거</h2>
             </div>
           </div>
           <div className="interpretation-evidence-grid">
