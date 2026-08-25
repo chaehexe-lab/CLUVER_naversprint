@@ -108,11 +108,9 @@
       ? magicBriefingText
       : sentenceBreakText("“사또님, 관아 근처에서 사람이 쓰러진 채 발견되었습니다.”\n\n당신은 이 꿈에서 고을의 사또입니다.\n현장을 조사하여 증거를 모으고, 용의자를 심문하여 범인을 찾아야 합니다.");
     const magicSuspects = [
-      { name: "건달프", id: "gandalf", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/gandalf-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
-      { name: "덩쿨도어", id: "dunguldoor", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/dunguldoor-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
-      { name: "말포일", id: "malpoil", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malpoil-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
       { name: "말포이", id: "malpoi", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malpoi-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
-      { name: "말포삼", id: "malposam", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malposam-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" }
+      { name: "말포삼", id: "malposam", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malposam-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
+      { name: "말포일", id: "malpoil", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malpoil-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" }
     ];
     const spaceSuspects = [
       { name: "해리", id: "harry", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/harry-upper-transparent.webp", sleeveScene: "/assets/space-station/characters/harry-upper-transparent.webp" },
@@ -159,7 +157,7 @@
     }
 
     let suspectIndex = 0;
-    let activeNoteSuspectId = suspects[0]?.id || (isSpaceTheme ? "harry" : isMagicTheme ? "gandalf" : "dolsoe");
+    let activeNoteSuspectId = suspects[0]?.id || (isSpaceTheme ? "harry" : isMagicTheme ? "malpoi" : "dolsoe");
     let briefingStepIndex = 0;
     let briefingRestoreTimer = 0;
     let isBriefingTyped = false;
@@ -1320,11 +1318,9 @@
       const suspectGrid = document.querySelector(".briefing-suspect-tags");
       if (suspectGrid && !magicRecordIntro) {
         const roles = {
-          gandalf: "경비원",
-          dunguldoor: "학년부장",
-          malpoil: "모범생",
-          malpoi: "천재 학생",
-          malposam: "환각 마법 학생"
+          malpoi: "화염 마법 학생",
+          malposam: "환각 마법 학생",
+          malpoil: "모범생"
         };
         suspectGrid.innerHTML = magicSuspects.map((suspect) => `
           <section class="briefing-suspect-tag magic-suspect-tag" data-suspect="${suspect.name}">
@@ -1581,13 +1577,10 @@
     ];
     const magicThemeStartAssets = [
       "/samunmong/assets/magic-school/scenes/alchemy-lab.webp",
-      "/samunmong/assets/magic-school/scenes/cleaning-closet.webp",
       "/samunmong/assets/magic-school/scenes/library.webp",
-      "/samunmong/assets/magic-school/interrogation/gandalf.webp",
-      "/samunmong/assets/magic-school/interrogation/dunguldoor.webp",
-      "/samunmong/assets/magic-school/interrogation/malpoil.webp",
       "/samunmong/assets/magic-school/interrogation/malpoi.webp",
-      "/samunmong/assets/magic-school/interrogation/malposam.webp"
+      "/samunmong/assets/magic-school/interrogation/malposam.webp",
+      "/samunmong/assets/magic-school/interrogation/malpoil.webp"
     ];
     const spaceThemeStartAssets = [
       "/assets/space-station/backgrounds/orbit-13-airlock-evidence-v3.webp",

@@ -11,6 +11,7 @@ export type InterrogationFact = {
   fact: string;
   visibility: FactVisibility;
   evidenceNames?: string[];
+  requiresAllEvidence?: boolean;
   responseMode?: InterrogationReaction;
   pressure?: number;
   discoverable?: boolean;
@@ -34,7 +35,12 @@ const commonSemanticAliases: Record<string, string[]> = {
   injury: ["상처", "긁히다", "피", "붕대", "팔", "저항", "몸싸움"],
   ribbon: ["옷고름", "비단", "끈", "목", "조르다", "찢어지다", "향"],
   death: ["죽음", "살해", "범인", "시신", "점순", "어떻게 죽", "누가 죽"],
-  diary: ["일기", "기록", "뒷문", "목격", "들었다", "보았다", "말했다"]
+  diary: ["일기", "기록", "뒷문", "목격", "들었다", "보았다", "말했다"],
+  wand: ["지팡이", "부러진 지팡이", "폐기함", "버렸다", "누명"],
+  rune: ["룬스톤", "경보", "빙결", "얼리다", "화염 감지"],
+  crystal: ["수정구", "기록", "환각", "조작", "출입 기록"],
+  library: ["도서관", "대출", "보안 마법책", "책", "공부"],
+  arson: ["방화", "불", "화재", "실습실", "범인"]
 };
 
 export const interrogationFacts: InterrogationFact[] = [
@@ -235,6 +241,107 @@ export const interrogationFacts: InterrogationFact[] = [
     responseMode: "nervous",
     pressure: 2,
     discoverable: true
+  },
+  {
+    id: "MALPOI_DISCARDED_WAND",
+    suspectIds: ["malpoi", "malpoil"],
+    topics: ["wand", "arson"],
+    aliases: ["말포이 지팡이", "버린 지팡이", "기숙사 폐기함", "주워 간 지팡이"],
+    fact: "말포이는 사건 전에 부러진 지팡이를 기숙사 폐기함에 버렸으며, 누군가 그 지팡이를 가져가 범행에 다시 사용할 수 있었다.",
+    visibility: "collected",
+    evidenceNames: ["부러진 지팡이"],
+    responseMode: "nervous",
+    pressure: 1,
+    discoverable: true
+  },
+  {
+    id: "MALPOI_CANNOT_FREEZE_RUNE",
+    suspectIds: ["malpoi", "malpoil"],
+    topics: ["rune", "arson"],
+    aliases: ["빙결 마법을 못 쓴다", "룬스톤을 얼리지 못한다", "화염 마법 학생"],
+    fact: "말포이는 강한 화염 마법은 사용하지만 경보 룬스톤을 멈출 만큼 정교한 빙결 마법은 사용하지 못한다.",
+    visibility: "collected",
+    evidenceNames: ["화염 감지 룬스톤"],
+    responseMode: "attentive",
+    pressure: 2,
+    discoverable: true
+  },
+  {
+    id: "MALPOSAM_ALIBI",
+    suspectIds: ["malposam"],
+    topics: ["alibi", "crystal"],
+    aliases: ["기록 수정구실", "수정구실에 있었다", "사건 당시 위치"],
+    fact: "말포삼은 사건 당시 기록 수정구실에 있었으며 처음에는 수정구를 만지지 않았다고 주장한다.",
+    visibility: "public",
+    responseMode: "avoid",
+    pressure: 1
+  },
+  {
+    id: "MALPOSAM_CAST_ILLUSION",
+    suspectIds: ["malposam", "malpoil"],
+    topics: ["crystal", "arson"],
+    aliases: ["환각 마법", "출입 기록을 가렸다", "수정구 조작"],
+    fact: "조작된 기록 수정구의 환각 마력은 말포삼의 것이며, 그는 증거를 확인하면 자신이 기록을 가렸다는 사실을 인정한다.",
+    visibility: "collected",
+    evidenceNames: ["조작된 기록 수정구"],
+    responseMode: "shocked",
+    pressure: 3,
+    discoverable: true
+  },
+  {
+    id: "MALPOSAM_NAMES_MALPOIL",
+    suspectIds: ["malposam", "malpoil"],
+    topics: ["crystal", "relationship", "arson"],
+    aliases: ["누가 부탁", "말포일 부탁", "깜짝 실험", "기록을 가려 달라"],
+    fact: "말포삼은 말포일이 깜짝 실험을 준비한다며 복도 출입 기록을 잠시 가려 달라고 부탁했다고 진술한다.",
+    visibility: "collected",
+    evidenceNames: ["말포삼의 자백"],
+    responseMode: "shocked",
+    pressure: 3,
+    discoverable: true
+  },
+  {
+    id: "MALPOIL_LIBRARY_ALIBI",
+    suspectIds: ["malpoil"],
+    topics: ["alibi", "library"],
+    aliases: ["도서관에서 공부", "기숙사로 돌아갔다", "사건 당시 행적"],
+    fact: "말포일은 사건 당시 도서관에서 공부한 뒤 곧바로 기숙사로 돌아갔다고 주장한다.",
+    visibility: "public",
+    responseMode: "calm"
+  },
+  {
+    id: "MALPOIL_SECURITY_BOOK",
+    suspectIds: ["malpoil", "malpoi", "malposam"],
+    topics: ["library", "rune", "arson"],
+    aliases: ["보안 마법책", "경보 해제법", "말포일 대출", "빙결 마법책"],
+    fact: "말포일은 사건 전날 빙결 마법으로 화염 경보 룬스톤을 멈추는 방법이 적힌 보안 마법책을 빌렸다.",
+    visibility: "collected",
+    evidenceNames: ["도서관 대출 기록부"],
+    responseMode: "nervous",
+    pressure: 2,
+    discoverable: true
+  },
+  {
+    id: "MALPOIL_ALIBI_BROKEN",
+    suspectIds: ["malpoil"],
+    topics: ["library", "crystal", "alibi", "arson"],
+    aliases: ["알리바이 모순", "기록 조작 지시", "경보 해제 준비"],
+    fact: "말포일은 경보 해제법을 미리 조사했고 말포삼에게 자신의 출입 기록을 가리게 했으므로 도서관에만 있었다는 알리바이가 성립하지 않는다.",
+    visibility: "collected",
+    evidenceNames: ["도서관 대출 기록부", "말포삼의 자백"],
+    requiresAllEvidence: true,
+    responseMode: "silent",
+    pressure: 4,
+    discoverable: true
+  },
+  {
+    id: "MALPOIL_ARSON_TRUTH",
+    suspectIds: ["malpoil"],
+    topics: ["wand", "rune", "crystal", "arson"],
+    aliases: ["진범", "범행 전말", "누명을 씌웠다", "열등감"],
+    fact: "말포일은 말포이에게 누명을 씌우려고 버려진 지팡이를 사용해 불을 지르고, 빙결 마법으로 경보를 멈춘 뒤 말포삼에게 기록 조작을 부탁했다.",
+    visibility: "never",
+    responseMode: "silent"
   }
 ];
 
@@ -260,7 +367,10 @@ function canUseFact(fact: InterrogationFact, collectedEvidence: Set<string>, rev
   if (fact.visibility === "never" || fact.visibility === "hidden") return false;
   if (fact.visibility === "public") return true;
   if (fact.visibility === "revealed") return revealedFacts.has(fact.id);
-  return (fact.evidenceNames || []).some((name) => collectedEvidence.has(name));
+  const evidenceNames = fact.evidenceNames || [];
+  return fact.requiresAllEvidence
+    ? evidenceNames.length > 0 && evidenceNames.every((name) => collectedEvidence.has(name))
+    : evidenceNames.some((name) => collectedEvidence.has(name));
 }
 
 function baselineFacts(persona: SuspectPersona): InterrogationFact[] {

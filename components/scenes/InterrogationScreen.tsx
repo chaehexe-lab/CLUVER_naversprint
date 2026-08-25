@@ -114,11 +114,9 @@ const THEME_INTERROGATION_COPY: Record<GameTheme, {
     toolKicker: "마력 감식대",
     toolTitle: "잔류 마력 분석",
     suspects: [
-      { id: "gandalf", name: "건달프" },
-      { id: "dunguldoor", name: "덩쿨도어" },
-      { id: "malpoil", name: "말포일" },
       { id: "malpoi", name: "말포이" },
-      { id: "malposam", name: "말포삼" }
+      { id: "malposam", name: "말포삼" },
+      { id: "malpoil", name: "말포일" }
     ]
   },
   spaceStation: {
@@ -167,9 +165,9 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
     : isSpaceTheme
       ? "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp"
     : "/samunmong/assets/scene-interrogation-room-empty.png";
-  const initialSuspect = isSpaceTheme ? "harry" : isMagicTheme ? "gandalf" : "dolsoe";
-  const initialSprite = isSpaceTheme ? "/assets/space-station/characters/harry-upper-transparent.webp" : isMagicTheme ? "/samunmong/assets/magic-school/interrogation/gandalf-sprite.webp" : "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707";
-  const initialName = isSpaceTheme ? "해리" : isMagicTheme ? "건달프" : "돌쇠";
+  const initialSuspect = isSpaceTheme ? "harry" : isMagicTheme ? "malpoi" : "dolsoe";
+  const initialSprite = isSpaceTheme ? "/assets/space-station/characters/harry-upper-transparent.webp" : isMagicTheme ? "/samunmong/assets/magic-school/interrogation/malpoi-sprite.webp" : "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707";
+  const initialName = isSpaceTheme ? "해리" : isMagicTheme ? "말포이" : "돌쇠";
   const mapIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/orbit-blueprint.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-school-map.webp" : "/samunmong/assets/labels/transparent/tool-village-map.webp";
   const noteIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/log-record.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/labels/transparent/tool-note-short.webp";
   const journalIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/final-report.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/ui-generated/tool-case-journal.webp";

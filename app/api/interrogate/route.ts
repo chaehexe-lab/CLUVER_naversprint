@@ -1,4 +1,5 @@
 import { evidenceCatalog, getSuspectSpecialAnswer, suspectPersonas, type EvidenceReaction, type SuspectPersona } from "@/lib/suspectPersonas";
+import { getMagicSchoolFallbackDialogue, magicSchoolSuspectIds } from "@/lib/magicSchoolPersonas";
 import {
   retrieveInterrogationFacts,
   selectNewFactId,
@@ -36,8 +37,7 @@ type InterrogateRequest = {
 const OPENAI_RESPONSES_ENDPOINT = "https://api.openai.com/v1/responses";
 const FOREIGN_TEXT_PATTERN = /[A-Za-z\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3040-\u30FF\u0400-\u04FF\u0600-\u06FF\u0900-\u097F]/;
 const ALIBI_QUESTION_PATTERN = /(알리바이|어제|사건\s*당일|그날|그\s*밤|그때|행적|어디 있었|뭐 했|무엇을 했)/;
-const CASE_SUBJECT_PATTERN = /(피해자|사망자|점순|죽|살해|사건|시신|목\s*졸|목을\s*졸|편지|호패|옷고름|도망|돌쇠|춘월|유문석|무덕|방화|화재|불|실습실|마법|마력|지팡이|룬스톤|경보|빙결|환각|수정구|도서관|대출|담배|건달프|덩쿨도어|말포일|말포이|말포삼|우주|정거장|오르빗|데이비드|메르스|해리|알라딘딘|아인슈페너|에어록|우주복|레버|무전|로그|의료|산소|압력|센서|정전|로봇\s*팔|근위축증|젤)/;
-const MAGIC_SUSPECT_IDS = new Set(["gandalf", "dunguldoor", "malpoil", "malpoi", "malposam"]);
+const CASE_SUBJECT_PATTERN = /(피해자|사망자|점순|죽|살해|사건|시신|목\s*졸|목을\s*졸|편지|호패|옷고름|도망|돌쇠|춘월|유문석|무덕|방화|화재|불|실습실|마법|마력|지팡이|룬스톤|경보|빙결|환각|수정구|도서관|대출|담배|건달프|덩쿨도어|말포일|말포이|말포삼|우주|정거장|오르빗|데이비드|메르스|해리|알라딘딘|안성줴줴이|아인슈페너|에어록|우주복|레버|무전|로그|의료|산소|압력|센서|정전|로봇\s*팔|근위축증|젤)/;
 const SPACE_SUSPECT_IDS = new Set(["harry", "mers", "aladdindin", "einspanner"]);
 const CHUNWOL_DIRECT_PRESSURE_PATTERNS = [
   { evidenceName: "찢어진 옷고름", pattern: /(범인|죽였|살해|목\s*졸|목을\s*졸|목\s*조른|옷고름|비단\s*끈|목끈)/ },
@@ -208,7 +208,7 @@ function buildResponseMeta(facts: InterrogationFact[], reaction: InterrogationRe
 
 function buildSystemPrompt(persona: SuspectPersona, evidenceNames: string[], reactions: EvidenceReaction[], retrievedFacts: InterrogationFact[]) {
   const pressureCount = countBreakEvidence(persona, evidenceNames);
-  const isMagicPersona = MAGIC_SUSPECT_IDS.has(persona.id);
+  const isMagicPersona = magicSchoolSuspectIds.has(persona.id);
   const isSpacePersona = SPACE_SUSPECT_IDS.has(persona.id);
   const caseSubjectRule = isSpacePersona
     ? `질문 맥락 확인 규칙:
@@ -365,6 +365,16 @@ function fallbackAnswer(
   wasQuestionTruncated = false,
   meta?: ReturnType<typeof buildResponseMeta>
 ) {
+  const magicDialogue = getMagicSchoolFallbackDialogue(persona.id, question, evidenceNames);
+  if (magicDialogue) {
+    return {
+      answer: applyLongQuestionNotice(magicDialogue, wasQuestionTruncated),
+      source: "fallback",
+      warning: reason,
+      ...meta
+    };
+  }
+
   const guide = reactions[0]?.responseGuide;
   const evidenceText = evidenceNames[0] ? ` ${evidenceNames[0]} 말씀이십니까.` : "";
   const base = guide || (hasAlibiIntent(question) ? persona.fixedAlibi : hasCaseSubjectIntent(question) ? persona.publicTruth : "누구를 두고 물으시는지 먼저 말씀해 주십시오.");
