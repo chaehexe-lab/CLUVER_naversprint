@@ -89,7 +89,7 @@ function ActiveInvestigationScene({ screenId }: { screenId: string }) {
   if (InvestigationComponent) return <InvestigationComponent />;
 
   const magicScene = MAGIC_SCENES_BY_ID.get(screenId);
-  if (magicScene) return <MagicSchoolScene scene={magicScene} />;
+  if (magicScene) return <MagicSchoolScene key={magicScene.id} scene={magicScene} />;
 
   const spaceScene = SPACE_SCENES_BY_ID.get(screenId);
   return spaceScene ? <SpaceStationScene scene={spaceScene} /> : null;

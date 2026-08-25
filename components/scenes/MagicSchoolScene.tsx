@@ -1,13 +1,21 @@
+"use client";
+
+import { useCallback, useState } from "react";
+import MagicSpellSystem from "@/components/MagicSpellSystem";
 import { magicSchoolScenes } from "@/lib/gameData";
 import { hotspotStyle } from "./hotspotStyle";
 
 type MagicScene = (typeof magicSchoolScenes)[number];
 
 export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
+  const [lightEnabled, setLightEnabled] = useState(false);
+  const handleLightChange = useCallback((enabled: boolean) => setLightEnabled(enabled), []);
+
   return (
-    <section className="screen magic-school-screen" id={scene.id}>
+    <section className={`screen active magic-school-screen${lightEnabled ? " light-magic-active" : ""}`} id={scene.id}>
       <img className="plate" src={scene.image} alt={scene.alt} />
       <div className="shade magic-shade" />
+      <div className="magic-light-bloom" aria-hidden="true" />
 
       {scene.hotspots.map((hotspot) => {
         const hotspotKey = "id" in hotspot && typeof hotspot.id === "string" ? hotspot.id : hotspot.evidenceName;
@@ -49,6 +57,7 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
           );
         })}
       </nav>
+      <MagicSpellSystem sceneId={scene.id} onLightChange={handleLightChange} />
     </section>
   );
 }
