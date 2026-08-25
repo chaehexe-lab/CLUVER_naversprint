@@ -320,12 +320,6 @@ const spaceDock = [
     label: "증거 보관함"
   },
   {
-    className: "tool-chip open-tool-panel",
-    ariaLabel: "스캔 도구 열기",
-    image: "/assets/space-station/ui-icons-v3/scan-tool.webp",
-    label: "스캔 도구"
-  },
-  {
     className: "note-chip open-note-panel",
     ariaLabel: "로그 기록 열기",
     image: "/assets/space-station/ui-icons-v3/log-record.webp",

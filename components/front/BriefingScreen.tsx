@@ -163,6 +163,8 @@ function MagicStartCaseButtonArt({ label }: { label: string }) {
 }
 
 function SpaceStationBriefingScreen() {
+  const [briefingStep, setBriefingStep] = useState(0);
+
   return (
     <section className="screen briefing-screen space-station-briefing-screen" id="briefingScreen">
       <img
@@ -173,14 +175,14 @@ function SpaceStationBriefingScreen() {
       <div className="shade" />
       <article
         className="hud briefing-card"
-        data-briefing-step="0"
+        data-briefing-step={briefingStep}
         style={{
-          width: "min(820px, 56vw)",
+          width: briefingStep === 0 ? "min(820px, 56vw)" : "min(1180px, 82vw)",
           minHeight: "auto",
           left: "50%",
           top: "50%",
           gap: "12px",
-          padding: "34px 44px 10px",
+          padding: briefingStep === 0 ? "34px 44px 10px" : "20px 40px 8px",
           border: "1px solid rgba(160, 207, 229, .36)",
           borderRadius: "22px",
           color: "#eaf6ff",
@@ -189,10 +191,52 @@ function SpaceStationBriefingScreen() {
           backdropFilter: "blur(3px)"
         }}
       >
-        <p className="briefing-kicker">ORBIT-13 INCIDENT LOG</p>
-        <h2>우주정거장 살인사건</h2>
-        <div className="briefing-step active" data-briefing-panel="0">
+        {briefingStep === 0 ? <p className="briefing-kicker">ORBIT-13 INCIDENT LOG</p> : null}
+        <h2>{briefingStep === 0 ? "우주정거장 살인사건" : "데이비드의 마지막 생체 기록"}</h2>
+        <div className={`briefing-step${briefingStep === 0 ? " active" : ""}`} data-briefing-panel="0">
           <div className="briefing-copy" id="briefingCopy" aria-live="polite" />
+        </div>
+        <div className={`briefing-step space-remote-report${briefingStep === 1 ? " active" : ""}`} data-briefing-panel="1">
+          <div className="space-report-left">
+            <section className="space-crew-profile">
+              <span className="space-profile-label">피해자</span>
+              <div className="space-profile-identity">
+                <div className="space-profile-visual">
+                  <img src="/assets/space-station/characters/david-upper.png" alt="데이비드 대원 프로필" draggable={false} />
+                  <span className="space-critical-status">STATUS CRITICAL</span>
+                </div>
+                <div><strong>데이비드</strong><p>오르빗-13 수석 엔지니어</p></div>
+              </div>
+            </section>
+            <div className="space-status-chip"><span>현재 상태</span><strong>시신 미회수 · 사망 추정</strong></div>
+          </div>
+          <div className="space-report-right">
+            <section className="space-report-summary">
+              <h3>최종 원격 판정 기록</h3>
+              <div className="space-report-summary-body">
+                <div className="space-report-summary-copy">
+                  <p>외부 작업 중 갑작스러운 심박 이상과 근력 저하가 감지되었습니다.<br />직후 추진 레버가 응답하지 않았고 산소 수치가 비정상적으로 감소했습니다.</p>
+                  <p>안전줄 체결 신호가 해제된 뒤 구조 가능 궤도를 벗어났으며,<br />생체 신호와 통신이 모두 끊겼습니다.</p>
+                  <p className="space-report-verdict">시신을 회수하지 못해 정확한 사인은 확정할 수 없으나,<br />이탈 전부터 이어진 신체 이상과 장비 오류는 단순 외부 작업 사고로 보기 어렵습니다.</p>
+                </div>
+                <img
+                  className="space-body-scan-image"
+                  src="/assets/space-station/panels/digital-human-scan-v3.png"
+                  alt="디지털 인체 스캔 장식"
+                  draggable={false}
+                />
+              </div>
+            </section>
+            <section className="space-timeline-panel">
+              <h3>사건 로그 타임라인</h3>
+              <ol className="space-report-timeline" aria-label="정거장 시각 기록">
+                <li><time>22:14</time><span>외부 작업 시작</span></li><li><time>22:19</time><span>심박 이상 · 악력 급감</span></li>
+                <li><time>22:21</time><span>추진 레버 응답 정지</span></li><li><time>22:22</time><span>우주복 산소 수치 급락</span></li>
+                <li><time>22:23</time><span>안전줄 체결 신호 해제</span></li><li><time>22:24</time><span>마지막 무전 수신</span></li>
+                <li><time>22:26</time><span>생체 신호 · 통신 두절</span></li>
+              </ol>
+            </section>
+          </div>
         </div>
         <div className="briefing-actions">
           <button
@@ -205,10 +249,16 @@ function SpaceStationBriefingScreen() {
           </button>
         </div>
         <button
-          id="spaceBriefingNext"
+          key={briefingStep}
+          id={briefingStep === 0 ? "spaceBriefingReportNext" : "spaceBriefingNext"}
           type="button"
-          data-go="spaceAirlock"
-          aria-label="다음 화면으로 이동"
+          {...(briefingStep === 1 ? { "data-go": "spaceAirlock" } : {})}
+          onClick={briefingStep === 0 ? ((event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            setBriefingStep(1);
+          }) : undefined}
+          aria-label={briefingStep === 0 ? "생체 기록 보기" : "에어록으로 이동"}
           style={{
             justifySelf: "center",
             width: "clamp(155px, 16.2vw, 234px)",

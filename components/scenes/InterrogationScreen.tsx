@@ -287,10 +287,12 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             <img src={bagIcon} alt="" />
             <span className="sr-only">{copy.bag}</span>
           </button>
-          <button className="scene-chip tool-chip open-tool-panel" type="button" aria-label={`${copy.tools} 열기`}>
-            <img src={toolIcon} alt="" />
-            <span className="sr-only">{copy.tools}</span>
-          </button>
+          {!isSpaceTheme ? (
+            <button className="scene-chip tool-chip open-tool-panel" type="button" aria-label={`${copy.tools} 열기`}>
+              <img src={toolIcon} alt="" />
+              <span className="sr-only">{copy.tools}</span>
+            </button>
+          ) : null}
           <button className="tool-prop hint-prop" id="interrogationHint" type="button" aria-label="심문 힌트">
             <img src={hintIcon} alt="" />
             <span className="sr-only">힌트</span>

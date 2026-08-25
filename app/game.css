@@ -2240,6 +2240,100 @@
       display: none;
     }
 
+    .space-station-briefing-screen .briefing-card[data-briefing-step="1"] {
+      max-height: min(840px, 92vh);
+      font-family: "VitroPride", "Noto Sans KR", sans-serif;
+    }
+
+    .space-station-briefing-screen .briefing-card[data-briefing-step="1"] h2 {
+      margin: 0;
+      color: #eaf6ff;
+      font-size: clamp(29px, 3vw, 43px);
+    }
+
+    .space-station-briefing-screen .briefing-card[data-briefing-step="1"] .briefing-kicker {
+      border-color: #eaf6ff;
+      color: #eaf6ff;
+      font-family: inherit;
+      font-size: 13px;
+    }
+
+    .space-remote-report.active {
+      width: 100%;
+      min-height: 0;
+      display: grid;
+      justify-self: stretch;
+      justify-items: stretch;
+      box-sizing: border-box;
+      grid-template-columns: minmax(300px, 330px) minmax(0, 1fr);
+      gap: 10px;
+      margin: 18px 0 0;
+      color: #dcecf7;
+      text-align: left;
+    }
+
+    .space-report-left,
+    .space-report-right { display: grid; gap: 10px; align-content: start; }
+    .space-report-right { grid-template-rows: 250px 190px; }
+    .space-report-left { padding: 11px 17px 11px 17px; border: 1px solid rgba(126, 207, 246, .42); border-radius: 22px; background: rgba(7, 13, 20, .48); box-shadow: inset 0 0 24px rgba(78, 176, 225, .08); }
+    .space-crew-profile { display: grid; gap: 6px; padding: 0; }
+    .space-profile-label {
+      display: block;
+      width: 100%;
+      box-sizing: border-box;
+      padding: 0 0 8px;
+      color: #9edfff;
+      font-size: 19px;
+      font-weight: 700;
+    }
+    .space-profile-label::after {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 1px;
+      margin-top: 8px;
+      background: linear-gradient(90deg, rgba(126, 207, 246, .58), rgba(126, 207, 246, 0));
+    }
+    .space-status-chip span { display: block; color: #83d6ff; font-size: 14px; }
+    .space-profile-identity { display: grid; grid-template-columns: 142px minmax(0, 1fr); gap: 13px; align-items: center; padding-bottom: 10px; }
+    .space-profile-visual { display: grid; gap: 6px; }
+    .space-profile-identity img { width: 142px; height: 180px; object-fit: contain; object-position: center bottom; background: rgba(1, 8, 14, .48); }
+    .space-critical-status { display: grid; min-height: 24px; place-items: center; border: 1px solid rgba(255, 86, 86, .78); color: #ff6666; font-size: 11px; font-weight: 700; letter-spacing: .08em; background: rgba(72, 8, 12, .22); }
+    .space-profile-identity strong { display: block; color: #f1f9ff; font-size: clamp(22px, 1.8vw, 27px); line-height: 1.1; }
+    .space-profile-identity p { margin: 10px 0 0; color: #8fdcff; font-size: 14px; line-height: 1.45; white-space: nowrap; }
+    .space-status-chip { padding: 7px 12px 9px; border-left: 3px solid #ff5d5d; background: linear-gradient(90deg, rgba(106, 18, 25, .28), rgba(72, 8, 16, .1)); box-shadow: none; }
+    .space-status-chip span { margin-bottom: 5px; color: #ff6666; }
+    .space-status-chip strong { display: block; color: #f0f8ff; font-size: 19px; letter-spacing: .03em; text-align: left; white-space: nowrap; }
+    .space-report-summary, .space-timeline-panel { border: 1px solid rgba(126, 207, 246, .42); border-radius: 22px; background: #010d1b; box-shadow: inset 0 0 24px rgba(78, 176, 225, .07); }
+    .space-report-summary { background: linear-gradient(90deg, rgba(7, 13, 20, .48) 0%, rgba(3, 13, 27, .82) 58%, #010d1b 100%); }
+    .space-timeline-panel { background: rgba(7, 13, 20, .48); }
+    .space-report-summary { position: relative; padding: 10px 17px 10px 17px; overflow: hidden; }
+    .space-report-summary h3, .space-timeline-panel h3 { margin: 0; padding: 0 0 8px; color: #9edfff; font-size: 19px; }
+    .space-report-summary h3 { width: calc(100% - 226px); }
+    .space-timeline-panel h3 { width: 100%; }
+    .space-report-summary h3::after,
+    .space-timeline-panel h3::after {
+      content: "";
+      display: block;
+      width: 100%;
+      height: 1px;
+      margin-top: 8px;
+      background: linear-gradient(90deg, rgba(126, 207, 246, .58), rgba(126, 207, 246, 0));
+    }
+    .space-report-summary-body { position: relative; display: block; }
+    .space-report-summary-copy { position: relative; z-index: 2; }
+    .space-report-summary p { margin: 6px 0; font-size: 15.5px; line-height: 1.4; word-break: keep-all; }
+    .space-report-summary p + p { margin-top: 14px; }
+    .space-report-summary strong { color: #fff; }
+    .space-report-summary .space-report-verdict { margin-top: 8px; padding-top: 0; border-top: 0; color: #f1f8fc; }
+    .space-body-scan-image { position: absolute; z-index: 1; right: -4px; top: 50%; display: block; width: 220px; height: 220px; object-fit: contain; user-select: none; transform: translateY(-55%); }
+    .space-timeline-panel { padding: 13px 14px 10px 17px; }
+    .space-report-timeline { position: relative; display: grid; grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, auto); grid-auto-flow: column; gap: 7px 18px; margin: 8px 0 0; padding: 0; list-style: none; }
+    .space-report-timeline li { position: relative; display: grid; grid-template-columns: 52px 1fr; gap: 8px; padding-left: 9px; font-size: 15.5px; }
+    .space-report-timeline li::after { content: ""; position: absolute; z-index: 0; left: 1.5px; top: -7px; bottom: -7px; width: 1px; background: rgba(118, 212, 255, .38); }
+    .space-report-timeline li::before { content: ""; position: absolute; z-index: 1; left: 0; top: .48em; width: 4px; height: 4px; border-radius: 50%; background: #76d4ff; box-shadow: 0 0 6px #53b9e9; }
+    .space-report-timeline time { color: #7dd8ff; font-weight: 700; }
+
     .button.primary.briefing-start {
       position: relative;
       min-width: 178px;
@@ -3274,6 +3368,16 @@
 
     html[data-samunmong-theme="spaceStation"] .scene-dock .room-chip {
       left: calc(2.2% + 116px);
+    }
+
+    html[data-samunmong-theme="spaceStation"] .scene-dock .note-chip {
+      right: 2.4%;
+      bottom: 14%;
+    }
+
+    html[data-samunmong-theme="spaceStation"] .scene-dock .bag-chip {
+      right: 2.4%;
+      bottom: 3%;
     }
 
     .field-onboarding {
@@ -6878,11 +6982,11 @@
       width: min(400px, calc(100% - 28px));
       aspect-ratio: auto;
       min-width: 0;
-      min-height: 108px;
+      min-height: 96px;
       display: flex;
       align-items: center;
       gap: 0;
-      padding: 16px 22px;
+      padding: 10px 22px;
       border: 1px solid rgba(157, 220, 247, .72);
       border-radius: 8px;
       color: #eaf6ff;
@@ -6944,7 +7048,7 @@
       font-weight: 700;
       line-height: 1.25;
       text-shadow: 0 0 12px rgba(131, 218, 255, .14);
-      transform: translateY(-4px);
+      transform: translateY(1px);
     }
 
     html[data-samunmong-theme="spaceStation"] .toast.evidence-toast .toast-message {

@@ -1468,7 +1468,11 @@
         hint.appendChild(hintText);
       }
       hint.addEventListener("click", () => {
-        const remainingEvidence = evidenceHotspots.filter((hotspot) => !hotspot.classList.contains("collected"));
+        const collectedNames = isSpaceTheme ? new Set(readStoredNames(collectedEvidenceKey)) : null;
+        const remainingEvidence = isSpaceTheme
+          ? [...screen.querySelectorAll(".hotspot[data-evidence-name]")]
+              .filter((hotspot) => !collectedNames.has(hotspot.dataset.evidenceName || ""))
+          : evidenceHotspots.filter((hotspot) => !hotspot.classList.contains("collected"));
         if (!remainingEvidence.length) {
           showToast("이 장면의 증거를 모두 찾았습니다.", { variant: "hint" });
           return;
@@ -1617,6 +1621,7 @@
       "/assets/space-station/evidence/engineer-tool-clamp.webp",
       "/assets/space-station/evidence/coffee-tumbler.webp",
       "/assets/space-station/evidence/unauthorized-drug-ampoule.webp",
+      "/assets/space-station/panels/digital-human-scan-v3.png",
       "/assets/space-station/loading/space-transition-bg.webp"
     ];
     const themeStartAssets = isSpaceTheme ? spaceThemeStartAssets : isMagicTheme ? magicThemeStartAssets : joseonThemeStartAssets;
@@ -6078,6 +6083,7 @@
     const globalPanels = [...document.querySelectorAll(".global-panel")];
 
     function openGlobalPanel(id) {
+      if (isSpaceTheme && id === "toolPanel") return;
       if (id !== "mapPanel" && isFieldGuideBlockingControls()) return;
       if (document.querySelector("#mainScreen")?.classList.contains("active")) {
         globalPanels.forEach((panel) => {
