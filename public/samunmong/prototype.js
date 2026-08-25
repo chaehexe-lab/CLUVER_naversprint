@@ -1422,16 +1422,83 @@
       fieldGuideSkipButton = document.querySelector("#skipFieldGuide");
     }
 
+    // Collected evidence tooltip offsets: +x right, -x left, +y down, -y up.
+    const collectedEvidenceTooltipOffsets = {
+      "엔지니어 공구 클램프": { x: -10, y: 30 },
+      "얼어붙은 추진 레버 젤": { x: 20, y: 60 },
+      "마지막 무전 로그": { x: -130, y: 95 },
+      "소독천과 장갑": { x: 40, y: 35 },
+      "삭제된 의료 기록": { x: 35, y: 70 },
+      "조작된 지연 타이머": { x: -45, y: 25 },
+      "손상된 압력 센서": { x: -47, y: 25 },
+      "접속 키카드 칩": { x: 20, y: 34 },
+      "암호화된 연구 보상 계약": { x: -55, y: 20 },
+      "커피 텀블러": { x: 25, y: 65 },
+      "미승인 약물 앰풀": { x: 31, y: 60 }
+    };
+
+    function getCollectedEvidenceTooltip() {
+      let tooltip = document.querySelector("#collectedEvidenceTooltip");
+      if (tooltip) return tooltip;
+
+      tooltip = document.createElement("div");
+      tooltip.id = "collectedEvidenceTooltip";
+      tooltip.className = "collected-evidence-tooltip";
+      tooltip.setAttribute("role", "status");
+      tooltip.setAttribute("aria-hidden", "true");
+      tooltip.innerHTML = '<strong class="collected-evidence-tooltip-title"></strong>';
+      document.body.appendChild(tooltip);
+      return tooltip;
+    }
+
+    function showCollectedEvidenceTooltip(hotspot) {
+      if (!isSpaceTheme || !hotspot.classList.contains("collected")) return;
+      const tooltip = getCollectedEvidenceTooltip();
+      const title = tooltip.querySelector(".collected-evidence-tooltip-title");
+      const name = hotspot.dataset.evidenceName || hotspot.getAttribute("aria-label") || "수집한 증거";
+      if (title) title.textContent = getEvidenceDisplayName(name);
+
+      tooltip.classList.add("show");
+      tooltip.setAttribute("aria-hidden", "false");
+      const hotspotRect = hotspot.getBoundingClientRect();
+      const tooltipRect = tooltip.getBoundingClientRect();
+      const margin = 14;
+      const offset = collectedEvidenceTooltipOffsets[name] || { x: 0, y: 0 };
+      const left = Math.min(
+        window.innerWidth - tooltipRect.width / 2 - margin,
+        Math.max(tooltipRect.width / 2 + margin, hotspotRect.left + hotspotRect.width / 2 + offset.x)
+      );
+      const preferredTop = hotspotRect.top - tooltipRect.height - 14 + offset.y;
+      const top = preferredTop >= margin ? preferredTop : hotspotRect.bottom + 14 + offset.y;
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+    }
+
+    function hideCollectedEvidenceTooltip() {
+      const tooltip = document.querySelector("#collectedEvidenceTooltip");
+      if (!tooltip) return;
+      tooltip.classList.remove("show");
+      tooltip.setAttribute("aria-hidden", "true");
+    }
+
     function setupEvidenceScreen(screenId) {
       const screen = document.getElementById(screenId);
       if (!screen) return;
 
       const evidenceHotspots = [...screen.querySelectorAll(".hotspot[data-evidence-name], #hopaeHotspot, #portraitHotspot")];
-      evidenceHotspots.forEach((hotspot) => hotspot.classList.add("evidence-hotspot"));
+      evidenceHotspots.forEach((hotspot) => {
+        hotspot.classList.add("evidence-hotspot");
+        if (!isSpaceTheme || hotspot.dataset.collectedTooltipBound === "true") return;
+        hotspot.dataset.collectedTooltipBound = "true";
+        hotspot.addEventListener("mouseenter", () => showCollectedEvidenceTooltip(hotspot));
+        hotspot.addEventListener("mouseleave", hideCollectedEvidenceTooltip);
+        hotspot.addEventListener("focus", () => showCollectedEvidenceTooltip(hotspot));
+        hotspot.addEventListener("blur", hideCollectedEvidenceTooltip);
+      });
       readStoredNames(collectedEvidenceKey).forEach((name) => {
         screen.querySelectorAll(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((item) => {
           item.classList.add("collected");
-          if (item instanceof HTMLButtonElement) item.disabled = true;
+          if (item instanceof HTMLButtonElement) item.disabled = !isSpaceTheme;
           item.setAttribute("aria-disabled", "true");
         });
       });
@@ -1488,6 +1555,7 @@
 
     window.addEventListener("samunmong:screen-change", (event) => {
       const screenId = event.detail?.screenId || getActiveScreenId();
+      hideCollectedEvidenceTooltip();
       refreshFieldGuideNodes();
       setupEvidenceScreen(screenId);
       updateCurrentLocation(screenId);
@@ -3197,7 +3265,7 @@
     function markEvidenceCollectedInScene(name) {
       document.querySelectorAll(`[data-evidence-name="${name}"]`).forEach((item) => {
         item.classList.add("collected");
-        if (item instanceof HTMLButtonElement) item.disabled = true;
+        if (item instanceof HTMLButtonElement) item.disabled = !isSpaceTheme;
         item.setAttribute("aria-disabled", "true");
       });
       const propSelectors = {
