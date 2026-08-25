@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="420" height="132" viewBox="0 0 420 132" fill="none">
+  <defs>
+    <filter id="outerGlow" x="0" y="0" width="420" height="132" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="7" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.35 0 0 0 0 0.79 0 0 0 0 0.95 0 0 0 0.42 0"/>
+      <feBlend in="SourceGraphic" mode="screen"/>
+    </filter>
+    <linearGradient id="body" x1="210" y1="28" x2="210" y2="104" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#142838" stop-opacity="0.94"/>
+      <stop offset="0.52" stop-color="#07101B" stop-opacity="0.92"/>
+      <stop offset="1" stop-color="#111926" stop-opacity="0.96"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="38" y1="28" x2="382" y2="104" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9CD8EA" stop-opacity="0.84"/>
+      <stop offset="0.47" stop-color="#EFFCFF" stop-opacity="0.32"/>
+      <stop offset="1" stop-color="#D47B3C" stop-opacity="0.7"/>
+    </linearGradient>
+    <filter id="textGlow" x="90" y="28" width="240" height="80" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="2.6" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.35 0 0 0 0 0.82 0 0 0 0 1 0 0 0 0.75 0"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <g filter="url(#outerGlow)">
+    <rect x="38" y="28" width="344" height="76" rx="22" fill="url(#body)" stroke="url(#rim)" stroke-width="2.2"/>
+    <rect x="51" y="40" width="318" height="52" rx="16" stroke="white" stroke-opacity="0.12"/>
+    <path d="M73 49H148M272 49H347" stroke="#9EDDF0" stroke-opacity="0.23" stroke-width="2" stroke-linecap="round"/>
+    <path d="M73 83H148M272 83H347" stroke="#D48440" stroke-opacity="0.25" stroke-width="2" stroke-linecap="round"/>
+    <path d="M84 66L104 49H120L104 66L120 83H104L84 66Z" fill="#9EDDF0" fill-opacity="0.36"/>
+    <path d="M336 66L316 49H300L316 66L300 83H316L336 66Z" fill="#9EDDF0" fill-opacity="0.36"/>
+    <path d="M66 55H95L107 66M66 77H95L107 66" stroke="#8BD4EC" stroke-opacity="0.58" stroke-width="2" stroke-linecap="round"/>
+    <path d="M354 55H325L313 66M354 77H325L313 66" stroke="#E18D45" stroke-opacity="0.55" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="65" cy="66" r="4" fill="#D98A43" fill-opacity="0.78"/>
+    <circle cx="355" cy="66" r="4" fill="#8BD4EC" fill-opacity="0.78"/>
+  </g>
+  <text x="210" y="77" text-anchor="middle" filter="url(#textGlow)" fill="#EDFBFF" font-size="37" font-weight="700" letter-spacing="2" font-family="Apple SD Gothic Neo, Noto Sans KR, sans-serif">조사 시작</text>
+</svg>

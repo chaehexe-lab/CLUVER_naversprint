@@ -272,8 +272,10 @@ function SpaceStationBriefingScreen() {
           }}
         >
           <img
-            src="/assets/space-station/ui-buttons/space-next-button.svg"
-            alt="다음"
+            src={briefingStep === 0
+              ? "/assets/space-station/ui-buttons/space-next-button.svg"
+              : "/assets/space-station/ui-buttons/space-investigation-start-button.svg"}
+            alt={briefingStep === 0 ? "다음" : "조사 시작"}
             draggable={false}
             style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
           />
