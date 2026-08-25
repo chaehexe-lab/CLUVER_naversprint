@@ -1,12 +1,13 @@
 ﻿(() => {
+    if (window.__SAMUNMONG_PROTOTYPE_BOOTED__) return;
+    window.__SAMUNMONG_PROTOTYPE_BOOTED__ = true;
 
     const knownScreenIds = new Set([
       "mainScreen", "tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne",
       "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters",
       "backGateCourtyard", "magicAlchemyLab", "magicCleaningCloset", "magicLibrary",
       "magicRecordCrystalRoom", "magicDormHallway", "spaceAirlock", "spaceMedicalBay",
-      "spaceOxygenGenerator", "spaceDataCore", "spaceScienceLab", "spaceGalleyCorridor",
-      "spaceSuitPrep", "spaceObservation", "interrogationScreen"
+      "spaceOxygenGenerator", "spaceDataCore", "spaceScienceLab", "interrogationScreen"
     ]);
     const getScreens = () => [...document.querySelectorAll(".screen")];
     const fade = document.querySelector("#fade");
@@ -20,6 +21,7 @@
     const memoryOrbTrigger = document.querySelector("#memoryOrbTrigger");
     const briefingPrevButton = document.querySelector("#briefingPrev");
     const briefingNextButton = document.querySelector("#briefingNext");
+    const briefingJournalCloseButton = document.querySelector("#closeBriefingJournal");
     const magicRecordIntro = document.querySelector(".magic-record-intro");
     const magicRecordTabs = [...document.querySelectorAll("[data-record-card-tab]")];
     const magicStudentPages = [...document.querySelectorAll("[data-record-card]")];
@@ -44,6 +46,12 @@
     let fieldGuideNextButton = document.querySelector("#nextFieldGuide");
     let fieldGuideSkipButton = document.querySelector("#skipFieldGuide");
     let selectedEvidence = "";
+    const defaultInterrogationPrompts = [
+      "이 증거를 본 적 있나?",
+      "사건 직전 어디에 있었지?",
+      "이 물건이 왜 여기 있지?",
+      "숨긴 말이 더 있나?"
+    ];
     let currentToolResultEvidence = "";
     let isAskingAi = false;
     const interrogationHistories = new Map();
@@ -69,13 +77,25 @@
     const requestedTheme = entryParams.get("theme");
     const requestedStart = entryParams.get("start") || "";
     const isMagicStart = requestedStart.startsWith("magic") || window.location.pathname.startsWith("/magic-");
+    const isSpaceStart = requestedStart.startsWith("space") || window.location.pathname.startsWith("/space-");
+    const hasExplicitTheme = requestedTheme === "magicSchool" || requestedTheme === "spaceStation" || requestedTheme === "joseon";
     if (requestedTheme === "magicSchool" || requestedTheme === "spaceStation" || requestedTheme === "joseon") {
       localStorage.setItem(themeKey, requestedTheme);
     } else if (isMagicStart) {
       localStorage.setItem(themeKey, "magicSchool");
+    } else if (isSpaceStart) {
+      localStorage.setItem(themeKey, "spaceStation");
+    } else if (!requestedStart && window.location.pathname === "/") {
+      localStorage.setItem(themeKey, "joseon");
     }
     const storedTheme = localStorage.getItem(themeKey);
-    const activeTheme = storedTheme === "magicSchool" || storedTheme === "spaceStation" ? storedTheme : "joseon";
+    const activeTheme = hasExplicitTheme
+      ? requestedTheme
+      : isMagicStart
+        ? "magicSchool"
+        : isSpaceStart
+          ? "spaceStation"
+          : "joseon";
     const isMagicTheme = activeTheme === "magicSchool";
     const isSpaceTheme = activeTheme === "spaceStation";
     if (isMagicTheme || isSpaceTheme) startCaseLabel = "조사 시작";
@@ -96,14 +116,13 @@
       { name: "해리", id: "harry", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/harry-upper-transparent.webp", sleeveScene: "/assets/space-station/characters/harry-upper-transparent.webp" },
       { name: "메르스", id: "mers", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/mers-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/mers-upper-aligned.webp" },
       { name: "알라딘딘", id: "aladdindin", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/aladdindin-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/aladdindin-upper-aligned.webp" },
-      { name: "안성줴줴이", id: "ansungjyejyei", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/ansungjyejyei-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/ansungjyejyei-upper-aligned.webp" },
       { name: "아인슈페너", id: "einspanner", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/einspanner-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/einspanner-upper-aligned.webp" }
     ];
     const suspects = isSpaceTheme ? spaceSuspects : isMagicTheme ? magicSuspects : window.SAMUNMONG_CONTENT?.suspects || [
-      { name: "돌쇠", id: "dolsoe", scene: "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-dolsoe-sleeve.webp?v=sleeve-20260707" },
-      { name: "최춘월", id: "chunwol", scene: "/samunmong/assets/scene-interrogation-chunwol.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-chunwol-sleeve.webp?v=sleeve-20260707" },
-      { name: "유문석", id: "yoomunseok", scene: "/samunmong/assets/scene-interrogation-yoomunseok.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-yoomunseok-sleeve.webp?v=sleeve-20260707" },
-      { name: "무덕", id: "mudeok", scene: "/samunmong/assets/scene-interrogation-mudeok.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-mudeok-sleeve.webp?v=sleeve-20260707" }
+      { name: "돌쇠", id: "dolsoe", scene: "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-dolsoe-sleeve.webp?v=sleeve-20260707", lieScene: "/samunmong/assets/interrogation-expressions/scene-interrogation-dolsoe-lie.png?v=lie-20260824" },
+      { name: "최춘월", id: "chunwol", scene: "/samunmong/assets/scene-interrogation-chunwol.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-chunwol-sleeve.webp?v=sleeve-20260707", lieScene: "/samunmong/assets/interrogation-expressions/scene-interrogation-chunwol-lie.png?v=lie-20260824" },
+      { name: "유문석", id: "yoomunseok", scene: "/samunmong/assets/scene-interrogation-yoomunseok.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-yoomunseok-sleeve.webp?v=sleeve-20260707", lieScene: "/samunmong/assets/interrogation-expressions/scene-interrogation-yoomunseok-lie.png?v=lie-20260824" },
+      { name: "무덕", id: "mudeok", scene: "/samunmong/assets/scene-interrogation-mudeok.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-mudeok-sleeve.webp?v=sleeve-20260707", lieScene: "/samunmong/assets/interrogation-expressions/scene-interrogation-mudeok-lie.png?v=lie-20260824" }
     ];
 
     function getInterrogationHistory(suspectId) {
@@ -206,15 +225,12 @@
       tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
       dreamScreen: { name: "꿈 선택", x: "18%", y: "18%" },
       briefingScreen: { name: "사건 브리핑", x: "18%", y: "18%" },
-      spaceAirlock: { name: "에어록", x: "18%", y: "25%" },
-      spaceMedicalBay: { name: "의료실", x: "18%", y: "39%" },
-      spaceOxygenGenerator: { name: "산소 발생기실", x: "18%", y: "55%" },
-      spaceDataCore: { name: "데이터실", x: "18%", y: "72%" },
-      spaceScienceLab: { name: "과학 실험실", x: "82%", y: "25%" },
-      spaceGalleyCorridor: { name: "주방 복도", x: "82%", y: "39%" },
-      spaceSuitPrep: { name: "외부 작업 준비실", x: "82%", y: "55%" },
-      spaceObservation: { name: "관측 구역", x: "82%", y: "72%" },
-      interrogationScreen: { name: "비상 조사실", x: "50%", y: "78%" }
+      spaceAirlock: { name: "에어록", x: "50%", y: "14%" },
+      spaceMedicalBay: { name: "의료실", x: "29%", y: "31%" },
+      spaceOxygenGenerator: { name: "산소 발생기실", x: "72%", y: "31%" },
+      spaceDataCore: { name: "데이터실", x: "29%", y: "61%" },
+      spaceScienceLab: { name: "과학 실험실", x: "72%", y: "61%" },
+      interrogationScreen: { name: "보안 조사실", x: "50%", y: "76%" }
     };
     const locationMeta = isSpaceTheme ? spaceLocationMeta : isMagicTheme ? magicLocationMeta : joseonLocationMeta;
     const soundBase = "/samunmong/sound";
@@ -230,6 +246,7 @@
       buttonAlt: `${soundBase}/sfx/button-alt.mp3`,
       dream: `${soundBase}/sfx/dream.mp3`,
       evidence: `${soundBase}/sfx/evidence.mp3`,
+      lie: "/samunmong/audio/joseon-dream-trace-sting-v1.wav",
       map: `${soundBase}/sfx/map.mp3`,
       move: `${soundBase}/sfx/move.mp3`,
       type1: `${soundBase}/sfx/type-1.mp3`,
@@ -836,6 +853,16 @@
     }
 
     function getMemoryDrawPoint(event) {
+      const drawingSvg = memoryDrawPath?.ownerSVGElement;
+      const screenMatrix = drawingSvg?.getScreenCTM();
+      if (drawingSvg && screenMatrix) {
+        const svgPoint = drawingSvg.createSVGPoint();
+        svgPoint.x = event.clientX;
+        svgPoint.y = event.clientY;
+        const localPoint = svgPoint.matrixTransform(screenMatrix.inverse());
+        return { x: localPoint.x, y: localPoint.y };
+      }
+
       const rect = memoryDrawZone?.getBoundingClientRect();
       if (!rect) return null;
       return {
@@ -926,6 +953,21 @@
       }
     }
 
+    function openBriefingJournal() {
+      briefingReturnScreenId = getActiveScreenId() || "fieldOne";
+      startBriefingSequence("deathOnly");
+      briefingScreen?.classList.add("journal-overlay-open");
+      briefingJournalCloseButton?.focus();
+      playSfx("buttonAlt", 0.62);
+    }
+
+    function closeBriefingJournal() {
+      briefingScreen?.classList.remove("journal-overlay-open");
+      setBriefingMode("full");
+      document.querySelector(`[data-go="briefingScreen"]`)?.focus();
+      playSfx("buttonAlt", 0.58);
+    }
+
     function beginMemoryRestoration() {
       if (!isMagicTheme || briefingCard?.dataset.briefingMode === "deathOnly") return;
       if (!briefingScreen?.classList.contains("awaiting-memory-orb")) return;
@@ -962,10 +1004,12 @@
       const messageEl = document.querySelector("#toastMessage");
       const closeButton = document.querySelector("#closeToast");
       const hasEvidence = Boolean(options.image && options.title);
+      const isDismissible = Boolean(options.dismissible) && !(hasEvidence && isSpaceTheme);
 
       clearTimeout(closeToast.cleanupTimer);
       toast.classList.toggle("evidence-toast", hasEvidence);
-      toast.classList.toggle("dismissible", Boolean(options.dismissible));
+      toast.classList.toggle("hint-toast", options.variant === "hint");
+      toast.classList.toggle("dismissible", isDismissible);
       toast.setAttribute("role", hasEvidence ? "dialog" : "status");
       if (image) {
         image.hidden = !hasEvidence;
@@ -976,11 +1020,16 @@
         title.hidden = !hasEvidence;
         title.textContent = hasEvidence ? options.title : "";
       }
-      if (closeButton) closeButton.hidden = !options.dismissible;
-      if (messageEl) messageEl.textContent = sentenceBreakText(message);
+      if (closeButton) closeButton.hidden = !isDismissible;
+      if (messageEl) {
+        const displayMessage = hasEvidence && isSpaceTheme
+          ? "증거 보관함에 저장되었습니다."
+          : message;
+        messageEl.textContent = sentenceBreakText(displayMessage);
+      }
       toast.classList.add("show");
       clearTimeout(showToast.timer);
-      if (!options.dismissible) {
+      if (!isDismissible) {
         showToast.timer = setTimeout(() => toast.classList.remove("show"), options.duration || 1900);
       }
     }
@@ -991,7 +1040,7 @@
       toast.classList.remove("show");
       closeToast.cleanupTimer = setTimeout(() => {
         if (toast.classList.contains("show")) return;
-        toast.classList.remove("dismissible", "evidence-toast");
+        toast.classList.remove("dismissible", "evidence-toast", "hint-toast");
         toast.setAttribute("role", "status");
         document.querySelector("#closeToast")?.setAttribute("hidden", "");
       }, 200);
@@ -1040,9 +1089,14 @@
       "mudeokServantRoom",
       "yoomunseokSarangbang",
       "dolsoeQuarters",
-      "backGateCourtyard",
-      "interrogationScreen"
-    ]);
+  "backGateCourtyard",
+  "spaceAirlock",
+  "spaceMedicalBay",
+  "spaceOxygenGenerator",
+  "spaceDataCore",
+  "spaceScienceLab",
+  "interrogationScreen"
+]);
 
     function getButtonGuideText(target) {
       if (!target) return "";
@@ -1053,7 +1107,7 @@
       if (target.matches(".tool-chip")) return isSpaceTheme ? "스캔 도구로 잔류 신호를 분석합니다." : isMagicTheme ? "마력 감지로 잔류 흔적을 분석합니다." : "증거를 더 자세히 분석합니다.";
       if (target.matches(".note-chip")) return isSpaceTheme ? "대원별 통신 로그를 확인합니다." : "등장인물과 나눈 대화를 기록합니다.";
       if (target.matches(".journal-chip")) return isSpaceTheme ? "초기 사고 보고서를 다시 확인합니다." : isMagicTheme ? "수사 일지에서 관계자별 기록을 확인합니다." : "처음 사건 일지를 다시 봅니다.";
-      if (target.matches(".room-chip")) return target.getAttribute("aria-current") === "page" ? "현재 위치입니다." : "취조실로 이동합니다.";
+      if (target.matches(".room-chip")) return target.getAttribute("aria-current") === "page" ? "현재 위치입니다." : isSpaceTheme ? "보안 조사실로 이동합니다." : "취조실로 이동합니다.";
       if (target.matches(".scene-hint")) return "남은 단서 위치를 잠깐 밝힙니다.";
       if (target.matches(".map-pin-button")) return target.getAttribute("aria-label") || "해당 장소로 이동합니다.";
       if (target.matches(".close-button")) return target.getAttribute("aria-label") || "창을 닫습니다.";
@@ -1087,9 +1141,10 @@
       let left = centerX;
       let top = targetTop - gap;
 
-      if (target.matches(".map-chip") && fitsTop) {
+      if ((target.matches(".map-chip") || (isSpaceTheme && target.matches(".room-chip"))) && fitsTop) {
         placement = "top";
-        left = clamp(centerX, margin + guideWidth / 2, shellWidth - margin - guideWidth / 2);
+        const horizontalOffset = isSpaceTheme && target.matches(".room-chip") ? 60 : 0;
+        left = clamp(centerX + horizontalOffset, margin + guideWidth / 2, shellWidth - margin - guideWidth / 2);
         top = targetTop - gap;
       } else if (targetRight > shellWidth * .68 && fitsLeft) {
         placement = "left";
@@ -1374,7 +1429,11 @@
       const evidenceHotspots = [...screen.querySelectorAll(".hotspot[data-evidence-name], #hopaeHotspot, #portraitHotspot")];
       evidenceHotspots.forEach((hotspot) => hotspot.classList.add("evidence-hotspot"));
       readStoredNames(collectedEvidenceKey).forEach((name) => {
-        screen.querySelectorAll(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((item) => item.classList.add("collected"));
+        screen.querySelectorAll(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((item) => {
+          item.classList.add("collected");
+          if (item instanceof HTMLButtonElement) item.disabled = true;
+          item.setAttribute("aria-disabled", "true");
+        });
       });
       readStoredNames(analyzedEvidenceKey).forEach((name) => {
         screen.querySelectorAll(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((item) => item.classList.add("analyzed"));
@@ -1411,7 +1470,7 @@
       hint.addEventListener("click", () => {
         const remainingEvidence = evidenceHotspots.filter((hotspot) => !hotspot.classList.contains("collected"));
         if (!remainingEvidence.length) {
-          showToast("이 장면의 증거를 모두 찾았습니다.");
+          showToast("이 장면의 증거를 모두 찾았습니다.", { variant: "hint" });
           return;
         }
         screen.classList.remove("hint-active");
@@ -1524,18 +1583,16 @@
       "/samunmong/assets/magic-school/interrogation/malpoil.webp"
     ];
     const spaceThemeStartAssets = [
-      "/assets/space-station/backgrounds/orbit-13-airlock.webp",
+      "/assets/space-station/backgrounds/orbit-13-airlock-evidence-v3.webp",
       "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp",
-      "/assets/space-station/backgrounds/medical-bay.webp",
-      "/assets/space-station/backgrounds/oxygen-generator.webp",
-      "/assets/space-station/backgrounds/data-core.webp",
-      "/assets/space-station/backgrounds/suit-prep.webp",
-      "/assets/space-station/backgrounds/science-lab.webp",
-      "/assets/space-station/backgrounds/galley-corridor.webp",
+      "/assets/space-station/backgrounds/medical-bay-evidence-v2.webp",
+      "/assets/space-station/backgrounds/oxygen-generator-evidence-v2.webp",
+      "/assets/space-station/backgrounds/data-core-evidence-v2.webp",
+      "/assets/space-station/backgrounds/science-lab-evidence-v2.webp",
       "/assets/space-station/panels/log-record-panel-v2.webp",
       "/assets/space-station/panels/evidence-vault-panel-v2.webp",
       "/assets/space-station/panels/scan-tools-panel-v2.webp",
-      "/assets/space-station/maps/orbit-13-blueprint.webp",
+      "/assets/space-station/maps/orbit-13-six-location-map.webp",
       "/assets/space-station/ui-icons-v2/emergency-investigation-v2.webp",
       "/assets/space-station/ui-icons-v3/orbit-blueprint.webp",
       "/assets/space-station/ui-icons-v3/evidence-vault.webp",
@@ -1548,16 +1605,18 @@
       "/assets/space-station/characters/harry-upper.webp",
       "/assets/space-station/characters/mers-upper.webp",
       "/assets/space-station/characters/aladdindin-upper.webp",
-      "/assets/space-station/characters/ansungjyejyei-upper.webp",
       "/assets/space-station/characters/einspanner-upper.webp",
       "/assets/space-station/evidence/frozen-lever-gel.webp",
       "/assets/space-station/evidence/final-radio-log.webp",
       "/assets/space-station/evidence/disinfectant-cloth-glove.webp",
       "/assets/space-station/evidence/deleted-medical-record.webp",
       "/assets/space-station/evidence/damaged-pressure-sensor.webp",
+      "/assets/space-station/evidence/tampered-delay-timer.webp",
       "/assets/space-station/evidence/access-keycard-chip.webp",
+      "/assets/space-station/evidence/encrypted-research-contract.webp",
       "/assets/space-station/evidence/engineer-tool-clamp.webp",
       "/assets/space-station/evidence/coffee-tumbler.webp",
+      "/assets/space-station/evidence/unauthorized-drug-ampoule.webp",
       "/assets/space-station/loading/space-transition-bg.webp"
     ];
     const themeStartAssets = isSpaceTheme ? spaceThemeStartAssets : isMagicTheme ? magicThemeStartAssets : joseonThemeStartAssets;
@@ -1798,7 +1857,7 @@
 
     function showInitialScreenFromSetup() {
       const startScreen = entryParams.get("start") || document.querySelector(".game-shell")?.dataset.startScreen;
-      const allowedScreens = new Set(["tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne", "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters", "backGateCourtyard", "magicAlchemyLab", "magicCleaningCloset", "magicLibrary", "magicRecordCrystalRoom", "magicDormHallway", "spaceAirlock", "spaceMedicalBay", "spaceOxygenGenerator", "spaceDataCore", "spaceScienceLab", "spaceGalleyCorridor", "spaceSuitPrep", "interrogationScreen"]);
+      const allowedScreens = new Set(["tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne", "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters", "backGateCourtyard", "magicAlchemyLab", "magicCleaningCloset", "magicLibrary", "magicRecordCrystalRoom", "magicDormHallway", "spaceAirlock", "spaceMedicalBay", "spaceOxygenGenerator", "spaceDataCore", "spaceScienceLab", "interrogationScreen"]);
 
       if (!allowedScreens.has(startScreen)) {
         return;
@@ -1959,9 +2018,12 @@
 
     memoryDrawZone?.addEventListener("pointermove", (event) => {
       if (memoryTraceComplete || !memoryDrawZone.hasPointerCapture?.(event.pointerId)) return;
-      const point = getMemoryDrawPoint(event);
-      if (!point) return;
-      memoryTracePoints.push(point);
+      const pointerEvents = event.getCoalescedEvents?.() || [];
+      const sampledEvents = pointerEvents.length > 0 ? pointerEvents : [event];
+      sampledEvents.forEach((sampledEvent) => {
+        const point = getMemoryDrawPoint(sampledEvent);
+        if (point) memoryTracePoints.push(point);
+      });
       updateMemoryDrawPath();
       if (isMemoryCircleComplete()) completeMemoryTrace();
     });
@@ -2014,12 +2076,11 @@
     });
     on("#startCase", "click", () => {
       if (briefingCard?.dataset.briefingMode === "deathOnly") {
-        const returnScreen = knownScreenIds.has(briefingReturnScreenId)
-          ? briefingReturnScreenId
-          : (isMagicTheme ? "magicAlchemyLab" : "fieldOne");
-        go(returnScreen, "사건 일지를 덮는 중...");
+        closeBriefingJournal();
         return;
       }
+
+      ensureJoseonBriefingEvidence();
 
       if (isMagicTheme || isSpaceTheme || hasSeenFieldGuide()) {
         sessionStorage.removeItem(fieldGuidePendingKey);
@@ -2053,14 +2114,17 @@
       if (!button || isFieldGuideBlockingControls()) return;
       const target = button.dataset.go;
       const isJournalBriefing = target === "briefingScreen";
-      if (isJournalBriefing) {
-        briefingReturnScreenId = getActiveScreenId() || "fieldOne";
+      if (isJournalBriefing && !isMagicTheme && !isSpaceTheme) {
+        event.preventDefault();
+        openBriefingJournal();
+        return;
       }
       go(target, isJournalBriefing ? "사건 일지를 펼치는 중..." : "이동 중...");
-      if (target === "briefingScreen") {
+      if (isJournalBriefing) {
         setTimeout(() => startBriefingSequence("deathOnly"), 340);
       }
     });
+    briefingJournalCloseButton?.addEventListener("click", closeBriefingJournal);
     on("#accuseButton", "click", openResultPage);
 
     let hopaeCollected = false;
@@ -2253,13 +2317,13 @@
         toolResult: "성분이 의료실 수술용 밀봉 젤과 일치한다.\n기계 결함이 아니라 누군가 레버 홈에 젤을 미리 채워 넣은 흔적이다."
       },
       "마지막 무전 로그": {
-        note: "데이비드가 표류 직전 남긴 마지막 통신 기록. 겉으로는 구조 요청처럼 들리지만 표현이 지나치게 침착하다.",
+        note: "데이비드가 표류 직전 남긴 마지막 통신 기록. 공용 채널 뒤 메르스의 개인 의료 채널로 구조를 요청한 흔적이 끊겨 있다.",
         location: "에어록",
-        logic: "데이비드가 사고를 연기했을 가능성과 메르스와의 비밀 계약을 암시한다.",
+        logic: "데이비드는 죽음에 동의하지 않았으며, 메르스가 구조 요청을 받고도 개인 채널을 고의로 차단했음을 암시한다.",
         relatedSuspects: ["데이비드", "메르스"],
         img: "/assets/space-station/evidence/final-radio-log.webp",
         tool: "로그 복구 모듈",
-        toolResult: "무전 마지막에 짧은 숨 고르기와 암호화된 개인 채널 호출 흔적이 남아 있다.\n단순 비명보다 누군가에게 보내는 신호처럼 들린다."
+        toolResult: "무전 마지막에 메르스의 개인 의료 채널을 호출한 흔적이 남아 있다.\n호출은 수신됐지만 4초 뒤 상대 측에서 차단됐다."
       },
       "소독천과 장갑": {
         note: "의료실 폐기함 근처에서 발견된 소독천과 장갑. 투명 젤 성분이 희미하게 묻어 있다.",
@@ -2271,13 +2335,13 @@
         toolResult: "장갑 안쪽에는 메르스가 쓰는 의료용 소독제와 같은 잔류 성분이 남아 있다.\n레버 젤과 의료실이 연결된다."
       },
       "삭제된 의료 기록": {
-        note: "데이비드의 퇴행성 근위축증 진단 기록이 해리 계정으로 삭제된 흔적.",
+        note: "데이비드에게 승인되지 않은 근육 재생 약물이 반복 투여됐고 심각한 부작용이 발생했다는 기록이 해리 계정으로 삭제된 흔적.",
         location: "의료실",
-        logic: "해리가 데이터를 날린 것이 아니라 누군가 해리 계정을 이용해 데이비드의 병을 숨겼다는 단서다.",
+        logic: "메르스가 불법 임상시험과 자신의 의료 과실을 숨기기 위해 해리 계정을 도용했다는 동기 단서다.",
         relatedSuspects: ["해리", "메르스", "데이비드"],
         img: "/assets/space-station/evidence/deleted-medical-record.webp",
         tool: "로그 복구 모듈",
-        toolResult: "삭제 명령은 해리 계정으로 실행됐지만 접근 위치는 의료실 단말이다.\n해리의 실수라는 설명과 맞지 않는다."
+        toolResult: "복구된 조각에는 메르스의 처방 서명과 '관제 승인 없음' 경고가 함께 남아 있다.\n삭제 명령은 해리 계정으로 실행됐지만 접근 위치는 의료실 단말이다."
       },
       "손상된 압력 센서": {
         note: "산소 발생기 압력 밸브의 미세 센서가 얇은 날붙이로 손상되어 있다.",
@@ -2288,6 +2352,15 @@
         tool: "신호 스캐너",
         toolResult: "센서 손상 뒤에도 약 5시간 동안 정상값을 흉내 낸 기록이 남아 있다.\n정전 당시 알리바이는 범행 시간을 설명하지 못한다."
       },
+      "조작된 지연 타이머": {
+        note: "산소 발생기 제어함 안쪽에서 발견된 비인가 타이머 모듈. 보안 봉인이 뜯기고 외부 작업 시간에 맞춘 지연 회로가 연결되어 있다.",
+        location: "산소 발생기실",
+        logic: "정전이 우연한 고장이 아니라 데이비드의 외부 작업 시각에 맞춰 예약된 계획 범행임을 확정한다.",
+        relatedSuspects: ["메르스", "알라딘딘"],
+        img: "/assets/space-station/evidence/tampered-delay-timer.webp",
+        tool: "신호 스캐너",
+        toolResult: "타이머는 정전 5시간 전에 수동 설정됐고 인증 신호가 의료실 휴대 단말과 일치한다.\n정전 순간 의료실에 있었다는 메르스의 알리바이는 무너진다."
+      },
       "접속 키카드 칩": {
         note: "데이터실 바닥에서 발견된 접속 칩. 해리 계정 세션과 의료실 단말 접근 기록이 함께 남아 있다.",
         location: "데이터실",
@@ -2297,19 +2370,37 @@
         tool: "로그 복구 모듈",
         toolResult: "칩의 마지막 인증 위치가 데이터실이 아니라 의료실 보조 단말로 찍혀 있다.\n해리가 자책하던 삭제 사고는 누군가의 위장일 가능성이 커진다."
       },
+      "암호화된 연구 보상 계약": {
+        note: "삭제 구역에서 복구된 암호화 계약 데이터. 미승인 임상 자료 제공 대가로 거액의 연구 보상과 우선 귀환권을 약속한다.",
+        location: "데이터실",
+        logic: "메르스가 불법 임상시험을 숨기고 데이비드의 폭로를 막으려 한 악의적 동기를 직접 보여 준다.",
+        relatedSuspects: ["메르스", "해리"],
+        img: "/assets/space-station/evidence/encrypted-research-contract.webp",
+        tool: "로그 복구 모듈",
+        toolResult: "계약 수신 계정은 메르스의 의료 책임자 키와 연결된다.\n최종 보상 조건에는 데이비드의 약물 반응 자료 전송이 명시되어 있다."
+      },
       "엔지니어 공구 클램프": {
-        note: "외부 작업 준비실의 공구 클램프. 알라딘딘의 점검 루틴에 쓰였지만 레버 젤 흔적은 없다.",
-        location: "외부 작업 준비실",
+        note: "에어록 장비 점검대의 공구 클램프. 알라딘딘의 점검 루틴에 쓰였지만 레버 젤 흔적은 없다.",
+        location: "에어록",
         logic: "알라딘딘이 우주복을 점검했을 때 젤이 보이지 않았다는 진술을 뒷받침한다.",
         relatedSuspects: ["알라딘딘"],
         img: "/assets/space-station/evidence/engineer-tool-clamp.webp"
       },
       "커피 텀블러": {
-        note: "정전 직전 복도에 떠다니던 텀블러. 대원들이 각자 어디에 있었는지 맞추는 알리바이 단서다.",
-        location: "주방 복도",
+        note: "과학 실험실 작업대 아래에 떠다니던 아인슈페너의 텀블러. 그의 비밀 실험을 의심하게 하는 미끼 단서다.",
+        location: "과학 실험실",
         logic: "정전 당시 위치보다 정전이 준비된 시점이 더 중요하다는 점을 드러낸다.",
-        relatedSuspects: ["안성줴줴이", "아인슈페너"],
+        relatedSuspects: ["아인슈페너"],
         img: "/assets/space-station/evidence/coffee-tumbler.webp"
+      },
+      "미승인 약물 앰풀": {
+        note: "과학 실험실 폐기함 뒤에 숨겨진 근육 재생 약물 앰풀. 라벨은 긁혀 있지만 의료실 투약 기록과 같은 제조 코드가 남아 있다.",
+        location: "과학 실험실",
+        logic: "메르스가 불법 약물의 책임을 아인슈페너에게 뒤집어씌우려 실험실에 증거를 숨긴 정황이다.",
+        relatedSuspects: ["메르스", "아인슈페너"],
+        img: "/assets/space-station/evidence/unauthorized-drug-ampoule.webp",
+        tool: "의료 분석 렌즈",
+        toolResult: "앰풀 성분은 데이비드의 삭제된 투약 기록과 일치한다.\n표면에서는 아인슈페너의 시약이 아니라 메르스의 의료용 소독제만 검출된다."
       }
     };
 
@@ -2382,21 +2473,21 @@
         note: "점순 옆에서 발견된 신분 단서. 유문석의 물건처럼 보이지만 일부 글자가 긁혀 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp",
         tool: "먼지털이 붓",
-        toolResult: "먼지털이 붓으로 털자 긁힌 글자 홈 사이에 고운 분가루가 남아 있다.\n거칠게 굴러다닌 물건이라기보다, 누군가 손에 쥐고 옮긴 뒤 일부러 현장에 둔 듯하다."
+        toolResult: "이름 홈의 먼지를 털자 오래된 새김 위로 더 얕고 거친 새 긁힘이 드러난다."
       },
       "돌쇠의 그림": {
-        note: "최춘월의 방에서 발견된 숨겨둔 초상. 오래 숨긴 마음과 집착을 추적할 단서다.",
+        note: "최춘월의 방에서 발견된 붉은 끈으로 단단히 묶인 두루마리. 펼치기 전에는 안의 그림을 알 수 없다.",
         img: "/samunmong/assets/evidence-transparent/evidence-portrait-concealed-v1.png",
         toolResultAsset: "/samunmong/assets/interactions/portrait-stroke-puzzle/state-2.png?v=portrait-reveal-v5",
         tool: "돋보기",
-        toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있다.\n그림 가장자리에는 지운 글씨 자국이 남아 있고, ‘떠나지 마라’로 보이는 획이 희미하다.\n우연한 초상이라기보다 오래 눌러 둔 마음에 가깝다."
+        toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있고, 그림 가장자리에는 지운 글씨의 눌린 획이 남아 있다."
       },
       "헐거워진 노리개": {
         note: "끊어진 장식과 급히 잡아챈 듯한 흔적이 남은 노리개. 누가 지녔는지 확인해야 한다.",
         img: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.webp"
       },
       "무덕의 번진 일기": {
-        note: "먹이 번져 읽기 어려운 일기. 점순과 돌쇠의 도망 계획이 춘월에게 닿은 경로를 추적할 수 있다.",
+        note: "먹이 번져 읽기 어려운 일기. 사건 전 며칠의 밤 이동과 전달 경로를 추적할 수 있다.",
         img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.webp",
         tool: "촛불 비추기",
         toolResult: "촛불을 비추자 번진 먹 아래 기록이 또렷해진다."
@@ -2447,7 +2538,7 @@
       },
       "찢어진 약속 편지": {
         note: "점순의 손에서 발견된 찢어진 약속 편지. 정중한 말투가 돌쇠의 평소 말투와 맞지 않는다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.webp"
+        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg"
       }
     };
 
@@ -2467,7 +2558,7 @@
       "긁힌 팔 흔적": "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp",
       "작은 발자국": "/samunmong/assets/evidence-transparent/evidence-small-footprints.webp",
       "끊어진 호패끈": "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.webp",
-      "찢어진 약속 편지": "/samunmong/assets/evidence-transparent/evidence-torn-letter-transparent.webp"
+      "찢어진 약속 편지": "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg"
     };
 
     function getEvidenceImage(name, fallback = "/samunmong/assets/evidence-wooden-tag.webp") {
@@ -2575,27 +2666,31 @@
     }
 
     const evidenceStoryCues = {
-      "호패 조각": ["누명", "유문석 ← 조작된 호패"],
-      "돌쇠의 그림": ["동기", "춘월 → 돌쇠를 향한 집착"],
-      "헐거워진 노리개": ["동선", "춘월의 급한 움직임"],
-      "무덕의 번진 일기": ["진술", "도망 계획 → 춘월"],
+      "점순의 목 압박 흔적": ["수법", "좁은 끈에 눌린 흔적"],
+      "점순의 손톱 밑 흔적": ["저항", "몸싸움 중 남은 흔적"],
+      "호패 조각": ["누명", "오래된 새김 위 새 긁힘"],
+      "돌쇠의 그림": ["동기", "여러 번 고쳐 그린 초상"],
+      "헐거워진 노리개": ["동선", "급하게 움직인 흔적"],
+      "무덕의 번진 일기": ["진술", "도망 계획을 아는 인물"],
       "진흙 묻은 짚신": ["동선", "짚신 ≠ 작은 발자국"],
       "찢어진 옷고름": ["수법", "비단 끈 → 목 졸림"],
       "빈 호패 주머니": ["누명", "방에서 사라진 호패"],
       "하인 장부": ["동선", "지워진 출입 기록"],
       "혼서 조각": ["동기", "강요된 혼인 → 압박"],
-      "피 묻은 붕대": ["상흔", "붕대 ↔ 돌쇠의 팔"],
+      "피 묻은 붕대": ["상흔", "누군가의 팔에 감았던 붕대"],
       "돌쇠의 팔 상처": ["상흔", "붕대를 감았던 자리"],
       "도망 보따리": ["동기", "점순·돌쇠의 도망"],
       "긁힌 팔 흔적": ["저항", "점순이 남긴 상처"],
       "작은 발자국": ["동선", "작은 발 → 뒷문"],
       "끊어진 호패끈": ["누명", "잘라낸 호패끈"],
-      "찢어진 약속 편지": ["진술", "말투 ≠ 돌쇠"]
+      "찢어진 약속 편지": ["진술", "평소와 다른 말투"]
     };
 
     const evidenceStoryMeanings = {
-      "호패 조각": "유문석에게 죄를 씌우려고 옮긴 흔적",
-      "돌쇠의 그림": "춘월이 돌쇠에게 품은 집착의 단서",
+      "점순의 목 압박 흔적": "범행 도구의 폭과 재질을 대조할 기준",
+      "점순의 손톱 밑 흔적": "상대에게 남긴 상처를 대조할 기준",
+      "호패 조각": "글자가 나중에 훼손된 흔적",
+      "돌쇠의 그림": "숨겨 둔 감정을 보여 주는 단서",
       "헐거워진 노리개": "급히 움직인 사람의 흔적",
       "무덕의 번진 일기": "도망 계획을 아는 사람이 있음",
       "진흙 묻은 짚신": "현장 발자국의 주인과 다름",
@@ -2613,14 +2708,15 @@
     };
 
     const evidenceConnections = [
-      ["호패 조각", "빈 호패 주머니", "호패는 우연히 떨어진 것이 아니라 누명을 위해 옮겨졌다."],
-      ["호패 조각", "끊어진 호패끈", "호패끈을 끊어 조각을 현장에 남긴 흔적이다."],
-      ["빈 호패 주머니", "끊어진 호패끈", "비어 있는 주머니와 잘린 끈이 호패 조작을 함께 가리킨다."],
+      ["호패 조각", "빈 호패 주머니", "주머니의 눌린 자리와 호패 크기가 맞아 원래 함께 보관됐던 물건임을 보여 준다."],
+      ["호패 조각", "끊어진 호패끈", "끈의 굵기와 호패 구멍의 마찰 홈이 맞아 원래 연결됐던 물건임을 보여 준다."],
+      ["빈 호패 주머니", "끊어진 호패끈", "주머니 안쪽의 붉은 섬유와 끊어진 끈의 결이 서로 맞는다."],
       ["진흙 묻은 짚신", "작은 발자국", "짚신의 크기와 현장의 작은 발자국이 서로 맞지 않는다."],
       ["피 묻은 붕대", "돌쇠의 팔 상처", "붕대를 감았던 자리와 돌쇠의 팔 상처가 맞아떨어진다."],
-      ["피 묻은 붕대", "긁힌 팔 흔적", "붕대는 몸싸움에서 생긴 긁힌 상처를 감추고 있었다."],
       ["도망 보따리", "무덕의 번진 일기", "도망 준비가 기록되어 있어 계획을 아는 사람이 있었음을 보여준다."],
-      ["찢어진 옷고름", "긁힌 팔 흔적", "찢어진 옷고름과 긁힌 팔은 마지막 몸싸움이 있었음을 가리킨다."]
+      ["찢어진 옷고름", "긁힌 팔 흔적", "찢어진 옷고름과 긁힌 팔은 마지막 몸싸움이 있었음을 가리킨다."],
+      ["찢어진 옷고름", "점순의 목 압박 흔적", "옷고름의 폭과 마찰 자국이 목에 남은 좁은 압박 흔적과 맞는다."],
+      ["긁힌 팔 흔적", "점순의 손톱 밑 흔적", "팔의 긁힌 방향과 손톱 밑 흔적이 마지막 몸싸움의 직접 접촉을 가리킨다."]
     ];
 
     function getEvidenceSource(name) {
@@ -2709,12 +2805,34 @@
       });
     }
 
+    function clearPresentedEvidence() {
+      selectedEvidence = "";
+      document.querySelectorAll("#evidenceList .evidence.active").forEach((item) => item.classList.remove("active"));
+      const presented = document.querySelector("#presentedEvidence");
+      const image = document.querySelector("#presentedEvidenceImage");
+      const roleBadge = document.querySelector("#presentedEvidenceRole");
+      if (presented) presented.textContent = "없음";
+      if (image) {
+        image.hidden = true;
+        image.alt = "";
+      }
+      if (roleBadge) roleBadge.hidden = true;
+      if (themeId === "joseon") {
+        document.querySelectorAll(".prompt-line").forEach((button, index) => {
+          button.hidden = false;
+          button.textContent = defaultInterrogationPrompts[index] || defaultInterrogationPrompts[0];
+          button.classList.remove("evidence-question");
+        });
+      }
+    }
+
     function showEvidenceResponseMarker(name) {
       const marker = document.querySelector("#evidenceResponseMarker");
-      if (!marker || themeId !== "joseon" || !name) return;
+      if (!marker) return;
+      marker.hidden = themeId !== "joseon" || !name;
+      if (marker.hidden) return;
       const data = evidenceData[name] || {};
       const [role] = getEvidenceStoryCue(name, data);
-      marker.hidden = false;
       document.querySelector("#responseEvidenceImage").src = getEvidenceImage(name);
       document.querySelector("#responseEvidenceImage").alt = getEvidenceSource(name);
       document.querySelector("#responseEvidenceRole").textContent = `${role} 증거와 대면`;
@@ -2734,15 +2852,12 @@
     }
 
     function updateEvidenceThreadUI() {
-      const unlocked = getUnlockedStoryConnections();
-      const examined = readExaminedClues();
       const count = document.querySelector("#evidenceThreadCount");
-      if (count) count.textContent = String(unlocked.length + examined.length);
+      if (count) count.textContent = "0";
       const trigger = document.querySelector("#openEvidenceThread");
-      trigger?.classList.toggle("has-clues", unlocked.length + examined.length > 0);
+      trigger?.classList.remove("has-clues");
       document.querySelectorAll("#evidenceList .evidence[data-evidence]").forEach((card) => {
-        const source = getEvidenceSource(card.dataset.evidence);
-        card.classList.toggle("story-linked", examined.some((clue) => clue.source === source) || unlocked.some(([a, b]) => a === source || b === source));
+        card.classList.remove("story-linked");
       });
     }
 
@@ -2798,6 +2913,11 @@
       if (!data.tool) return true;
       const source = data.source || name;
       return readExaminedClues().some((clue) => clue.source === source);
+    }
+
+    function getEvidenceDisplayName(name) {
+      if (name === "돌쇠의 그림" && !isEvidenceMeaningRevealed(name)) return "의문의 그림";
+      return name;
     }
 
     function refreshEvidenceCard(name) {
@@ -2875,7 +2995,6 @@
     function evidenceCardHtml(name) {
       const data = evidenceData[name] || {};
       const summary = sentenceBreakText(data.note || "현장에서 발견된 단서입니다.").split("\n").find(Boolean) || "";
-      const [storyRole, storyBeat] = getEvidenceStoryCue(name, data);
       const meaningRevealed = isEvidenceMeaningRevealed(name, data);
       const stateFrame = data.derived
         ? data.isNew
@@ -2891,8 +3010,7 @@
         </span>
         <span class="evidence-card-copy">
           <span class="evidence-kind-mark">${data.derived ? data.isNew ? "새 증좌" : "검험 증좌" : meaningRevealed ? "감식 완료" : "미확인 증거"}</span>
-          <strong>${escapeHtml(name)}</strong>
-          <span class="evidence-story-cue"><b>${meaningRevealed ? `${escapeHtml(storyRole)} 증거` : "???"}</b><span>${meaningRevealed ? escapeHtml(storyBeat) : "감식하면 의미가 드러납니다"}</span></span>
+          <strong>${escapeHtml(getEvidenceDisplayName(name))}</strong>
           <span class="evidence-summary">${escapeHtml(summary)}</span>
         </span>`;
     }
@@ -3072,7 +3190,11 @@
     }
 
     function markEvidenceCollectedInScene(name) {
-      document.querySelectorAll(`[data-evidence-name="${name}"]`).forEach((item) => item.classList.add("collected"));
+      document.querySelectorAll(`[data-evidence-name="${name}"]`).forEach((item) => {
+        item.classList.add("collected");
+        if (item instanceof HTMLButtonElement) item.disabled = true;
+        item.setAttribute("aria-disabled", "true");
+      });
       const propSelectors = {
         "작은 발자국": ".footprints-prop",
         "끊어진 호패끈": ".cord-prop"
@@ -3094,7 +3216,17 @@
       playSfx("bag", 0.7);
     }
 
+    function ensureJoseonBriefingEvidence() {
+      if (isMagicTheme || isSpaceTheme) return;
+      ["점순의 목 압박 흔적", "점순의 손톱 밑 흔적"].forEach((name) => {
+        if (readStoredNames(collectedEvidenceKey).includes(name)) return;
+        saveCollectedEvidence(name);
+        addEvidenceCardToInterrogation(name);
+      });
+    }
+
     function restoreSavedInvestigation() {
+      ensureJoseonBriefingEvidence();
       const collectedEvidence = readStoredNames(collectedEvidenceKey);
       const analyzedEvidence = new Set(readStoredNames(analyzedEvidenceKey));
 
@@ -3120,7 +3252,7 @@
       currentEvidenceForTool = name;
       evidenceFlipped = false;
       resetToolInteraction(true);
-      document.querySelector("#analysisTarget").textContent = name;
+      document.querySelector("#analysisTarget").textContent = getEvidenceDisplayName(name);
       document.querySelectorAll("#toolEvidenceList .tool-evidence-option").forEach((item) => {
         item.classList.toggle("selected", item.dataset.evidence === name);
       });
@@ -3141,8 +3273,8 @@
         asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-hopae-three-way-link.webp"
       }],
       [["진흙 묻은 짚신", "작은 발자국"], {
-        result: "같은 마당 흙이지만 발의 길이와 짚 섬유 비율은 서로 다르다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-footprint-soil-link.webp"
+        result: "뒤꿈치를 맞춰 겹치자 짚신이 발자국보다 길고 폭도 넓다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/expanded/result-footprint-comparison.png"
       }],
       [["피 묻은 붕대", "돌쇠의 팔 상처"], {
         result: "붕대를 감은 방향과 상처의 피가 번진 중심이 맞물린다.",
@@ -3151,6 +3283,14 @@
       [["찢어진 옷고름", "긁힌 팔 흔적"], {
         result: "상처 끝에 남은 가는 섬유와 옷고름의 풀린 비단실이 같은 방향으로 꼬여 있다.",
         asset: "/samunmong/assets/interactions/evidence-tools/secondary/result-fiber-match.png"
+      }],
+      [["찢어진 옷고름", "점순의 목 압박 흔적"], {
+        result: "옷고름의 폭과 눌린 마찰 자국이 목에 남은 좁은 압박 흔적과 맞는다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/expanded/result-fiber-comparison.png"
+      }],
+      [["긁힌 팔 흔적", "점순의 손톱 밑 흔적"], {
+        result: "팔의 긁힌 방향과 손톱 밑에 남은 접촉 흔적이 서로 맞물린다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-bandage-wound-link.webp"
       }]
     ].map(([names, comparison]) => [evidencePairKey(names[0], names[1]), comparison]));
 
@@ -3182,7 +3322,7 @@
       button.type = "button";
       button.dataset.evidence = name;
       button.draggable = isJoseonToolInteraction;
-      button.innerHTML = `<img src="${escapeHtml(getEvidenceImage(name))}" alt=""><span><strong>${escapeHtml(name)}</strong></span>`;
+      button.innerHTML = `<img src="${escapeHtml(getEvidenceImage(name))}" alt=""><span><strong>${escapeHtml(getEvidenceDisplayName(name))}</strong></span>`;
       button.addEventListener("click", () => setAnalysisTarget(name));
       button.addEventListener("dragstart", (event) => {
         event.dataTransfer?.setData("text/x-samunmong-evidence", name);
@@ -3232,7 +3372,7 @@
       image.src = getEvidenceImage(name);
       if (revealImage) revealImage.src = image.src;
       image.alt = name ? `${name} 확대 이미지` : "";
-      title.textContent = name || "증거를 선택하세요";
+      title.textContent = name ? getEvidenceDisplayName(name) : "증거를 선택하세요";
       note.textContent = analyzed
         ? allStepsComplete
           ? "분석 완료 · 자세한 내용은 기록장에 저장됨"
@@ -3281,7 +3421,10 @@
       if (image) image.src = nextImage;
       if (revealImage) revealImage.src = nextImage;
       const title = document.querySelector("#toolPreviewTitle");
-      if (title) title.textContent = evidenceFlipped ? `${currentEvidenceForTool} · 뒷면` : currentEvidenceForTool;
+      if (title) {
+        const displayName = getEvidenceDisplayName(currentEvidenceForTool);
+        title.textContent = evidenceFlipped ? `${displayName} · 뒷면` : displayName;
+      }
       const note = document.querySelector("#toolPreviewNote");
       if (note) note.textContent = evidenceFlipped ? "뒷면의 흔적이 드러났습니다." : "앞면으로 되돌렸습니다.";
       playSfx("buttonAlt", 0.58);
@@ -3314,11 +3457,11 @@
       button.addEventListener("click", () => selectEvidence(button));
       sectionGrid.appendChild(button);
       updateEvidenceLocationCounts();
-      updateEvidenceThreadUI();
       setActiveEvidenceLocation(location);
     }
 
     function selectEvidence(button) {
+      if (button.closest("#evidenceList")) return;
       document.querySelectorAll(".evidence").forEach((item) => item.classList.remove("active"));
       button.classList.add("active");
       selectedEvidence = button.dataset.evidence;
@@ -3334,7 +3477,10 @@
         button.querySelector(".evidence-state-frame").src = "/samunmong/assets/interactions/sato-skills/inventory-states/resolved.png";
       }
       playSfx("buttonAlt", 0.62);
-      showEvidenceStoryPreview(selectedEvidence);
+      const presented = document.querySelector("#presentedEvidence");
+      if (presented) presented.textContent = selectedEvidence;
+      updateEvidenceInterrogationUI(selectedEvidence);
+      showToast(`증거 선택: ${selectedEvidence}`);
     }
 
     function showEvidenceStoryPreview(name) {
@@ -3345,10 +3491,10 @@
       const meaningRevealed = isEvidenceMeaningRevealed(name, data);
       preview.hidden = false;
       document.querySelector("#evidencePreviewKind").textContent = data.derived ? "검험으로 얻은 증좌" : meaningRevealed ? `감식으로 확인한 ${role} 증거` : "아직 의미를 모르는 현장 증거";
-      document.querySelector("#evidencePreviewTitle").textContent = data.source || name;
+      document.querySelector("#evidencePreviewTitle").textContent = getEvidenceDisplayName(data.source || name);
       document.querySelector("#evidencePreviewImage").src = getEvidenceImage(name);
       document.querySelector("#evidencePreviewImage").alt = name;
-      document.querySelector("#evidencePreviewObject").textContent = data.source || name;
+      document.querySelector("#evidencePreviewObject").textContent = getEvidenceDisplayName(data.source || name);
       document.querySelector("#evidencePreviewFact").textContent = meaningRevealed ? fact : "도구함에서 이 증거를 감식하십시오.";
       document.querySelector("#evidencePreviewRole").textContent = meaningRevealed ? `${role} 증거` : "???";
       document.querySelector("#evidencePreviewMeaning").textContent = meaningRevealed ? getEvidenceStoryMeaning(name, data) : "감식을 마치면 사건에서의 의미가 열립니다.";
@@ -3896,8 +4042,11 @@
       if (!row) return;
       const data = evidenceData[name] || {};
       const sourceData = evidenceData[data.source || name] || data;
-      const people = Array.isArray(sourceData.relatedSuspects) ? sourceData.relatedSuspects : [];
+      const hasDreamTrace = Boolean(joseonDreamTraceByEvidence[data.source || name]);
+      row.hidden = hasDreamTrace;
       row.replaceChildren();
+      if (hasDreamTrace) return;
+      const people = Array.isArray(sourceData.relatedSuspects) ? sourceData.relatedSuspects : [];
       people.slice(0, 3).forEach((personName) => {
         const suspect = findJoseonSuspect(personName);
         if (!suspect) return;
@@ -4055,6 +4204,10 @@
         image: "/samunmong/assets/interactions/dream-traces/straw-shoe-mismatch-v2.png",
         alt: "정체를 감춘 인물이 큰 짚신을 작은 발자국 옆에 내려놓는 몽흔"
       },
+      "찢어진 옷고름": {
+        image: "/samunmong/assets/interactions/dream-traces/torn-collar-struggle-v1.png",
+        alt: "두 인물이 실랑이를 벌이는 사이 짙은 비단 옷고름이 당겨져 찢어지는 몽흔"
+      },
       "헐거워진 노리개": {
         image: "/samunmong/assets/interactions/dream-traces/norigae-snag-v2.png",
         alt: "두 인물이 갈라지는 순간 노리개가 남색 소매에 걸려 찢기는 몽흔"
@@ -4072,8 +4225,8 @@
         alt: "정체를 감춘 인물이 돌쇠의 초상을 여러 번 덧그리는 몽흔"
       },
       "무덕의 번진 일기": {
-        image: "/samunmong/assets/interactions/dream-traces/escape-plan-overheard-v1.png",
-        alt: "두 사람의 도망 계획을 문밖의 누군가가 엿듣고 기록하는 몽흔"
+        image: "/samunmong/assets/interactions/dream-traces/diary-secret-record-v1.png",
+        alt: "정체를 감춘 인물이 밤중에 목격한 움직임을 번진 일기에 기록하는 몽흔"
       }
     };
 
@@ -5127,14 +5280,14 @@
                     ? ["", "두 증거가 한 줄로 이어졌습니다. 위쪽 결론 매듭을 왼쪽으로 당겨 고정하십시오.", "두 증거의 공통 흔적이 하나의 사건 흐름으로 묶였습니다."][specialPuzzleStep]
         : specialPuzzleMode === "ledger"
           ? ["", "등잔의 배면광 아래 검은 덧칠보다 먼저 눌린 붓획이 한 줄 전체에 이어집니다. 이 칸은 처음부터 빈칸이 아니라 기록한 뒤 일부러 지운 자리입니다."][specialPuzzleStep]
-          : specialPuzzleMode === "diary"
-            ? ["", "6/29의 다툼, 6/30의 뒷문과 작은 발자국, 7/1 춘월이 돌쇠 이름을 알게 된 흐름이 이어집니다. 춘월은 도망 계획을 사건 전에 알고 있었습니다."][specialPuzzleStep]
+        : specialPuzzleMode === "diary"
+            ? ["", "날짜별 기록을 잇자 누군가 사건 전에 도망 계획을 알고 있었음이 드러납니다."][specialPuzzleStep]
             : specialPuzzleMode === "hopaeMark"
               ? ["", "탁본의 짙고 이어진 원래 홈 위로, 옅고 끊긴 새 긁힘이 겹칩니다. 누군가 이름 홈을 나중에 일부러 훼손했습니다."][specialPuzzleStep]
               : specialPuzzleMode === "shoeMud" ? ["", "진흙 본과 드러난 짚신 밑창에 같은 짜임이 남았습니다. 다른 발자국과 대조할 수 있는 밑창 무늬를 확보했습니다."][specialPuzzleStep]
               : specialPuzzleMode === "footprintTrace" ? ["", "기름 한지에 짧고 좁은 발 윤곽과 이동 방향이 그대로 남았습니다. 짚신 밑창 기록과 대조할 수 있습니다."][specialPuzzleStep]
           : specialPuzzleMode === "portrait"
-            ? ["", "묶인 초상 안에서 여러 번 고쳐 그린 돌쇠의 얼굴과 지우다 남은 ‘떠나지 마라’가 드러났습니다. 춘월이 오래 숨겨 둔 마음입니다."][specialPuzzleStep]
+            ? ["", "묶인 초상에서 여러 번 고친 얼굴과 가장자리의 지운 글씨 획이 드러났습니다."][specialPuzzleStep]
             : specialPuzzleMode === "ink"
               ? ["", "첫 먹은 천천히 번지고 가장자리가 고르게 마릅니다.", "다른 먹은 빠르게 퍼져 테두리가 짙게 남습니다.", "원문과 덧쓴 문장은 같은 때 쓴 것이 아니라, 다른 먹으로 나중에 고친 흔적입니다."][specialPuzzleStep]
           : specialPuzzleStep < 3 ? `한 단계 진행했습니다 · ${specialPuzzleStep}/3` : specialPuzzleMode === "norigae" ? "매듭 속 낯선 남색 섬유가 드러났습니다." : specialPuzzleMode === "bundle" ? "보따리 속 이동 준비물이 모두 드러났습니다." : specialPuzzleMode === "ink" ? "문서와 같은 먹 농도를 찾았습니다." : specialPuzzleMode === "portrait" ? "처음 그린 선과 지워진 흔적을 복원했습니다." : specialPuzzleMode === "hopaeThread" ? "끈 굵기와 오래된 마찰 홈이 정확히 맞습니다." : specialPuzzleMode === "stride" ? "짚신보다 발자국의 길이와 보폭이 짧습니다." : specialPuzzleMode === "silk" ? "비단실이 날이 아니라 강한 힘에 끊겼습니다." : "두 증거의 물리적 관계가 이어졌습니다.";
@@ -5189,7 +5342,7 @@
         if (previewNote) previewNote.textContent = sentenceBreakText(pending.comparison.result).split("\n").find(Boolean) || "두 증거의 관계를 확인했습니다.";
         showToolConclusion(pending.firstName, pending.comparison.result, storyConclusion);
         updateEvidenceThreadUI();
-        showToast("증거 연결 완료 · 사건 줄거리에 기록했습니다.");
+        showToast("증거 연결 완료");
       }, 420);
       playSfx("evidence", 0.86);
     }
@@ -5611,11 +5764,10 @@
       addEvidenceToBag(name);
       addEvidenceToNote(name);
       if (evidenceData[name]?.tool) setAnalysisTarget(name);
-      showToast("", {
+      showToast("보따리에 담았습니다.", {
         image: getEvidenceImage(name),
-        title: name,
-        dismissible: false,
-        duration: 2000,
+        title: getEvidenceDisplayName(name),
+        dismissible: true,
       });
       pendingEvidenceName = "";
       pendingEvidenceHotspot = null;
@@ -5636,6 +5788,9 @@
 
       const hotspot = target.closest("[data-evidence-name], #hopaeHotspot, #portraitHotspot");
       if (!hotspot) return;
+      if (hotspot.classList.contains("collected") || hotspot.getAttribute("aria-disabled") === "true") return;
+      if (event.__samunmongEvidenceHandled) return;
+      event.__samunmongEvidenceHandled = true;
       if (hotspot.id === "hopaeHotspot") {
         const hasHopae = readStoredNames(collectedEvidenceKey).includes("호패 조각");
         if (!hasHopae) {
@@ -5753,6 +5908,7 @@
       document.querySelector("#suspectName").textContent = suspect.name;
       document.querySelector("#suspectStage").dataset.suspect = suspect.id;
       const interrogationScreen = document.querySelector("#interrogationScreen");
+      setLieExpressionOverlay(false);
       if (isMagicTheme || isSpaceTheme) {
         document.querySelector("#interrogationPlate").src = suspect.scene;
       } else {
@@ -5762,8 +5918,10 @@
       const suspectSprite = document.querySelector("#suspectSprite");
       if ((isMagicTheme || isSpaceTheme) && suspectSprite && suspect.sprite) {
         suspectSprite.src = suspect.sprite;
+        suspectSprite.hidden = false;
       } else if (suspectSprite) {
         suspectSprite.src = suspect.sleeveScene || suspect.scene;
+        suspectSprite.hidden = false;
       }
       activeNoteSuspectId = suspect.id;
       renderConversationNotes();
@@ -5773,12 +5931,15 @@
       }
     }
 
-    document.querySelector("#prevSuspect").addEventListener("click", () => {
-      suspectIndex = (suspectIndex - 1 + suspects.length) % suspects.length;
-      updateSuspect();
-    });
-    document.querySelector("#nextSuspect").addEventListener("click", () => {
-      suspectIndex = (suspectIndex + 1) % suspects.length;
+    window.addEventListener("samunmong:suspect-request", (event) => {
+      const direction = event.detail?.direction;
+      if (direction === "previous") {
+        suspectIndex = (suspectIndex - 1 + suspects.length) % suspects.length;
+      } else if (direction === "next") {
+        suspectIndex = (suspectIndex + 1) % suspects.length;
+      } else {
+        return;
+      }
       updateSuspect();
     });
 
@@ -6051,7 +6212,7 @@
           return;
         }
         closeGlobalPanel();
-        go(target, isSpaceTheme ? "궤도 도면에서 이동 중..." : isMagicTheme ? "학교 지도에서 이동 중..." : "마을 지도에서 이동 중...");
+        go(target, isSpaceTheme ? "정거장 지도에서 이동 중..." : isMagicTheme ? "학교 지도에서 이동 중..." : "마을 지도에서 이동 중...");
       });
     });
 
@@ -6111,16 +6272,58 @@
       interrogationThinkingSoundTimer = 0;
     }
 
+    function setLieExpressionOverlay(show = false) {
+      if (isMagicTheme || isSpaceTheme) return;
+      const screen = document.querySelector("#interrogationScreen");
+      const suspect = suspects[suspectIndex];
+      if (!screen || !suspect?.lieScene) return;
+      const characterRig = screen.querySelector(".interrogation-character-rig");
+
+      let overlay = document.querySelector("#interrogationLieExpression");
+      if (!overlay) {
+        overlay = document.createElement("img");
+        overlay.id = "interrogationLieExpression";
+        overlay.alt = "";
+        overlay.draggable = false;
+        overlay.setAttribute("aria-hidden", "true");
+        Object.assign(overlay.style, {
+          position: "absolute",
+          inset: "0",
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          opacity: "0",
+          pointerEvents: "none",
+          transition: "opacity 220ms ease",
+          zIndex: "3"
+        });
+        screen.appendChild(overlay);
+      }
+
+      overlay.src = suspect.lieScene;
+      overlay.style.opacity = show ? "1" : "0";
+      if (characterRig) {
+        characterRig.style.opacity = show ? "0" : "1";
+      }
+    }
+
+    function getJoseonExpressionOnlyReaction(reaction = "calm") {
+      if (isMagicTheme || isSpaceTheme) return reaction;
+      return ["avoid", "nervous", "shocked", "silent", "lie"].includes(reaction) ? "lie" : reaction;
+    }
+
     function setInterrogationReaction(reaction = "calm", holdMs = 0) {
       const screen = document.querySelector("#interrogationScreen");
       const candle = document.querySelector("#interrogationCandle");
-      const normalized = ["calm", "thinking", "attentive", "avoid", "nervous", "shocked", "silent"].includes(reaction)
+      const normalized = ["calm", "lie", "thinking", "attentive", "avoid", "nervous", "shocked", "silent"].includes(reaction)
         ? reaction
         : "calm";
+      const visualReaction = getJoseonExpressionOnlyReaction(normalized);
 
       window.clearTimeout(interrogationReactionTimer);
-      screen?.setAttribute("data-interrogation-reaction", normalized);
-      candle?.setAttribute("data-state", normalized);
+      screen?.setAttribute("data-interrogation-reaction", visualReaction);
+      candle?.setAttribute("data-state", visualReaction);
+      setLieExpressionOverlay(visualReaction === "lie");
 
       if (normalized === "thinking") {
         stopInterrogationThinkingSound();
@@ -6131,10 +6334,21 @@
       } else {
         stopInterrogationThinkingSound();
       }
+      if (visualReaction === "lie") {
+        playSfx("lie", 0.34);
+      }
 
       if (holdMs > 0 && normalized !== "calm") {
         interrogationReactionTimer = window.setTimeout(() => setInterrogationReaction("calm"), holdMs);
       }
+    }
+
+    function getLieExpressionReaction(answer = "", reaction = "attentive") {
+      const normalizedAnswer = answer.replace(/\s+/g, " ");
+      const lieOrEvasionPattern =
+        /(모릅니다|모르겠|기억(?:이)?\s*(?:안|나지|없)|본\s*적\s*없|들은\s*적\s*없|간\s*적\s*없|제\s*것(?:이)?\s*아닙|아닙니다|그런\s*적\s*없|말씀드리기\s*어렵|답하기\s*어렵|글쎄|어찌\s*알겠|알\s*수\s*없)/;
+      if (lieOrEvasionPattern.test(normalizedAnswer)) return "lie";
+      return getJoseonExpressionOnlyReaction(reaction);
     }
 
     function showNewFactDiscovery(factId) {
@@ -6145,7 +6359,6 @@
 
       window.clearTimeout(newFactToastTimer);
       title.textContent = newFactTitles[factId] || "새로운 사실이 기록되었습니다";
-      dispatchEvidenceFeedback(title.textContent, toast, true);
       toast.classList.add("show");
       toast.setAttribute("aria-hidden", "false");
       playSfx("evidence", 0.48);
@@ -6230,7 +6443,7 @@
         while (history.length > 8) history.shift();
         addInterrogationAnswer(suspect, answer, data.source, data.warning);
         maybeCollectInterrogationEvidence(suspect, answer, data.usedEvidenceNames);
-        setInterrogationReaction(data.reaction || "attentive", data.newFactId ? 4200 : 3000);
+        setInterrogationReaction(getLieExpressionReaction(answer, data.reaction || "attentive"), data.newFactId ? 4200 : 3000);
         if (data.newFactId) showNewFactDiscovery(data.newFactId);
         if (data.newFactId) {
           const knownFactIds = new Set(readStoredNames(interrogationKnownFactsKey));
@@ -6252,6 +6465,7 @@
           setInterrogationReaction("calm");
         }
         isAskingAi = false;
+        clearPresentedEvidence();
         updateInterrogationQuestionLimitUI();
       }
     }

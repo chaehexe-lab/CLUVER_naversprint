@@ -7,6 +7,7 @@ const EMPTY_ROOM = "/samunmong/assets/scene-interrogation-room-empty.png";
 
 const REACTION_TARGETS: Record<string, { turn: number; lean: number; recoil: number; tension: number }> = {
   calm: { turn: 0, lean: 0, recoil: 0, tension: 0.15 },
+  lie: { turn: 0, lean: 0, recoil: 0, tension: 0.15 },
   thinking: { turn: -0.012, lean: 0.008, recoil: 0, tension: 0.28 },
   attentive: { turn: 0.01, lean: 0.014, recoil: 0, tension: 0.2 },
   avoid: { turn: -0.045, lean: -0.012, recoil: 0.006, tension: 0.42 },
@@ -50,6 +51,9 @@ export default function InterrogationCharacterRig3D({ initialTexture }: { initia
       const texture = await loader.loadAsync(url);
       texture.colorSpace = THREE.SRGBColorSpace;
       texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      texture.generateMipmaps = false;
+      texture.minFilter = THREE.LinearFilter;
+      texture.magFilter = THREE.LinearFilter;
       resources.push(texture);
       return texture;
     };
@@ -59,7 +63,7 @@ export default function InterrogationCharacterRig3D({ initialTexture }: { initia
       const height = Math.max(1, screen.clientHeight);
       canvas.style.width = `${width}px`;
       canvas.style.height = `${height}px`;
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.4));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setSize(width, height, false);
     };
 
@@ -109,6 +113,7 @@ export default function InterrogationCharacterRig3D({ initialTexture }: { initia
           uniform sampler2D previousMap;
           uniform sampler2D currentMap;
           uniform float transition;
+          uniform float tension;
           varying vec2 vUv;
           void main() {
             vec4 emptyColor = texture2D(emptyMap, vUv);
@@ -116,11 +121,23 @@ export default function InterrogationCharacterRig3D({ initialTexture }: { initia
             vec4 afterColor = texture2D(currentMap, vUv);
             float sleeveWipe = smoothstep(vUv.y - 0.18, vUv.y + 0.2, transition);
             vec4 characterColor = mix(beforeColor, afterColor, sleeveWipe);
-            float difference = distance(characterColor.rgb, emptyColor.rgb);
+            vec3 delta = abs(characterColor.rgb - emptyColor.rgb);
+            float difference = max(max(delta.r, delta.g), delta.b);
             float roi = smoothstep(0.12, 0.17, vUv.x) * smoothstep(0.47, 0.42, vUv.x)
               * smoothstep(0.06, 0.12, vUv.y) * smoothstep(0.9, 0.82, vUv.y);
-            float alpha = smoothstep(0.075, 0.19, difference) * roi;
-            if (alpha < 0.015) discard;
+            float matte = smoothstep(0.0025, 0.018, difference);
+            float alpha = roi * matte;
+            alpha = alpha > 0.035 ? 1.0 : alpha * 8.0;
+            if (alpha < 0.012) discard;
+            float faceMask = smoothstep(0.14, 0.2, vUv.x) * smoothstep(0.54, 0.47, vUv.x)
+              * smoothstep(0.52, 0.62, vUv.y) * smoothstep(0.91, 0.82, vUv.y);
+            float eyeBand = smoothstep(0.66, 0.71, vUv.y) * smoothstep(0.8, 0.74, vUv.y);
+            float mouthBand = smoothstep(0.55, 0.6, vUv.y) * smoothstep(0.68, 0.63, vUv.y);
+            float lieExpression = smoothstep(0.32, 0.7, tension) * faceMask;
+            vec3 anxiousTint = vec3(0.88, 0.82, 0.76);
+            characterColor.rgb = mix(characterColor.rgb, characterColor.rgb * anxiousTint, lieExpression * 0.2);
+            characterColor.rgb = mix(characterColor.rgb, characterColor.rgb * vec3(0.44, 0.38, 0.34), lieExpression * eyeBand * 0.45);
+            characterColor.rgb = mix(characterColor.rgb, characterColor.rgb * vec3(0.58, 0.46, 0.42), lieExpression * mouthBand * 0.28);
             gl_FragColor = vec4(characterColor.rgb, alpha);
           }
         `,

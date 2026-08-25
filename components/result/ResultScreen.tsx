@@ -52,62 +52,61 @@ const spaceSuspects = [
     id: "harry",
     name: "해리",
     image: "/assets/space-station/characters/harry-upper.webp",
-    slot: { left: "9.5%", top: "38.5%", width: "12.5%", height: "30%" },
-    nameLeft: "15.5%",
-    stampLeft: "18%",
+    slot: { left: "13.22%", top: "38.5%", width: "13.5%", height: "30%" },
+    nameLeft: "19.9%",
+    stampLeft: "23.8%",
     offsetX: "0%"
   },
   {
     id: "mers",
     name: "메르스",
     image: "/assets/space-station/characters/mers-upper.webp",
-    slot: { left: "26%", top: "37%", width: "12.5%", height: "31%" },
-    nameLeft: "32%",
-    stampLeft: "34.5%",
+    slot: { left: "32.78%", top: "37%", width: "13.5%", height: "31%" },
+    nameLeft: "39.5%",
+    stampLeft: "43.4%",
     offsetX: "0%"
   },
   {
     id: "aladdindin",
     name: "알라딘딘",
     image: "/assets/space-station/characters/aladdindin-upper.webp",
-    slot: { left: "42.5%", top: "37.8%", width: "12.5%", height: "30.4%" },
-    nameLeft: "48.5%",
-    stampLeft: "51%",
-    offsetX: "0%"
-  },
-  {
-    id: "ansungjyejyei",
-    name: "안성줴줴이",
-    image: "/assets/space-station/characters/ansungjyejyei-upper.webp",
-    slot: { left: "59%", top: "38.2%", width: "12.5%", height: "30%" },
-    nameLeft: "65%",
-    stampLeft: "67.5%",
+    slot: { left: "52.57%", top: "37.8%", width: "13.5%", height: "30.4%" },
+    nameLeft: "59.3%",
+    stampLeft: "63.2%",
     offsetX: "0%"
   },
   {
     id: "einspanner",
     name: "아인슈페너",
     image: "/assets/space-station/characters/einspanner-upper.webp",
-    slot: { left: "75.5%", top: "38.2%", width: "12.5%", height: "30%" },
-    nameLeft: "81.5%",
-    stampLeft: "84%",
+    slot: { left: "72.01%", top: "38.2%", width: "13.5%", height: "30%" },
+    nameLeft: "78.7%",
+    stampLeft: "82.6%",
     offsetX: "0%"
   }
 ] as const;
 
 const joseonRequiredEvidence = [
   "호패 조각",
-  "돌쇠의 그림",
+  "점순의 목 압박 흔적",
+  "찢어진 옷고름",
   "긁힌 팔 흔적",
-  "작은 발자국",
   "찢어진 약속 편지"
+] as const;
+
+const joseonRequiredAnalysisSteps = [
+  ["호패 조각", "호패 조각 감식"],
+  ["찢어진 옷고름", "찢어진 옷고름 감식"],
+  ["찢어진 약속 편지::먹빛 시험석", "찢어진 약속 편지 먹빛 대조"]
 ] as const;
 
 const spaceRequiredEvidence = [
   "얼어붙은 추진 레버 젤",
   "손상된 압력 센서",
+  "조작된 지연 타이머",
   "삭제된 의료 기록",
   "접속 키카드 칩",
+  "암호화된 연구 보상 계약",
   "마지막 무전 로그"
 ] as const;
 
@@ -163,6 +162,17 @@ function readCollectedEvidence(theme: ResultTheme) {
 
   try {
     const parsed = JSON.parse(window.localStorage.getItem(getEvidenceStorageKey(theme)) || "[]");
+    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+function readAnalyzedEvidence() {
+  if (typeof window === "undefined") return [] as string[];
+
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem("samunmong-analyzed-evidence-joseon") || "[]");
     return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
   } catch {
     return [];
@@ -385,7 +395,14 @@ export default function ResultScreen() {
   const selectedSuspect = activeSuspects.find((suspect) => suspect.id === selectedSuspectId) ?? activeSuspects[0];
   const missingEvidence = useMemo(() => {
     const collected = new Set(readCollectedEvidence(theme));
-    return requiredEvidence.filter((name) => !collected.has(name));
+    const missingCollected = requiredEvidence.filter((name) => !collected.has(name));
+    if (theme !== "joseon") return missingCollected;
+
+    const analyzed = new Set(readAnalyzedEvidence());
+    const missingAnalyzed = joseonRequiredAnalysisSteps
+      .filter(([storageName]) => !analyzed.has(storageName))
+      .map(([, label]) => label);
+    return [...missingCollected, ...missingAnalyzed];
   }, [requiredEvidence, showWarning, theme]);
 
   useEffect(() => {
@@ -607,7 +624,7 @@ export default function ResultScreen() {
             이 자를 지목한다
           </button>
           <Link className="wood-result-button" href={backToInterrogationHref}>
-            {theme === "spaceStation" ? "비상 조사실로 돌아간다" : "취조실로 돌아간다"}
+            {theme === "spaceStation" ? "보안 조사실로 돌아간다" : "취조실로 돌아간다"}
           </Link>
         </div>
       </section>

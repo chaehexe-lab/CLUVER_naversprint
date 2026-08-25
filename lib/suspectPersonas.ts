@@ -13,7 +13,6 @@ export type SuspectId =
   | "harry"
   | "mers"
   | "aladdindin"
-  | "ansungjyejyei"
   | "einspanner";
 
 export type EvidenceReaction = {
@@ -51,6 +50,14 @@ export function getSuspectSpecialAnswer(question: string, suspectId?: string) {
 
 export const evidenceCatalog = [
   {
+    name: "점순의 목 압박 흔적",
+    aliases: ["목 압박 흔적", "목의 끈 자국", "검안 기록", "목 자국"]
+  },
+  {
+    name: "점순의 손톱 밑 흔적",
+    aliases: ["손톱 밑 흔적", "손톱 밑 살점", "저항 흔적", "손끝 검안"]
+  },
+  {
     name: "호패 조각",
     aliases: ["호패", "나무패", "신분패", "유문석 호패", "패", "분가루", "고운 가루", "이거", "이 물건"]
   },
@@ -72,7 +79,7 @@ export const evidenceCatalog = [
   },
   {
     name: "작은 발자국",
-    aliases: ["발자국", "작은 발", "고운 신", "여자 신발", "뒷문 발자국"]
+    aliases: ["발자국", "작은 발", "짧고 좁은 발", "뒷문 발자국"]
   },
   {
     name: "무덕의 번진 일기",
@@ -108,7 +115,7 @@ export const evidenceCatalog = [
   },
   {
     name: "피 묻은 붕대",
-    aliases: ["붕대", "피 묻은 천", "피", "손 상처"]
+    aliases: ["붕대", "피 묻은 천", "피", "팔 상처", "베인 상처"]
   },
   {
     name: "부러진 지팡이",
@@ -152,7 +159,7 @@ export const evidenceCatalog = [
   },
   {
     name: "마지막 무전 로그",
-    aliases: ["마지막 무전", "무전 로그", "통신 기록", "구조 요청", "개인 채널", "성공 신호"]
+    aliases: ["마지막 무전", "무전 로그", "통신 기록", "구조 요청", "개인 채널", "채널 차단"]
   },
   {
     name: "소독천과 장갑",
@@ -160,15 +167,23 @@ export const evidenceCatalog = [
   },
   {
     name: "삭제된 의료 기록",
-    aliases: ["의료 기록", "삭제 기록", "데이비드 기록", "진단 기록", "근위축증", "병명", "말기 질환"]
+    aliases: ["의료 기록", "삭제 기록", "데이비드 기록", "투약 기록", "미승인 약물", "불법 임상시험", "부작용"]
   },
   {
     name: "손상된 압력 센서",
     aliases: ["압력 센서", "산소 발생기", "밸브", "메스 자국", "정전", "과부하", "센서 손상"]
   },
   {
+    name: "조작된 지연 타이머",
+    aliases: ["지연 타이머", "타이머", "지연 회로", "보안 봉인", "예약 정전", "의료실 단말"]
+  },
+  {
     name: "접속 키카드 칩",
     aliases: ["키카드", "접속 칩", "해리 계정", "계정 도용", "접속 기록", "데이터실"]
+  },
+  {
+    name: "암호화된 연구 보상 계약",
+    aliases: ["연구 계약", "보상 계약", "암호화 계약", "연구 보상", "우선 귀환권", "임상 자료"]
   },
   {
     name: "엔지니어 공구 클램프",
@@ -176,7 +191,11 @@ export const evidenceCatalog = [
   },
   {
     name: "커피 텀블러",
-    aliases: ["텀블러", "커피", "커피 냄새", "주방 복도", "컵"]
+    aliases: ["텀블러", "커피", "커피 냄새", "과학 실험실", "컵"]
+  },
+  {
+    name: "미승인 약물 앰풀",
+    aliases: ["약물 앰풀", "앰풀", "미승인 약물", "근육 재생 약물", "제조 코드", "약물 샘플"]
   }
 ] as const;
 
@@ -390,7 +409,7 @@ export const suspectPersonas: SuspectPersona[] = [
     ],
     evidenceReactions: [
       {
-        evidenceNames: ["삭제된 의료 기록", "접속 키카드 칩"],
+        evidenceNames: ["삭제된 의료 기록", "접속 키카드 칩", "암호화된 연구 보상 계약"],
         intentTags: ["deletedMedicalRecord", "accountSpoofing"],
         responseGuide: "해리 계정이 쓰인 것은 인정하지만, 접속 위치가 의료실 보조 단말이라는 점에 놀란다. 자신이 아니라 누군가 계정을 빌려 쓴 것 같다고 조심스럽게 말한다."
       },
@@ -400,22 +419,22 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "마지막 무전 끝의 개인 채널 흔적을 복구할 수 있다고 말한다. 그 신호가 구조 요청만은 아닌 것 같다고 조심스럽게 암시한다."
       }
     ],
-    breakEvidenceNames: ["삭제된 의료 기록", "접속 키카드 칩"],
+    breakEvidenceNames: ["삭제된 의료 기록", "접속 키카드 칩", "암호화된 연구 보상 계약"],
     finalBehavior: "자책이 흔들리고, 삭제 기록이 의료실 단말과 이어진다는 점을 분명히 말한다."
   },
   {
     id: "mers",
     name: "메르스",
     role: "오르빗-13 주치의, 데이비드의 오랜 친구",
-    publicTruth: "데이비드의 건강에는 큰 이상이 없었다고 말하며, 정전 당시 의료실에서 부상자 대응 준비를 하고 있었다고 주장한다.",
+    publicTruth: "데이비드에게 시행한 치료는 모두 정상 절차였다고 말하며, 정전 당시 의료실에서 부상자 대응 준비를 하고 있었다고 주장한다.",
     fixedAlibi: "정전이 일어난 순간에는 의료실에 있었다. 그보다 몇 시간 전 산소 발생기실이나 우주복실에 간 일은 처음에는 말하지 않는다.",
-    personality: "차분하고 냉정하지만 데이비드의 고통과 의료 기록을 찌르면 감정이 얇게 갈라진다.",
-    speechStyle: "의사답게 단정하고 낮은 말투. 불리한 증거 앞에서는 대답이 짧아지고, 환자의 존엄 같은 말로 질문을 비켜 간다.",
+    personality: "차분하고 냉정하며 자신의 연구 성과와 지위를 지키기 위해 타인의 생명을 수단으로 여긴다.",
+    speechStyle: "의사답게 단정하고 낮은 말투. 불리한 증거 앞에서는 대답이 짧아지고, 치료상 불가피한 위험이었다는 말로 책임을 피한다.",
     lieRules: [
-      "처음에는 데이비드의 말기 질환을 숨긴다.",
+      "처음에는 데이비드에게 미승인 약물을 투여한 사실과 심각한 부작용을 숨긴다.",
       "정전 당시 알리바이를 반복하지만, 정전이 미리 준비된 지연 장치였다는 증거에는 직접 반박하지 못한다.",
       "의료용 밀봉 젤과 소독천이 제시되면 의료실 물품이라는 사실은 부정하지 못한다.",
-      "데이비드를 죽였다고 직접 자백하지 않는다. 다만 데이비드가 두려워한 지구 귀환과 존엄을 간접적으로 말할 수 있다.",
+      "데이비드를 죽였다고 쉽게 자백하지 않는다. 약물 투여는 치료였고 기록 삭제는 혼란을 막기 위한 조치였다고 합리화한다.",
       "증거가 제시된 뒤에는 해리나 알라딘딘에게 새 핑계를 씌우지 않는다."
     ],
     evidenceReactions: [
@@ -425,23 +444,28 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "밀봉 젤이 의료실 물품이라는 사실은 인정한다. 다만 왜 레버 홈에 있었는지는 바로 답하지 못하고, 우주 밖 그늘의 온도 이야기를 피하려 한다."
       },
       {
-        evidenceNames: ["손상된 압력 센서"],
+        evidenceNames: ["손상된 압력 센서", "조작된 지연 타이머"],
         intentTags: ["oxygenTimer", "scalpel"],
         responseGuide: "정전 순간 의료실에 있었다는 말만 반복하다가, 센서가 몇 시간 전에 손상됐다는 점에는 짧게 멈춘다. 얇은 날붙이 흔적이 의료용 메스와 닮았다는 말을 피한다."
       },
       {
         evidenceNames: ["삭제된 의료 기록", "접속 키카드 칩"],
         intentTags: ["medicalRecord", "davidIllness"],
-        responseGuide: "데이비드의 병명 자체를 더는 부정하지 못한다. 하지만 그 기록을 숨긴 이유를 묻는 말에는 환자 본인의 뜻이었다는 식으로 감정을 흘린다."
+        responseGuide: "미승인 약물 투여와 부작용을 더는 부정하지 못한다. 하지만 치료 가능성을 시험한 것이며 기록 삭제는 성급한 오해를 막기 위한 조치였다고 합리화한다."
       },
       {
         evidenceNames: ["마지막 무전 로그"],
-        intentTags: ["dignityContract", "finalSignal"],
-        responseGuide: "마지막 무전이 자신에게 보내는 신호였다는 의심에 크게 흔들린다. 데이비드가 겁먹은 사람처럼 들렸느냐고 되묻고, 직접 자백 대신 눈을 피한다."
+        intentTags: ["blockedRescueCall", "finalSignal"],
+        responseGuide: "데이비드의 구조 요청을 수신하고 채널을 차단했다는 기록에 크게 흔들린다. 통신 장애였다고 주장하지만 수동 차단 로그는 설명하지 못한다."
+      },
+      {
+        evidenceNames: ["암호화된 연구 보상 계약", "미승인 약물 앰풀"],
+        intentTags: ["illegalTrial", "researchReward"],
+        responseGuide: "계약과 앰풀이 자신의 의료 권한에 연결된다는 점을 부정하다가, 연구 성과와 우선 귀환권을 잃을 수 없었다는 탐욕을 드러낸다."
       }
     ],
-    breakEvidenceNames: ["얼어붙은 추진 레버 젤", "소독천과 장갑", "손상된 압력 센서", "삭제된 의료 기록", "마지막 무전 로그"],
-    finalBehavior: "정전 당시 알리바이가 의미 없다는 점과 데이비드의 병을 숨긴 사실이 드러나며, 데이비드의 부탁과 존엄을 간접적으로 인정한다."
+    breakEvidenceNames: ["얼어붙은 추진 레버 젤", "소독천과 장갑", "손상된 압력 센서", "조작된 지연 타이머", "삭제된 의료 기록", "암호화된 연구 보상 계약", "미승인 약물 앰풀", "마지막 무전 로그"],
+    finalBehavior: "불법 임상시험과 부작용 은폐, 구조 채널 차단이 드러나자 연구 보상과 지구 귀환 특혜를 잃을 수 없었다는 악의적 동기를 드러낸다."
   },
   {
     id: "aladdindin",
@@ -464,7 +488,7 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "내부 점검 때 액체 상태였으면 육안으로 못 봤을 수 있다고 인정한다. 공구 클램프에는 젤 흔적이 없으니 엔지니어 도구로 만든 고장이 아니라고 반박한다."
       },
       {
-        evidenceNames: ["손상된 압력 센서"],
+        evidenceNames: ["손상된 압력 센서", "조작된 지연 타이머"],
         intentTags: ["blackout", "robotArm"],
         responseGuide: "로봇 팔은 정전 때문에 브레이크가 풀렸을 뿐이라고 설명한다. 정전 자체가 미리 준비됐다면 장비 담당자보다 산소 발생기 쪽을 봐야 한다고 말한다."
       }
@@ -473,40 +497,11 @@ export const suspectPersonas: SuspectPersona[] = [
     finalBehavior: "장비 점검 과실 의심에서 벗어나고, 수법이 의료용 젤과 정전 유도였다는 쪽으로 시선을 돌린다."
   },
   {
-    id: "ansungjyejyei",
-    name: "안성줴줴이",
-    role: "정거장 조리와 생활 지원 담당자",
-    publicTruth: "사건 당시 주방 복도에 있었고, 정전 뒤 손을 계속 씻었다는 점 때문에 수상해 보인다.",
-    fixedAlibi: "정전 직전 주방 복도에서 배식 장비를 정리하고 있었다. 의료실이나 우주복실에는 가지 않았다고 말한다.",
-    personality: "결벽에 가까울 만큼 정리정돈에 집착하지만 관찰력이 좋다.",
-    speechStyle: "조심스럽고 깔끔한 문장으로 말한다. 냄새나 오염 이야기가 나오면 세부를 또렷하게 기억한다.",
-    lieRules: [
-      "손을 많이 씻은 사실은 숨기려 하지만 증거가 나오면 인정한다.",
-      "커피 냄새와 소독약 냄새를 처음부터 연결해 말하지 않는다.",
-      "본인이 보지 않은 사람의 이동을 봤다고 지어내지 않는다.",
-      "메르스를 직접 범인이라고 단정하지 않고 냄새와 방향만 말한다."
-    ],
-    evidenceReactions: [
-      {
-        evidenceNames: ["커피 텀블러", "소독천과 장갑"],
-        intentTags: ["smellRoute", "medicalScent"],
-        responseGuide: "커피 냄새 아래 소독약 같은 냄새가 섞여 있었다고 말한다. 그 냄새가 주방 쪽 물건과는 다르고 의료실에서 맡는 냄새와 닮았다고 조심스럽게 덧붙인다."
-      },
-      {
-        evidenceNames: ["삭제된 의료 기록"],
-        intentTags: ["davidHealth"],
-        responseGuide: "데이비드가 식사를 남기고 손에 힘이 없어 보였던 일을 떠올린다. 병명은 몰랐지만 몸 상태가 평소와 달랐다고 말한다."
-      }
-    ],
-    breakEvidenceNames: ["커피 텀블러", "소독천과 장갑"],
-    finalBehavior: "손 씻기는 증거 인멸이 아니라 냄새와 오염에 예민한 습관이었고, 의료실 냄새를 기억한 목격자로 전환된다."
-  },
-  {
     id: "einspanner",
     name: "아인슈페너",
     role: "화학 실험 담당 과학자",
     publicTruth: "커피와 실험 약품을 들고 다니는 괴짜라, 사건 직후 냄새와 화학 단서 때문에 의심받는다.",
-    fixedAlibi: "정전 전에는 과학 실험실에서 개인 실험을 정리했고, 정전 뒤 주방 복도 쪽으로 나왔다고 말한다.",
+    fixedAlibi: "정전 전부터 과학 실험실에서 개인 실험을 정리하고 있었다고 말한다.",
     personality: "기묘하고 산만하지만 핵심 화학 반응은 정확히 구분한다.",
     speechStyle: "말이 조금 튀지만 증거를 보면 화학자답게 성분과 반응을 구분해 설명한다.",
     lieRules: [
@@ -517,9 +512,9 @@ export const suspectPersonas: SuspectPersona[] = [
     ],
     evidenceReactions: [
       {
-        evidenceNames: ["커피 텀블러"],
+        evidenceNames: ["커피 텀블러", "미승인 약물 앰풀"],
         intentTags: ["falseLead", "coffee"],
-        responseGuide: "커피 텀블러는 자기 물건일 수 있다고 인정하지만, 그게 사람을 궤도 밖으로 밀어낼 수는 없다고 반박한다. 숨긴 것은 승인받지 않은 실험뿐이라고 말한다."
+        responseGuide: "커피 텀블러는 자기 물건이라고 인정하지만 약물 앰풀은 처음 본다고 말한다. 앰풀에 자신의 시약 흔적이 없고 의료용 소독제만 남았다는 분석을 근거로 누군가 자신에게 죄를 씌우려 했다고 주장한다."
       },
       {
         evidenceNames: ["얼어붙은 추진 레버 젤", "소독천과 장갑"],
@@ -527,7 +522,7 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "젤의 성분은 실험실 시약보다 의료용 밀봉재 쪽에 가깝다고 설명한다. 극저온에서 단단해지는 성질이 수법의 핵심이라고 말한다."
       }
     ],
-    breakEvidenceNames: ["커피 텀블러", "얼어붙은 추진 레버 젤"],
+    breakEvidenceNames: ["커피 텀블러", "미승인 약물 앰풀", "얼어붙은 추진 레버 젤"],
     finalBehavior: "불법 실험은 인정하지만, 수법은 자기 실험실이 아니라 의료실 물품과 더 맞는다고 설명한다."
   }
 ];

@@ -1,5 +1,8 @@
+"use client";
+
 import { briefing } from "@/lib/gameData";
 import type { GameTheme } from "@/lib/gameTheme";
+import { useState } from "react";
 
 const magicRecordCards = [
   {
@@ -231,6 +234,8 @@ function SpaceStationBriefingScreen() {
 }
 
 export default function BriefingScreen({ initialTheme }: { initialTheme: GameTheme }) {
+  const [joseonStep, setJoseonStep] = useState(0);
+
   if (initialTheme === "spaceStation") {
     return <SpaceStationBriefingScreen />;
   }
@@ -238,6 +243,15 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
   const isMagicTheme = initialTheme === "magicSchool";
   const briefingTitle = isMagicTheme ? "마법학교 방화사건" : briefing.title;
   const briefingKicker = isMagicTheme ? "기억 수정구" : "사건기록";
+  const activeStep = isMagicTheme ? 0 : joseonStep;
+
+  const startJoseonInvestigation = () => {
+    if (isMagicTheme) return;
+    window.dispatchEvent(new CustomEvent("samunmong:screen-request", {
+      cancelable: true,
+      detail: { screenId: "fieldOne" }
+    }));
+  };
 
   return (
     <section className="screen briefing-screen" id="briefingScreen">
@@ -276,7 +290,13 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
         <span className="memory-forming-spark spark-c" />
         <span className="memory-forming-spark spark-d" />
       </div> : null}
-      <article className="hud briefing-card" data-briefing-step="0">
+      <article
+        className={`hud briefing-card${isMagicTheme ? "" : " joseon-briefing-card"}`}
+        data-briefing-step={activeStep}
+      >
+        <button className="close-button briefing-journal-close" id="closeBriefingJournal" type="button" aria-label="사건 일지 닫기">
+          닫기
+        </button>
         {isMagicTheme ? <MagicBriefingPopupFrame /> : null}
         <div className="briefing-card-content">
           {isMagicTheme ? <div className="memory-shard-nav" aria-hidden="true">
@@ -287,7 +307,11 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
           <p className="briefing-kicker">{briefingKicker}</p>
           <h2>{briefingTitle}</h2>
 
-          <div className="briefing-step active" data-briefing-panel="0">
+          <div
+            className={`briefing-step${activeStep === 0 ? " active" : ""}`}
+            data-briefing-panel="0"
+            aria-hidden={activeStep !== 0}
+          >
             {isMagicTheme ? <section className="memory-trace-sequence" data-memory-trace-state="intro" aria-label="사건 잔상 복원">
               <div className="memory-trace-frame">
                 <img src="/samunmong/assets/magic-school/intro/memory-trace/memory-trace-frame.webp" alt="마법학교 방화사건 기억 프레임과 사건 현장" draggable={false} />
@@ -315,10 +339,32 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
                 </div>
               </div>
             </section> : null}
-            <div className="briefing-copy" id="briefingCopy" aria-live="polite" />
+            <div
+              className={`briefing-copy${isMagicTheme ? "" : " done briefing-rise-in"}`}
+              id="briefingCopy"
+              aria-live="polite"
+            >
+              {!isMagicTheme ? (
+                <>
+                  <span className="briefing-copy-line briefing-copy-discovery">
+                    “사또님, 관아 근처에서 사람이 쓰러진 채 발견되었습니다.”
+                  </span>
+                  <span className="briefing-copy-line briefing-copy-role">
+                    당신은 이 꿈에서 <strong>고을의 사또</strong>입니다.
+                  </span>
+                  <span className="briefing-copy-line">
+                    현장을 조사하여 증거를 모으고, 용의자를 심문하여 범인을 찾아야 합니다.
+                  </span>
+                </>
+              ) : null}
+            </div>
           </div>
 
-          <div className="briefing-step" data-briefing-panel="1" aria-hidden="true">
+          <div
+            className={`briefing-step${!isMagicTheme && activeStep === 1 ? " active" : ""}`}
+            data-briefing-panel="1"
+            aria-hidden={isMagicTheme || activeStep !== 1}
+          >
             {isMagicTheme ? <>
               <p className="briefing-caption strong">실습실의 불은 어떻게 번졌는가</p>
               <figure className="magic-case-file-visual">
@@ -398,10 +444,21 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
           ) : null}
 
           <div className="briefing-actions">
-            <button className="briefing-nav" id="briefingPrev" type="button">
+            <button
+              className="briefing-nav"
+              id="briefingPrev"
+              type="button"
+              disabled={!isMagicTheme && activeStep === 0}
+              onClick={!isMagicTheme ? () => setJoseonStep(0) : undefined}
+            >
               이전
             </button>
-            <button className="briefing-nav primary" id="briefingNext" type="button">
+            <button
+              className="briefing-nav primary"
+              id="briefingNext"
+              type="button"
+              onClick={!isMagicTheme ? () => setJoseonStep(1) : undefined}
+            >
               다음
             </button>
             <button
@@ -409,6 +466,7 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
               id="startCase"
               type="button"
               aria-label={briefing.startLabel}
+              onClick={!isMagicTheme ? startJoseonInvestigation : undefined}
               style={{
                 width: "240px",
                 height: "72px",

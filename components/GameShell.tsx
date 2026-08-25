@@ -29,8 +29,8 @@ import {
   type GameTheme
 } from "@/lib/gameTheme";
 
-const CONTENT_SCRIPT = "/samunmong/content.js?v=20260816-interactions-v91";
-const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260822-theme-isolation-v112";
+const CONTENT_SCRIPT = "/samunmong/content.js?v=20260824-evidence-scene-v3";
+const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260825-evidence-popup-v117";
 const MAIN_SCREEN = "mainScreen";
 
 const INVESTIGATION_SCENE_COMPONENTS: Record<string, ComponentType> = {
@@ -78,8 +78,10 @@ function ensureRequestedStartScreen(initialScreen?: string) {
   const startScreen = new URLSearchParams(window.location.search).get("start") || initialScreen;
   if (!startScreen || !STARTABLE_SCREENS.has(startScreen)) return;
 
-  document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
   requestScreen(startScreen);
+  window.setTimeout(() => {
+    document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
+  }, 0);
 }
 
 function ActiveInvestigationScene({ screenId }: { screenId: string }) {
@@ -87,7 +89,7 @@ function ActiveInvestigationScene({ screenId }: { screenId: string }) {
   if (InvestigationComponent) return <InvestigationComponent />;
 
   const magicScene = MAGIC_SCENES_BY_ID.get(screenId);
-  if (magicScene) return <MagicSchoolScene scene={magicScene} />;
+  if (magicScene) return <MagicSchoolScene key={magicScene.id} scene={magicScene} />;
 
   const spaceScene = SPACE_SCENES_BY_ID.get(screenId);
   return spaceScene ? <SpaceStationScene scene={spaceScene} /> : null;
@@ -100,6 +102,13 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
   const [currentScreen, setCurrentScreen] = useState(
     initialScreen && STARTABLE_SCREENS.has(initialScreen) ? initialScreen : MAIN_SCREEN
   );
+
+  useLayoutEffect(() => {
+    const requestedStart = new URLSearchParams(window.location.search).get("start") || initialScreen;
+    if (requestedStart && STARTABLE_SCREENS.has(requestedStart)) {
+      setCurrentScreen(requestedStart);
+    }
+  }, [initialScreen]);
 
   useEffect(() => {
     const navigationWindow = window as Window & { samunmongNavigate?: (href: string) => void };
