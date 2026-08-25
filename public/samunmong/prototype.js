@@ -1000,11 +1000,12 @@
       const messageEl = document.querySelector("#toastMessage");
       const closeButton = document.querySelector("#closeToast");
       const hasEvidence = Boolean(options.image && options.title);
+      const isDismissible = Boolean(options.dismissible) && !(hasEvidence && isSpaceTheme);
 
       clearTimeout(closeToast.cleanupTimer);
       toast.classList.toggle("evidence-toast", hasEvidence);
       toast.classList.toggle("hint-toast", options.variant === "hint");
-      toast.classList.toggle("dismissible", Boolean(options.dismissible));
+      toast.classList.toggle("dismissible", isDismissible);
       toast.setAttribute("role", hasEvidence ? "dialog" : "status");
       if (image) {
         image.hidden = !hasEvidence;
@@ -1015,16 +1016,16 @@
         title.hidden = !hasEvidence;
         title.textContent = hasEvidence ? options.title : "";
       }
-      if (closeButton) closeButton.hidden = !options.dismissible;
+      if (closeButton) closeButton.hidden = !isDismissible;
       if (messageEl) {
-        const displayMessage = hasEvidence && isSpaceTheme && !message
+        const displayMessage = hasEvidence && isSpaceTheme
           ? "증거 보관함에 저장되었습니다."
           : message;
         messageEl.textContent = sentenceBreakText(displayMessage);
       }
       toast.classList.add("show");
       clearTimeout(showToast.timer);
-      if (!options.dismissible) {
+      if (!isDismissible) {
         showToast.timer = setTimeout(() => toast.classList.remove("show"), options.duration || 1900);
       }
     }
@@ -3439,6 +3440,7 @@
     }
 
     function selectEvidence(button) {
+      if (button.closest("#evidenceList")) return;
       document.querySelectorAll(".evidence").forEach((item) => item.classList.remove("active"));
       button.classList.add("active");
       selectedEvidence = button.dataset.evidence;

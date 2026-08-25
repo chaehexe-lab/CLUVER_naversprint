@@ -6940,16 +6940,17 @@
     html[data-samunmong-theme="spaceStation"] .toast.evidence-toast .toast-title {
       color: #f3f9ff;
       font-family: "VitroPride", "Noto Sans KR", sans-serif;
-      font-size: 19px;
+      font-size: 21px;
       font-weight: 700;
       line-height: 1.25;
       text-shadow: 0 0 12px rgba(131, 218, 255, .14);
+      transform: translateY(-4px);
     }
 
     html[data-samunmong-theme="spaceStation"] .toast.evidence-toast .toast-message {
       color: #bfd8e5;
       font-family: "VitroPride", "Noto Sans KR", sans-serif;
-      font-size: 12px;
+      font-size: 15px;
       font-weight: 400;
       line-height: 1.4;
     }
@@ -7617,7 +7618,7 @@
       z-index: 2;
       bottom: 8px;
       color: rgba(255, 229, 169, .88);
-      font-size: 14px;
+      font-size: 16px;
       line-height: 1.15;
       text-shadow: 0 1px 4px rgba(0, 0, 0, .62);
     }
@@ -14857,4 +14858,310 @@ html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-preview-image
   .scene-lantern-light { animation:sceneLanternBreathe 4.5s ease-in-out infinite !important; }
   .scene-lantern-light::before { animation:sceneLanternSpriteFrames 1.8s steps(11,end) infinite !important; }
   .hotspot.hanging-evidence .hotspot-evidence-visual { animation:hangingEvidenceSway 7s ease-in-out infinite alternate !important; }
+}
+
+/* Space-station evidence storage: calm, brighter steel-blue glass. */
+html[data-samunmong-theme="spaceStation"] .global-panel.bag-panel,
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop {
+  border: 1px solid rgba(184, 222, 239, .58);
+  border-radius: 24px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .14), transparent 18%),
+    radial-gradient(ellipse at 50% 0%, rgba(196, 231, 247, .2), transparent 46%),
+    linear-gradient(145deg, rgba(81, 111, 132, .96), rgba(42, 69, 90, .97)) !important;
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, .56),
+    inset 0 0 0 1px rgba(226, 246, 255, .14),
+    inset 0 -28px 52px rgba(16, 43, 63, .14);
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-empty {
+  border-color: rgba(35, 78, 111, .26);
+  color: rgba(15, 43, 67, .82);
+  background: rgba(239, 247, 255, .46);
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .bag-pop-head,
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .bag-pop-head strong {
+  color: #eaf6ff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, .6);
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .close-button {
+  border-color: rgba(157, 220, 247, .62);
+  color: #eaf6ff;
+  background: rgba(7, 18, 29, .72);
+}
+
+/* Compact space-station evidence vault. */
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop {
+  box-sizing: border-box;
+  isolation: isolate;
+  width: min(920px, 88vw);
+  height: min(585px, 88%);
+  max-height: 88%;
+  padding: clamp(34px, 3.4vw, 48px) clamp(42px, 4.2vw, 60px);
+  overflow: hidden;
+  border: 1px solid rgba(188, 229, 255, .9);
+  border-radius: 24px;
+  color: #102b44;
+  background: linear-gradient(145deg, rgba(221, 233, 248, .62), rgba(185, 204, 229, .54)) !important;
+  box-shadow:
+    0 22px 64px rgba(0, 0, 0, .46),
+    0 0 22px rgba(112, 205, 255, .2),
+    inset 0 1px 0 rgba(255, 255, 255, .84),
+    inset 0 -18px 38px rgba(64, 105, 154, .1);
+  backdrop-filter: blur(12px) saturate(1.08);
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 8px;
+  border: 1px solid rgba(132, 198, 238, .52);
+  border-radius: 18px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .24);
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 4%, rgba(255, 255, 255, .38), transparent 34%),
+    linear-gradient(115deg, transparent 12%, rgba(255, 255, 255, .14) 34%, transparent 56%);
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop > * {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop,
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop * {
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .bag-pop-head {
+  max-width: none;
+  margin-bottom: 36px;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .bag-pop-head strong {
+  color: #102b44;
+  text-shadow: none;
+  font-size: clamp(26px, 2.4vw, 34px);
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .mini-close {
+  width: 38px;
+  height: 38px;
+  border-color: rgba(55, 99, 143, .58);
+  border-radius: 50%;
+  color: #173a5a;
+  background: rgba(217, 234, 250, .48);
+  font-size: 28px;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .mini-close:hover,
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .mini-close:focus-visible {
+  border: 2px solid rgba(55, 99, 143, .94);
+  color: #173a5a;
+  background: rgba(217, 234, 250, .48);
+  box-shadow: none;
+  outline: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-location-tabs {
+  width: calc(100% - 36px);
+  max-width: none;
+  margin-inline: auto;
+  gap: 7px;
+  margin-bottom: 16px;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-location-tab {
+  min-height: 32px;
+  padding: 0 11px;
+  border: 1px solid rgba(92, 130, 169, .42);
+  border-radius: 8px;
+  color: #071f35;
+  background: rgba(231, 241, 252, .42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .48);
+  font-size: clamp(13px, 1.1vw, 15px);
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-location-tab.active {
+  border-color: rgba(83, 173, 231, .92);
+  color: #071f35;
+  background: rgba(149, 207, 246, .68);
+  box-shadow:
+    inset 0 0 0 1px rgba(235, 249, 255, .72),
+    0 0 12px rgba(64, 160, 222, .28);
+  text-shadow: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-grid {
+  max-width: none;
+  gap: 12px;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-location-section {
+  gap: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-location-head {
+  display: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-location-grid {
+  width: calc(100% - 36px);
+  margin-inline: auto;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card {
+  min-height: 104px;
+  display: grid;
+  grid-template-columns: 132px minmax(0, 1fr);
+  align-items: center;
+  gap: 2px;
+  padding: 0 14px;
+  border: 1px solid rgba(255, 255, 255, .72);
+  border-radius: 13px;
+  color: #102d47;
+  background: rgba(239, 247, 255, .32);
+  box-shadow:
+    inset 0 0 0 1px rgba(103, 160, 204, .22),
+    0 8px 20px rgba(39, 70, 104, .08);
+  cursor: default;
+  text-align: left;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card:hover,
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card:focus-visible {
+  border-color: rgba(31, 112, 166, .72);
+  background: rgba(235, 247, 255, .5);
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card,
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card.active {
+  filter: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card.active {
+  border-color: rgba(255, 255, 255, .72);
+  background: rgba(239, 247, 255, .32);
+  box-shadow:
+    inset 0 0 0 1px rgba(103, 160, 204, .22),
+    0 8px 20px rgba(39, 70, 104, .08);
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card[data-evidence="마지막 무전 로그"].active {
+  border-color: rgba(255, 255, 255, .72);
+  background: rgba(239, 247, 255, .32);
+  box-shadow:
+    inset 0 0 0 1px rgba(103, 160, 204, .22),
+    0 8px 20px rgba(39, 70, 104, .08);
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card[data-evidence="마지막 무전 로그"].active:hover,
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card[data-evidence="마지막 무전 로그"].active:focus-visible {
+  border-color: rgba(31, 112, 166, .72);
+  background: rgba(235, 247, 255, .5);
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-visual {
+  position: relative;
+  width: 132px;
+  height: 112px;
+  display: grid;
+  place-items: center;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card .evidence-thumb {
+  width: 118px;
+  height: 108px;
+  border: 0;
+  border-radius: 0;
+  object-fit: contain;
+  background: transparent;
+  filter: drop-shadow(0 7px 8px rgba(0, 0, 0, .45));
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-state-frame,
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-kind-mark {
+  display: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card-copy {
+  width: calc(100% + 70px);
+  margin: 0 0 0 -70px;
+  gap: 10px;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card-copy strong {
+  color: #102b44;
+  font-size: clamp(20px, 1.8vw, 24px);
+  line-height: 1.25;
+}
+
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card .evidence-summary {
+  display: block;
+  color: #071f35;
+  font-size: clamp(13px, 1.15vw, 16px);
+  line-height: 1.45;
+  word-break: keep-all;
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  html[data-samunmong-theme="spaceStation"] .evidence-bag-pop {
+    width: 92%;
+    height: min(585px, 88%);
+    padding: 40px 34px;
+  }
+
+  html[data-samunmong-theme="spaceStation"] .evidence-bag-pop::before {
+    inset: 7px;
+    border-radius: 16px;
+  }
+
+  html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card {
+    width: 100%;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 13px;
+    padding-inline: 12px;
+  }
+
+  html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card-copy {
+    width: calc(100% + 20px);
+    margin-left: -20px;
+  }
+
+  html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card .evidence-summary {
+    white-space: normal;
+  }
+
+  html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-visual {
+    width: 96px;
+  }
+
+  html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card .evidence-thumb {
+    width: 90px;
+    height: 92px;
+  }
 }

@@ -14,11 +14,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body>
-        {children}
-        <script src="/samunmong/content.js?v=20260824-evidence-scene-v3" />
-        <script src="/samunmong/prototype.js?v=20260824-evidence-popup-v114" />
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
