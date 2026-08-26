@@ -3420,6 +3420,11 @@
       bottom: 14%;
     }
 
+    html[data-samunmong-theme="spaceStation"] .scene-dock .briefing-chip {
+      right: 2.4%;
+      bottom: 25%;
+    }
+
     html[data-samunmong-theme="spaceStation"] .scene-dock .bag-chip {
       right: 2.4%;
       bottom: 3%;
@@ -7256,6 +7261,23 @@
       right: 46px;
       z-index: 4;
       display: grid;
+    }
+
+    html[data-samunmong-theme="spaceStation"] #briefingScreen.journal-overlay-open .briefing-journal-close {
+      position: absolute;
+      top: 20px;
+      right: 22px;
+      z-index: 12;
+      display: grid;
+    }
+
+    html[data-samunmong-theme="spaceStation"] #briefingScreen.journal-overlay-open,
+    html[data-samunmong-theme="spaceStation"] #briefingScreen.journal-overlay-open .briefing-card,
+    html[data-samunmong-theme="spaceStation"] #briefingScreen.journal-overlay-open .briefing-card *,
+    html[data-samunmong-theme="spaceStation"] #briefingScreen.journal-overlay-open .briefing-card *::before,
+    html[data-samunmong-theme="spaceStation"] #briefingScreen.journal-overlay-open .briefing-card *::after {
+      animation: none !important;
+      transition: none !important;
     }
 
     #briefingScreen.journal-overlay-open {
