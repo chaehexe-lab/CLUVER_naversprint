@@ -37,7 +37,7 @@ export const spaceStationTheme = {
     { id: "interrogationScreen", name: "보안 조사실", map: { x: "50.2%", y: "79%", labelY: "88.6%" }, indicator: { x: "50%", y: "76%" }, image: room, alt: "오르빗-13 보안 조사실" }
   ],
   evidence: {
-    "엔지니어 공구 클램프": { role: "무혐의 증거", location: "에어록", note: "에어록 장비 점검대의 공구 클램프. 알라딘딘의 점검에 쓰였지만 레버 젤 흔적은 없다.", logic: "알라딘딘이 장비를 조작했다는 의혹을 약화한다.", relatedSuspects: ["알라딘딘"], img: "/assets/space-station/evidence/engineer-tool-clamp.webp" },
+    "엔지니어 공구 클램프": { role: "무혐의 증거", location: "에어록", note: "공구함 반납 기록을 확인할 수 있다.", logic: "알라딘딘이 장비를 조작했다는 의혹을 약화한다.", relatedSuspects: ["알라딘딘"], img: "/assets/space-station/evidence/engineer-tool-clamp.webp" },
     "추진 레버 결빙 기록": { role: "수법 증거", location: "에어록", note: "데이비드의 우주복 원격 진단 기록을 확인할 수 있다.", logic: "추진 레버는 데이비드와 함께 표류했지만 관제 기록을 통해 결빙 시점과 작동 불능 상태를 확인할 수 있다.", relatedSuspects: ["메르스", "알라딘딘"], img: "/assets/space-station/evidence/control-terminal.webp" },
     "마지막 무전 로그": { role: "결정타 증거", location: "에어록", note: "데이비드의 마지막 구조 요청이 개인 의료 채널에서 수동 차단됐다.", logic: "메르스가 구조 요청을 받고도 채널을 차단했다.", relatedSuspects: ["데이비드", "메르스"], img: "/assets/space-station/evidence/final-radio-log.webp" },
     "소독천과 장갑": { role: "연결 증거", location: "의료실", note: "흰 소독천과 수술용 장갑에 투명 젤 성분이 남아 있다.", logic: "추진 레버를 막은 젤과 의료실을 연결한다.", relatedSuspects: ["메르스"], img: "/assets/space-station/evidence/disinfectant-cloth-glove.webp" },

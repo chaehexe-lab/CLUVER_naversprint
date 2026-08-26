@@ -778,14 +778,15 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             </button>
             <div className="space-evidence-detail-visual">
               <img
+                id="spaceEvidenceDetailImage"
                 src="/assets/space-station/evidence/thruster-freeze-record-detail.webp"
                 alt="정면에서 본 추진 레버 결빙 진단 화면"
               />
             </div>
             <div className="space-evidence-detail-copy">
-              <span>ORBIT-13 · EQUIPMENT DIAGNOSTIC</span>
+              <span id="spaceEvidenceDetailKicker">ORBIT-13 · EQUIPMENT DIAGNOSTIC</span>
               <h2 id="spaceEvidenceDetailTitle">추진 레버 결빙 기록</h2>
-              <p>
+              <p id="spaceEvidenceDetailDescription">
                 데이비드의 우주복에서 전송된 마지막 장비 진단 화면이다. 비상 추진 레버 연결부가
                 정체불명의 투명한 결빙 물질로 뒤덮여 있다. 레버 작동 신호는 입력됐지만 추진 가스
                 밸브는 열리지 않았다. 기록만으로는 결빙 물질의 정확한 성분을 확인할 수 없다.

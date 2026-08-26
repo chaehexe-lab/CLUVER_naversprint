@@ -1574,13 +1574,43 @@
       tooltip.setAttribute("aria-hidden", "true");
     }
 
-    const detailedSpaceEvidenceName = "추진 레버 결빙 기록";
+    const detailedSpaceEvidence = {
+      "추진 레버 결빙 기록": {
+        kicker: "ORBIT-13 · EQUIPMENT DIAGNOSTIC",
+        title: "추진 레버 결빙 기록",
+        image: "/assets/space-station/evidence/thruster-freeze-record-detail.webp",
+        imageAlt: "정면에서 본 추진 레버 결빙 진단 화면",
+        description: "데이비드의 우주복에서 전송된 마지막 장비 진단 화면이다. 비상 추진 레버 연결부가 정체불명의 투명한 결빙 물질로 뒤덮여 있다. 레버 작동 신호는 입력됐지만 추진 가스 밸브는 열리지 않았다. 기록만으로는 결빙 물질의 정확한 성분을 확인할 수 없다."
+      },
+      "엔지니어 공구 클램프": {
+        kicker: "ORBIT-13 · TOOL RETURN LOG",
+        title: "공구함 반납 기록",
+        image: "/assets/space-station/evidence/engineer-tool-clamp.webp",
+        imageAlt: "엔지니어 공구 클램프",
+        description: "- 사용 목적: 우주복 점검\n- 공구함 반납 시각: OST 21:37\n- 마지막 사용자 ID: ORBIT-13-MNT-0821\n- 점검 결과: 우주복 손상 및 특이 잔류물 없음"
+      }
+    };
 
-    function setSpaceEvidenceDetail(open) {
+    function setSpaceEvidenceDetail(open, evidenceName) {
       if (!isSpaceTheme) return;
       const panel = document.querySelector("#spaceEvidenceDetail");
       const overlay = document.querySelector("#spaceEvidenceDetailOverlay");
       if (!panel || !overlay) return;
+      if (open) {
+        const detail = detailedSpaceEvidence[evidenceName];
+        if (!detail) return;
+        const image = panel.querySelector("#spaceEvidenceDetailImage");
+        const kicker = panel.querySelector("#spaceEvidenceDetailKicker");
+        const title = panel.querySelector("#spaceEvidenceDetailTitle");
+        const description = panel.querySelector("#spaceEvidenceDetailDescription");
+        if (image) {
+          image.src = detail.image;
+          image.alt = detail.imageAlt;
+        }
+        if (kicker) kicker.textContent = detail.kicker;
+        if (title) title.textContent = detail.title;
+        if (description) description.textContent = detail.description;
+      }
       panel.classList.toggle("show", open);
       overlay.classList.toggle("show", open);
       panel.setAttribute("aria-hidden", String(!open));
@@ -3643,8 +3673,8 @@
       button.dataset.storyRole = meaningRevealed ? getEvidenceStoryCue(name, data)[0] : "???";
       button.innerHTML = evidenceCardHtml(name);
       button.addEventListener("click", () => {
-        if (isSpaceTheme && name === detailedSpaceEvidenceName) {
-          setSpaceEvidenceDetail(true);
+        if (isSpaceTheme && detailedSpaceEvidence[name]) {
+          setSpaceEvidenceDetail(true, name);
           playSfx("buttonAlt", 0.48);
           return;
         }
@@ -6068,8 +6098,8 @@
       const hotspot = target.closest("[data-evidence-name], #hopaeHotspot, #portraitHotspot");
       if (!hotspot) return;
       if (hotspot.classList.contains("collected") || hotspot.getAttribute("aria-disabled") === "true") {
-        if (isSpaceTheme && hotspot.dataset.evidenceName === detailedSpaceEvidenceName) {
-          setSpaceEvidenceDetail(true);
+        if (isSpaceTheme && detailedSpaceEvidence[hotspot.dataset.evidenceName]) {
+          setSpaceEvidenceDetail(true, hotspot.dataset.evidenceName);
           playSfx("buttonAlt", 0.48);
         }
         return;

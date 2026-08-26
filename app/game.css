@@ -16312,6 +16312,7 @@ html[data-samunmong-theme="spaceStation"] .space-evidence-detail-copy p {
   font-size: clamp(15px, 1.35vw, 18px);
   line-height: 1.8;
   word-break: keep-all;
+  white-space: pre-line;
 }
 
 html[data-samunmong-theme="spaceStation"] .space-evidence-detail-close {
