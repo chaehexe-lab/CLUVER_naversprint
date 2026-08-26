@@ -11666,6 +11666,19 @@ html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel .special-touch-p
   box-shadow: none !important;
   cursor: grabbing;
 }
+/* The pouch lining itself is the handle: expose the folded lower hem, not a floating UI button. */
+html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel .special-touch-points[data-special-mode="pouch"] button {
+  display: none !important;
+}
+html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel .special-touch-points[data-special-mode="pouch"][data-active-step="1"] button[data-special-point="1"] {
+  display: block !important;
+  left: 42.5%;
+  right: auto;
+  top: 66%;
+  width: 20%;
+  height: 22%;
+  overflow: hidden;
+}
 html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel .direct-affordance-fragment {
   position: absolute;
   z-index: 1;

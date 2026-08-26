@@ -2571,7 +2571,10 @@
       },
       "빈 호패 주머니": {
         note: "호패가 빠진 듯한 빈 주머니. 주인과 호패 조각의 관계를 확인할 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-empty-hopae-holder.webp"
+        img: "/samunmong/assets/evidence-transparent/evidence-empty-hopae-holder.webp",
+        tool: "돋보기",
+        toolResultAsset: "/samunmong/assets/interactions/pouch-lining-puzzle/state-2.png",
+        toolResult: "안감을 끝까지 뒤집자 길쭉한 나무패 눌림과 잘린 붉은 끈 섬유가 함께 드러난다. 이 주머니에는 호패가 들어 있었고, 저절로 빠진 것이 아니라 누군가 끈을 끊어 꺼낸 것일까?"
       },
       "하인 장부": {
         note: "하인들의 출입과 심부름 기록이 적힌 장부. 장소 이동을 대조할 수 있다.",
@@ -3139,6 +3142,9 @@
     function getExaminedClueName(evidenceName, toolName) {
       if (evidenceName === "무덕의 번진 일기" && toolName === "촛불 비추기") {
         return "일기 속 밤 기록";
+      }
+      if (evidenceName === "빈 호패 주머니" && toolName === "돋보기") {
+        return "주머니 속 호패 자국";
       }
       const source = String(evidenceName || "증거")
         .replace(/^(무덕|돌쇠|춘월|유문석)의\s*/, "")
@@ -5393,7 +5399,7 @@
     }
 
     function openPouchLiningPuzzle() {
-      prepareSpecialPuzzle("pouch", "pouch-lining-puzzle", "빈 호패 주머니 안감 뒤집기", "입구 밖으로 반쯤 나온 베이지색 안감의 아래 끝을 잡아 완전히 뒤집으십시오.", "주머니 안감 아래로 뒤집기");
+      prepareSpecialPuzzle("pouch", "pouch-lining-puzzle", "주머니 속에 있던 물건 확인하기", "주머니 가운데로 길게 나온 베이지색 안감의 접힌 아랫단을 잡아 아래로 당기십시오. 안쪽에 남은 물건 자국이 선명해집니다.", "베이지색 안감 아랫단 당기기");
     }
 
     function openSilkTensionPuzzle() {
@@ -5475,7 +5481,7 @@
       document.querySelector("#specialTouchPoints").dataset.activeStep = String(Math.min(3, specialPuzzleStep + 1));
       requestAnimationFrame(syncDirectAffordanceFragments);
       document.querySelector("#specialPuzzleGuide").textContent = specialPuzzleMode === "pouch"
-        ? ["", "완전히 뒤집힌 안감에 호패 눌림과 잘린 붉은 끈 섬유가 함께 남았습니다. 호패는 자연히 빠진 것이 아니라 끈을 잘라 꺼낸 물건입니다."][specialPuzzleStep]
+        ? ["", "안감에 길쭉한 호패 눌림과 잘린 붉은 끈 섬유가 함께 남았습니다. 누군가 끈을 끊어 호패를 꺼낸 것일까요?"][specialPuzzleStep]
         : specialPuzzleMode === "norigae"
           ? ["", "휘어진 고리에서 노리개와 재질이 다른 남색 옷감이 빠졌습니다. 오래 닳은 것이 아니라 다른 옷에 강하게 걸렸던 흔적입니다."][specialPuzzleStep]
         : specialPuzzleMode === "bundle"
