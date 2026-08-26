@@ -73,12 +73,6 @@ const investigationDock = [
     label: "보따리"
   },
   {
-    className: "tool-chip open-tool-panel",
-    ariaLabel: "도구 열기",
-    image: "/samunmong/assets/labels/transparent/tool-investigation-tools.webp",
-    label: "도구"
-  },
-  {
     className: "note-chip open-note-panel",
     ariaLabel: "기록장 열기",
     image: "/samunmong/assets/labels/transparent/tool-note-short.webp",
@@ -112,10 +106,9 @@ export const fieldOneScene = {
   dock: [
     { id: "openMapFromField", ...investigationDock[0], className: "map-chip" },
     { id: "openBagFromField", ...investigationDock[1], className: "bag-chip" },
-    investigationDock[2],
-    { id: "openNoteFromField", ...investigationDock[3], className: "note-chip" },
-    investigationDock[4],
-    investigationDock[5]
+    { id: "openNoteFromField", ...investigationDock[2], className: "note-chip" },
+    investigationDock[3],
+    investigationDock[4]
   ] satisfies SceneDockAction[],
   inspect: {
     id: "hopaeInspect",
@@ -139,10 +132,9 @@ export const chunwolRoomScene = {
   dock: [
     { id: "openMapFromRoom", ...investigationDock[0], className: "map-chip" },
     { id: "openBagFromRoom", ...investigationDock[1], className: "bag-chip" },
-    investigationDock[2],
-    { id: "openNoteFromRoom", ...investigationDock[3], className: "note-chip" },
-    investigationDock[4],
-    investigationDock[5]
+    { id: "openNoteFromRoom", ...investigationDock[2], className: "note-chip" },
+    investigationDock[3],
+    investigationDock[4]
   ] satisfies SceneDockAction[],
   inspect: {
     id: "portraitInspect",
@@ -168,10 +160,9 @@ export const mudeokServantRoomScene = {
   dock: [
     { id: "openMapFromMudeokRoom", ...investigationDock[0], className: "map-chip" },
     { id: "openBagFromMudeokRoom", ...investigationDock[1], className: "bag-chip" },
-    investigationDock[2],
-    { id: "openNoteFromMudeokRoom", ...investigationDock[3], className: "note-chip" },
-    investigationDock[4],
-    investigationDock[5]
+    { id: "openNoteFromMudeokRoom", ...investigationDock[2], className: "note-chip" },
+    investigationDock[3],
+    investigationDock[4]
   ] satisfies SceneDockAction[]
 } as const;
 
