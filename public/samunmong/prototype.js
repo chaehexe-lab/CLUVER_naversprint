@@ -1463,7 +1463,7 @@
       const accuseChip = document.querySelector("#accuseButton img");
       if (accuseChip) accuseChip.src = "/samunmong/assets/magic-school/ui/icon-final-accuse.webp";
       const hintChip = document.querySelector("#interrogationHint img");
-      if (hintChip) hintChip.src = "/samunmong/assets/magic-school/ui/icon-mana-hint.webp";
+      if (hintChip) hintChip.src = "/samunmong/assets/magic-school/ui/icon-arcane-hint-compass.png";
       const hintLabel = document.querySelector("#interrogationHint .sr-only");
       if (hintLabel) hintLabel.textContent = "마력 감지";
       const magicBagTitle = document.querySelector("#evidenceBagPop .bag-pop-head strong");

@@ -3263,6 +3263,15 @@
       pointer-events: none;
     }
 
+    html[data-samunmong-theme="magicSchool"] .scene-hint::before {
+      top: -3px;
+      width: 64px;
+      height: 64px;
+      background-image: url("/samunmong/assets/magic-school/ui/icon-arcane-hint-compass.png");
+      transform: translateX(-50%) rotate(-3deg);
+      filter: drop-shadow(0 0 10px rgba(157, 102, 255, .48));
+    }
+
     .scene-hint:hover,
     .scene-hint:focus-visible {
       transform: translateY(-1px) rotate(-1deg);
@@ -8695,13 +8704,20 @@ html[data-samunmong-theme="magicSchool"] .tool-evidence-option {
 @keyframes satoReveal { from { opacity: 0; transform: translateY(22px) scale(.92); } to { opacity: 1; transform: none; } }
 
 /* Magic-school rune drawing and light spell */
-.magic-school-screen.magic-light-required .plate { transition: filter 1.25s ease; }
+.magic-school-screen.magic-light-required .plate { transition: filter 2.6s cubic-bezier(.18,.78,.22,1); }
 html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-required:not(.light-magic-active) .plate { filter: brightness(.28) contrast(1.18) saturate(.55); }
 html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-required.light-magic-active .plate { filter: brightness(1.16) contrast(1.03) saturate(1.04); }
-.magic-school-screen.magic-light-required .magic-shade { z-index: 2; background: radial-gradient(circle at 50% 44%, rgba(20,25,45,.18), rgba(1,2,8,.82) 72%); opacity: 1; transition: opacity 1.3s ease; }
+.magic-school-screen.magic-light-required .magic-shade { z-index: 2; background: radial-gradient(circle at 50% 44%, rgba(20,25,45,.18), rgba(1,2,8,.82) 72%); opacity: 1; transition: opacity 2.4s cubic-bezier(.18,.78,.22,1); }
 .magic-school-screen.magic-light-required.light-magic-active .magic-shade { opacity: 0; }
 .magic-light-bloom { position: absolute; z-index: 3; inset: 0; opacity: 0; pointer-events: none; background: radial-gradient(circle at 50% 46%, rgba(255,251,202,.74), rgba(245,203,104,.25) 24%, transparent 62%); mix-blend-mode: screen; }
-.magic-school-screen.magic-light-required.light-magic-active .magic-light-bloom { animation: magicSceneIlluminate 1.5s ease-out both; }
+.magic-school-screen.light-magic-active .magic-light-bloom { animation: magicSceneIlluminate 2.8s ease-out both; }
+.magic-holy-particles { position: absolute; z-index: 90; inset: 0; overflow: hidden; pointer-events: none; }
+.holy-particle { position: absolute; left: 50%; top: 47%; width: var(--particle-size); height: var(--particle-size); opacity: 0; border-radius: 50%; background: #ffe77a; box-shadow: 0 0 5px #fffbd2,0 0 12px #ffd84d,0 0 24px #e9a92e; }
+.holy-particle::before,.holy-particle::after { content: ""; position: absolute; left: 50%; top: 50%; border-radius: 999px; background: linear-gradient(90deg,transparent,#fff9bf,transparent); transform: translate(-50%,-50%); }
+.holy-particle::before { width: calc(var(--particle-size) * 4.2); height: 1px; }
+.holy-particle::after { width: 1px; height: calc(var(--particle-size) * 4.2); background: linear-gradient(transparent,#fff9bf,transparent); }
+.holy-particle.star { border-radius: 1px; background: #fff4a3; box-shadow: 0 0 7px #fff,0 0 18px #ffd84d,0 0 34px #f2b739; }
+.magic-school-screen.light-magic-active .holy-particle { animation: magicHolyParticleBurst var(--particle-duration) cubic-bezier(.12,.72,.2,1) var(--particle-delay) both; }
 .magic-spell-system { position: absolute; z-index: 88; inset: 0; pointer-events: none; color: #eafcff; font-family: "Nanum BareunJeongsin", serif; }
 .magic-spell-toggle { pointer-events: auto; position: absolute; right: calc(2.4% + 11px); bottom: 47%; width: 96px; min-height: 94px; display: grid; place-items: center; align-content: center; gap: 4px; padding: 7px; color: #effcff; border: 1px solid rgba(132,226,255,.55); border-radius: 48% 48% 13px 13px; background: radial-gradient(circle at 50% 33%,rgba(82,196,239,.34),rgba(15,29,60,.95) 62%); box-shadow: inset 0 0 22px rgba(114,226,255,.24),0 9px 26px #000c; cursor: pointer; transition: transform .2s ease,box-shadow .2s ease; }
 .magic-spell-toggle:hover,.magic-spell-toggle.active { transform: translateX(-5px) scale(1.04); box-shadow: inset 0 0 28px rgba(154,239,255,.38),0 0 22px rgba(90,210,255,.48),0 12px 28px #000d; }
@@ -8720,6 +8736,7 @@ button.magic-spell-card:hover { border-color: #a5edff; background: rgba(31,74,11
 .spell-card-icon { width: 60px; height: 60px; display: grid; place-items: center; border: 1px solid #8bdfffa8; border-radius: 50%; color: #fff6b1; font-family: serif; font-size: 43px; text-align: center; text-shadow: 0 0 15px #e8fdff; }
 .magic-spell-card.locked { filter: grayscale(.9); opacity: .46; }
 .magic-spell-backdrop { pointer-events: auto; position: absolute; inset: 0; border: 0; background: rgba(1,3,12,.82); backdrop-filter: blur(6px); }
+.magic-spell-system.phase-casting .magic-spell-backdrop,.magic-spell-system.phase-complete .magic-spell-backdrop { animation: magicBackdropRelease 2.1s ease-out both; }
 .magic-circle-modal { pointer-events: auto; position: absolute; left: 50%; top: 50%; width: min(1040px,88%); height: min(790px,88%); overflow: hidden; transform: translate(-50%,-50%); border: 1px solid rgba(137,226,255,.62); border-radius: 24px; background: radial-gradient(circle at 50% 62%,rgba(28,70,110,.72),transparent 45%),linear-gradient(155deg,#101b3cf7,#050817fc); box-shadow: inset 0 0 60px #5ddcff18,0 28px 100px #000f,0 0 35px #53d7ff40; }
 .magic-spell-close { position: absolute; z-index: 5; right: 19px; top: 17px; width: 44px; height: 44px; color: #dffaff; border: 1px solid #82dfffa3; border-radius: 50%; background: #0d1939e8; font-size: 28px; cursor: pointer; }
 .magic-circle-modal > header { height: 130px; display: flex; align-items: center; gap: 18px; padding: 19px 78px 13px 28px; border-bottom: 1px solid rgba(131,221,255,.24); background: linear-gradient(90deg,rgba(20,54,88,.75),rgba(6,13,35,.3)); }
@@ -8743,12 +8760,20 @@ button.magic-spell-card:hover { border-color: #a5edff; background: rgba(31,74,11
 .magic-circle-modal > footer button:disabled { opacity: .38; filter: grayscale(.65); box-shadow: none; cursor: not-allowed; }
 .magic-circle-modal.phase-casting,.magic-circle-modal.phase-complete { animation: magicModalAnswer .7s ease-in-out infinite alternate; }
 .magic-circle-modal.phase-complete .magic-player-strokes { stroke: #fff; }
-@keyframes magicSceneIlluminate { 0% { opacity: 0; } 32% { opacity: 1; } 100% { opacity: 0; } }
+@keyframes magicSceneIlluminate { 0% { opacity: 0; } 24% { opacity: .92; } 62% { opacity: .5; } 100% { opacity: 0; } }
+@keyframes magicHolyParticleBurst {
+  0% { opacity: 0; transform: translate(-50%,-50%) scale(.15) rotate(0deg); }
+  12% { opacity: 1; }
+  58% { opacity: .95; }
+  100% { opacity: 0; transform: translate(calc(-50% + var(--particle-x)),calc(-50% + var(--particle-y))) scale(.35) rotate(var(--particle-spin)); }
+}
+@keyframes magicBackdropRelease { from { background: rgba(1,3,12,.82); backdrop-filter: blur(6px); } to { background: rgba(8,6,2,.08); backdrop-filter: blur(0); } }
 @keyframes magicRuneBreathe { to { transform: scale(1.06) rotate(8deg); box-shadow: inset 0 0 22px #bff9ff55,0 0 17px #83dfff8c; } }
 @keyframes magicCastBurst { from { opacity: .9; transform: scale(.12); } to { opacity: 0; transform: scale(1.45); } }
 @keyframes magicModalAnswer { to { box-shadow: inset 0 0 90px #fff7bb22,0 28px 100px #000f,0 0 58px #9deaff88; } }
 @media (prefers-reduced-motion: reduce) {
-  .magic-spell-toggle-rune,.magic-circle-modal.phase-casting,.magic-circle-modal.phase-complete,.magic-cast-burst { animation: none; }
+  .magic-spell-toggle-rune,.magic-circle-modal.phase-casting,.magic-circle-modal.phase-complete,.magic-cast-burst,.holy-particle { animation: none; }
+  .magic-holy-particles { display: none; }
   .magic-school-screen.magic-light-required .plate,.magic-school-screen.magic-light-required .magic-shade { transition-duration: .15s; }
 }
 

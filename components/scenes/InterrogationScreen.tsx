@@ -173,7 +173,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
   const journalIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/final-report.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/ui-generated/tool-case-journal.webp";
   const bagIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/evidence-vault.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-magic-bag.webp" : "/samunmong/assets/labels/transparent/tool-bag-short.webp";
   const toolIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/scan-tool.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-mana-tools.webp" : "/samunmong/assets/labels/transparent/tool-investigation-tools.webp";
-  const hintIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/hint-beacon.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-mana-hint.webp" : "/samunmong/assets/ui-generated/tool-hint.webp";
+  const hintIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/hint-beacon.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-arcane-hint-compass.png" : "/samunmong/assets/ui-generated/tool-hint.webp";
   const accuseIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/accuse-target.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-final-accuse.webp" : "/samunmong/assets/labels/transparent/tool-accuse-short.webp";
   const bagPanelStyle = isSpaceTheme
     ? ({ backgroundImage: "url('/assets/space-station/panels/evidence-vault-panel-v2.webp')" } satisfies CSSProperties)
