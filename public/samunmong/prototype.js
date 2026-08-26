@@ -955,7 +955,17 @@
 
     function openBriefingJournal() {
       briefingReturnScreenId = getActiveScreenId() || "fieldOne";
-      startBriefingSequence("deathOnly");
+      if (isSpaceTheme) {
+        setBriefingMode("full");
+        window.dispatchEvent(new CustomEvent("samunmong:briefing-journal-open"));
+        return;
+      } else {
+        startBriefingSequence("deathOnly");
+      }
+      revealBriefingJournal();
+    }
+
+    function revealBriefingJournal() {
       briefingScreen?.classList.add("journal-overlay-open");
       briefingJournalCloseButton?.focus();
       playSfx("buttonAlt", 0.62);
@@ -964,6 +974,9 @@
     function closeBriefingJournal() {
       briefingScreen?.classList.remove("journal-overlay-open");
       setBriefingMode("full");
+      if (isSpaceTheme) {
+        window.dispatchEvent(new CustomEvent("samunmong:briefing-journal-close"));
+      }
       document.querySelector(`[data-go="briefingScreen"]`)?.focus();
       playSfx("buttonAlt", 0.58);
     }
@@ -1104,6 +1117,7 @@
       if (buttonGuideTextById[target.id]) return buttonGuideTextById[target.id];
       if (target.matches(".map-chip")) return isSpaceTheme ? "오르빗-13의 구역 도면을 펼칩니다." : "조사 장소를 오갑니다.";
       if (target.matches(".bag-chip")) return isSpaceTheme ? "증거 보관함에서 수집물을 확인합니다." : isMagicTheme ? "차원 주머니 속 증거를 불러옵니다." : "모은 증거를 확인합니다.";
+      if (target.matches(".briefing-chip")) return "초기 사고 보고서를 다시 확인합니다.";
       if (target.matches(".tool-chip")) return isSpaceTheme ? "스캔 도구로 잔류 신호를 분석합니다." : isMagicTheme ? "마력 감지로 잔류 흔적을 분석합니다." : "증거를 더 자세히 분석합니다.";
       if (target.matches(".note-chip")) return isSpaceTheme ? "대원별 통신 로그를 확인합니다." : "등장인물과 나눈 대화를 기록합니다.";
       if (target.matches(".journal-chip")) return isSpaceTheme ? "초기 사고 보고서를 다시 확인합니다." : isMagicTheme ? "수사 일지에서 관계자별 기록을 확인합니다." : "처음 사건 일지를 다시 봅니다.";
@@ -1669,6 +1683,7 @@
       "/assets/space-station/ui-icons-v3/orbit-blueprint.webp",
       "/assets/space-station/ui-icons-v3/evidence-vault.webp",
       "/assets/space-station/ui-icons-v3/log-record.webp",
+      "/assets/space-station/ui-icons-v3/case-briefing.webp",
       "/assets/space-station/ui-icons-v3/scan-tool.webp",
       "/assets/space-station/ui-icons-v3/final-report.webp",
       "/assets/space-station/ui-icons-v3/accuse-target.webp",
@@ -2187,7 +2202,7 @@
       if (!button || isFieldGuideBlockingControls()) return;
       const target = button.dataset.go;
       const isJournalBriefing = target === "briefingScreen";
-      if (isJournalBriefing && !isMagicTheme && !isSpaceTheme) {
+      if (isJournalBriefing && !isMagicTheme) {
         event.preventDefault();
         openBriefingJournal();
         return;
@@ -2198,6 +2213,8 @@
       }
     });
     briefingJournalCloseButton?.addEventListener("click", closeBriefingJournal);
+    window.addEventListener("samunmong:briefing-journal-ready", revealBriefingJournal);
+    window.addEventListener("samunmong:briefing-journal-close-request", closeBriefingJournal);
     on("#accuseButton", "click", openResultPage);
 
     let hopaeCollected = false;

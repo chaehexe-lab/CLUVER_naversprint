@@ -326,6 +326,13 @@ const spaceDock = [
     label: "로그 기록"
   },
   {
+    className: "briefing-chip",
+    ariaLabel: "사건 브리핑 다시 보기",
+    image: "/assets/space-station/ui-icons-v3/case-briefing.webp",
+    label: "사건 브리핑",
+    goTo: "briefingScreen"
+  },
+  {
     className: "room-chip",
     ariaLabel: "보안 조사실로 이동",
     image: "/assets/space-station/ui-icons-v2/emergency-investigation-v2.webp",

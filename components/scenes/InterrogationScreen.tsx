@@ -170,6 +170,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
   const initialName = isSpaceTheme ? "해리" : isMagicTheme ? "말포이" : "돌쇠";
   const mapIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/orbit-blueprint.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-school-map.webp" : "/samunmong/assets/labels/transparent/tool-village-map.webp";
   const noteIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/log-record.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/labels/transparent/tool-note-short.webp";
+  const briefingIcon = "/assets/space-station/ui-icons-v3/case-briefing.webp";
   const journalIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/final-report.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/ui-generated/tool-case-journal.webp";
   const bagIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/evidence-vault.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-magic-bag.webp" : "/samunmong/assets/labels/transparent/tool-bag-short.webp";
   const toolIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/scan-tool.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-mana-tools.webp" : "/samunmong/assets/labels/transparent/tool-investigation-tools.webp";
@@ -271,6 +272,12 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             <img src={noteIcon} alt="" />
             <span className="sr-only">{copy.note}</span>
           </button>
+          {isSpaceTheme ? (
+            <button className="scene-chip briefing-chip" data-go="briefingScreen" type="button" aria-label="사건 브리핑 다시 보기">
+              <img src={briefingIcon} alt="" draggable={false} />
+              <span className="sr-only">사건 브리핑</span>
+            </button>
+          ) : null}
           {!isSpaceTheme ? (
             <button className="scene-chip journal-chip" data-go="briefingScreen" type="button" aria-label={`${copy.journal} 다시 보기`}>
               <img src={journalIcon} alt="" />

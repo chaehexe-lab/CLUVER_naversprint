@@ -2,7 +2,7 @@
 
 import { briefing } from "@/lib/gameData";
 import type { GameTheme } from "@/lib/gameTheme";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const magicRecordCards = [
   {
@@ -164,6 +164,28 @@ function MagicStartCaseButtonArt({ label }: { label: string }) {
 
 function SpaceStationBriefingScreen() {
   const [briefingStep, setBriefingStep] = useState(0);
+  const [isJournalOpen, setIsJournalOpen] = useState(false);
+
+  useEffect(() => {
+    const openJournal = () => {
+      setBriefingStep(1);
+      setIsJournalOpen(true);
+    };
+    const closeJournal = () => setIsJournalOpen(false);
+
+    window.addEventListener("samunmong:briefing-journal-open", openJournal);
+    window.addEventListener("samunmong:briefing-journal-close", closeJournal);
+    return () => {
+      window.removeEventListener("samunmong:briefing-journal-open", openJournal);
+      window.removeEventListener("samunmong:briefing-journal-close", closeJournal);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isJournalOpen) {
+      window.dispatchEvent(new CustomEvent("samunmong:briefing-journal-ready"));
+    }
+  }, [isJournalOpen]);
 
   return (
     <section className="screen briefing-screen space-station-briefing-screen" id="briefingScreen">
@@ -182,7 +204,7 @@ function SpaceStationBriefingScreen() {
           left: "50%",
           top: "50%",
           gap: "12px",
-          padding: briefingStep === 0 ? "34px 44px 10px" : "20px 40px 8px",
+          padding: briefingStep === 0 ? "34px 44px 10px" : isJournalOpen ? "20px 40px" : "20px 40px 8px",
           border: "1px solid rgba(160, 207, 229, .36)",
           borderRadius: "22px",
           color: "#eaf6ff",
@@ -191,6 +213,9 @@ function SpaceStationBriefingScreen() {
           backdropFilter: "blur(3px)"
         }}
       >
+        <button className="close-button map-floating-close briefing-journal-close" id="closeBriefingJournal" type="button" aria-label="사건 브리핑 닫기">
+          닫기
+        </button>
         {briefingStep === 0 ? <p className="briefing-kicker">ORBIT-13 INCIDENT LOG</p> : null}
         <h2>{briefingStep === 0 ? "우주정거장 살인사건" : "데이비드의 마지막 생체 기록"}</h2>
         <div className={`briefing-step${briefingStep === 0 ? " active" : ""}`} data-briefing-panel="0">
@@ -248,38 +273,38 @@ function SpaceStationBriefingScreen() {
             조사 시작
           </button>
         </div>
-        <button
-          key={briefingStep}
-          id={briefingStep === 0 ? "spaceBriefingReportNext" : "spaceBriefingNext"}
-          type="button"
-          {...(briefingStep === 1 ? { "data-go": "spaceAirlock" } : {})}
-          onClick={briefingStep === 0 ? ((event) => {
-            event.preventDefault();
-            event.stopPropagation();
-            setBriefingStep(1);
-          }) : undefined}
-          aria-label={briefingStep === 0 ? "생체 기록 보기" : "에어록으로 이동"}
-          style={{
-            justifySelf: "center",
-            width: "clamp(155px, 16.2vw, 234px)",
-            aspectRatio: "420 / 132",
-            padding: 0,
-            border: 0,
-            background: "transparent",
-            cursor: "pointer",
-            zIndex: 8,
-            filter: "drop-shadow(0 18px 28px rgba(0,0,0,.48))"
-          }}
-        >
-          <img
-            src={briefingStep === 0
-              ? "/assets/space-station/ui-buttons/space-next-button.svg"
-              : "/assets/space-station/ui-buttons/space-investigation-start-button.svg"}
-            alt={briefingStep === 0 ? "다음" : "조사 시작"}
-            draggable={false}
-            style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
-          />
-        </button>
+        {!isJournalOpen ? <button
+            key={briefingStep}
+            id={briefingStep === 0 ? "spaceBriefingReportNext" : "spaceBriefingNext"}
+            type="button"
+            {...(briefingStep === 1 ? { "data-go": "spaceAirlock" } : {})}
+            onClick={briefingStep === 0 ? ((event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              setBriefingStep(1);
+            }) : undefined}
+            aria-label={briefingStep === 0 ? "생체 기록 보기" : "에어록으로 이동"}
+            style={{
+              justifySelf: "center",
+              width: "clamp(155px, 16.2vw, 234px)",
+              aspectRatio: "420 / 132",
+              padding: 0,
+              border: 0,
+              background: "transparent",
+              cursor: "pointer",
+              zIndex: 8,
+              filter: "drop-shadow(0 18px 28px rgba(0,0,0,.48))"
+            }}
+          >
+            <img
+              src={briefingStep === 0
+                ? "/assets/space-station/ui-buttons/space-next-button.svg"
+                : "/assets/space-station/ui-buttons/space-investigation-start-button.svg"}
+              alt={briefingStep === 0 ? "다음" : "조사 시작"}
+              draggable={false}
+              style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
+            />
+          </button> : null}
       </article>
     </section>
   );
