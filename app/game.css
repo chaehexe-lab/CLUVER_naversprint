@@ -15899,3 +15899,213 @@ html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card .evid
     height: 92px;
   }
 }
+
+/* Space-station interrogation log: evidence-vault-inspired glass panel. */
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel {
+  box-sizing: border-box;
+  isolation: isolate;
+  width: min(760px, 88vw);
+  max-height: min(690px, 86%);
+  padding: 38px 44px 40px;
+  overflow: hidden;
+  border: 1px solid rgba(188, 229, 255, .9);
+  border-radius: 24px;
+  color: #102b44;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .16), transparent 19%),
+    radial-gradient(ellipse at 50% 0%, rgba(214, 240, 252, .23), transparent 48%),
+    linear-gradient(145deg, rgba(221, 233, 248, .66), rgba(185, 204, 229, .58)) !important;
+  box-shadow:
+    0 22px 64px rgba(0, 0, 0, .5),
+    0 0 22px rgba(112, 205, 255, .2),
+    inset 0 1px 0 rgba(255, 255, 255, .86),
+    inset 0 -18px 38px rgba(64, 105, 154, .1);
+  -webkit-backdrop-filter: blur(12px) saturate(1.08);
+  backdrop-filter: blur(12px) saturate(1.08);
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 8px;
+  border: 1px solid rgba(132, 198, 238, .52);
+  border-radius: 18px;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .24);
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  width: auto;
+  height: auto;
+  border: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 18% 4%, rgba(255, 255, 255, .38), transparent 34%),
+    linear-gradient(115deg, transparent 12%, rgba(255, 255, 255, .14) 34%, transparent 56%);
+  transform: none;
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel > * {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel h2 {
+  margin: 0 58px 10px 0;
+  color: #102b44;
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+  font-size: clamp(27px, 2.5vw, 34px);
+  font-weight: 500;
+  text-shadow: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel h2::after {
+  content: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .note-lead {
+  max-width: calc(100% - 60px);
+  margin: 0 0 15px;
+  color: rgba(7, 31, 53, .78);
+  font-size: clamp(14px, 1.3vw, 17px);
+  line-height: 1.5;
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .note-suspect-tabs {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 7px;
+  margin: 0 0 12px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .note-suspect-tab {
+  min-height: 34px;
+  padding: 4px 10px;
+  border: 1px solid rgba(92, 130, 169, .44);
+  border-radius: 8px;
+  color: #173a5a;
+  background: rgba(231, 241, 252, .42);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .48);
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+  font-size: clamp(13px, 1.15vw, 16px);
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .note-suspect-tab:hover,
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .note-suspect-tab:focus-visible {
+  transform: none;
+  border-color: rgba(54, 134, 186, .72);
+  background: rgba(235, 247, 255, .58);
+  outline: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .note-suspect-tab.active {
+  border-color: rgba(83, 173, 231, .92);
+  color: #071f35;
+  background: rgba(149, 207, 246, .68);
+  box-shadow:
+    inset 0 0 0 1px rgba(235, 249, 255, .72),
+    0 0 12px rgba(64, 160, 222, .28);
+  text-shadow: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .conversation-log {
+  height: min(350px, 38vh);
+  margin-top: 0;
+  padding: 15px;
+  border: 1px solid rgba(255, 255, 255, .7);
+  border-radius: 14px;
+  background: rgba(239, 247, 255, .34);
+  box-shadow:
+    inset 0 0 0 1px rgba(103, 160, 204, .22),
+    inset 0 10px 24px rgba(59, 100, 137, .08);
+  scrollbar-color: rgba(72, 129, 171, .58) rgba(231, 241, 252, .3);
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .conversation-empty {
+  width: 100%;
+  max-width: none;
+  min-height: 100%;
+  margin: 0;
+  align-items: center;
+  justify-items: center;
+  color: rgba(7, 31, 53, .62);
+  font-size: clamp(15px, 1.35vw, 18px);
+  text-align: center;
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .conversation-message {
+  max-width: min(84%, 510px);
+  margin-bottom: 10px;
+  padding: 10px 13px;
+  border: 1px solid rgba(87, 137, 176, .28);
+  border-radius: 13px;
+  color: #102b44;
+  background: rgba(239, 247, 255, .58);
+  box-shadow: 0 6px 14px rgba(39, 70, 104, .1);
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .conversation-message.player {
+  border-color: rgba(80, 164, 217, .48);
+  border-bottom-right-radius: 4px;
+  color: #08223a;
+  background: rgba(153, 211, 246, .68);
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .conversation-message.suspect {
+  border-bottom-left-radius: 4px;
+  color: #102b44;
+  background: rgba(239, 247, 255, .58);
+  box-shadow: 0 6px 14px rgba(39, 70, 104, .1);
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .conversation-speaker {
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+  font-size: 13px;
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .conversation-text {
+  color: inherit;
+  font-size: clamp(14px, 1.3vw, 17px);
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .conversation-meta {
+  color: inherit;
+  font-size: 12px;
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .note-close {
+  position: absolute;
+  z-index: 2;
+  top: 38px;
+  right: 44px;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(55, 99, 143, .58);
+  border-radius: 50%;
+  color: #173a5a;
+  background: rgba(217, 234, 250, .48);
+  box-shadow: none;
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+  font-size: 28px;
+  line-height: 1;
+}
+
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .note-close:hover,
+html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-panel .note-close:focus-visible {
+  border: 2px solid rgba(55, 99, 143, .94);
+  color: #173a5a;
+  background: rgba(217, 234, 250, .48);
+  box-shadow: none;
+  outline: none;
+}

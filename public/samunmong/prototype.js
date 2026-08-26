@@ -6195,14 +6195,16 @@
 
           const name = document.createElement("strong");
           name.className = "conversation-speaker";
-          name.textContent = message.sender === "player" ? (isMagicTheme ? "선생님" : "사또") : activeSuspect.name;
+          name.textContent = message.sender === "player"
+            ? (isSpaceTheme ? "조사관" : isMagicTheme ? "선생님" : "사또")
+            : activeSuspect.name;
 
           const text = document.createElement("p");
           text.className = "conversation-text";
           text.textContent = sentenceBreakText(message.text);
 
           bubble.append(name, text);
-          if (message.meta) {
+          if (message.meta && !isSpaceTheme) {
             const meta = document.createElement("span");
             meta.className = "conversation-meta";
             meta.textContent = sentenceBreakText(message.meta);
@@ -6454,8 +6456,8 @@
 
     function addInterrogationSummary(question) {
       const suspect = suspects[suspectIndex];
-      const evidence = selectedEvidence || "증거 제시 없음";
-      addConversationMessage(suspect.id, "player", question, `제시 증거: ${evidence}`);
+      const evidenceMeta = isSpaceTheme ? "" : `제시 증거: ${selectedEvidence || "증거 제시 없음"}`;
+      addConversationMessage(suspect.id, "player", question, evidenceMeta);
     }
 
     function getCollectedEvidenceNames() {
