@@ -2566,8 +2566,11 @@
         img: "/samunmong/assets/evidence-transparent/evidence-muddy-straw-shoes-clean-v2.png"
       },
       "찢어진 옷고름": {
-        note: "무덕의 방에서 발견된 찢어진 옷고름. 하인 옷감보다 고급스럽고, 목을 조를 때 쓰였을 가능성이 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-torn-silk-tie-clean-v2.png"
+        note: "무덕의 방 바닥에서 발견된 붉은 비단끈. 가운데가 단단히 조여 있고 한쪽 끝이 찢어져 있다.",
+        img: "/samunmong/assets/evidence-transparent/evidence-torn-silk-tie-clean-v2.png",
+        tool: "돋보기",
+        toolResultAsset: "/samunmong/assets/interactions/silk-tension-puzzle/state-2.png",
+        toolResult: "매듭을 펴자 가운데에 좁게 조여 마찰로 번들거린 자국과, 힘을 받아 한 방향으로 늘어난 찢김이 드러난다. 단순히 낡아 끊어진 끈은 아닌 것 같다."
       },
       "빈 호패 주머니": {
         note: "호패가 빠진 듯한 빈 주머니. 주인과 호패 조각의 관계를 확인할 수 있다.",
@@ -3146,6 +3149,9 @@
       if (evidenceName === "빈 호패 주머니" && toolName === "돋보기") {
         return "주머니 속 호패 자국";
       }
+      if (evidenceName === "찢어진 옷고름" && toolName === "돋보기") {
+        return "비단끈의 조임 흔적";
+      }
       const source = String(evidenceName || "증거")
         .replace(/^(무덕|돌쇠|춘월|유문석)의\s*/, "")
         .replace(/피 묻은\s*/, "");
@@ -3718,6 +3724,7 @@
       "돌쇠의 그림": { tool: "돋보기", label: "두루마리 직접 펼치기", open: () => openPortraitStrokePuzzle() },
       "찢어진 약속 편지": { tool: "문서 맞춤판", label: "편지 조각 직접 맞추기", open: () => openDocumentAssembly("찢어진 약속 편지") },
       "빈 호패 주머니": { tool: "돋보기", label: "주머니 안감 직접 뒤집기", open: () => openPouchLiningPuzzle() },
+      "찢어진 옷고름": { tool: "돋보기", label: "조인 비단끈 직접 펼치기", open: () => openSilkTensionPuzzle() },
       "하인 장부": { tool: "촛불 비추기", label: "지워진 장부 직접 복원하기", open: () => openLedgerTimelinePuzzle() },
       "도망 보따리": { tool: "먼지털이 붓", label: "보따리 매듭 직접 풀기", open: () => openBundlePuzzle() },
       "무덕의 번진 일기": { tool: "촛불 비추기", label: "번진 일기 직접 읽어 보기", open: () => openDiaryTimelinePuzzle() }
@@ -5403,7 +5410,7 @@
     }
 
     function openSilkTensionPuzzle() {
-      prepareSpecialPuzzle("silk", "silk-tension-puzzle", "조여진 옷고름 펼치기", "조인 고리에서 왼쪽 아래로 길게 나온 비단 꼬리를 잡아 왼쪽으로 빼내십시오.", "비단 꼬리 당겨 펼치기");
+      prepareSpecialPuzzle("silk", "silk-tension-puzzle", "조인 비단끈 풀어 보기", "매듭에서 길게 빠져나온 찢긴 비단 끝을 잡아 왼쪽으로 천천히 당기십시오.", "찢긴 비단 끝 잡아당기기");
     }
 
     function openLedgerTimelinePuzzle() {
@@ -5489,7 +5496,7 @@
             : specialPuzzleMode === "bandage"
               ? ["", "왼쪽의 짙은 최초 혈흔에서 오른쪽으로 옅어지는 반복 자국이 이어집니다. 좁은 팔에 감았던 붕대이며, 팔 상처와 대조해야 주인을 알 수 있습니다."][specialPuzzleStep]
           : specialPuzzleMode === "silk"
-            ? ["", "조임 자리는 마찰로 번들거리고 찢긴 끝은 한 방향으로 늘어났습니다. 바깥 흙 위에 실내 먼지가 앉아, 밖에서 주워 온 물건일 가능성도 있습니다."][specialPuzzleStep]
+            ? ["", "매듭을 펴자 가운데에 좁게 조여 마찰로 번들거린 자국과, 힘을 받아 한 방향으로 늘어난 찢김이 드러납니다. 단순히 낡아 끊어진 끈은 아닌 것 같습니다."][specialPuzzleStep]
               : specialPuzzleMode === "hopaeThread"
                 ? ["", "끈 굵기와 호패 구멍, 오래 닳아 반질거리는 마찰 홈이 정확히 맞습니다. 따로 발견된 끈은 이 호패에 매여 있던 끈입니다."][specialPuzzleStep]
                 : specialPuzzleMode === "stride"
