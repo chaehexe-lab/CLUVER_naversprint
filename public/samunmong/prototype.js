@@ -205,6 +205,87 @@
     let interrogationThinkingSoundTimer = 0;
     let newFactToastTimer = 0;
 
+    const magicLinearProgression = [
+      { screenId: "magicAlchemyLab", name: "제1 연금술 실습실", evidence: ["부러진 지팡이", "화염 감지 룬스톤", "기록의 수정구"] },
+      { screenId: "magicCleaningCloset", name: "청소도구함", evidence: ["금지된 마법 담배 재"] },
+      { screenId: "magicLibrary", name: "도서관", evidence: ["도서관 대출 기록부", "빙결 흔적이 남은 반납 도서"] },
+      { screenId: "magicRecordCrystalRoom", name: "기록 수정구실", evidence: ["조작된 기록 수정구"] },
+      { screenId: "magicDormHallway", name: "학생들 기숙사", evidence: ["버려진 지팡이 조각"] },
+      { screenId: "interrogationScreen", name: "교무 조사실", evidence: [] }
+    ];
+    let magicUnlockedIndex = -1;
+
+    function getMagicUnlockedIndex() {
+      if (!isMagicTheme) return magicLinearProgression.length - 1;
+      const collected = new Set(readStoredNames(collectedEvidenceKey));
+      let unlockedIndex = 0;
+
+      for (let index = 0; index < magicLinearProgression.length - 1; index += 1) {
+        const locationComplete = magicLinearProgression[index].evidence.every((name) => collected.has(name));
+        if (!locationComplete) break;
+        unlockedIndex = index + 1;
+      }
+
+      return unlockedIndex;
+    }
+
+    function getMagicLockMessage(targetScreenId) {
+      const targetIndex = magicLinearProgression.findIndex((location) => location.screenId === targetScreenId);
+      if (targetIndex <= 0) return "";
+      const previous = magicLinearProgression[targetIndex - 1];
+      const collected = new Set(readStoredNames(collectedEvidenceKey));
+      const remaining = previous.evidence.filter((name) => !collected.has(name)).length;
+      return `${previous.name}의 증거 ${remaining}개를 더 찾아야 봉인이 풀립니다.`;
+    }
+
+    function canAccessMagicScreen(targetScreenId) {
+      if (!isMagicTheme) return true;
+      const targetIndex = magicLinearProgression.findIndex((location) => location.screenId === targetScreenId);
+      return targetIndex < 0 || targetIndex <= getMagicUnlockedIndex();
+    }
+
+    function syncMagicMapProgress({ announce = false } = {}) {
+      if (!isMagicTheme) return;
+      const unlockedIndex = getMagicUnlockedIndex();
+      const newlyUnlocked = magicUnlockedIndex >= 0 && unlockedIndex > magicUnlockedIndex;
+      magicUnlockedIndex = unlockedIndex;
+
+      magicLinearProgression.forEach((location, index) => {
+        const isLocked = index > unlockedIndex;
+        const pin = document.querySelector(`.map-pin-button[data-location-screen="${location.screenId}"]`);
+        const label = document.querySelector(`.map-label[data-location-screen="${location.screenId}"]`);
+        const dockButton = location.screenId === "interrogationScreen"
+          ? document.querySelector(`.magic-school-dock [data-go="${location.screenId}"]`)
+          : null;
+
+        [pin, dockButton].forEach((button) => {
+          if (!(button instanceof HTMLButtonElement)) return;
+          button.disabled = isLocked;
+          button.classList.toggle("locked", isLocked);
+          button.setAttribute("aria-disabled", String(isLocked));
+          button.title = isLocked ? getMagicLockMessage(location.screenId) : `${location.name}으로 이동`;
+        });
+        label?.classList.toggle("locked", isLocked);
+      });
+
+      const current = magicLinearProgression[Math.min(unlockedIndex, magicLinearProgression.length - 1)];
+      const progress = document.querySelector("#magicMapProgress");
+      if (progress) {
+        const collected = new Set(readStoredNames(collectedEvidenceKey));
+        const remaining = current.evidence.filter((name) => !collected.has(name)).length;
+        progress.textContent = current.evidence.length && remaining > 0
+          ? `${current.name} 조사 중 · 남은 증거 ${remaining}개`
+          : unlockedIndex === magicLinearProgression.length - 1
+            ? "모든 조사 장소의 봉인이 풀렸습니다."
+            : `${magicLinearProgression[unlockedIndex + 1].name}의 봉인이 풀렸습니다.`;
+      }
+
+      if (announce && newlyUnlocked) {
+        const unlockedLocation = magicLinearProgression[unlockedIndex];
+        window.setTimeout(() => showToast(`${unlockedLocation.name}의 봉인이 풀렸습니다.`), 2100);
+      }
+    }
+
     const joseonLocationMeta = {
       tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
       dreamScreen: { name: "꿈 선택", x: "18%", y: "18%" },
@@ -462,6 +543,7 @@
       collected.add(name);
       localStorage.setItem(collectedEvidenceKey, JSON.stringify([...collected]));
       if (isNewEvidence) markEvidenceBagUnread();
+      if (isNewEvidence) syncMagicMapProgress({ announce: true });
     }
 
     function syncEvidenceBagUnreadIndicator() {
@@ -1381,7 +1463,7 @@
       const accuseChip = document.querySelector("#accuseButton img");
       if (accuseChip) accuseChip.src = "/samunmong/assets/magic-school/ui/icon-final-accuse.webp";
       const hintChip = document.querySelector("#interrogationHint img");
-      if (hintChip) hintChip.src = "/samunmong/assets/magic-school/ui/icon-mana-hint.webp";
+      if (hintChip) hintChip.src = "/samunmong/assets/magic-school/ui/icon-arcane-hint-compass.png";
       const hintLabel = document.querySelector("#interrogationHint .sr-only");
       if (hintLabel) hintLabel.textContent = "마력 감지";
       const magicBagTitle = document.querySelector("#evidenceBagPop .bag-pop-head strong");
@@ -1580,6 +1662,7 @@
       refreshFieldGuideNodes();
       setupEvidenceScreen(screenId);
       updateCurrentLocation(screenId);
+      syncMagicMapProgress();
     });
 
     const fieldGuideTargets = {
@@ -2208,6 +2291,10 @@
       const button = event.target instanceof Element ? event.target.closest("[data-go]") : null;
       if (!button || isFieldGuideBlockingControls()) return;
       const target = button.dataset.go;
+      if (!canAccessMagicScreen(target)) {
+        showToast(getMagicLockMessage(target));
+        return;
+      }
       const isJournalBriefing = target === "briefingScreen";
       if (isJournalBriefing && !isMagicTheme) {
         event.preventDefault();
@@ -6311,6 +6398,10 @@
       button.addEventListener("blur", () => button.classList.remove("pressing"));
       button.addEventListener("click", () => {
         const target = button.dataset.mapGo;
+        if (!canAccessMagicScreen(target)) {
+          showToast(getMagicLockMessage(target));
+          return;
+        }
         button.classList.add("pressing");
         playSfx("move", 0.82);
         if (["map-click", "map-open"].includes(fieldGuideStep)) {
@@ -6812,6 +6903,7 @@
     renderTools();
     restoreConversationNotes();
     restoreSavedInvestigation();
+    syncMagicMapProgress();
     syncEvidenceBagUnreadIndicator();
     renderConversationNotes();
     setupButtonGuides();
