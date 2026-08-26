@@ -2771,7 +2771,7 @@
     // their story meaning in the inventory before the player examines them.
     const joseonUnexaminedEvidenceNames = {
       "호패 조각": "글자 지워진 나무패",
-      "돌쇠의 그림": "붉은 끈 두루마리",
+      "돌쇠의 그림": "의문의 그림",
       "무덕의 번진 일기": "먹 번진 책자",
       "진흙 묻은 짚신": "흙 묻은 짚신",
       "찢어진 옷고름": "찢긴 비단끈",
@@ -2910,18 +2910,18 @@
       "점순의 손톱 밑 흔적": ["저항", "몸싸움 중 남은 흔적"],
       "호패 조각": ["누명", "오래된 새김 위 새 긁힘"],
       "돌쇠의 그림": ["동기", "여러 번 고쳐 그린 초상"],
-      "헐거워진 노리개": ["동선", "급하게 움직인 흔적"],
+      "헐거워진 노리개": ["접촉", "장식 고리에 걸린 옷감"],
       "무덕의 번진 일기": ["진술", "도망 계획을 아는 인물"],
       "진흙 묻은 짚신": ["동선", "짚신 ≠ 작은 발자국"],
       "찢어진 옷고름": ["수법", "좁게 눌린 비단 끈"],
       "빈 호패 주머니": ["누명", "방에서 사라진 호패"],
       "하인 장부": ["동선", "지워진 출입 기록"],
       "혼서 조각": ["동기", "강요된 혼인 → 압박"],
-      "피 묻은 붕대": ["상흔", "누군가의 팔에 감았던 붕대"],
+      "피 묻은 붕대": ["상흔", "사건 전후를 알 수 없는 피"],
       "돌쇠의 팔 상처": ["상흔", "붕대를 감았던 자리"],
       "도망 보따리": ["동기", "점순·돌쇠의 도망"],
       "긁힌 팔 흔적": ["저항", "점순이 남긴 상처"],
-      "작은 발자국": ["동선", "작은 발 → 뒷문"],
+      "작은 발자국": ["동선", "뒷문을 지난 작은 신발 자국"],
       "끊어진 호패끈": ["누명", "잘라낸 호패끈"],
       "찢어진 약속 편지": ["진술", "평소와 다른 말투"]
     };
@@ -2931,7 +2931,7 @@
       "점순의 손톱 밑 흔적": "마지막에 붙잡은 누군가의 흔적인 것 같다.",
       "호패 조각": "이름을 감추려 뒤늦게 긁어 낸 것인가?",
       "돌쇠의 그림": "여러 번 고쳐 그릴 만큼 마음에 둔 사람이 있었던 것 같다.",
-      "헐거워진 노리개": "이 증거는 현재 수사에서 제외되었다.",
+      "헐거워진 노리개": "벌어진 고리에 다른 옷감이 걸린 것인가? 언제 스친 흔적인지는 더 따져봐야 한다.",
       "무덕의 번진 일기": "밤의 기척을 들은 사람이 있었던 것 같다.",
       "진흙 묻은 짚신": "작은 발자국과 맞지 않는다면 다른 동선의 흔적인가?",
       "찢어진 옷고름": "목의 흔적과 닮았지만, 정말 같은 끈인 것일까?",
@@ -2942,7 +2942,7 @@
       "돌쇠의 팔 상처": "붕대를 감았던 자리 같지만, 언제 생긴 상처일까?",
       "도망 보따리": "두 사람이 함께 떠날 준비를 했던 것 같다.",
       "긁힌 팔 흔적": "점순이 마지막으로 붙잡은 사람에게 남긴 것인가?",
-      "작은 발자국": "뒷문을 지난 사람은 짧고 좁은 신을 신었던 것 같다.",
+      "작은 발자국": "누군가 뒷문을 평범하게 지나며 남긴 자국 같다. 일부러 만든 흔적으로 보이지는 않는다.",
       "끊어진 호패끈": "저절로 끊어진 것이 아니라 누군가 손을 댄 것인가?",
       "찢어진 약속 편지": "돌쇠의 말투를 흉내 낸 글은 아닐까?"
     };
@@ -4429,32 +4429,54 @@
 
     const joseonDreamTraceByEvidence = {
       "도망 보따리": {
-        image: "/samunmong/assets/interactions/dream-traces/escape-bundle-packed-v2.png",
-        alt: "정체를 감춘 두 사람이 함께 떠날 보따리를 꾸리는 몽흔"
+        image: "/samunmong/assets/interactions/dream-traces/escape-bundle-packed-v3.png",
+        alt: "정체를 감춘 한 사람이 두 사람 몫의 물건을 보따리에 꾸리는 몽흔",
+        observed: "두 사람 몫의 물건이 한 보따리에 함께 꾸려짐",
+        scene: "누군가 두 사람 몫의 떠날 채비를 꾸린 순간",
+        question: "누가 이 계획을 알고 있었던 것일까?"
       },
       "작은 발자국": {
-        image: "/samunmong/assets/interactions/dream-traces/small-shoeprints-natural-v2.png",
-        alt: "정체를 감춘 인물이 뒷문을 지나며 작은 신발 자국을 자연스럽게 남기는 몽흔"
+        image: "/samunmong/assets/interactions/dream-traces/small-shoeprints-natural-v3.png",
+        alt: "정체를 감춘 인물이 뒷문을 지나며 작은 신발 자국을 자연스럽게 남기는 몽흔",
+        observed: "짧고 좁은 신발 자국이 뒷문 쪽으로 이어짐",
+        scene: "누군가 젖은 마당을 지나며 자연히 자국을 남긴 순간",
+        question: "이 길을 지난 사람은 누구였을까?",
+        caution: "일부러 놓은 흔적이 아니라 실제 이동 중 남은 자국으로 보임"
       },
       "빈 호패 주머니": {
         image: "/samunmong/assets/interactions/dream-traces/empty-hopae-pouch-v2.png",
-        alt: "정체를 감춘 인물이 주머니에서 호패를 훔쳐 꺼내는 몽흔"
+        alt: "정체를 감춘 인물이 주머니에서 호패를 꺼내는 몽흔",
+        observed: "안감에 호패 눌림과 잘린 끈 섬유가 함께 남음",
+        scene: "주머니의 끈을 끊고 호패를 꺼낸 듯한 순간",
+        question: "주인이 꺼낸 것일까, 다른 손이 가져간 것일까?"
       },
       "하인 장부": {
         image: "/samunmong/assets/interactions/dream-traces/ledger-record-erased-v1.png",
-        alt: "정체를 감춘 인물이 이미 적힌 출입 기록을 먹으로 덮어 지우는 몽흔"
+        alt: "정체를 감춘 인물이 이미 적힌 출입 기록을 먹으로 덮어 지우는 몽흔",
+        observed: "한 줄의 필획만 나중 먹으로 덮여 있음",
+        scene: "이미 적힌 출입 기록 하나를 다시 가린 순간",
+        question: "지워진 행에는 누구의 이름이 있었을까?"
       },
       "찢어진 약속 편지": {
-        image: "/samunmong/assets/interactions/dream-traces/false-letter-written-v2.png",
-        alt: "정체를 감춘 인물이 다른 이의 말투를 흉내 낸 편지를 쓰고 찢는 몽흔"
+        image: "/samunmong/assets/interactions/dream-traces/promise-letter-written-v3.png",
+        alt: "정체를 감춘 인물이 온전한 약속 편지를 쓰는 몽흔",
+        observed: "정중한 문장이 한 번에 이어져 있음",
+        scene: "누군가 정중한 말투로 약속을 적은 순간",
+        question: "이 문장은 돌쇠의 평소 말투와 같은 것일까?"
       },
       "돌쇠의 그림": {
         image: "/samunmong/assets/interactions/dream-traces/portrait-redrawn-v1.png",
-        alt: "정체를 감춘 인물이 돌쇠의 초상을 여러 번 덧그리는 몽흔"
+        alt: "정체를 감춘 인물이 돌쇠의 초상을 여러 번 덧그리는 몽흔",
+        observed: "눈매와 옷깃에 지우고 덧그린 획이 여러 겹 남음",
+        scene: "누군가 감춰 둔 초상을 오래 고쳐 그린 순간",
+        question: "그린 이는 왜 이 얼굴을 거듭 붙잡았을까?"
       },
       "무덕의 번진 일기": {
-        image: "/samunmong/assets/interactions/dream-traces/diary-heard-at-door-v2.png",
-        alt: "어린 하인이 닫힌 문밖의 소리를 듣고 번진 일기에 기록하는 몽흔"
+        image: "/samunmong/assets/interactions/dream-traces/mudeok-diary-overheard-v4.png",
+        alt: "어린 하인이 닫힌 문밖의 소리를 듣고 번진 일기에 기록하는 몽흔",
+        observed: "번진 먹 아래 밤의 문소리와 들은 말이 기록됨",
+        scene: "무덕이 닫힌 문밖의 기척을 듣고 기억을 적은 순간",
+        question: "무덕이 들은 이야기는 누구에게까지 전해졌을까?"
       }
     };
 
@@ -4464,6 +4486,8 @@
       const data = evidenceData[clue.name] || { source: clue.source, note: clue.note, img: clue.img };
       const sourceName = clue.source || data.source || clue.name;
       const dreamTrace = joseonDreamTraceByEvidence[sourceName];
+      const [storyRole] = getEvidenceStoryCue(sourceName, evidenceData[sourceName] || data);
+      const storyQuestion = getEvidenceStoryMeaning(sourceName, evidenceData[sourceName] || data);
       const result = document.createElement("article");
       result.className = `interaction-earned-evidence ${dreamTrace ? "dream-trace-evidence" : "evidence-still-result"}`;
       result.setAttribute("aria-live", "polite");
@@ -4477,14 +4501,23 @@
             <span>검험을 마쳤습니다</span>
             <strong>${escapeHtml(clue.name)}</strong>
             <small>새 증좌가 보따리에 기록됨</small>
+            <div class="evidence-story-bridge">
+              <span><b>확인</b>${escapeHtml(dreamTrace?.observed || clue.note || data.note || "새 흔적을 확인함")}</span>
+              <i aria-hidden="true">→</i>
+              <span><b>${escapeHtml(storyRole)}</b>${escapeHtml(storyQuestion)}</span>
+            </div>
             ${dreamTrace ? '<button type="button" class="dream-trace-toggle"><b>꿈자취 살피기</b><em>증좌에 밴 지난 순간을 엿봄</em></button>' : ""}
           </div>
         </section>
         ${dreamTrace ? `<figure class="dream-trace-still" hidden>
           <img src="${escapeHtml(dreamTrace.image)}" alt="${escapeHtml(dreamTrace.alt)}" draggable="false">
           <figcaption>
-            <span>꿈자취</span>
-            <strong>${escapeHtml(clue.name)}</strong>
+            <span>꿈자취 · 재구성</span>
+            <div class="dream-trace-caption-copy">
+              <strong>${escapeHtml(dreamTrace.scene)}</strong>
+              <em>${escapeHtml(dreamTrace.question)}</em>
+              ${dreamTrace.caution ? `<small>${escapeHtml(dreamTrace.caution)}</small>` : ""}
+            </div>
             <button type="button" class="dream-trace-return">증좌로 돌아가기</button>
           </figcaption>
         </figure>` : ""}`;

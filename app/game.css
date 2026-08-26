@@ -12345,6 +12345,41 @@ html[data-samunmong-theme="joseon"] .evidence-recovery-copy > small {
   color: #bcae91;
   font-size: 14px;
 }
+html[data-samunmong-theme="joseon"] .evidence-story-bridge {
+  width: min(520px, 100%);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 22px minmax(0, 1fr);
+  align-items: stretch;
+  gap: 8px;
+  margin-top: 12px;
+}
+html[data-samunmong-theme="joseon"] .evidence-story-bridge > span {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-height: 82px;
+  padding: 12px 13px;
+  border: 1px solid #a56f3f70;
+  color: #e8d8b4;
+  background: #180d09b8;
+  font-size: 13px;
+  line-height: 1.48;
+}
+html[data-samunmong-theme="joseon"] .evidence-story-bridge b {
+  width: max-content;
+  padding-bottom: 3px;
+  border-bottom: 1px solid #c58d4c80;
+  color: #e8b766;
+  font-size: 12px;
+  letter-spacing: .08em;
+}
+html[data-samunmong-theme="joseon"] .evidence-story-bridge > i {
+  align-self: center;
+  color: #c38c4f;
+  font-size: 18px;
+  font-style: normal;
+  text-align: center;
+}
 html[data-samunmong-theme="joseon"] .dream-trace-toggle {
   width: min(340px, 100%);
   margin-top: 25px;
@@ -12425,6 +12460,27 @@ html[data-samunmong-theme="joseon"] .dream-trace-still figcaption {
   gap: 13px;
   color: #fff0c9;
 }
+html[data-samunmong-theme="joseon"] .dream-trace-caption-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+html[data-samunmong-theme="joseon"] .dream-trace-caption-copy em {
+  color: #eed8aa;
+  font-family: "NanumBareunJeongsin", "Noto Serif KR", serif;
+  font-size: 14px;
+  font-style: normal;
+}
+html[data-samunmong-theme="joseon"] .dream-trace-caption-copy small {
+  width: max-content;
+  max-width: 100%;
+  margin-top: 3px;
+  padding: 4px 7px;
+  border-left: 2px solid #cf9250;
+  color: #d6c29a;
+  background: #160c08a8;
+  font-size: 11px;
+}
 html[data-samunmong-theme="joseon"] .dream-trace-still figcaption span {
   padding: 6px 10px;
   border: 1px solid #cf9250;
@@ -12494,9 +12550,12 @@ html[data-samunmong-theme="joseon"] #documentAssemblyPanel.interaction-complete 
   html[data-samunmong-theme="joseon"] .evidence-object-stage { min-height: min(210px, 25vh); padding: 14px; }
   html[data-samunmong-theme="joseon"] .evidence-object-stage > img { height: min(175px, 21vh); }
   html[data-samunmong-theme="joseon"] .evidence-recovery-copy { justify-items: center; text-align: center; }
+  html[data-samunmong-theme="joseon"] .evidence-story-bridge { grid-template-columns: 1fr; }
+  html[data-samunmong-theme="joseon"] .evidence-story-bridge > i { transform: rotate(90deg); }
   html[data-samunmong-theme="joseon"] .dream-trace-toggle { margin-top: 8px; }
   html[data-samunmong-theme="joseon"] .dream-trace-still { height: min(300px, 38vh); }
-  html[data-samunmong-theme="joseon"] .dream-trace-still figcaption { left: 14px; right: 14px; bottom: 12px; }
+  html[data-samunmong-theme="joseon"] .dream-trace-still figcaption { left: 14px; right: 14px; bottom: 12px; align-items: flex-end; }
+  html[data-samunmong-theme="joseon"] .dream-trace-caption-copy em { font-size: 12px; }
   html[data-samunmong-theme="joseon"] .dream-trace-return { padding: 7px 9px; font-size: 12px; }
   html[data-samunmong-theme="joseon"] .ledger-recovered-records { inset: 3%; padding: 14px; overflow: auto; }
   html[data-samunmong-theme="joseon"] .ledger-recovered-records header { display: grid; gap: 2px; }
