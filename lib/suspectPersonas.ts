@@ -154,8 +154,8 @@ export const evidenceCatalog = [
     aliases: ["말포삼 자백", "자백", "말포일 부탁", "깜짝 파티", "환각 부탁"]
   },
   {
-    name: "얼어붙은 추진 레버 젤",
-    aliases: ["레버 젤", "추진 레버", "얼어붙은 젤", "밀봉 젤", "수술용 젤", "투명 젤", "레버", "젤"]
+    name: "추진 레버 결빙 기록",
+    aliases: ["결빙 화면", "결빙 기록", "추진 레버 기록", "추진 레버 결빙", "레버 진단 기록"]
   },
   {
     name: "마지막 무전 로그",
@@ -441,9 +441,9 @@ export const suspectPersonas: SuspectPersona[] = [
     ],
     evidenceReactions: [
       {
-        evidenceNames: ["얼어붙은 추진 레버 젤", "소독천과 장갑"],
+        evidenceNames: ["추진 레버 결빙 기록", "소독천과 장갑"],
         intentTags: ["medicalGel", "sealedLever"],
-        responseGuide: "밀봉 젤이 의료실 물품이라는 사실은 인정한다. 다만 왜 레버 홈에 있었는지는 바로 답하지 못하고, 우주 밖 그늘의 온도 이야기를 피하려 한다."
+        responseGuide: "추진 레버 결빙 기록의 원인이 의료용 밀봉 젤일 가능성은 인정한다. 다만 젤이 어떻게 데이비드의 우주복 레버에 들어갔는지는 답하지 못하고, 우주 밖 그늘의 온도 이야기만 반복한다."
       },
       {
         evidenceNames: ["손상된 압력 센서", "조작된 지연 타이머"],
@@ -466,7 +466,7 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "계약과 앰풀이 자신의 의료 권한에 연결된다는 점을 부정하다가, 연구 성과와 우선 귀환권을 잃을 수 없었다는 탐욕을 드러낸다."
       }
     ],
-    breakEvidenceNames: ["얼어붙은 추진 레버 젤", "소독천과 장갑", "손상된 압력 센서", "조작된 지연 타이머", "삭제된 의료 기록", "암호화된 연구 보상 계약", "미승인 약물 앰풀", "마지막 무전 로그"],
+    breakEvidenceNames: ["추진 레버 결빙 기록", "소독천과 장갑", "손상된 압력 센서", "조작된 지연 타이머", "삭제된 의료 기록", "암호화된 연구 보상 계약", "미승인 약물 앰풀", "마지막 무전 로그"],
     finalBehavior: "불법 임상시험과 부작용 은폐, 구조 채널 차단이 드러나고 공개되지 않은 증상 시각과 투여량을 말실수한 뒤 연구 보상과 지구 귀환 특혜를 잃을 수 없었다는 악의적 동기를 드러낸다."
   },
   {
@@ -486,9 +486,9 @@ export const suspectPersonas: SuspectPersona[] = [
     ],
     evidenceReactions: [
       {
-        evidenceNames: ["얼어붙은 추진 레버 젤", "엔지니어 공구 클램프"],
+        evidenceNames: ["추진 레버 결빙 기록", "엔지니어 공구 클램프"],
         intentTags: ["gelNotVisible", "suitCheck"],
-        responseGuide: "내부 점검 때 액체 상태였으면 육안으로 못 봤을 수 있다고 인정한다. 공구 클램프에는 젤 흔적이 없으니 엔지니어 도구로 만든 고장이 아니라고 반박한다."
+        responseGuide: "출발 전 점검에서는 레버가 정상이었고 외부 작업 중 급격히 결빙된 기록이 남았다고 설명한다. 공구 클램프에는 젤 흔적이 없으니 엔지니어 도구로 만든 고장이 아니라고 반박한다."
       },
       {
         evidenceNames: ["손상된 압력 센서", "조작된 지연 타이머"],
@@ -496,7 +496,7 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "외벽 통신 장치의 고정 전력이 끊겨 패널이 이탈했다고 설명한다. 타이머의 22시 05분 예약 기록을 제시하면 22시 11분경 에어록 근처에서 메르스가 '이제 시간만 맞으면 된다'고 무전하는 것을 들었다고 밝힌다."
       }
     ],
-    breakEvidenceNames: ["얼어붙은 추진 레버 젤", "엔지니어 공구 클램프"],
+    breakEvidenceNames: ["추진 레버 결빙 기록", "엔지니어 공구 클램프"],
     finalBehavior: "장비 점검 과실 의심에서 벗어나고, 수법이 의료용 젤과 정전 유도였다는 쪽으로 시선을 돌린다."
   },
   {
@@ -521,12 +521,12 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "커피 텀블러는 자기 물건이라고 인정하지만 약물 앰풀은 자신의 것이 아니라고 말한다. 추궁하면 21시 47분경 메르스가 앰풀이 든 냉각 보관함을 의료실 방향으로 운반하는 모습을 봤다고 밝힌다."
       },
       {
-        evidenceNames: ["얼어붙은 추진 레버 젤", "소독천과 장갑"],
+        evidenceNames: ["추진 레버 결빙 기록", "소독천과 장갑"],
         intentTags: ["gelChemistry", "medicalGel"],
-        responseGuide: "젤의 성분은 실험실 시약보다 의료용 밀봉재 쪽에 가깝다고 설명한다. 극저온에서 단단해지는 성질이 수법의 핵심이라고 말한다."
+        responseGuide: "추진 레버 결빙 기록과 소독천에 남은 젤 성분을 비교해, 실험실 시약보다 의료용 밀봉재가 원인에 가깝다고 설명한다. 극저온에서 단단해지는 성질이 수법의 핵심이라고 말한다."
       }
     ],
-    breakEvidenceNames: ["커피 텀블러", "미승인 약물 앰풀", "얼어붙은 추진 레버 젤"],
+    breakEvidenceNames: ["커피 텀블러", "미승인 약물 앰풀", "추진 레버 결빙 기록"],
     finalBehavior: "불법 실험은 인정하지만, 수법은 자기 실험실이 아니라 의료실 물품과 더 맞는다고 설명한다."
   }
 ];

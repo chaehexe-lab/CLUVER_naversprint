@@ -1518,7 +1518,7 @@
     // Collected evidence tooltip offsets: +x right, -x left, +y down, -y up.
     const collectedEvidenceTooltipOffsets = {
       "엔지니어 공구 클램프": { x: -10, y: 30 },
-      "얼어붙은 추진 레버 젤": { x: 20, y: 60 },
+      "추진 레버 결빙 기록": { x: 60, y: 60 },
       "마지막 무전 로그": { x: -130, y: 95 },
       "소독천과 장갑": { x: 40, y: 35 },
       "삭제된 의료 기록": { x: 35, y: 70 },
@@ -1572,6 +1572,23 @@
       if (!tooltip) return;
       tooltip.classList.remove("show");
       tooltip.setAttribute("aria-hidden", "true");
+    }
+
+    const detailedSpaceEvidenceName = "추진 레버 결빙 기록";
+
+    function setSpaceEvidenceDetail(open) {
+      if (!isSpaceTheme) return;
+      const panel = document.querySelector("#spaceEvidenceDetail");
+      const overlay = document.querySelector("#spaceEvidenceDetailOverlay");
+      if (!panel || !overlay) return;
+      panel.classList.toggle("show", open);
+      overlay.classList.toggle("show", open);
+      panel.setAttribute("aria-hidden", String(!open));
+      overlay.setAttribute("aria-hidden", String(!open));
+      if (open) {
+        hideCollectedEvidenceTooltip();
+        document.querySelector("#closeSpaceEvidenceDetail")?.focus();
+      }
     }
 
     function setupEvidenceScreen(screenId) {
@@ -1749,7 +1766,7 @@
       "/samunmong/assets/magic-school/interrogation/malpoil.webp"
     ];
     const spaceThemeStartAssets = [
-      "/assets/space-station/backgrounds/orbit-13-airlock-evidence-v3.webp",
+      "/assets/space-station/backgrounds/orbit-13-airlock-evidence-v4.webp",
       "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp",
       "/assets/space-station/backgrounds/medical-bay-evidence-v2.webp",
       "/assets/space-station/backgrounds/oxygen-generator-evidence-v2.webp",
@@ -1771,7 +1788,7 @@
       "/assets/space-station/characters/mers-upper.webp",
       "/assets/space-station/characters/aladdindin-upper.webp",
       "/assets/space-station/characters/einspanner-upper.webp",
-      "/assets/space-station/evidence/frozen-lever-gel.webp",
+      "/assets/space-station/evidence/control-terminal.webp",
       "/assets/space-station/evidence/final-radio-log.webp",
       "/assets/space-station/evidence/disinfectant-cloth-glove.webp",
       "/assets/space-station/evidence/deleted-medical-record.webp",
@@ -2616,6 +2633,18 @@
         img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg"
       }
     };
+
+    function removeUnknownSpaceEvidence() {
+      if (!isSpaceTheme) return;
+      const stored = readStored(collectedEvidenceKey, []);
+      if (!Array.isArray(stored)) return;
+      const valid = [...new Set(stored.filter((name) => typeof name === "string" && evidenceData[name]))];
+      if (JSON.stringify(valid) !== JSON.stringify(stored)) {
+        localStorage.setItem(collectedEvidenceKey, JSON.stringify(valid));
+      }
+    }
+
+    removeUnknownSpaceEvidence();
 
     const joseonEvidenceImageByName = {
       "호패 조각": "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp",
@@ -3592,6 +3621,7 @@
 
     function addEvidenceCardToInterrogation(name) {
       const list = document.querySelector("#evidenceList");
+      if (isSpaceTheme && !evidenceData[name]) return;
       const data = evidenceData[name] || {};
       document.querySelector("#emptyInterrogationEvidence")?.remove();
       const existing = [...list.querySelectorAll(".evidence")].find((item) => item.dataset.evidence === name);
@@ -3613,6 +3643,11 @@
       button.dataset.storyRole = meaningRevealed ? getEvidenceStoryCue(name, data)[0] : "???";
       button.innerHTML = evidenceCardHtml(name);
       button.addEventListener("click", () => {
+        if (isSpaceTheme && name === detailedSpaceEvidenceName) {
+          setSpaceEvidenceDetail(true);
+          playSfx("buttonAlt", 0.48);
+          return;
+        }
         if (isJoseonToolInteraction) {
           selectedEvidence = name;
           document.querySelectorAll("#evidenceList .evidence").forEach((item) => item.classList.toggle("active", item === button));
@@ -6016,6 +6051,11 @@
       const target = event.target instanceof Element ? event.target : null;
       if (!target) return;
 
+      if (target.closest("#closeSpaceEvidenceDetail, #spaceEvidenceDetailOverlay")) {
+        setSpaceEvidenceDetail(false);
+        return;
+      }
+
       if (target.closest("#closeHopaeInspect, #closeGenericEvidenceInspect")) {
         hideInspectPanels();
         return;
@@ -6027,7 +6067,13 @@
 
       const hotspot = target.closest("[data-evidence-name], #hopaeHotspot, #portraitHotspot");
       if (!hotspot) return;
-      if (hotspot.classList.contains("collected") || hotspot.getAttribute("aria-disabled") === "true") return;
+      if (hotspot.classList.contains("collected") || hotspot.getAttribute("aria-disabled") === "true") {
+        if (isSpaceTheme && hotspot.dataset.evidenceName === detailedSpaceEvidenceName) {
+          setSpaceEvidenceDetail(true);
+          playSfx("buttonAlt", 0.48);
+        }
+        return;
+      }
       if (event.__samunmongEvidenceHandled) return;
       event.__samunmongEvidenceHandled = true;
       if (hotspot.id === "hopaeHotspot") {

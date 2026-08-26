@@ -762,6 +762,39 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
         </div>
       </aside>
 
+      {isSpaceTheme ? (
+        <>
+          <div className="space-evidence-detail-overlay" id="spaceEvidenceDetailOverlay" aria-hidden="true" />
+          <aside
+            className="space-evidence-detail"
+            id="spaceEvidenceDetail"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="spaceEvidenceDetailTitle"
+            aria-hidden="true"
+          >
+            <button className="space-evidence-detail-close" id="closeSpaceEvidenceDetail" type="button" aria-label="증거 상세 닫기">
+              ×
+            </button>
+            <div className="space-evidence-detail-visual">
+              <img
+                src="/assets/space-station/evidence/thruster-freeze-record-detail.webp"
+                alt="정면에서 본 추진 레버 결빙 진단 화면"
+              />
+            </div>
+            <div className="space-evidence-detail-copy">
+              <span>ORBIT-13 · EQUIPMENT DIAGNOSTIC</span>
+              <h2 id="spaceEvidenceDetailTitle">추진 레버 결빙 기록</h2>
+              <p>
+                데이비드의 우주복에서 전송된 마지막 장비 진단 화면이다. 비상 추진 레버 연결부가
+                정체불명의 투명한 결빙 물질로 뒤덮여 있다. 레버 작동 신호는 입력됐지만 추진 가스
+                밸브는 열리지 않았다. 기록만으로는 결빙 물질의 정확한 성분을 확인할 수 없다.
+              </p>
+            </div>
+          </aside>
+        </>
+      ) : null}
+
       <div className="toast" id="toast" role="status" aria-live="polite">
         <button className="toast-close" id="closeToast" type="button" aria-label="알림 닫기" hidden>×</button>
         <span className="toast-evidence-kicker" aria-hidden="true">▣ 증거 확보</span>

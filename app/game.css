@@ -15929,6 +15929,11 @@ html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card .evid
   filter: drop-shadow(0 7px 8px rgba(0, 0, 0, .45));
 }
 
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card[data-evidence="추진 레버 결빙 기록"] .evidence-thumb {
+  width: 104px;
+  height: 96px;
+}
+
 html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-state-frame,
 html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-kind-mark {
   display: none;
@@ -16200,5 +16205,135 @@ html[data-samunmong-theme="spaceStation"] .conversation-note.investigation-note-
   color: #173a5a;
   background: rgba(217, 234, 250, .48);
   box-shadow: none;
+  outline: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail-overlay {
+  position: fixed;
+  z-index: 70;
+  inset: 0;
+  visibility: hidden;
+  background: rgba(0, 0, 0, .48);
+  opacity: 0;
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail-overlay.show {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail {
+  position: fixed;
+  z-index: 71;
+  left: 50%;
+  top: 50%;
+  box-sizing: border-box;
+  width: min(900px, 88vw);
+  min-height: 390px;
+  display: none;
+  grid-template-columns: minmax(260px, .82fr) minmax(0, 1.18fr);
+  align-items: center;
+  gap: 36px;
+  padding: 46px 52px;
+  border: 1px solid rgba(188, 229, 255, .9);
+  border-radius: 24px;
+  color: #102b44;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .16), transparent 19%),
+    radial-gradient(ellipse at 24% 0%, rgba(214, 240, 252, .24), transparent 48%),
+    linear-gradient(145deg, rgba(221, 233, 248, .9), rgba(185, 204, 229, .86));
+  box-shadow:
+    0 26px 76px rgba(0, 0, 0, .58),
+    0 0 22px rgba(112, 205, 255, .2),
+    inset 0 0 0 1px rgba(226, 246, 255, .34),
+    inset 0 -18px 38px rgba(64, 105, 154, .1);
+  transform: translate(-50%, -50%);
+  -webkit-backdrop-filter: blur(12px) saturate(1.08);
+  backdrop-filter: blur(12px) saturate(1.08);
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(132, 198, 238, .52);
+  border-radius: 18px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .24);
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail.show {
+  display: grid;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail-visual {
+  display: grid;
+  place-items: center;
+  min-height: 290px;
+  border: 1px solid rgba(255, 255, 255, .65);
+  border-radius: 16px;
+  background: rgba(7, 24, 39, .14);
+  box-shadow: inset 0 0 24px rgba(43, 96, 132, .15);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail-visual img {
+  width: min(270px, 90%);
+  height: 270px;
+  object-fit: contain;
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, .36));
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail-copy {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail-copy > span {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(16, 59, 88, .68);
+  font-size: 12px;
+  letter-spacing: .12em;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail-copy h2 {
+  margin: 0 0 24px;
+  color: #102b44;
+  font-size: clamp(25px, 2.3vw, 34px);
+  font-weight: 500;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail-copy p {
+  margin: 0;
+  color: #071f35;
+  font-size: clamp(15px, 1.35vw, 18px);
+  line-height: 1.8;
+  word-break: keep-all;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail-close {
+  position: absolute;
+  z-index: 2;
+  top: 28px;
+  right: 30px;
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgba(55, 99, 143, .58);
+  border-radius: 50%;
+  color: #173a5a;
+  background: rgba(217, 234, 250, .58);
+  font-size: 28px;
+  line-height: 1;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail-close:hover,
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail-close:focus-visible {
+  border: 2px solid rgba(55, 99, 143, .94);
   outline: none;
 }

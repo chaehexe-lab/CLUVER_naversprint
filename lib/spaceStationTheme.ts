@@ -29,7 +29,7 @@ export const spaceStationTheme = {
     { id: "einspanner", name: "아인슈페너", role: "화학 실험 담당 과학자", authId: "ORBIT-13-SCI-0516", scene: room, sprite: "/assets/space-station/characters/einspanner-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/einspanner-upper-aligned.webp", resultImage: "/assets/space-station/characters/einspanner-upper.webp", resultLayout: { slot: { left: "72.01%", top: "38.2%", width: "13.5%", height: "30%" }, nameLeft: "78.7%", stampLeft: "82.6%", offsetX: "0%" }, hiddenTruth: "21시 47분경 메르스가 약물 냉각 보관함을 의료실로 운반하는 모습을 목격했다." }
   ],
   locations: [
-    { id: "spaceAirlock", name: "에어록", map: { x: "50.1%", y: "17%", labelY: "26.4%" }, indicator: { x: "50%", y: "14%" }, image: "/assets/space-station/backgrounds/orbit-13-airlock-evidence-v3.webp", alt: "오르빗-13 에어록과 외부 작업 사고 현장" },
+    { id: "spaceAirlock", name: "에어록", map: { x: "50.1%", y: "17%", labelY: "26.4%" }, indicator: { x: "50%", y: "14%" }, image: "/assets/space-station/backgrounds/orbit-13-airlock-evidence-v4.webp", alt: "오르빗-13 에어록과 외부 작업 사고 현장" },
     { id: "spaceMedicalBay", name: "의료실", map: { x: "28.5%", y: "33%", labelY: "43.4%" }, indicator: { x: "29%", y: "31%" }, image: "/assets/space-station/backgrounds/medical-bay-evidence-v2.webp", alt: "오르빗-13 의료실" },
     { id: "spaceOxygenGenerator", name: "산소 발생기실", map: { x: "71.9%", y: "33%", labelY: "43.4%" }, indicator: { x: "72%", y: "31%" }, image: "/assets/space-station/backgrounds/oxygen-generator-evidence-v2.webp", alt: "오르빗-13 산소 발생기실" },
     { id: "spaceDataCore", name: "데이터실", map: { x: "28.5%", y: "63.5%", labelY: "73.5%" }, indicator: { x: "29%", y: "61%" }, image: "/assets/space-station/backgrounds/data-core-evidence-v2.webp", alt: "오르빗-13 데이터실" },
@@ -38,7 +38,7 @@ export const spaceStationTheme = {
   ],
   evidence: {
     "엔지니어 공구 클램프": { role: "무혐의 증거", location: "에어록", note: "에어록 장비 점검대의 공구 클램프. 알라딘딘의 점검에 쓰였지만 레버 젤 흔적은 없다.", logic: "알라딘딘이 장비를 조작했다는 의혹을 약화한다.", relatedSuspects: ["알라딘딘"], img: "/assets/space-station/evidence/engineer-tool-clamp.webp" },
-    "얼어붙은 추진 레버 젤": { role: "수법 증거", location: "에어록", note: "비상 추진 레버 홈의 투명한 얼음막. 내부에서는 액체라 점검 때 보이지 않았다.", logic: "의료용 젤이 극저온에서 굳어 최후의 복귀 수단을 막았다.", relatedSuspects: ["메르스", "알라딘딘"], img: "/assets/space-station/evidence/frozen-lever-gel.webp" },
+    "추진 레버 결빙 기록": { role: "수법 증거", location: "에어록", note: "데이비드의 우주복 원격 진단 기록을 확인할 수 있다.", logic: "추진 레버는 데이비드와 함께 표류했지만 관제 기록을 통해 결빙 시점과 작동 불능 상태를 확인할 수 있다.", relatedSuspects: ["메르스", "알라딘딘"], img: "/assets/space-station/evidence/control-terminal.webp" },
     "마지막 무전 로그": { role: "결정타 증거", location: "에어록", note: "데이비드의 마지막 구조 요청이 개인 의료 채널에서 수동 차단됐다.", logic: "메르스가 구조 요청을 받고도 채널을 차단했다.", relatedSuspects: ["데이비드", "메르스"], img: "/assets/space-station/evidence/final-radio-log.webp" },
     "소독천과 장갑": { role: "연결 증거", location: "의료실", note: "흰 소독천과 수술용 장갑에 투명 젤 성분이 남아 있다.", logic: "추진 레버를 막은 젤과 의료실을 연결한다.", relatedSuspects: ["메르스"], img: "/assets/space-station/evidence/disinfectant-cloth-glove.webp" },
     "삭제된 의료 기록": { role: "동기 증거", location: "의료실", note: "데이비드의 미승인 약물 투여와 부작용 기록이 해리 계정으로 삭제됐다.", logic: "불법 임상시험과 약물 부작용 은폐를 보여준다.", relatedSuspects: ["해리", "메르스", "데이비드"], img: "/assets/space-station/evidence/deleted-medical-record.webp" },
@@ -49,7 +49,7 @@ export const spaceStationTheme = {
     "커피 텀블러": { role: "미끼 증거", location: "과학 실험실", note: "아인슈페너의 텀블러. 숨긴 개인 실험을 의심하게 한다.", logic: "아인슈페너를 의심하게 하지만 살인 수법과 연결되지 않는다.", relatedSuspects: ["아인슈페너"], img: "/assets/space-station/evidence/coffee-tumbler.webp" },
     "미승인 약물 앰풀": { role: "위장 및 동기 증거", location: "과학 실험실", note: "삭제된 투약 기록과 같은 제조 코드가 남은 파란 근육 재생 약물 앰풀.", logic: "메르스가 불법 약물을 숨기고 아인슈페너에게 책임을 씌우려 했다.", relatedSuspects: ["메르스", "아인슈페너"], img: "/assets/space-station/evidence/unauthorized-drug-ampoule.webp" }
   },
-  requiredEvidence: ["얼어붙은 추진 레버 젤", "손상된 압력 센서", "조작된 지연 타이머", "삭제된 의료 기록", "접속 키카드 칩", "암호화된 연구 보상 계약", "마지막 무전 로그"],
+  requiredEvidence: ["추진 레버 결빙 기록", "손상된 압력 센서", "조작된 지연 타이머", "삭제된 의료 기록", "접속 키카드 칩", "암호화된 연구 보상 계약", "마지막 무전 로그"],
   deductionRoute: ["외벽 장비 담당 알라딘딘이 먼저 의심받는다.", "약물 앰풀 때문에 아인슈페너가 의심받는다.", "삭제 로그 때문에 해리가 의심받는다.", "산소 복구 과정에서 사고가 예약 실행됐음이 드러난다.", "심문과 의료실 증거가 메르스의 행동을 완성한다.", "최종 지목은 메르스다."]
 } as const;
 
@@ -64,7 +64,7 @@ const dock = [
 const hotspots: Record<string, SceneHotspot[]> = {
   spaceAirlock: [
     { evidenceName: "엔지니어 공구 클램프", ariaLabel: "엔지니어 공구 클램프 조사", x: "30.9%", y: "87.8%", w: "11%", h: "10%", clipPath: "polygon(2% 36%, 85% 12%, 98% 68%, 18% 96%)", radius: "999px", rot: "5deg" },
-    { evidenceName: "얼어붙은 추진 레버 젤", ariaLabel: "얼어붙은 추진 레버 젤 조사", x: "61%", y: "42%", w: "7%", h: "17%", clipPath: "polygon(18% 4%, 82% 8%, 96% 92%, 8% 96%)", radius: "16px", rot: "0deg" },
+    { evidenceName: "추진 레버 결빙 기록", ariaLabel: "추진 레버 결빙 기록 조사", x: "61.5%", y: "40.5%", w: "7%", h: "17%", clipPath: "polygon(8% 4%, 92% 4%, 96% 94%, 4% 96%)", radius: "12px", rot: "0deg" },
     { evidenceName: "마지막 무전 로그", ariaLabel: "마지막 무전 로그 조사", x: "96.5%", y: "35.4%", w: "7%", h: "17%", clipPath: "polygon(12% 4%, 88% 8%, 98% 92%, 4% 96%)", radius: "14px", rot: "0deg" }
   ],
   spaceMedicalBay: [
