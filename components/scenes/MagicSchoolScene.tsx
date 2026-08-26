@@ -8,11 +8,15 @@ import { hotspotStyle } from "./hotspotStyle";
 type MagicScene = (typeof magicSchoolScenes)[number];
 
 export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
+  const requiresLightSpell = scene.id === "magicAlchemyLab";
   const [lightEnabled, setLightEnabled] = useState(false);
   const handleLightChange = useCallback((enabled: boolean) => setLightEnabled(enabled), []);
+  const lightClassName = requiresLightSpell
+    ? ` magic-light-required${lightEnabled ? " light-magic-active" : ""}`
+    : "";
 
   return (
-    <section className={`screen active magic-school-screen${lightEnabled ? " light-magic-active" : ""}`} id={scene.id}>
+    <section className={`screen active magic-school-screen${lightClassName}`} id={scene.id}>
       <img className="plate" src={scene.image} alt={scene.alt} />
       <div className="shade magic-shade" />
       <div className="magic-light-bloom" aria-hidden="true" />
