@@ -568,6 +568,274 @@ body {
   }
 }
 
+/* 마법학교 범인 지목·판정: 양피지, 목재, 황동, 봉인 인장을 중심으로 한 고전 마법학교 양식. */
+.result-screen.theme-magicSchool {
+  background: #0c0805;
+  color: #ead7ae;
+  font-family: "ChosunNm", "Noto Serif KR", serif;
+}
+
+.theme-magicSchool .accusation-stage {
+  isolation: isolate;
+  background: #0c0805;
+  box-shadow: 0 30px 120px rgba(0, 0, 0, 0.84), 0 0 0 1px rgba(137, 98, 47, 0.28);
+}
+
+.theme-magicSchool .accusation-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(circle at 50% 38%, rgba(212, 164, 85, 0.11), transparent 28%),
+    linear-gradient(180deg, rgba(15, 9, 5, 0.2), rgba(10, 6, 4, 0.76)),
+    repeating-linear-gradient(90deg, transparent 0 7px, rgba(224, 186, 113, 0.012) 7px 8px);
+  pointer-events: none;
+}
+
+.theme-magicSchool .accusation-stage::after {
+  display: none;
+}
+
+.theme-magicSchool .accusation-bg,
+.theme-magicSchool .result-full-bg {
+  filter: brightness(0.5) saturate(0.68) sepia(0.2) hue-rotate(-8deg);
+}
+
+.theme-magicSchool .accusation-title {
+  color: #f1d8a5;
+  font-family: "ChosunNm", "Noto Serif KR", serif;
+  font-size: clamp(34px, 4.1vw, 68px);
+  letter-spacing: 0.04em;
+  text-shadow: 0 4px 0 rgba(0, 0, 0, 0.78), 0 2px 18px rgba(0, 0, 0, 0.9);
+}
+
+.theme-magicSchool .accusation-suspect {
+  overflow: hidden;
+  border: 0;
+  border-radius: 0;
+  background: rgba(31, 18, 11, 0.1);
+  box-shadow: none;
+  clip-path: none;
+}
+
+.theme-magicSchool .accusation-suspect::before {
+  inset: 0;
+  border: 1px solid rgba(239, 208, 143, 0.18);
+  border-radius: 0;
+  clip-path: none;
+  box-shadow: inset 0 0 24px rgba(17, 8, 4, 0.4);
+}
+
+.theme-magicSchool .accusation-suspect img {
+  top: 55%;
+  width: auto;
+  height: 118%;
+  max-width: none;
+  filter: drop-shadow(0 14px 13px rgba(0, 0, 0, 0.58)) brightness(0.88) saturate(0.72) sepia(0.08);
+}
+
+.theme-magicSchool .accusation-suspect[data-suspect-id="malpoi"] img {
+  top: 55%;
+}
+
+.theme-magicSchool .accusation-suspect:hover,
+.theme-magicSchool .accusation-suspect:focus-visible,
+.theme-magicSchool .accusation-suspect.selected {
+  outline: 2px solid rgba(205, 156, 79, 0.72);
+  outline-offset: 2px;
+  box-shadow:
+    inset 0 0 34px rgba(191, 139, 65, 0.13),
+    0 10px 24px rgba(0, 0, 0, 0.28);
+}
+
+.theme-magicSchool .accusation-suspect:hover img,
+.theme-magicSchool .accusation-suspect:focus-visible img,
+.theme-magicSchool .accusation-suspect.selected img {
+  filter: drop-shadow(0 16px 15px rgba(0, 0, 0, 0.62)) brightness(1.02) saturate(0.84) sepia(0.06);
+  transform: translate(-50%, -50%);
+}
+
+.theme-magicSchool .accusation-name {
+  z-index: 3;
+  top: 72.7%;
+  color: #f6e0b4;
+  font-family: "ChilgokLjh", "ChosunNm", serif;
+  font-size: clamp(20px, 2.5vw, 42px);
+  text-shadow: 0 3px 0 #110a06, 0 2px 10px rgba(0, 0, 0, 0.92);
+}
+
+.theme-magicSchool .accusation-stamp {
+  z-index: 4;
+  top: 69.1%;
+  width: min(7.54vw, 126px);
+  aspect-ratio: 126 / 94;
+  display: grid;
+  place-items: center;
+  border: clamp(2px, 0.3vw, 5px) solid rgba(150, 36, 32, 0.84);
+  border-radius: 0;
+  background: transparent;
+  color: rgba(154, 37, 32, 0.9);
+  font-family: "ChilgokLjh", "ChosunNm", serif;
+  font-size: clamp(22px, 2.63vw, 44px);
+  text-shadow: none;
+  box-shadow: none;
+  transform: translateX(-50%) rotate(-11deg);
+}
+
+.theme-magicSchool .wood-result-button {
+  border-color: rgba(141, 101, 51, 0.72);
+  border-radius: 3px;
+  background:
+    linear-gradient(180deg, rgba(81, 53, 30, 0.96), rgba(32, 20, 13, 0.98)),
+    repeating-linear-gradient(0deg, rgba(236, 193, 111, 0.04) 0 1px, transparent 1px 7px),
+    #2c1b11;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.52), inset 0 0 0 1px rgba(233, 193, 119, 0.13);
+  color: #ead2a0;
+  font-family: "ChosunNm", "Noto Serif KR", serif;
+}
+
+.theme-magicSchool .wood-result-button.primary {
+  border-color: rgba(163, 109, 58, 0.82);
+  background:
+    linear-gradient(180deg, rgba(107, 47, 37, 0.96), rgba(52, 21, 18, 0.98)),
+    repeating-linear-gradient(0deg, rgba(239, 194, 119, 0.05) 0 1px, transparent 1px 7px),
+    #401b17;
+  color: #f0d7a4;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.54), inset 0 0 0 1px rgba(238, 195, 118, 0.14);
+}
+
+.theme-magicSchool .wood-result-button::before {
+  border-color: rgba(231, 190, 112, 0.16);
+}
+
+.theme-magicSchool .accusation-dialog-backdrop {
+  background: radial-gradient(circle, rgba(147, 100, 48, 0.14), transparent 38%), rgba(8, 5, 3, 0.8);
+  backdrop-filter: blur(2px);
+}
+
+.theme-magicSchool .accusation-dialog {
+  border: 0;
+  border-radius: 0;
+  background: url("/samunmong/assets/magic-school/ui/magic-common-panel.webp") center / 100% 100% no-repeat;
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.8);
+  color: #382416;
+}
+
+.theme-magicSchool .accusation-dialog::before {
+  inset: 34px;
+  border-color: rgba(99, 63, 31, 0.28);
+}
+
+.theme-magicSchool .accusation-dialog h2,
+.theme-magicSchool .accusation-dialog p {
+  color: #382416;
+  font-family: "ChosunNm", "Noto Serif KR", serif;
+  text-shadow: 0 1px 0 rgba(255, 239, 194, 0.42);
+}
+
+.theme-magicSchool .verdict-stage::before {
+  background:
+    radial-gradient(circle at 25% 45%, rgba(203, 155, 79, 0.12), transparent 31%),
+    linear-gradient(90deg, rgba(10, 6, 3, 0.86), rgba(20, 12, 7, 0.36) 52%, rgba(8, 5, 3, 0.86));
+}
+
+.theme-magicSchool .verdict-tag {
+  border: 8px solid #352216;
+  border-radius: 4px;
+  background:
+    linear-gradient(90deg, rgba(100, 59, 28, 0.12), transparent 12% 88%, rgba(100, 59, 28, 0.12)),
+    repeating-linear-gradient(0deg, rgba(72, 40, 20, 0.025) 0 1px, transparent 1px 6px),
+    #c9aa74;
+  clip-path: polygon(3% 0, 97% 0, 100% 3%, 99% 97%, 96% 100%, 4% 99%, 0 96%, 1% 4%);
+  box-shadow: inset 0 0 0 2px rgba(201, 158, 85, 0.55), inset 0 0 44px rgba(72, 35, 14, 0.24);
+  filter: drop-shadow(0 28px 56px rgba(0, 0, 0, 0.72));
+}
+
+.theme-magicSchool .verdict-portrait-frame {
+  left: 12%;
+  top: 13%;
+  width: 76%;
+  height: 61%;
+  border: 1px solid rgba(84, 50, 27, 0.58);
+  background: radial-gradient(circle at 50% 45%, rgba(187, 143, 75, 0.13), transparent 60%), #25180f;
+}
+
+.theme-magicSchool .verdict-portrait-frame img {
+  top: 55%;
+  width: auto;
+  height: 112%;
+  max-width: none;
+  filter: drop-shadow(0 12px 14px rgba(0, 0, 0, 0.55)) brightness(0.92) saturate(0.72) sepia(0.09);
+}
+
+.theme-magicSchool .verdict-tag strong {
+  left: 10%;
+  bottom: 7.5%;
+  color: #3a2315;
+  font-family: "ChosunNm", "Noto Serif KR", serif;
+  text-shadow: 0 1px 0 rgba(246, 218, 160, 0.42);
+}
+
+.theme-magicSchool .verdict-stamp {
+  border: 4px double rgba(247, 211, 143, 0.76);
+  border-radius: 50%;
+  background: radial-gradient(circle, #8e2c24 0 58%, #5f1713 61% 100%);
+  color: #f1d49c;
+  font-family: "ChosunNm", serif;
+  text-shadow: 0 2px 2px rgba(48, 9, 7, 0.86);
+  box-shadow: inset 0 0 0 5px rgba(72, 12, 10, 0.2), 0 5px 12px rgba(0, 0, 0, 0.42);
+}
+
+.theme-magicSchool.result-failure .verdict-stamp {
+  border-color: rgba(218, 191, 134, 0.7);
+  background: radial-gradient(circle, #55503d 0 58%, #302d22 61% 100%);
+  color: #ead9b3;
+  text-shadow: 0 2px 2px rgba(20, 18, 12, 0.86);
+}
+
+.theme-magicSchool .verdict-message {
+  min-height: min(520px, calc(100vh - 96px));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(48px, 5vw, 68px) clamp(36px, 3.5vw, 48px);
+  border-left: 0;
+  background: url("/samunmong/assets/magic-school/ui/magic-common-panel.webp") center / 100% 100% no-repeat;
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.54);
+}
+
+.theme-magicSchool .verdict-actions {
+  flex-wrap: nowrap;
+  gap: 12px;
+}
+
+.theme-magicSchool .verdict-actions .wood-result-button {
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+.theme-magicSchool .verdict-kicker {
+  color: #7c2d23;
+  font-family: "ChosunNm", "Noto Serif KR", serif;
+}
+
+.theme-magicSchool .verdict-message h1 {
+  color: #352116;
+  font-family: "ChosunNm", "Noto Serif KR", serif;
+  text-shadow: 0 1px 0 rgba(255, 237, 191, 0.5);
+}
+
+.theme-magicSchool .typewriter-lines p {
+  color: #4e3421;
+  font-family: "ChosunNm", "Noto Serif KR", serif;
+}
+
+.theme-magicSchool .typewriter-lines p.typing::after {
+  background: #7f2e25;
+  box-shadow: none;
+}
+
 html body * {
   cursor: var(--cursor-default) !important;
 }

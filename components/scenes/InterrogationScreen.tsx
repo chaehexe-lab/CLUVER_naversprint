@@ -757,12 +757,18 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               className="map-pin-button"
               type="button"
               data-map-go={location.goTo}
+              data-location-screen={location.screen}
               style={mapPinStyle(location)}
               aria-label={location.label}
               disabled={!location.goTo}
               key={`pin-${location.screen}`}
             />
           ))}
+          {isMagicTheme ? (
+            <p className="magic-map-progress" id="magicMapProgress" aria-live="polite">
+              첫 조사 장소에서 증거를 모두 찾으면 다음 장소의 봉인이 풀립니다.
+            </p>
+          ) : null}
         </div>
       </aside>
 
