@@ -21,6 +21,7 @@ import MudeokServantRoomScene from "@/components/scenes/MudeokServantRoomScene";
 import SpaceStationScene from "@/components/scenes/SpaceStationScene";
 import YoomunseokSarangbangScene from "@/components/scenes/YoomunseokSarangbangScene";
 import { magicSchoolScenes, spaceStationScenes } from "@/lib/gameData";
+import { spaceStationRuntimeConfig } from "@/lib/spaceStationTheme";
 import { STARTABLE_SCREENS } from "@/lib/gameState";
 import {
   getThemeEntryHref,
@@ -221,6 +222,7 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
       });
 
     async function bootScripts() {
+      (window as Window & { SAMUNMONG_SPACE_STATION?: typeof spaceStationRuntimeConfig }).SAMUNMONG_SPACE_STATION = spaceStationRuntimeConfig;
       await loadScript(CONTENT_SCRIPT);
       if (cancelled) return;
       await loadScript(PROTOTYPE_SCRIPT);
@@ -236,6 +238,12 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
   }, [initialScreen, initialTheme]);
 
   return (
+    <>
+    <script
+      id="spaceStationRuntimeData"
+      type="application/json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(spaceStationRuntimeConfig).replace(/</g, "\\u003c") }}
+    />
     <div
       className="game-viewport"
       onDragStartCapture={(event) => {
@@ -264,5 +272,6 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
         <CinematicEvidenceFeedback />
       </main>
     </div>
+    </>
   );
 }

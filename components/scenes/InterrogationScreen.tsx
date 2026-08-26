@@ -5,6 +5,7 @@ import EvidenceInventory from "@/components/EvidenceInventory";
 import InvestigationNote from "@/components/InvestigationNote";
 import InterrogationCharacter2D from "@/components/effects/InterrogationCharacter2D";
 import type { GameTheme } from "@/lib/gameTheme";
+import { spaceStationInterrogationCopy, spaceStationMap, spaceStationTheme } from "@/lib/spaceStationTheme";
 import type { CSSProperties } from "react";
 
 type PinStyle = CSSProperties & {
@@ -59,18 +60,7 @@ const THEME_MAPS: Record<GameTheme, { image: string; alt: string; locations: Map
       { screen: "interrogationScreen", goTo: "interrogationScreen", text: "교무 조사실", label: "교무 조사실로 이동", x: "70.3%", y: "73.6%", labelY: "61.6%" }
     ]
   },
-  spaceStation: {
-    image: "/assets/space-station/maps/orbit-13-six-location-map.webp",
-    alt: "중앙 허브와 여섯 조사 장소가 연결된 우주정거장 오르빗-13 도면",
-    locations: [
-      { screen: "spaceAirlock", goTo: "spaceAirlock", text: "에어록", label: "에어록으로 이동", x: "50.1%", y: "17%", labelY: "26.4%" },
-      { screen: "spaceMedicalBay", goTo: "spaceMedicalBay", text: "의료실", label: "의료실로 이동", x: "28.5%", y: "33%", labelY: "43.4%" },
-      { screen: "spaceOxygenGenerator", goTo: "spaceOxygenGenerator", text: "산소 발생기실", label: "산소 발생기실로 이동", x: "71.9%", y: "33%", labelY: "43.4%" },
-      { screen: "spaceDataCore", goTo: "spaceDataCore", text: "데이터실", label: "데이터실로 이동", x: "28.5%", y: "63.5%", labelY: "73.5%" },
-      { screen: "spaceScienceLab", goTo: "spaceScienceLab", text: "과학 실험실", label: "과학 실험실로 이동", x: "71.5%", y: "63%", labelY: "73.5%" },
-      { screen: "interrogationScreen", goTo: "interrogationScreen", text: "보안 조사실", label: "보안 조사실로 이동", x: "50.2%", y: "79%", labelY: "88.6%" }
-    ]
-  }
+  spaceStation: spaceStationMap
 };
 
 const THEME_INTERROGATION_COPY: Record<GameTheme, {
@@ -118,23 +108,7 @@ const THEME_INTERROGATION_COPY: Record<GameTheme, {
       { id: "malpoil", name: "말포일" }
     ]
   },
-  spaceStation: {
-    map: "정거장 지도",
-    note: "로그 기록",
-    noteKicker: "통신 로그",
-    noteLead: "대원별 질문과 답변을 통신 기록처럼 확인합니다.",
-    journal: "최종 보고서",
-    bag: "증거 보관함",
-    tools: "스캔 도구",
-    toolKicker: "신호 분석",
-    toolTitle: "스캔 분석",
-    suspects: [
-      { id: "harry", name: "해리" },
-      { id: "mers", name: "메르스" },
-      { id: "aladdindin", name: "알라딘딘" },
-      { id: "einspanner", name: "아인슈페너" }
-    ]
-  }
+  spaceStation: spaceStationInterrogationCopy
 };
 
 function mapPositionStyle(item: { x: string; y: string; rot?: string }): PinStyle {
@@ -162,25 +136,23 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
   const initialPlate = isMagicTheme
     ? "/samunmong/assets/magic-school/interrogation/office-empty.webp"
     : isSpaceTheme
-      ? "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp"
+      ? spaceStationTheme.assets.room
     : "/samunmong/assets/interactions/interrogation-candle/interrogation-room-common-clean-v2.png";
   const initialSuspect = isSpaceTheme ? "harry" : isMagicTheme ? "malpoi" : "dolsoe";
-  const initialSprite = isSpaceTheme ? "/assets/space-station/characters/harry-upper-transparent.webp" : isMagicTheme ? "/samunmong/assets/magic-school/interrogation/malpoi-sprite.webp" : "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707";
-  const initialName = isSpaceTheme ? "해리" : isMagicTheme ? "말포이" : "돌쇠";
-  const mapIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/orbit-blueprint.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-school-map.webp" : "/samunmong/assets/labels/transparent/tool-village-map.webp";
-  const noteIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/log-record.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/labels/transparent/tool-note-short.webp";
-  const briefingIcon = "/assets/space-station/ui-icons-v3/case-briefing.webp";
+  const initialSprite = isSpaceTheme ? spaceStationTheme.suspects[0].sprite : isMagicTheme ? "/samunmong/assets/magic-school/interrogation/malpoi-sprite.webp" : "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707";
+  const initialName = isSpaceTheme ? spaceStationTheme.suspects[0].name : isMagicTheme ? "말포이" : "돌쇠";
+  const mapIcon = isSpaceTheme ? spaceStationTheme.assets.mapIcon : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-school-map.webp" : "/samunmong/assets/labels/transparent/tool-village-map.webp";
+  const noteIcon = isSpaceTheme ? spaceStationTheme.assets.conversationIcon : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/labels/transparent/tool-note-short.webp";
+  const briefingIcon = spaceStationTheme.assets.briefingIcon;
   const journalIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/final-report.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/ui-generated/tool-case-journal.webp";
   const bagIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/evidence-vault.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-magic-bag.webp" : "/samunmong/assets/labels/transparent/tool-bag-short.webp";
-  const toolIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/scan-tool.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-mana-tools.webp" : "/samunmong/assets/labels/transparent/tool-investigation-tools.webp";
+  const toolIcon = isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-mana-tools.webp" : "/samunmong/assets/labels/transparent/tool-investigation-tools.webp";
   const hintIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/hint-beacon.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-arcane-hint-compass.png" : "/samunmong/assets/ui-generated/tool-hint.webp";
   const accuseIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/accuse-target.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-final-accuse.webp" : "/samunmong/assets/labels/transparent/tool-accuse-short.webp";
   const bagPanelStyle = isSpaceTheme
     ? ({ backgroundImage: "url('/assets/space-station/panels/evidence-vault-panel-v2.webp')" } satisfies CSSProperties)
     : undefined;
-  const toolPanelStyle = isSpaceTheme
-    ? ({ backgroundImage: "url('/assets/space-station/panels/scan-tools-panel-v2.webp')" } satisfies CSSProperties)
-    : undefined;
+  const toolPanelStyle = undefined;
   const notePanelStyle = isSpaceTheme
     ? ({ backgroundImage: "url('/assets/space-station/panels/log-record-panel-v2.webp')" } satisfies CSSProperties)
     : undefined;
@@ -441,7 +413,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           </button>
         </div>
         {isSpaceTheme || isMagicTheme ? (
-          <p>{isSpaceTheme ? "스캔 장비를 고른 뒤 증거를 확인하십시오." : "단서 하나와 도구 하나를 골라 증거 위에 놓으세요."}</p>
+          <p>단서 하나와 도구 하나를 골라 증거 위에 놓으세요.</p>
         ) : null}
         {!isSpaceTheme && !isMagicTheme ? (
           <ol className="tool-flow-guide" aria-label="증거 감식 순서">
