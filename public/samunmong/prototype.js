@@ -2792,6 +2792,8 @@
 
     function getEvidenceImage(name, fallback = "/samunmong/assets/evidence-wooden-tag.webp") {
       if (!isJoseonToolInteraction) return evidenceData[name]?.img || fallback;
+      const transformed = readExaminedClues().filter((clue) => clue.source === name).at(-1);
+      if (transformed?.img) return transformed.img;
       return joseonEvidenceImageByName[name] || evidenceData[name]?.img || fallback;
     }
 
@@ -3147,12 +3149,20 @@
       if (isJoseonToolInteraction && !isEvidenceMeaningRevealed(name)) {
         return joseonUnexaminedEvidenceNames[name] || "정체 모를 물건";
       }
+      if (isJoseonToolInteraction) {
+        const transformed = readExaminedClues().filter((clue) => clue.source === name).at(-1);
+        if (transformed?.name) return transformed.name;
+      }
       return name;
     }
 
     function getEvidenceCardSummary(name, data = evidenceData[name] || {}) {
       if (isJoseonToolInteraction && !isEvidenceMeaningRevealed(name, data)) {
         return joseonUnexaminedEvidenceSummaries[name] || "도구로 살펴봐야 정체를 알 수 있다.";
+      }
+      if (isJoseonToolInteraction) {
+        const transformed = readExaminedClues().filter((clue) => clue.source === name).at(-1);
+        if (transformed?.note) return transformed.note;
       }
       return sentenceBreakText(data.note || "현장에서 발견된 단서입니다.").split("\n").find(Boolean) || "";
     }
@@ -3315,7 +3325,6 @@
         isNew: true,
         source: evidenceName
       };
-      addEvidenceCardToInterrogation(name);
       refreshEvidenceCard(evidenceName);
       document.querySelectorAll(`#toolEvidenceList [data-evidence="${CSS.escape(evidenceName)}"]`).forEach((item) => item.remove());
       return name;
@@ -3350,7 +3359,6 @@
           isNew: Boolean(clue.isNew),
           source: clue.source
         };
-        addEvidenceCardToInterrogation(clue.name);
         refreshEvidenceCard(clue.source);
       });
     }
