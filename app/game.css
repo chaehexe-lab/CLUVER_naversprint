@@ -885,7 +885,10 @@
     .scene-state-backgrounds {
       z-index: 0;
       pointer-events: none;
-      opacity: 0;
+      /* Never hide the entire room while saved evidence state is restoring.
+         Hotspots are reconciled independently; a missed hydration tick must not
+         leave only the lantern layer visible on a black screen. */
+      opacity: 1;
     }
 
     .screen[data-evidence-state-ready="true"] .scene-state-backgrounds {
