@@ -200,7 +200,7 @@ export const backGateCourtyardScene = {
   props: [] as SceneProp[],
   hotspots: [
     { className: "scene-evidence-object backgate-footprints-evidence", evidenceName: "작은 발자국", ariaLabel: "작은 발자국 조사", x: "58%", y: "77.5%", w: "8%", h: "16%", clipPath: "polygon(8% 34%, 24% 12%, 52% 18%, 68% 4%, 96% 34%, 82% 88%, 22% 96%)", radius: "999px", rot: "8deg" },
-    { className: "scene-evidence-object backgate-cord-evidence", evidenceName: "끊어진 호패끈", ariaLabel: "끊어진 호패끈 조사", x: "30%", y: "80%", w: "12%", h: "12%", clipPath: "polygon(2% 60%, 36% 18%, 98% 34%, 78% 80%, 18% 96%)", radius: "999px", rot: "-12deg" }
+    { className: "scene-evidence-object backgate-cord-evidence", evidenceName: "끊어진 호패끈", ariaLabel: "끊어진 호패끈 조사", x: "17.8%", y: "81.8%", w: "14.2%", h: "11.5%", clipPath: "polygon(1% 43%, 18% 20%, 49% 5%, 82% 19%, 99% 48%, 84% 78%, 52% 96%, 17% 84%)", radius: "999px", rot: "-5deg" }
   ] satisfies SceneHotspot[],
   lights: [{ x: "70.5%", y: "28.5%", size: "7%", strength: 0.4 }],
   dock: investigationDock
