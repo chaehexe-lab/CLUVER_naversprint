@@ -3852,21 +3852,16 @@
     function renderEvidencePeople(name) {
       const row = document.querySelector("#evidencePeopleRow");
       if (!row) return;
-      const data = evidenceData[name] || {};
-      const sourceData = evidenceData[data.source || name] || data;
-      const people = Array.isArray(sourceData.relatedSuspects) ? sourceData.relatedSuspects : [];
       row.replaceChildren();
-      if (!people.length || themeId !== "joseon") {
+      if (themeId !== "joseon") {
         row.hidden = true;
         return;
       }
       row.hidden = false;
       const label = document.createElement("span");
-      label.textContent = "누구에게 물을까";
+      label.textContent = "누구에게 제시할까";
       row.appendChild(label);
-      people.slice(0, 4).forEach((personName) => {
-        const suspect = findJoseonSuspect(personName);
-        if (!suspect) return;
+      suspects.slice(0, 4).forEach((suspect) => {
         const button = document.createElement("button");
         button.type = "button";
         button.setAttribute("aria-label", `${suspect.name}에게 이 증거 제시`);
