@@ -8,27 +8,70 @@ import { hotspotStyle } from "./hotspotStyle";
 type MagicScene = (typeof magicSchoolScenes)[number];
 
 type HolyParticleStyle = CSSProperties & {
-  "--particle-x": string;
-  "--particle-y": string;
+  "--particle-start-x": string;
+  "--particle-drift": string;
+  "--particle-fall": string;
   "--particle-delay": string;
   "--particle-duration": string;
   "--particle-size": string;
   "--particle-spin": string;
+  "--particle-opacity": string;
 };
 
-const holyParticles: HolyParticleStyle[] = Array.from({ length: 28 }, (_, index) => {
-  const angle = (index / 28) * Math.PI * 2 + (index % 3) * 0.09;
-  const distance = 190 + (index % 6) * 64;
+type HeavenlyBeamStyle = CSSProperties & {
+  "--beam-start-x": string;
+  "--beam-start-y": string;
+  "--beam-angle": string;
+  "--beam-length": string;
+  "--beam-width": string;
+  "--beam-delay": string;
+  "--beam-brightness": string;
+};
 
+const holyParticles: HolyParticleStyle[] = Array.from({ length: 180 }, (_, index) => {
   return {
-    "--particle-x": `${Math.cos(angle) * distance}px`,
-    "--particle-y": `${Math.sin(angle) * distance * 0.72}px`,
-    "--particle-delay": `${(index % 7) * 0.055}s`,
-    "--particle-duration": `${1.55 + (index % 5) * 0.18}s`,
-    "--particle-size": `${5 + (index % 4) * 2}px`,
-    "--particle-spin": `${90 + (index % 6) * 47}deg`
+    "--particle-start-x": `${(index * 47 + (index % 7) * 3) % 101}%`,
+    "--particle-drift": `${((index * 31) % 25) - 12}vw`,
+    "--particle-fall": `${108 + (index % 8) * 5}vh`,
+    "--particle-delay": `${(index % 45) * 0.028}s`,
+    "--particle-duration": `${2.6 + (index % 10) * 0.12}s`,
+    "--particle-size": `${2.5 + (index % 6) * 1.1}px`,
+    "--particle-spin": `${120 + (index % 11) * 37}deg`,
+    "--particle-opacity": `${0.55 + (index % 5) * 0.09}`
   } satisfies HolyParticleStyle;
 });
+
+const heavenlyBeams: HeavenlyBeamStyle[] = [
+  [50, 3, 4, 118, 10.5, 0.02, 0.88],
+  [50, 1, 15, 122, 8.5, 0.05, 0.92],
+  [50, -2, 26, 132, 11, 0.01, 0.96],
+  [50, -8, 36, 182, 9.5, 0.04, 0.98],
+  [50, -8, 43, 171, 7.2, 0.02, 0.9],
+  [50, -8, 50, 163, 10.5, 0.06, 1.06],
+  [50, -8, 58, 153, 6.8, 0, 0.92],
+  [50, -8, 66, 146, 11.5, 0.05, 1.1],
+  [50, -8, 74, 140, 7.5, 0.03, 0.96],
+  [50, -8, 82, 136, 12.5, 0.07, 1.12],
+  [50, -8, 90, 134, 9.5, 0, 1.18],
+  [50, -8, 98, 136, 12, 0.06, 1.1],
+  [50, -8, 106, 140, 7.3, 0.02, 0.95],
+  [50, -8, 114, 146, 11.2, 0.05, 1.08],
+  [50, -8, 122, 153, 6.6, 0, 0.9],
+  [50, -8, 130, 163, 10.2, 0.07, 1.04],
+  [50, -8, 137, 171, 7, 0.03, 0.9],
+  [50, -8, 144, 182, 9.2, 0.05, 0.98],
+  [50, -2, 154, 132, 11, 0.01, 0.96],
+  [50, 1, 165, 122, 8.5, 0.05, 0.92],
+  [50, 3, 176, 118, 10.5, 0.02, 0.88]
+].map(([startX, startY, angle, length, width, delay, brightness]) => ({
+  "--beam-start-x": `${startX}%`,
+  "--beam-start-y": `${startY}%`,
+  "--beam-angle": `${angle}deg`,
+  "--beam-length": `${length}vh`,
+  "--beam-width": `${width}vw`,
+  "--beam-delay": `${delay}s`,
+  "--beam-brightness": `${brightness}`
+}));
 
 export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
   const requiresLightSpell = scene.id === "magicAlchemyLab";
@@ -45,9 +88,14 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
       <img className="plate" src={scene.image} alt={scene.alt} />
       <div className="shade magic-shade" />
       <div className="magic-light-bloom" aria-hidden="true" />
+      <div className="magic-heavenly-light" aria-hidden="true" key={`heavenly-light-${lightCastCount}`}>
+        {heavenlyBeams.map((style, index) => (
+          <span className="heavenly-light-beam" style={style} key={index} />
+        ))}
+      </div>
       <div className="magic-holy-particles" aria-hidden="true" key={lightCastCount}>
         {holyParticles.map((style, index) => (
-          <span className={index % 4 === 0 ? "holy-particle star" : "holy-particle"} style={style} key={index} />
+          <span className={index % 9 === 0 ? "holy-particle star" : "holy-particle"} style={style} key={index} />
         ))}
       </div>
 

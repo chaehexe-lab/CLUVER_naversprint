@@ -75,6 +75,7 @@ export default function MagicSpellSystem({
   );
   const hasDrawing = useMemo(() => strokes.some((stroke) => stroke.length > 0), [strokes]);
   const canCast = hasDrawing && progress >= REQUIRED_COVERAGE;
+  const spellLocked = phase === "casting" || phase === "complete";
 
   useEffect(() => {
     onLightChange(false);
@@ -83,6 +84,7 @@ export default function MagicSpellSystem({
   function castSpell() {
     if (!canCast || phase !== "draw" || completionStarted.current) return;
     completionStarted.current = true;
+    setMenuOpen(false);
     setPhase("casting");
     onLightChange(true);
     closeTimer.current = window.setTimeout(() => {
@@ -181,10 +183,11 @@ export default function MagicSpellSystem({
   }
 
   return (
-    <div className={`magic-spell-system phase-${phase}`}>
+    <div className="magic-spell-system">
       <button
         className={`magic-spell-toggle${menuOpen ? " active" : ""}`}
         type="button"
+        disabled={spellLocked}
         onClick={() => {
           if (menuOpen) closeSpellUi();
           else {
@@ -216,17 +219,17 @@ export default function MagicSpellSystem({
         </aside>
       ) : null}
 
-      {menuOpen && phase !== "select" ? (
+      {menuOpen && phase === "draw" ? (
         <>
           <button className="magic-spell-backdrop" type="button" aria-label="마법진 닫기" onClick={closeSpellUi} />
-          <section className={`magic-circle-modal phase-${phase}`} role="dialog" aria-modal="true" aria-labelledby="lightSpellTitle">
+          <section className="magic-circle-modal phase-draw" role="dialog" aria-modal="true" aria-labelledby="lightSpellTitle">
             <button className="magic-spell-close" type="button" onClick={closeSpellUi} aria-label="닫기">×</button>
             <header>
               <div className="magic-spell-emblem" aria-hidden="true">☼</div>
               <div>
                 <small>빛의 마법 · LUMEN</small>
                 <h2 id="lightSpellTitle">밑그림을 따라 마법진을 그리세요</h2>
-                <p>{phase === "draw" ? `별을 그려 일치율 ${REQUIRED_COVERAGE}% 이상을 만든 뒤 마법 발동을 누르세요. 기준을 만족해도 자동으로 발동되지는 않습니다.` : phase === "casting" ? "빛의 룬이 응답합니다…" : "어둠이 걷히고 숨겨진 공간이 드러났습니다."}</p>
+                <p>{`별을 그려 일치율 ${REQUIRED_COVERAGE}% 이상을 만든 뒤 마법 발동을 누르세요. 기준을 만족해도 자동으로 발동되지는 않습니다.`}</p>
               </div>
             </header>
 
@@ -253,21 +256,18 @@ export default function MagicSpellSystem({
                 <g className="magic-player-strokes" filter={`url(#lightGlow-${sceneId})`}>
                   {strokes.map((stroke, index) => <path d={pathFromStroke(stroke)} key={`${index}-${stroke.length}`} />)}
                 </g>
-                {(phase === "casting" || phase === "complete") ? <circle className="magic-cast-burst" cx="300" cy="235" r="185" /> : null}
               </svg>
               <div className="magic-trace-status" aria-live="polite">
                 <span><i style={{ width: `${progress}%` }} /></span>
-                <strong className={canCast ? "ready" : ""}>{phase === "complete" ? "발동 완료" : `마력 일치율 ${progress}% · 필요 ${REQUIRED_COVERAGE}%`}</strong>
+                <strong className={canCast ? "ready" : ""}>{`마력 일치율 ${progress}% · 필요 ${REQUIRED_COVERAGE}%`}</strong>
               </div>
             </div>
 
-            {phase === "draw" ? (
-              <footer>
-                <button type="button" onClick={resetDrawing}>다시 그리기</button>
-                <button className="magic-keyboard-cast" type="button" onClick={drawForKeyboard}>별 문양 자동 그리기</button>
-                <button className="magic-cast-button" type="button" onClick={castSpell} disabled={!canCast}>마법 발동</button>
-              </footer>
-            ) : null}
+            <footer>
+              <button type="button" onClick={resetDrawing}>다시 그리기</button>
+              <button className="magic-keyboard-cast" type="button" onClick={drawForKeyboard}>별 문양 자동 그리기</button>
+              <button className="magic-cast-button" type="button" onClick={castSpell} disabled={!canCast}>마법 발동</button>
+            </footer>
           </section>
         </>
       ) : null}
