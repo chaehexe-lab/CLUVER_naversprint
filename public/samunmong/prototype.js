@@ -2673,7 +2673,7 @@
       "돌쇠의 그림": {
         note: "최춘월의 방에서 발견된 붉은 끈으로 단단히 묶인 두루마리. 펼치기 전에는 안의 그림을 알 수 없다.",
         img: "/samunmong/assets/evidence-transparent/evidence-portrait-concealed-v1.png",
-        toolResultAsset: "/samunmong/assets/interactions/portrait-stroke-puzzle/state-2.png?v=portrait-reveal-v5",
+        toolResultAsset: "/samunmong/assets/evidence-transparent/evidence-portrait-strokes-clean-v2.png",
         tool: "돋보기",
         toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있고, 그림 가장자리에는 지운 글씨의 눌린 획이 남아 있다."
       },
@@ -2683,17 +2683,17 @@
       },
       "무덕의 번진 일기": {
         note: "먹이 번져 읽기 어려운 일기. 사건 전 며칠의 밤 이동과 전달 경로를 추적할 수 있다.",
-        img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.webp",
+        img: "/samunmong/assets/evidence-transparent/evidence-smeared-diary-clean-v2.png",
         tool: "촛불 비추기",
         toolResult: "촛불을 비추자 번진 먹 아래 기록이 또렷해진다."
       },
       "진흙 묻은 짚신": {
         note: "문밖 젖은 길과 닮은 진흙이 묻은 짚신. 이동 경로를 비교할 단서다.",
-        img: "/samunmong/assets/mudeok-interaction/evidence-mudeok-muddy-straw-shoes.webp"
+        img: "/samunmong/assets/evidence-transparent/evidence-muddy-straw-shoes-clean-v2.png"
       },
       "찢어진 옷고름": {
         note: "무덕의 방에서 발견된 찢어진 옷고름. 하인 옷감보다 고급스럽고, 목을 조를 때 쓰였을 가능성이 있다.",
-        img: "/samunmong/assets/mudeok-interaction/evidence-torn-collar-tie.webp"
+        img: "/samunmong/assets/evidence-transparent/evidence-torn-silk-tie-clean-v2.png"
       },
       "빈 호패 주머니": {
         note: "호패가 빠진 듯한 빈 주머니. 주인과 호패 조각의 관계를 확인할 수 있다.",
@@ -2741,9 +2741,9 @@
       "호패 조각": "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp",
       "돌쇠의 그림": "/samunmong/assets/evidence-transparent/evidence-portrait-concealed-v1.png",
       "헐거워진 노리개": "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.webp",
-      "무덕의 번진 일기": "/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.webp",
-      "진흙 묻은 짚신": "/samunmong/assets/mudeok-interaction/evidence-mudeok-muddy-straw-shoes.webp",
-      "찢어진 옷고름": "/samunmong/assets/mudeok-interaction/evidence-torn-collar-tie.webp",
+      "무덕의 번진 일기": "/samunmong/assets/evidence-transparent/evidence-smeared-diary-clean-v2.png",
+      "진흙 묻은 짚신": "/samunmong/assets/evidence-transparent/evidence-muddy-straw-shoes-clean-v2.png",
+      "찢어진 옷고름": "/samunmong/assets/evidence-transparent/evidence-torn-silk-tie-clean-v2.png",
       "빈 호패 주머니": "/samunmong/assets/evidence-transparent/evidence-empty-hopae-holder.webp",
       "하인 장부": "/samunmong/assets/evidence-transparent/evidence-servant-ledger.webp",
       "혼서 조각": "/samunmong/assets/evidence-transparent/evidence-marriage-letter.webp",
@@ -3292,8 +3292,13 @@
       const valid = stored.filter((item) => {
         if (!item || typeof item.name !== "string" || typeof item.source !== "string" || typeof item.tool !== "string") return false;
         return hasCompletedToolStep(item.source, item.tool);
+      }).map((item) => {
+        if (item.source === "돌쇠의 그림") {
+          return { ...item, img: "/samunmong/assets/evidence-transparent/evidence-portrait-strokes-clean-v2.png" };
+        }
+        return item;
       });
-      if (valid.length !== stored.length) {
+      if (JSON.stringify(valid) !== JSON.stringify(stored)) {
         localStorage.setItem(examinedCluesKey, JSON.stringify(valid));
         const hasAnyCompletedAnalysis = readStoredNames(analyzedEvidenceKey).length > 0;
         if (!valid.length && stored.length && !hasAnyCompletedAnalysis) {
