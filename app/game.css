@@ -885,7 +885,10 @@
     .scene-state-backgrounds {
       z-index: 0;
       pointer-events: none;
-      opacity: 0;
+      /* Never hide the entire room while saved evidence state is restoring.
+         Hotspots are reconciled independently; a missed hydration tick must not
+         leave only the lantern layer visible on a black screen. */
+      opacity: 1;
     }
 
     .screen[data-evidence-state-ready="true"] .scene-state-backgrounds {
@@ -12518,6 +12521,68 @@ html[data-samunmong-theme="joseon"] .evidence-direct-action:focus-visible {
 html[data-samunmong-theme="joseon"] .evidence-story-preview {
   overflow: auto;
   justify-content: flex-start;
+}
+
+/* 보따리는 카드 목록이 아니라 실제 증거를 펼쳐 둔 진열상처럼 보인다. */
+html[data-samunmong-theme="joseon"] .evidence-bag-pop {
+  height: min(830px, 94vh);
+  max-height: 94vh;
+}
+html[data-samunmong-theme="joseon"] .evidence-bag-pop .evidence-grid {
+  min-height: 0;
+}
+html[data-samunmong-theme="joseon"] .evidence-bag-pop .evidence-location-grid {
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  align-items: start;
+  gap: 24px 18px;
+}
+html[data-samunmong-theme="joseon"] .evidence-bag-pop .evidence-card {
+  min-height: 230px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 4px;
+  padding: 4px;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  text-align: center;
+}
+html[data-samunmong-theme="joseon"] .evidence-bag-pop .evidence-card:hover,
+html[data-samunmong-theme="joseon"] .evidence-bag-pop .evidence-card:focus-visible,
+html[data-samunmong-theme="joseon"] .evidence-bag-pop .evidence-card.active {
+  border: 0;
+  background: radial-gradient(circle at 50% 44%, rgba(137, 65, 35, .15), transparent 64%);
+  box-shadow: none;
+  outline: 0;
+}
+html[data-samunmong-theme="joseon"] .evidence-bag-pop .evidence-visual {
+  width: 100%;
+  height: 174px;
+}
+html[data-samunmong-theme="joseon"] .evidence-bag-pop .evidence-card .evidence-thumb {
+  width: 100%;
+  height: 168px;
+  object-fit: contain;
+  filter: drop-shadow(0 11px 9px rgba(48, 25, 14, .38));
+  transition: transform .2s ease, filter .2s ease;
+}
+html[data-samunmong-theme="joseon"] .evidence-bag-pop .evidence-card:hover .evidence-thumb,
+html[data-samunmong-theme="joseon"] .evidence-bag-pop .evidence-card:focus-visible .evidence-thumb,
+html[data-samunmong-theme="joseon"] .evidence-bag-pop .evidence-card.active .evidence-thumb {
+  transform: translateY(-4px) scale(1.05);
+  filter: brightness(1.06) drop-shadow(0 14px 11px rgba(48, 25, 14, .46));
+}
+html[data-samunmong-theme="joseon"] .evidence-bag-pop .evidence-state-frame {
+  display: none;
+}
+html[data-samunmong-theme="joseon"] .evidence-bag-pop .evidence-card-copy {
+  align-items: center;
+  gap: 4px;
+}
+html[data-samunmong-theme="joseon"] .evidence-bag-pop .evidence-card-copy strong {
+  font-size: 20px;
 }
 html[data-samunmong-theme="joseon"] .dream-trace-still figcaption span {
   padding: 6px 10px;

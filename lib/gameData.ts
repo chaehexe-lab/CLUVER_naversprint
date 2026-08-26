@@ -73,12 +73,6 @@ const investigationDock = [
     label: "보따리"
   },
   {
-    className: "tool-chip open-tool-panel",
-    ariaLabel: "도구 열기",
-    image: "/samunmong/assets/labels/transparent/tool-investigation-tools.webp",
-    label: "도구"
-  },
-  {
     className: "note-chip open-note-panel",
     ariaLabel: "기록장 열기",
     image: "/samunmong/assets/labels/transparent/tool-note-short.webp",
@@ -112,10 +106,9 @@ export const fieldOneScene = {
   dock: [
     { id: "openMapFromField", ...investigationDock[0], className: "map-chip" },
     { id: "openBagFromField", ...investigationDock[1], className: "bag-chip" },
-    investigationDock[2],
-    { id: "openNoteFromField", ...investigationDock[3], className: "note-chip" },
-    investigationDock[4],
-    investigationDock[5]
+    { id: "openNoteFromField", ...investigationDock[2], className: "note-chip" },
+    investigationDock[3],
+    investigationDock[4]
   ] satisfies SceneDockAction[],
   inspect: {
     id: "hopaeInspect",
@@ -139,10 +132,9 @@ export const chunwolRoomScene = {
   dock: [
     { id: "openMapFromRoom", ...investigationDock[0], className: "map-chip" },
     { id: "openBagFromRoom", ...investigationDock[1], className: "bag-chip" },
-    investigationDock[2],
-    { id: "openNoteFromRoom", ...investigationDock[3], className: "note-chip" },
-    investigationDock[4],
-    investigationDock[5]
+    { id: "openNoteFromRoom", ...investigationDock[2], className: "note-chip" },
+    investigationDock[3],
+    investigationDock[4]
   ] satisfies SceneDockAction[],
   inspect: {
     id: "portraitInspect",
@@ -168,10 +160,9 @@ export const mudeokServantRoomScene = {
   dock: [
     { id: "openMapFromMudeokRoom", ...investigationDock[0], className: "map-chip" },
     { id: "openBagFromMudeokRoom", ...investigationDock[1], className: "bag-chip" },
-    investigationDock[2],
-    { id: "openNoteFromMudeokRoom", ...investigationDock[3], className: "note-chip" },
-    investigationDock[4],
-    investigationDock[5]
+    { id: "openNoteFromMudeokRoom", ...investigationDock[2], className: "note-chip" },
+    investigationDock[3],
+    investigationDock[4]
   ] satisfies SceneDockAction[]
 } as const;
 
@@ -209,7 +200,7 @@ export const backGateCourtyardScene = {
   props: [] as SceneProp[],
   hotspots: [
     { className: "scene-evidence-object backgate-footprints-evidence", evidenceName: "작은 발자국", ariaLabel: "작은 발자국 조사", x: "58%", y: "77.5%", w: "8%", h: "16%", clipPath: "polygon(8% 34%, 24% 12%, 52% 18%, 68% 4%, 96% 34%, 82% 88%, 22% 96%)", radius: "999px", rot: "8deg" },
-    { className: "scene-evidence-object backgate-cord-evidence", evidenceName: "끊어진 호패끈", ariaLabel: "끊어진 호패끈 조사", x: "30%", y: "80%", w: "12%", h: "12%", clipPath: "polygon(2% 60%, 36% 18%, 98% 34%, 78% 80%, 18% 96%)", radius: "999px", rot: "-12deg" }
+    { className: "scene-evidence-object backgate-cord-evidence", evidenceName: "끊어진 호패끈", ariaLabel: "끊어진 호패끈 조사", x: "17.8%", y: "81.8%", w: "14.2%", h: "11.5%", clipPath: "polygon(1% 43%, 18% 20%, 49% 5%, 82% 19%, 99% 48%, 84% 78%, 52% 96%, 17% 84%)", radius: "999px", rot: "-5deg" }
   ] satisfies SceneHotspot[],
   lights: [{ x: "70.5%", y: "28.5%", size: "7%", strength: 0.4 }],
   dock: investigationDock

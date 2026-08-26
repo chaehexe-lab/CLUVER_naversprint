@@ -267,7 +267,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             <img src={bagIcon} alt="" />
             <span className="sr-only">{copy.bag}</span>
           </button>
-          {!isSpaceTheme ? (
+          {isMagicTheme ? (
             <button className="scene-chip tool-chip open-tool-panel" type="button" aria-label={`${copy.tools} 열기`}>
               <img src={toolIcon} alt="" />
               <span className="sr-only">{copy.tools}</span>
@@ -389,6 +389,33 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               {copy.bag}에 담긴 증거가 없습니다.
             </div>
           </div>
+          {!isMagicTheme && !isSpaceTheme ? (
+            <section className="evidence-story-preview" id="evidenceStoryPreview" hidden>
+              <button className="evidence-story-preview-close" id="closeEvidenceStoryPreview" type="button" aria-label="증거 상세 닫기">×</button>
+              <header className="evidence-story-preview-head">
+                <span id="evidencePreviewKind">현장 증거</span>
+                <strong id="evidencePreviewTitle">증거를 선택하세요</strong>
+              </header>
+              <div className="evidence-story-path">
+                <div className="evidence-story-node evidence-story-object">
+                  <img id="evidencePreviewImage" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" />
+                  <small>발견한 물건</small><b id="evidencePreviewObject">증거</b>
+                </div>
+                <i className="evidence-story-arrow" aria-hidden="true">→</i>
+                <div className="evidence-story-node"><small>확인된 사실</small><b id="evidencePreviewFact">아직 살펴보지 않았습니다.</b></div>
+                <i className="evidence-story-arrow" aria-hidden="true">→</i>
+                <div className="evidence-story-node"><small id="evidencePreviewRole">남은 의문</small><b id="evidencePreviewMeaning">무엇과 이어지는 증거일까?</b></div>
+              </div>
+              <button className="evidence-direct-action" id="evidenceDirectAction" type="button">직접 살펴보기</button>
+              <div className="evidence-related-row" id="evidenceRelatedRow" />
+              <div className="evidence-connection-result" id="evidenceConnectionResult" hidden>
+                <div className="evidence-connection-images"><img id="connectionImageA" alt="" /><span>＋</span><img id="connectionImageB" alt="" /></div>
+                <span>자동으로 이어진 실마리</span><strong id="evidenceConnectionText">두 증거가 이어집니다.</strong>
+              </div>
+              <div className="evidence-people-row" id="evidencePeopleRow" aria-label="관련 인물" />
+              <button className="evidence-present-confirm" id="confirmEvidencePresent" type="button">이 증거를 선택하기</button>
+            </section>
+          ) : null}
         </aside>
       </EvidenceInventory>
 
