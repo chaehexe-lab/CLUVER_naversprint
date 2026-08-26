@@ -6017,7 +6017,7 @@
       if (isMagicTheme || isSpaceTheme) {
         document.querySelector("#interrogationPlate").src = suspect.scene;
       } else {
-        document.querySelector("#interrogationPlate").src = "/samunmong/assets/scene-interrogation-room-empty.png";
+        document.querySelector("#interrogationPlate").src = "/samunmong/assets/interactions/interrogation-candle/interrogation-room-common-clean-v2.png";
         interrogationScreen.dataset.characterScene = sleeveCheckedSuspects.has(suspect.id) ? suspect.sleeveScene : suspect.scene;
       }
       const suspectSprite = document.querySelector("#suspectSprite");
@@ -6663,7 +6663,7 @@
         if (isMagicTheme || isSpaceTheme) {
           document.querySelector("#interrogationPlate").src = suspect.scene;
         } else {
-          document.querySelector("#interrogationPlate").src = "/samunmong/assets/scene-interrogation-room-empty.png";
+          document.querySelector("#interrogationPlate").src = "/samunmong/assets/interactions/interrogation-candle/interrogation-room-common-clean-v2.png";
           document.querySelector("#interrogationScreen").dataset.characterScene = sleeveCheckedSuspects.has(suspect.id) ? suspect.sleeveScene : suspect.scene;
         }
         if (isMagicTheme && suspect.sprite) document.querySelector("#suspectSprite").src = suspect.sprite;
