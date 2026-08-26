@@ -791,6 +791,29 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
                 정체불명의 투명한 결빙 물질로 뒤덮여 있다. 레버 작동 신호는 입력됐지만 추진 가스
                 밸브는 열리지 않았다. 기록만으로는 결빙 물질의 정확한 성분을 확인할 수 없다.
               </p>
+              <form className="space-medical-recovery-form" id="spaceMedicalRecoveryForm" hidden>
+                <label htmlFor="spaceMedicalRecoveryPassword">
+                  의료 기록을 복구하려면 비밀번호 4자리를 입력하시오.
+                </label>
+                <div className="space-medical-recovery-controls">
+                  <input
+                    id="spaceMedicalRecoveryPassword"
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={4}
+                    autoComplete="off"
+                    aria-describedby="spaceMedicalRecoveryError"
+                  />
+                  <button type="submit">기록 복구</button>
+                </div>
+                <p className="space-medical-recovery-error" id="spaceMedicalRecoveryError" role="alert" />
+              </form>
+              <div className="space-medical-recovered-record" id="spaceMedicalRecoveredRecord" aria-live="polite" hidden>
+                <p>▪ 투약 시각: OST 21:52</p>
+                <p>▪ 환자: 데이비드</p>
+                <p>▪ 계정: harry0319@orbit.sys</p>
+                <p>▪ 삭제 시각: OST 22:31</p>
+              </div>
             </div>
           </aside>
         </>

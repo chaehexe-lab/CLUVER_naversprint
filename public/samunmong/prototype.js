@@ -186,6 +186,7 @@
     const analyzedEvidenceKey = `samunmong-analyzed-evidence-${themeStorageSuffix}`;
     const examinedCluesKey = `samunmong-examined-clues-${themeStorageSuffix}`;
     const linkedEvidenceKey = `samunmong-linked-evidence-${themeStorageSuffix}`;
+    const spaceMedicalRecordRecoveryKey = "samunmong-space-medical-record-recovered";
     const retiredJoseonEvidenceNames = new Set(["헐거워진 노리개"]);
     const conversationNotesKey = `samunmong-conversation-notes-${themeStorageSuffix}`;
     const interrogationQuestionCountKey = `samunmong-interrogation-question-count-${themeStorageSuffix}`;
@@ -483,6 +484,7 @@
       localStorage.removeItem(`samunmong-conversation-notes-${suffix}`);
       localStorage.removeItem(`samunmong-interrogation-question-count-${suffix}`);
       localStorage.removeItem(`samunmong-interrogation-known-facts-${suffix}`);
+      if (normalizedTheme === "spaceStation") localStorage.removeItem(spaceMedicalRecordRecoveryKey);
       if (normalizedTheme === "joseon") localStorage.removeItem(fieldGuideSeenKey);
 
       const slots = readSaveSlots();
@@ -1595,6 +1597,14 @@
         image: "/assets/space-station/evidence/final-radio-log.webp",
         imageAlt: "데이비드의 마지막 무전 기록 장치",
         description: "[OST 22:14]\n“오르빗-13 관제실, 데이비드다.\n외부 통신 장치 점검을 시작한다.\n안전 로프와 우주복 상태 모두 정상이다.”\n\n[OST 22:19]\n“관제실, 심박이 갑자기 불규칙해졌다.\n손에도 힘이 잘 들어가지 않아.\n우주복 문제인지 확인해 줘.”\n\n[OST 22:21]\n“비상 추진 장치를 점검 중이다.\n레버 작동 신호는 들어가는데 가스 밸브가 반응하지 않는다.”\n\n“레버 연결부에 투명한 물질이 붙어 있어.\n외부 온도에서 완전히 얼어붙은 것 같다.”\n\n[OST 22:22]\n“우주복 산소 수치가 급격히 떨어지고 있다.\n누출 경고는 없는데 잔량만 계속 감소한다.\n관제실, 즉시 복귀 허가를 요청한다.”\n\n[OST 22:23]\n“외벽 통신 장치의 고정 전력이 끊겼다!\n패널 하나가 구조물에서 이탈했다.”\n\n“외벽 패널이 안전 로프를 쳤다.\n연결 고리가 파손됐다!”\n\n“정거장에서 멀어지고 있다.\n몸이 계속 회전해… 추진 레버도 움직이지 않아.”\n\n[OST 22:24]\n“오르빗-13, 응답해.\n안전 로프가 끊어졌고 비상 추진 장치도 작동하지 않는다.”\n\n“정거장 뒤편의 통신 음영 구역(Shadow Zone)으로 진입하고 있다.\n태양광이 사라졌고 외부 온도가 계속 내려간다.\n아직 정거장 신호는 잡힌다. 구조 장비를 보내 줘..”"
+      },
+      "삭제된 의료 기록": {
+        kicker: "ORBIT-13 · MEDICAL ARCHIVE",
+        title: "삭제된 의료 기록",
+        image: "/assets/space-station/evidence/deleted-medical-record.webp",
+        imageAlt: "삭제된 데이비드의 의료 기록",
+        description: "",
+        requiresRecovery: true
       }
     };
 
@@ -1603,6 +1613,7 @@
       const panel = document.querySelector("#spaceEvidenceDetail");
       const overlay = document.querySelector("#spaceEvidenceDetailOverlay");
       if (!panel || !overlay) return;
+      let focusRecoveryInput = false;
       if (open) {
         const detail = detailedSpaceEvidence[evidenceName];
         if (!detail) return;
@@ -1611,13 +1622,27 @@
         const kicker = panel.querySelector("#spaceEvidenceDetailKicker");
         const title = panel.querySelector("#spaceEvidenceDetailTitle");
         const description = panel.querySelector("#spaceEvidenceDetailDescription");
+        const recoveryForm = panel.querySelector("#spaceMedicalRecoveryForm");
+        const recoveredRecord = panel.querySelector("#spaceMedicalRecoveredRecord");
+        const recoveryError = panel.querySelector("#spaceMedicalRecoveryError");
         if (image) {
           image.src = detail.image;
           image.alt = detail.imageAlt;
         }
         if (kicker) kicker.textContent = detail.kicker;
         if (title) title.textContent = detail.title;
-        if (description) description.textContent = detail.description;
+        if (description) {
+          description.textContent = detail.description;
+          description.hidden = Boolean(detail.requiresRecovery);
+        }
+        const recovered = detail.requiresRecovery && localStorage.getItem(spaceMedicalRecordRecoveryKey) === "1";
+        if (recoveryForm) {
+          recoveryForm.hidden = !detail.requiresRecovery || recovered;
+          if (detail.requiresRecovery && !recovered) recoveryForm.reset();
+        }
+        if (recoveredRecord) recoveredRecord.hidden = !detail.requiresRecovery || !recovered;
+        if (recoveryError) recoveryError.textContent = "";
+        focusRecoveryInput = Boolean(detail.requiresRecovery && !recovered);
       }
       panel.classList.toggle("show", open);
       overlay.classList.toggle("show", open);
@@ -1625,9 +1650,31 @@
       overlay.setAttribute("aria-hidden", String(!open));
       if (open) {
         hideCollectedEvidenceTooltip();
-        document.querySelector("#closeSpaceEvidenceDetail")?.focus();
+        document.querySelector(focusRecoveryInput ? "#spaceMedicalRecoveryPassword" : "#closeSpaceEvidenceDetail")?.focus();
       }
     }
+
+    document.querySelector("#spaceMedicalRecoveryForm")?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const input = form.querySelector("#spaceMedicalRecoveryPassword");
+      const error = form.querySelector("#spaceMedicalRecoveryError");
+      const recoveredRecord = document.querySelector("#spaceMedicalRecoveredRecord");
+      if (input?.value !== "0319") {
+        if (error) error.textContent = "비밀번호가 틀렸습니다.";
+        if (input) {
+          input.value = "";
+          input.focus();
+        }
+        playSfx("buttonAlt", 0.38);
+        return;
+      }
+      localStorage.setItem(spaceMedicalRecordRecoveryKey, "1");
+      form.hidden = true;
+      if (recoveredRecord) recoveredRecord.hidden = false;
+      if (error) error.textContent = "";
+      playSfx("evidence", 0.5);
+    });
 
     function setupEvidenceScreen(screenId) {
       const screen = document.getElementById(screenId);
