@@ -4429,14 +4429,14 @@
 
     const joseonDreamTraceByEvidence = {
       "도망 보따리": {
-        image: "/samunmong/assets/interactions/dream-traces/escape-bundle-packed-v2.png",
-        alt: "정체를 감춘 두 사람이 함께 떠날 보따리를 꾸리는 몽흔",
+        image: "/samunmong/assets/interactions/dream-traces/escape-bundle-packed-v3.png",
+        alt: "정체를 감춘 한 사람이 두 사람 몫의 물건을 보따리에 꾸리는 몽흔",
         observed: "두 사람 몫의 물건이 한 보따리에 함께 꾸려짐",
-        scene: "누군가 둘이 떠날 채비를 했던 순간",
+        scene: "누군가 두 사람 몫의 떠날 채비를 꾸린 순간",
         question: "누가 이 계획을 알고 있었던 것일까?"
       },
       "작은 발자국": {
-        image: "/samunmong/assets/interactions/dream-traces/small-shoeprints-natural-v2.png",
+        image: "/samunmong/assets/interactions/dream-traces/small-shoeprints-natural-v3.png",
         alt: "정체를 감춘 인물이 뒷문을 지나며 작은 신발 자국을 자연스럽게 남기는 몽흔",
         observed: "짧고 좁은 신발 자국이 뒷문 쪽으로 이어짐",
         scene: "누군가 젖은 마당을 지나며 자연히 자국을 남긴 순간",
@@ -4458,11 +4458,11 @@
         question: "지워진 행에는 누구의 이름이 있었을까?"
       },
       "찢어진 약속 편지": {
-        image: "/samunmong/assets/interactions/dream-traces/false-letter-written-v2.png",
-        alt: "정체를 감춘 인물이 약속 편지를 쓰고 찢는 몽흔",
-        observed: "편지는 한 번에 쓰였으나 돌쇠의 평소 말투와 다름",
-        scene: "누군가 정중한 말투로 약속을 적고 편지를 찢은 순간",
-        question: "돌쇠 대신 이 문장을 쓴 사람은 누구일까?"
+        image: "/samunmong/assets/interactions/dream-traces/promise-letter-written-v3.png",
+        alt: "정체를 감춘 인물이 온전한 약속 편지를 쓰는 몽흔",
+        observed: "정중한 문장이 한 번에 이어져 있음",
+        scene: "누군가 정중한 말투로 약속을 적은 순간",
+        question: "이 문장은 돌쇠의 평소 말투와 같은 것일까?"
       },
       "돌쇠의 그림": {
         image: "/samunmong/assets/interactions/dream-traces/portrait-redrawn-v1.png",
@@ -4472,7 +4472,7 @@
         question: "그린 이는 왜 이 얼굴을 거듭 붙잡았을까?"
       },
       "무덕의 번진 일기": {
-        image: "/samunmong/assets/interactions/dream-traces/diary-heard-at-door-v2.png",
+        image: "/samunmong/assets/interactions/dream-traces/mudeok-diary-overheard-v4.png",
         alt: "어린 하인이 닫힌 문밖의 소리를 듣고 번진 일기에 기록하는 몽흔",
         observed: "번진 먹 아래 밤의 문소리와 들은 말이 기록됨",
         scene: "무덕이 닫힌 문밖의 기척을 듣고 기억을 적은 순간",
