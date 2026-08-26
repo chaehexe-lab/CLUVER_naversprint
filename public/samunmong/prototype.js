@@ -2608,8 +2608,8 @@
         img: "/samunmong/assets/evidence-transparent/evidence-small-footprints.webp"
       },
       "끊어진 호패끈": {
-        note: "호패와 연결되었을 법한 끊어진 끈. 호패 조각과 함께 봐야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.webp"
+        note: "뒷문 마당에서 발견된 짙은 붉은 꼰끈. 한쪽에는 매듭과 술이 남고, 반대쪽 끝은 거칠게 끊겨 있다.",
+        img: "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord-v2.png"
       },
       "찢어진 약속 편지": {
         note: "점순의 손에서 발견된 찢어진 약속 편지. 정중한 말투가 돌쇠의 평소 말투와 맞지 않는다.",
@@ -2632,7 +2632,7 @@
       "도망 보따리": "/samunmong/assets/evidence-transparent/evidence-escape-bundle.webp",
       "긁힌 팔 흔적": "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp",
       "작은 발자국": "/samunmong/assets/evidence-transparent/evidence-small-footprints.webp",
-      "끊어진 호패끈": "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.webp",
+      "끊어진 호패끈": "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord-v2.png",
       "찢어진 약속 편지": "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg"
     };
 
@@ -2650,7 +2650,7 @@
       "피 묻은 붕대": "붉은 얼룩 천",
       "도망 보따리": "단단히 묶인 보따리",
       "작은 발자국": "작은 신발 자국",
-      "끊어진 호패끈": "끊어진 매듭끈",
+      "끊어진 호패끈": "끊어진 붉은 꼰끈",
       "찢어진 약속 편지": "찢어진 편지 조각"
     };
 
@@ -2666,7 +2666,7 @@
       "피 묻은 붕대": "붉고 검게 마른 얼룩이 남아 있다.",
       "도망 보따리": "매듭이 단단해 내용물을 볼 수 없다.",
       "작은 발자국": "젖은 마당에 짧고 좁은 자국이 이어진다.",
-      "끊어진 호패끈": "한쪽 끝이 거칠게 끊긴 짧은 끈이다.",
+      "끊어진 호패끈": "매듭과 술은 남아 있지만 반대쪽 끝이 끊겨 있다. 무엇에 매였던 끈인지는 알 수 없다.",
       "찢어진 약속 편지": "찢어진 글줄 몇 자만 흩어져 보인다."
     };
 
@@ -3020,6 +3020,9 @@
 
     function isEvidenceMeaningRevealed(name, data = evidenceData[name] || {}) {
       if (data.derived) return true;
+      if (name === "끊어진 호패끈") {
+        return readExaminedClues().some((clue) => clue.source === name);
+      }
       if (!data.tool) return true;
       const source = data.source || name;
       return readExaminedClues().some((clue) => clue.source === source);
@@ -3151,6 +3154,9 @@
       }
       if (evidenceName === "찢어진 옷고름" && toolName === "돋보기") {
         return "비단끈의 조임 흔적";
+      }
+      if (evidenceName === "끊어진 호패끈" && toolName === "호패 조각과 대조") {
+        return "호패에서 끊긴 매듭끈";
       }
       const source = String(evidenceName || "증거")
         .replace(/^(무덕|돌쇠|춘월|유문석)의\s*/, "")
@@ -3425,8 +3431,8 @@
         asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-hopae-three-way-link.webp"
       }],
       [["호패 조각", "끊어진 호패끈"], {
-        result: "호패 구멍의 마찰 자국과 끊어진 끈의 굵기가 이어진다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-hopae-three-way-link.webp"
+        result: "끊어진 끝을 호패 구멍에 대자 끈의 굵기와 오래 눌린 마찰 홈이 맞는다. 이 끈은 호패에 매여 있던 끈인 것 같다.",
+        asset: "/samunmong/assets/interactions/hopae-thread-puzzle/state-2.png"
       }],
       [["진흙 묻은 짚신", "작은 발자국"], {
         result: "뒤꿈치를 맞춰 겹치자 짚신이 발자국보다 길고 폭도 넓다.",
@@ -5379,7 +5385,7 @@
       pendingEvidenceComparison = { firstName, secondName, key, comparison };
       const names = new Set([firstName, secondName]);
       if (names.has("호패 조각") && names.has("끊어진 호패끈")) {
-        prepareSpecialPuzzle("hopaeThread", "hopae-thread-puzzle", "끊어진 호패끈 맞춰 보기", "호패 구멍 바로 옆의 끊어진 끈 끝을 잡아 왼쪽으로 꿰어 보십시오.", "끊어진 끈 끝을 호패 구멍에 꿰기");
+        prepareSpecialPuzzle("hopaeThread", "hopae-thread-puzzle", "붉은 꼰끈의 주인 찾기", "따로 놓인 끈의 거칠게 끊어진 끝을 잡아 호패의 둥근 구멍에 직접 대어 보십시오.", "끊어진 끝을 호패 구멍에 맞추기");
         return;
       }
       if (names.has("진흙 묻은 짚신") && names.has("작은 발자국")) {
@@ -5498,7 +5504,7 @@
           : specialPuzzleMode === "silk"
             ? ["", "매듭을 펴자 가운데에 좁게 조여 마찰로 번들거린 자국과, 힘을 받아 한 방향으로 늘어난 찢김이 드러납니다. 단순히 낡아 끊어진 끈은 아닌 것 같습니다."][specialPuzzleStep]
               : specialPuzzleMode === "hopaeThread"
-                ? ["", "끈 굵기와 호패 구멍, 오래 닳아 반질거리는 마찰 홈이 정확히 맞습니다. 따로 발견된 끈은 이 호패에 매여 있던 끈입니다."][specialPuzzleStep]
+                ? ["", "끊어진 끝을 대자 끈의 굵기와 호패 구멍 안쪽의 오래 눌린 마찰 홈이 맞습니다. 이 붉은 끈은 호패에 매여 있던 끈인 것 같습니다."][specialPuzzleStep]
                 : specialPuzzleMode === "stride"
                   ? ["", "뒤꿈치를 맞추자 짚신 앞코가 발자국 밖으로 나옵니다. 실측줄을 오른쪽으로 늘리십시오.", "현장 발자국은 짚신보다 짧고 폭도 좁아 같은 사람의 흔적이 아닙니다."][specialPuzzleStep]
                   : specialPuzzleMode === "thread"
@@ -5556,6 +5562,14 @@
       if (["shoeMud", "footprintTrace"].includes(specialPuzzleMode)) { finishTactilePuzzle("발자국 실측줄"); return; }
       const pending = pendingEvidenceComparison;
       if (!pending) return;
+      if (specialPuzzleMode === "hopaeThread") {
+        registerExaminedClue(
+          "끊어진 호패끈",
+          "호패 조각과 대조",
+          pending.comparison.result,
+          pending.comparison.asset
+        );
+      }
       const linkedPairs = new Set(readStoredNames(linkedEvidenceKey));
       linkedPairs.add(pending.key);
       localStorage.setItem(linkedEvidenceKey, JSON.stringify([...linkedPairs]));
