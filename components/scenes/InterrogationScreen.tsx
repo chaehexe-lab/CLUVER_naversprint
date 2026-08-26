@@ -153,9 +153,6 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
     ? ({ backgroundImage: "url('/assets/space-station/panels/evidence-vault-panel-v2.webp')" } satisfies CSSProperties)
     : undefined;
   const toolPanelStyle = undefined;
-  const notePanelStyle = isSpaceTheme
-    ? ({ backgroundImage: "url('/assets/space-station/panels/log-record-panel-v2.webp')" } satisfies CSSProperties)
-    : undefined;
 
   const moveFromMap = (screenId?: string) => {
     if (!screenId) return;
@@ -328,11 +325,11 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
 
         {/* 사이드 서랍형 기록장 패널 */}
         <InvestigationNote>
-          <aside className="note-drawer investigation-note-panel conversation-note" id="noteDrawer" aria-hidden="true" style={notePanelStyle}>
+          <aside className="note-drawer investigation-note-panel conversation-note" id="noteDrawer" aria-hidden="true">
             <button className="close-button note-close" id="closeNote" type="button" aria-label={`${copy.note} 닫기`}>
               ×
             </button>
-            <p className="note-kicker">{copy.noteKicker}</p>
+            {!isSpaceTheme ? <p className="note-kicker">{copy.noteKicker}</p> : null}
             <h2>{copy.note}</h2>
             <p className="note-lead">{copy.noteLead}</p>
             <div className="note-suspect-tabs" data-note-tabs aria-label="기록할 등장인물 선택">
@@ -340,9 +337,11 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
                 <button className={`note-suspect-tab${index === 0 ? " active" : ""}`} type="button" data-suspect-id={suspect.id} key={suspect.id}>{suspect.name}</button>
               ))}
             </div>
-            <p className="note-conversation-meta">
-              현재 기록: <span className="note-current-suspect" id="noteSuspect">{copy.suspects[0].name}</span>
-            </p>
+            {!isSpaceTheme ? (
+              <p className="note-conversation-meta">
+                현재 기록: <span className="note-current-suspect" id="noteSuspect">{copy.suspects[0].name}</span>
+              </p>
+            ) : null}
             <div className="conversation-log" id="interrogationSummary" data-note-log aria-live="polite">
               <p className="conversation-empty">아직 이 인물과 나눈 대화가 없습니다.</p>
             </div>
@@ -695,15 +694,15 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
       ) : null}
 
       <InvestigationNote>
-        <aside className="global-panel investigation-note-panel conversation-note" id="fieldNotePanel" aria-hidden="true" style={notePanelStyle}>
+        <aside className="global-panel investigation-note-panel conversation-note" id="fieldNotePanel" aria-hidden="true">
+          <button className="close-button note-close global-close" type="button" aria-label={`${copy.note} 닫기`}>
+            ×
+          </button>
           <div className="global-panel-head">
             <div>
-              <p className="note-kicker">{copy.noteKicker}</p>
+              {!isSpaceTheme ? <p className="note-kicker">{copy.noteKicker}</p> : null}
               <h2>{copy.note}</h2>
             </div>
-            <button className="close-button note-close global-close" type="button" aria-label={`${copy.note} 닫기`}>
-              ×
-            </button>
           </div>
           <p className="note-lead">{copy.noteLead}</p>
           <div className="note-suspect-tabs" data-note-tabs aria-label="기록할 등장인물 선택">
@@ -711,9 +710,11 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               <button className={`note-suspect-tab${index === 0 ? " active" : ""}`} type="button" data-suspect-id={suspect.id} key={suspect.id}>{suspect.name}</button>
             ))}
           </div>
-          <p className="note-conversation-meta">
-            현재 기록: <span className="note-current-suspect">{copy.suspects[0].name}</span>
-          </p>
+          {!isSpaceTheme ? (
+            <p className="note-conversation-meta">
+              현재 기록: <span className="note-current-suspect">{copy.suspects[0].name}</span>
+            </p>
+          ) : null}
           <div className="conversation-log" data-note-log aria-live="polite">
             <p className="conversation-empty">아직 이 인물과 나눈 대화가 없습니다.</p>
           </div>
