@@ -2558,7 +2558,8 @@
         note: "먹이 번져 읽기 어려운 일기. 사건 전 며칠의 밤 이동과 전달 경로를 추적할 수 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-smeared-diary-clean-v2.png",
         tool: "촛불 비추기",
-        toolResult: "촛불을 비추자 번진 먹 아래 기록이 또렷해진다."
+        toolResultAsset: "/samunmong/assets/interactions/diary-timeline-puzzle/state-2.png",
+        toolResult: "번진 세 장을 펼치자 사건 전날까지의 기록이 이어진다. 무덕은 뒷문이 열린 밤을 보았고, 마지막 장에는 아씨가 돌쇠의 이름을 되물었다고 적었다. 왜 돌쇠를 물었을까?"
       },
       "진흙 묻은 짚신": {
         note: "문밖 젖은 길과 닮은 진흙이 묻은 짚신. 이동 경로를 비교할 단서다.",
@@ -3136,6 +3137,9 @@
     }
 
     function getExaminedClueName(evidenceName, toolName) {
+      if (evidenceName === "무덕의 번진 일기" && toolName === "촛불 비추기") {
+        return "일기 속 밤 기록";
+      }
       const source = String(evidenceName || "증거")
         .replace(/^(무덕|돌쇠|춘월|유문석)의\s*/, "")
         .replace(/피 묻은\s*/, "");
@@ -5432,7 +5436,7 @@
     }
 
     function openDiaryTimelinePuzzle() {
-      prepareSpecialPuzzle("diary", "diary-timeline-puzzle", "물에 붙은 무덕의 일기 펼치기", "일기장을 가로질러 잠근 대나무 핀의 오른쪽 손잡이를 잡아 끝까지 빼내십시오.", "대나무 잠금핀 빼기");
+      prepareSpecialPuzzle("diary", "diary-timeline-puzzle", "먹에 붙은 일기 세 장 펼치기", "오른쪽으로 튀어나온 대나무 손잡이를 잡아 오른쪽으로 당기면, 붙어 있던 세 장의 날짜 기록이 펼쳐집니다.", "오른쪽 대나무 손잡이 당기기");
     }
     function openHopaeMarkPuzzle() {
       prepareSpecialPuzzle("hopaeMark", "hopae-mark-puzzle", "호패 이름 홈 탁본 벗기기", "호패 위에서 말려 올라온 한지 귀퉁이를 잡아 왼쪽 위로 벗기십시오.", "한지 탁본 벗기기");
@@ -5489,7 +5493,7 @@
         : specialPuzzleMode === "ledger"
           ? ["", "등잔의 배면광 아래 검은 덧칠보다 먼저 눌린 붓획이 한 줄 전체에 이어집니다. 이 칸은 처음부터 빈칸이 아니라 기록한 뒤 일부러 지운 자리입니다."][specialPuzzleStep]
         : specialPuzzleMode === "diary"
-            ? ["", "날짜별 기록을 잇자 누군가 사건 전에 도망 계획을 알고 있었음이 드러납니다."][specialPuzzleStep]
+            ? ["", "세 장이 펼쳐졌습니다. 6월 29일의 울음, 6월 30일의 뒷문 발자국, 7월 1일 아씨가 돌쇠 이름을 물었다는 기록이 이어집니다."][specialPuzzleStep]
             : specialPuzzleMode === "hopaeMark"
               ? ["", "탁본의 짙고 이어진 원래 홈 위로, 옅고 끊긴 새 긁힘이 겹칩니다. 누군가 이름 홈을 나중에 일부러 훼손했습니다."][specialPuzzleStep]
               : specialPuzzleMode === "shoeMud" ? ["", "진흙 본과 드러난 짚신 밑창에 같은 짜임이 남았습니다. 다른 발자국과 대조할 수 있는 밑창 무늬를 확보했습니다."][specialPuzzleStep]
