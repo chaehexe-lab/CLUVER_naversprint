@@ -12481,6 +12481,44 @@ html[data-samunmong-theme="joseon"] .dream-trace-caption-copy small {
   background: #160c08a8;
   font-size: 11px;
 }
+
+/* 조선: 보따리 안에서 바로 증거를 살피며 별도 도구함은 노출하지 않는다. */
+html[data-samunmong-theme="joseon"] #toolPanel,
+html[data-samunmong-theme="joseon"] #toolStatus,
+html[data-samunmong-theme="joseon"] .open-tool-panel {
+  display: none !important;
+}
+html[data-samunmong-theme="joseon"] .evidence-bag-pop {
+  width: min(1240px, 94vw);
+  max-height: 90vh;
+}
+html[data-samunmong-theme="joseon"] .evidence-direct-action {
+  align-self: center;
+  min-width: min(360px, 90%);
+  min-height: 58px;
+  padding: 12px 24px;
+  border: 1px solid #6f281f;
+  border-radius: 6px;
+  color: #fff0d1;
+  background:
+    linear-gradient(180deg, #943a2f, #581d18),
+    url("/samunmong/assets/ui/joseon-hopae-panel-bg.png") center / cover;
+  box-shadow: inset 0 0 0 2px #e8ba7130, 0 9px 20px #4e1c1738;
+  font-family: "NanumBareunJeongsin", "Noto Serif KR", serif;
+  font-size: clamp(17px, 1.7vw, 22px);
+  cursor: pointer;
+}
+html[data-samunmong-theme="joseon"] .evidence-direct-action[hidden] { display: none; }
+html[data-samunmong-theme="joseon"] .evidence-direct-action:hover,
+html[data-samunmong-theme="joseon"] .evidence-direct-action:focus-visible {
+  border-color: #d79a52;
+  filter: brightness(1.08);
+  outline: 0;
+}
+html[data-samunmong-theme="joseon"] .evidence-story-preview {
+  overflow: auto;
+  justify-content: flex-start;
+}
 html[data-samunmong-theme="joseon"] .dream-trace-still figcaption span {
   padding: 6px 10px;
   border: 1px solid #cf9250;
@@ -14827,6 +14865,53 @@ html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing
   font-family: "ChilgokLjh", "Noto Serif KR", "Batang", serif;
 }
 
+/* Joseon second briefing: keep every Hangul glyph and report line visible. */
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] :is(
+  .briefing-kicker,
+  h2,
+  .briefing-caption,
+  .briefing-evidence-caption,
+  .briefing-death-copy,
+  .briefing-death-copy p,
+  .briefing-death-copy strong
+) {
+  font-family: "NanumBareunJeongsin", "Noto Serif KR", "Apple SD Gothic Neo", "Malgun Gothic", serif;
+  opacity: 1;
+}
+
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-death-copy p {
+  color: #301c11;
+  -webkit-text-fill-color: #301c11;
+}
+
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-death-copy strong {
+  color: #7a241c;
+  -webkit-text-fill-color: #7a241c;
+}
+
+@media (max-height: 820px) {
+  html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] {
+    max-height: 94vh;
+    gap: 10px;
+    padding-top: 28px;
+    padding-bottom: 24px;
+  }
+
+  html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-step {
+    min-height: 0;
+  }
+
+  html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-evidence-photo img,
+  html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-evidence-photo-small img {
+    max-height: min(30vh, 260px);
+  }
+
+  html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-death-copy p {
+    font-size: clamp(18px, 2vw, 24px);
+    line-height: 1.42;
+  }
+}
+
 /* Keep the settings dialog visually consistent across every game theme. */
 #settingsDialog .main-dialog-panel {
   border: 1px solid rgba(199, 164, 126, .46) !important;
@@ -14947,8 +15032,11 @@ html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing
 #newDreamDialog .new-dream-warning-panel {
   position: relative;
   width: min(480px, 88%);
-  border-color: rgba(187, 91, 67, .58);
-  box-shadow: 0 28px 80px rgba(0, 0, 0, .78), inset 0 0 34px rgba(120, 48, 31, .08);
+  border: 1px solid rgba(198, 198, 198, .5);
+  border-radius: 6px;
+  color: #f2f2f2;
+  background: linear-gradient(180deg, rgba(55, 55, 58, .98), rgba(27, 27, 30, .98));
+  box-shadow: 0 28px 80px rgba(0, 0, 0, .78), inset 0 0 0 1px rgba(255, 255, 255, .05);
 }
 
 #newDreamDialog .new-dream-warning-close {
@@ -14957,10 +15045,10 @@ html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing
   right: 15px;
   width: 36px;
   height: 36px;
-  border: 1px solid rgba(220, 155, 120, .58);
-  border-radius: 50%;
-  color: #ffe6d6;
-  background: rgba(92, 38, 29, .88);
+  border: 1px solid rgba(220, 220, 220, .56);
+  border-radius: 3px;
+  color: #f4f4f4;
+  background: rgba(74, 74, 78, .94);
   font-size: 25px;
   line-height: 1;
   cursor: pointer;
@@ -14968,7 +15056,7 @@ html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing
 
 #newDreamDialog .new-dream-warning-kicker {
   margin: 0 0 7px;
-  color: #d79a79;
+  color: #bdbdbd;
   font-size: 12px;
   letter-spacing: .16em;
 }
@@ -14976,7 +15064,48 @@ html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing
 #newDreamDialog .new-dream-warning-panel h2 {
   margin-right: 44px;
   margin-bottom: 18px;
-  color: #fff2e8;
+  color: #f5f5f5;
+}
+
+#newDreamDialog .settings-reset-confirm {
+  border-color: rgba(196, 196, 196, .32);
+  color: #ededed;
+  background: rgba(15, 15, 17, .5);
+}
+
+#newDreamDialog .settings-reset-confirm strong {
+  color: #f2f2f2;
+}
+
+#newDreamDialog .settings-reset-confirm p {
+  color: #c9c9c9;
+}
+
+#newDreamDialog .button:not(.danger) {
+  border-color: rgba(205, 205, 205, .42) !important;
+  color: #f3f3f3 !important;
+  background: linear-gradient(180deg, #5b5b5f, #36363a) !important;
+}
+
+/* NEW DREAM reuses the established SAVE_FILE retro dialog. */
+#newDreamDialog .new-dream-notice-panel {
+  width: min(650px, calc(100vw - 44px));
+}
+
+#newDreamDialog .new-dream-notice-actions {
+  justify-content: flex-start;
+  gap: 12px;
+}
+
+#newDreamDialog .new-dream-notice-actions .button {
+  width: auto;
+  min-width: 128px;
+  padding-inline: 22px !important;
+  border: 4px solid #1e1e1e !important;
+  border-radius: 0 !important;
+  color: #1e1e1e !important;
+  background: #edede8 !important;
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, .34) !important;
 }
 
 /* Joseon investigation legibility lock: operational copy must survive theme overrides. */

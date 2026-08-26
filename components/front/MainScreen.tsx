@@ -24,25 +24,20 @@ export default function MainScreen({ active = false }: MainScreenProps) {
     }));
   };
 
-  const startNewDream = () => {
+  const startNewDream = (mode: "restart" | "unplayed") => {
     setShowNewDreamWarning(false);
-    window.sessionStorage.setItem("samunmong-new-dream-mode", "1");
+    window.sessionStorage.setItem("samunmong-new-dream-mode", mode);
     window.sessionStorage.removeItem("samunmong-field-guide-pending");
     window.dispatchEvent(new CustomEvent("samunmong:new-dream-confirmed"));
-    requestScreen("tutorialScreen");
+    requestScreen(mode === "restart" ? "tutorialScreen" : "dreamScreen");
   };
 
   const handleMenuClick = (itemId: string, event: MouseEvent<HTMLButtonElement>) => {
     if (itemId === "newDream") {
-      const hasSavedProgress = !document.querySelector<HTMLButtonElement>("#continueDream")?.disabled;
-      if (hasSavedProgress) {
-        // The legacy prototype also listens to this button. Stop this saved-game
-        // branch here so it cannot bypass the warning and open the tutorial.
-        event.stopPropagation();
-        setShowNewDreamWarning(true);
-        return;
-      }
-      startNewDream();
+      // The legacy prototype also listens to this button. Always stop it here so
+      // the theme-aware confirmation flow owns navigation.
+      event.stopPropagation();
+      setShowNewDreamWarning(true);
       return;
     }
     if (itemId === "continueDream") {
@@ -101,39 +96,38 @@ export default function MainScreen({ active = false }: MainScreenProps) {
         );
       })}
 
-      <div
-        className={`main-dialog new-dream-dialog${showNewDreamWarning ? " open" : ""}`}
+      <aside
+        className={`dream-notice-dialog new-dream-dialog${showNewDreamWarning ? " open" : ""}`}
         id="newDreamDialog"
         role="alertdialog"
         aria-modal="true"
         aria-labelledby="newDreamWarningTitle"
-        aria-describedby="newDreamWarningCopy"
       >
-        <div className="main-dialog-panel new-dream-warning-panel">
-          <button
-            className="new-dream-warning-close"
-            type="button"
-            aria-label="새 게임 경고 닫기"
-            onClick={() => setShowNewDreamWarning(false)}
-          >
-            ×
-          </button>
-          <p className="new-dream-warning-kicker">DREAM RECORD</p>
-          <h2 id="newDreamWarningTitle">새 꿈을 시작하시겠습니까?</h2>
-          <div className="settings-reset-confirm">
-            <strong>이어 하던 수사 기록이 있습니다.</strong>
-            <p id="newDreamWarningCopy">계속하면 저장된 꿈의 수사 기록과 이어하기 지점이 모두 지워집니다.</p>
-          </div>
-          <div className="dialog-actions">
-            <button className="button" type="button" onClick={() => setShowNewDreamWarning(false)}>
-              돌아가기
+        <div className="dream-notice-panel new-dream-notice-panel">
+          <div className="dream-notice-titlebar">
+            <span>NEW_DREAM</span>
+            <button
+              className="dream-notice-close"
+              type="button"
+              aria-label="새 게임 확인창 닫기"
+              onClick={() => setShowNewDreamWarning(false)}
+            >
+              ×
             </button>
-            <button className="button danger" type="button" onClick={startNewDream}>
-              기록 지우고 시작
+          </div>
+          <span className="dream-notice-seal" aria-hidden="true">▶</span>
+          <p className="dream-notice-kicker">DREAM ARCHIVE</p>
+          <h2 id="newDreamWarningTitle">새로 시작할 꿈을 고르시겠습니까?</h2>
+          <div className="dream-notice-actions new-dream-notice-actions">
+            <button className={`button ${styles.retroDialogButton}`} type="button" onClick={() => startNewDream("restart")}>
+              처음부터 다시 시작하기
+            </button>
+            <button className={`button ${styles.retroDialogButton}`} type="button" onClick={() => startNewDream("unplayed")}>
+              아직 안 꾼 꿈 선택하기
             </button>
           </div>
         </div>
-      </div>
+      </aside>
 
       <aside className="dream-notice-dialog save-slot-dialog" id="saveSlotDialog" aria-hidden="true" role="dialog" aria-labelledby="saveSlotTitle">
         <div className="dream-notice-panel save-slot-panel">

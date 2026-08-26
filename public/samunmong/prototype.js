@@ -510,8 +510,9 @@
     }
 
     function consumeNewDreamMode(theme) {
-      if (sessionStorage.getItem(newDreamModeKey) !== "1") return;
-      clearThemeProgress(theme);
+      const mode = sessionStorage.getItem(newDreamModeKey);
+      if (!mode) return;
+      if (mode === "restart" || mode === "1") clearThemeProgress(theme);
       sessionStorage.removeItem(newDreamModeKey);
     }
 
@@ -2103,23 +2104,11 @@
     });
 
     on("#newDream", "click", () => {
-      // React owns the saved-progress warning. Do not let this legacy target
-      // listener navigate before the confirmation dialog can open.
-      if (getValidSaveSlots().length) return;
-      sessionStorage.setItem(newDreamModeKey, "1");
-      sessionStorage.removeItem(fieldGuidePendingKey);
-      conversationNotes.clear();
-      updateContinueButtonState();
-      updateInterrogationQuestionLimitUI();
-      go("tutorialScreen");
+      // React owns the NEW DREAM archive popup and navigation.
     });
     window.addEventListener("samunmong:new-dream-confirmed", () => {
-      // "기록 지우고 시작" must invalidate every continue source now, not
-      // later when a theme is selected. Otherwise returning to the main menu
-      // revives CONTINUE from the untouched slot/legacy save.
-      Object.keys(themeLabels).forEach((theme) => clearThemeProgress(theme));
-      writeSaveSlots({});
-      localStorage.removeItem(saveKey);
+      // Keep every theme slot intact until the player actually chooses a dream.
+      // consumeNewDreamMode() then resets only that selected theme.
       conversationNotes.clear();
       renderSaveSlots();
       updateContinueButtonState();
@@ -3461,7 +3450,23 @@
       saveCollectedEvidence(name);
       addEvidenceCardToInterrogation(name);
       addEvidenceToToolPanel(name);
+      unlockCollectedEvidenceConnections();
       playSfx("bag", 0.7);
+    }
+
+    function unlockCollectedEvidenceConnections() {
+      if (!isJoseonToolInteraction) return;
+      const collected = new Set(readStoredNames(collectedEvidenceKey));
+      const linked = new Set(readStoredNames(linkedEvidenceKey));
+      let changed = false;
+      evidenceConnections.forEach(([first, second]) => {
+        if (!collected.has(first) || !collected.has(second)) return;
+        const key = evidencePairKey(first, second);
+        if (linked.has(key)) return;
+        linked.add(key);
+        changed = true;
+      });
+      if (changed) localStorage.setItem(linkedEvidenceKey, JSON.stringify([...linked]));
     }
 
     function ensureJoseonBriefingEvidence() {
@@ -3494,6 +3499,7 @@
         document.querySelectorAll(`[data-evidence-name="${name}"]`).forEach((item) => item.classList.add("analyzed"));
         document.querySelectorAll(`#toolEvidenceList [data-evidence="${name}"]`).forEach((item) => item.classList.add("analyzed"));
       });
+      unlockCollectedEvidenceConnections();
     }
 
     function setAnalysisTarget(name) {
@@ -3698,7 +3704,16 @@
       button.dataset.location = location;
       button.dataset.storyRole = meaningRevealed ? getEvidenceStoryCue(name, data)[0] : "???";
       button.innerHTML = evidenceCardHtml(name);
-      button.addEventListener("click", () => selectEvidence(button));
+      button.addEventListener("click", () => {
+        if (isJoseonToolInteraction) {
+          selectedEvidence = name;
+          document.querySelectorAll("#evidenceList .evidence").forEach((item) => item.classList.toggle("active", item === button));
+          showEvidenceStoryPreview(name);
+          playSfx("paper", 0.48);
+          return;
+        }
+        selectEvidence(button);
+      });
       sectionGrid.appendChild(button);
       updateEvidenceLocationCounts();
       setActiveEvidenceLocation(location);
@@ -3739,9 +3754,17 @@
       document.querySelector("#evidencePreviewImage").src = getEvidenceImage(name);
       document.querySelector("#evidencePreviewImage").alt = name;
       document.querySelector("#evidencePreviewObject").textContent = getEvidenceDisplayName(data.source || name);
-      document.querySelector("#evidencePreviewFact").textContent = meaningRevealed ? fact : "도구함에서 이 증거를 감식하십시오.";
+      const directAction = joseonDirectEvidenceInteractions[name];
+      const directActionButton = document.querySelector("#evidenceDirectAction");
+      const interactionComplete = directAction ? hasCompletedToolStep(name, directAction.tool) : false;
+      document.querySelector("#evidencePreviewFact").textContent = meaningRevealed ? fact : directAction ? "직접 펼치거나 맞추면 숨은 내용이 드러납니다." : getEvidenceCardSummary(name, data);
       document.querySelector("#evidencePreviewRole").textContent = meaningRevealed ? `${role} 증거` : "???";
-      document.querySelector("#evidencePreviewMeaning").textContent = meaningRevealed ? getEvidenceStoryMeaning(name, data) : "감식을 마치면 이 증거가 남긴 의문이 열립니다.";
+      document.querySelector("#evidencePreviewMeaning").textContent = meaningRevealed ? getEvidenceStoryMeaning(name, data) : directAction ? "직접 살펴보면 이 증거가 남긴 의문이 열립니다." : "다른 증거와 진술에 제시해 의미를 확인할 수 있습니다.";
+      if (directActionButton) {
+        directActionButton.hidden = !directAction || interactionComplete;
+        directActionButton.textContent = directAction?.label || "직접 살펴보기";
+        directActionButton.dataset.evidence = directAction ? name : "";
+      }
       renderEvidencePeople(name);
       const connectionResult = document.querySelector("#evidenceConnectionResult");
       if (connectionResult) {
@@ -3762,7 +3785,30 @@
         relatedSources.add(source);
         related.push(card);
       });
-      relatedRow.innerHTML = related.length ? `<span>하나를 골라 실마리 잇기</span>` : "";
+      const collected = new Set(readStoredNames(collectedEvidenceKey));
+      const automaticConnections = evidenceConnections.filter(([first, second]) => {
+        const source = data.source || name;
+        return (first === source || second === source) && collected.has(first) && collected.has(second);
+      });
+      relatedRow.innerHTML = automaticConnections.length ? `<span>함께 모여 자동으로 이어진 증거</span>` : "";
+      automaticConnections.forEach(([first, second, conclusion]) => {
+        const relatedButton = document.createElement("button");
+        relatedButton.type = "button";
+        relatedButton.className = "connected";
+        relatedButton.textContent = first === (data.source || name) ? second : first;
+        relatedButton.addEventListener("click", () => {
+          const other = first === (data.source || name) ? second : first;
+          connectEvidenceClues(name, other, relatedButton);
+          document.querySelector("#evidenceConnectionText").textContent = conclusion;
+        });
+        relatedRow.appendChild(relatedButton);
+      });
+      if (automaticConnections.length) {
+        const [first, second, conclusion] = automaticConnections[0];
+        connectEvidenceClues(first, second);
+        document.querySelector("#evidenceConnectionText").textContent = conclusion;
+      }
+      if (isJoseonToolInteraction) return;
       related.forEach((card) => {
         const relatedButton = document.createElement("button");
         relatedButton.type = "button";
@@ -3771,6 +3817,26 @@
         relatedRow.appendChild(relatedButton);
       });
     }
+
+    const joseonDirectEvidenceInteractions = {
+      "돌쇠의 그림": { tool: "돋보기", label: "두루마리 직접 펼치기", open: () => openPortraitStrokePuzzle() },
+      "찢어진 약속 편지": { tool: "문서 맞춤판", label: "편지 조각 직접 맞추기", open: () => openDocumentAssembly("찢어진 약속 편지") },
+      "빈 호패 주머니": { tool: "돋보기", label: "주머니 안감 직접 뒤집기", open: () => openPouchLiningPuzzle() },
+      "하인 장부": { tool: "촛불 비추기", label: "지워진 장부 직접 복원하기", open: () => openLedgerTimelinePuzzle() },
+      "도망 보따리": { tool: "먼지털이 붓", label: "보따리 매듭 직접 풀기", open: () => openBundlePuzzle() },
+      "무덕의 번진 일기": { tool: "촛불 비추기", label: "번진 일기 직접 읽어 보기", open: () => openDiaryTimelinePuzzle() }
+    };
+
+    document.querySelector("#evidenceDirectAction")?.addEventListener("click", (event) => {
+      const name = event.currentTarget.dataset.evidence;
+      const interaction = joseonDirectEvidenceInteractions[name];
+      if (!interaction) return;
+      currentEvidenceForTool = name;
+      evidenceFlipped = false;
+      resetToolInteraction(true);
+      setEvidenceBag(false);
+      interaction.open();
+    });
 
     const suspectPortraits = {
       dolsoe: "/samunmong/assets/suspects/dolsoe-seated.webp",
@@ -3872,7 +3938,7 @@
       updateEvidenceInterrogationUI(selectedEvidence);
       closeEvidenceStoryPreview();
       setEvidenceBag(false);
-      dispatchEvidenceFeedback(selectedEvidence, button);
+      dispatchEvidenceFeedback(selectedEvidence, document.querySelector(`[data-evidence="${CSS.escape(selectedEvidence)}"]`));
       playSfx("buttonAlt", 0.62);
       showToast(`증거 제시: ${getEvidenceDisplayName(selectedEvidence)}`);
     });
@@ -6424,6 +6490,12 @@
         toolSubPanel.querySelectorAll(".dragging, .wrong-fit").forEach((item) => item.classList.remove("dragging", "wrong-fit"));
         resetToolInteraction(true);
         renderTools();
+        if (isJoseonToolInteraction) {
+          closeGlobalPanel();
+          setEvidenceBag(true);
+          if (currentEvidenceForTool) showEvidenceStoryPreview(currentEvidenceForTool);
+          return;
+        }
         openGlobalPanel("toolPanel");
         return;
       }
