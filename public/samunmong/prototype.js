@@ -112,11 +112,18 @@
       { name: "말포삼", id: "malposam", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malposam-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
       { name: "말포일", id: "malpoil", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malpoil-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" }
     ];
+    const spacePersonnelAuthIds = {
+      david: "ORBIT-13-ENG-0714",
+      mers: "ORBIT-13-MED-0427",
+      harry: "ORBIT-13-DAT-0319",
+      aladdindin: "ORBIT-13-MNT-0821",
+      einspanner: "ORBIT-13-SCI-0516"
+    };
     const spaceSuspects = [
-      { name: "해리", id: "harry", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/harry-upper-transparent.webp", sleeveScene: "/assets/space-station/characters/harry-upper-transparent.webp" },
-      { name: "메르스", id: "mers", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/mers-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/mers-upper-aligned.webp" },
-      { name: "알라딘딘", id: "aladdindin", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/aladdindin-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/aladdindin-upper-aligned.webp" },
-      { name: "아인슈페너", id: "einspanner", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/einspanner-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/einspanner-upper-aligned.webp" }
+      { name: "해리", id: "harry", authId: spacePersonnelAuthIds.harry, scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/harry-upper-transparent.webp", sleeveScene: "/assets/space-station/characters/harry-upper-transparent.webp" },
+      { name: "메르스", id: "mers", authId: spacePersonnelAuthIds.mers, scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/mers-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/mers-upper-aligned.webp" },
+      { name: "알라딘딘", id: "aladdindin", authId: spacePersonnelAuthIds.aladdindin, scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/aladdindin-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/aladdindin-upper-aligned.webp" },
+      { name: "아인슈페너", id: "einspanner", authId: spacePersonnelAuthIds.einspanner, scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/einspanner-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/einspanner-upper-aligned.webp" }
     ];
     const suspects = isSpaceTheme ? spaceSuspects : isMagicTheme ? magicSuspects : window.SAMUNMONG_CONTENT?.suspects || [
       { name: "돌쇠", id: "dolsoe", scene: "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-dolsoe-sleeve.webp?v=sleeve-20260707", lieScene: "/samunmong/assets/interrogation-expressions/scene-interrogation-dolsoe-lie.png?v=lie-20260824" },
@@ -198,6 +205,87 @@
     let interrogationReactionTimer = 0;
     let interrogationThinkingSoundTimer = 0;
     let newFactToastTimer = 0;
+
+    const magicLinearProgression = [
+      { screenId: "magicAlchemyLab", name: "제1 연금술 실습실", evidence: ["부러진 지팡이", "화염 감지 룬스톤", "기록의 수정구"] },
+      { screenId: "magicCleaningCloset", name: "청소도구함", evidence: ["금지된 마법 담배 재"] },
+      { screenId: "magicLibrary", name: "도서관", evidence: ["도서관 대출 기록부", "빙결 흔적이 남은 반납 도서"] },
+      { screenId: "magicRecordCrystalRoom", name: "기록 수정구실", evidence: ["조작된 기록 수정구"] },
+      { screenId: "magicDormHallway", name: "학생들 기숙사", evidence: ["버려진 지팡이 조각"] },
+      { screenId: "interrogationScreen", name: "교무 조사실", evidence: [] }
+    ];
+    let magicUnlockedIndex = -1;
+
+    function getMagicUnlockedIndex() {
+      if (!isMagicTheme) return magicLinearProgression.length - 1;
+      const collected = new Set(readStoredNames(collectedEvidenceKey));
+      let unlockedIndex = 0;
+
+      for (let index = 0; index < magicLinearProgression.length - 1; index += 1) {
+        const locationComplete = magicLinearProgression[index].evidence.every((name) => collected.has(name));
+        if (!locationComplete) break;
+        unlockedIndex = index + 1;
+      }
+
+      return unlockedIndex;
+    }
+
+    function getMagicLockMessage(targetScreenId) {
+      const targetIndex = magicLinearProgression.findIndex((location) => location.screenId === targetScreenId);
+      if (targetIndex <= 0) return "";
+      const previous = magicLinearProgression[targetIndex - 1];
+      const collected = new Set(readStoredNames(collectedEvidenceKey));
+      const remaining = previous.evidence.filter((name) => !collected.has(name)).length;
+      return `${previous.name}의 증거 ${remaining}개를 더 찾아야 봉인이 풀립니다.`;
+    }
+
+    function canAccessMagicScreen(targetScreenId) {
+      if (!isMagicTheme) return true;
+      const targetIndex = magicLinearProgression.findIndex((location) => location.screenId === targetScreenId);
+      return targetIndex < 0 || targetIndex <= getMagicUnlockedIndex();
+    }
+
+    function syncMagicMapProgress({ announce = false } = {}) {
+      if (!isMagicTheme) return;
+      const unlockedIndex = getMagicUnlockedIndex();
+      const newlyUnlocked = magicUnlockedIndex >= 0 && unlockedIndex > magicUnlockedIndex;
+      magicUnlockedIndex = unlockedIndex;
+
+      magicLinearProgression.forEach((location, index) => {
+        const isLocked = index > unlockedIndex;
+        const pin = document.querySelector(`.map-pin-button[data-location-screen="${location.screenId}"]`);
+        const label = document.querySelector(`.map-label[data-location-screen="${location.screenId}"]`);
+        const dockButton = location.screenId === "interrogationScreen"
+          ? document.querySelector(`.magic-school-dock [data-go="${location.screenId}"]`)
+          : null;
+
+        [pin, dockButton].forEach((button) => {
+          if (!(button instanceof HTMLButtonElement)) return;
+          button.disabled = isLocked;
+          button.classList.toggle("locked", isLocked);
+          button.setAttribute("aria-disabled", String(isLocked));
+          button.title = isLocked ? getMagicLockMessage(location.screenId) : `${location.name}으로 이동`;
+        });
+        label?.classList.toggle("locked", isLocked);
+      });
+
+      const current = magicLinearProgression[Math.min(unlockedIndex, magicLinearProgression.length - 1)];
+      const progress = document.querySelector("#magicMapProgress");
+      if (progress) {
+        const collected = new Set(readStoredNames(collectedEvidenceKey));
+        const remaining = current.evidence.filter((name) => !collected.has(name)).length;
+        progress.textContent = current.evidence.length && remaining > 0
+          ? `${current.name} 조사 중 · 남은 증거 ${remaining}개`
+          : unlockedIndex === magicLinearProgression.length - 1
+            ? "모든 조사 장소의 봉인이 풀렸습니다."
+            : `${magicLinearProgression[unlockedIndex + 1].name}의 봉인이 풀렸습니다.`;
+      }
+
+      if (announce && newlyUnlocked) {
+        const unlockedLocation = magicLinearProgression[unlockedIndex];
+        window.setTimeout(() => showToast(`${unlockedLocation.name}의 봉인이 풀렸습니다.`), 2100);
+      }
+    }
 
     const joseonLocationMeta = {
       tutorialScreen: { name: "튜토리얼", x: "18%", y: "18%" },
@@ -458,6 +546,7 @@
       collected.add(name);
       localStorage.setItem(collectedEvidenceKey, JSON.stringify([...collected]));
       if (isNewEvidence) markEvidenceBagUnread();
+      if (isNewEvidence) syncMagicMapProgress({ announce: true });
     }
 
     function syncEvidenceBagUnreadIndicator() {
@@ -958,7 +1047,17 @@
 
     function openBriefingJournal() {
       briefingReturnScreenId = getActiveScreenId() || "fieldOne";
-      startBriefingSequence("deathOnly");
+      if (isSpaceTheme) {
+        setBriefingMode("full");
+        window.dispatchEvent(new CustomEvent("samunmong:briefing-journal-open"));
+        return;
+      } else {
+        startBriefingSequence("deathOnly");
+      }
+      revealBriefingJournal();
+    }
+
+    function revealBriefingJournal() {
       briefingScreen?.classList.add("journal-overlay-open");
       briefingJournalCloseButton?.focus();
       playSfx("buttonAlt", 0.62);
@@ -967,6 +1066,9 @@
     function closeBriefingJournal() {
       briefingScreen?.classList.remove("journal-overlay-open");
       setBriefingMode("full");
+      if (isSpaceTheme) {
+        window.dispatchEvent(new CustomEvent("samunmong:briefing-journal-close"));
+      }
       document.querySelector(`[data-go="briefingScreen"]`)?.focus();
       playSfx("buttonAlt", 0.58);
     }
@@ -1107,6 +1209,7 @@
       if (buttonGuideTextById[target.id]) return buttonGuideTextById[target.id];
       if (target.matches(".map-chip")) return isSpaceTheme ? "오르빗-13의 구역 도면을 펼칩니다." : "조사 장소를 오갑니다.";
       if (target.matches(".bag-chip")) return isSpaceTheme ? "증거 보관함에서 수집물을 확인합니다." : isMagicTheme ? "차원 주머니 속 증거를 불러옵니다." : "모은 증거를 확인합니다.";
+      if (target.matches(".briefing-chip")) return "초기 사고 보고서를 다시 확인합니다.";
       if (target.matches(".tool-chip")) return isSpaceTheme ? "스캔 도구로 잔류 신호를 분석합니다." : isMagicTheme ? "마력 감지로 잔류 흔적을 분석합니다." : "증거를 더 자세히 분석합니다.";
       if (target.matches(".note-chip")) return isSpaceTheme ? "대원별 통신 로그를 확인합니다." : "등장인물과 나눈 대화를 기록합니다.";
       if (target.matches(".journal-chip")) return isSpaceTheme ? "초기 사고 보고서를 다시 확인합니다." : isMagicTheme ? "수사 일지에서 관계자별 기록을 확인합니다." : "처음 사건 일지를 다시 봅니다.";
@@ -1363,7 +1466,7 @@
       const accuseChip = document.querySelector("#accuseButton img");
       if (accuseChip) accuseChip.src = "/samunmong/assets/magic-school/ui/icon-final-accuse.webp";
       const hintChip = document.querySelector("#interrogationHint img");
-      if (hintChip) hintChip.src = "/samunmong/assets/magic-school/ui/icon-mana-hint.webp";
+      if (hintChip) hintChip.src = "/samunmong/assets/magic-school/ui/icon-arcane-hint-compass.png";
       const hintLabel = document.querySelector("#interrogationHint .sr-only");
       if (hintLabel) hintLabel.textContent = "마력 감지";
       const magicBagTitle = document.querySelector("#evidenceBagPop .bag-pop-head strong");
@@ -1425,16 +1528,83 @@
       fieldGuideSkipButton = document.querySelector("#skipFieldGuide");
     }
 
+    // Collected evidence tooltip offsets: +x right, -x left, +y down, -y up.
+    const collectedEvidenceTooltipOffsets = {
+      "엔지니어 공구 클램프": { x: -10, y: 30 },
+      "얼어붙은 추진 레버 젤": { x: 20, y: 60 },
+      "마지막 무전 로그": { x: -130, y: 95 },
+      "소독천과 장갑": { x: 40, y: 35 },
+      "삭제된 의료 기록": { x: 35, y: 70 },
+      "조작된 지연 타이머": { x: -45, y: 25 },
+      "손상된 압력 센서": { x: -47, y: 25 },
+      "접속 키카드 칩": { x: 20, y: 34 },
+      "암호화된 연구 보상 계약": { x: -55, y: 20 },
+      "커피 텀블러": { x: 25, y: 65 },
+      "미승인 약물 앰풀": { x: 31, y: 60 }
+    };
+
+    function getCollectedEvidenceTooltip() {
+      let tooltip = document.querySelector("#collectedEvidenceTooltip");
+      if (tooltip) return tooltip;
+
+      tooltip = document.createElement("div");
+      tooltip.id = "collectedEvidenceTooltip";
+      tooltip.className = "collected-evidence-tooltip";
+      tooltip.setAttribute("role", "status");
+      tooltip.setAttribute("aria-hidden", "true");
+      tooltip.innerHTML = '<strong class="collected-evidence-tooltip-title"></strong>';
+      document.body.appendChild(tooltip);
+      return tooltip;
+    }
+
+    function showCollectedEvidenceTooltip(hotspot) {
+      if (!isSpaceTheme || !hotspot.classList.contains("collected")) return;
+      const tooltip = getCollectedEvidenceTooltip();
+      const title = tooltip.querySelector(".collected-evidence-tooltip-title");
+      const name = hotspot.dataset.evidenceName || hotspot.getAttribute("aria-label") || "수집한 증거";
+      if (title) title.textContent = getEvidenceDisplayName(name);
+
+      tooltip.classList.add("show");
+      tooltip.setAttribute("aria-hidden", "false");
+      const hotspotRect = hotspot.getBoundingClientRect();
+      const tooltipRect = tooltip.getBoundingClientRect();
+      const margin = 14;
+      const offset = collectedEvidenceTooltipOffsets[name] || { x: 0, y: 0 };
+      const left = Math.min(
+        window.innerWidth - tooltipRect.width / 2 - margin,
+        Math.max(tooltipRect.width / 2 + margin, hotspotRect.left + hotspotRect.width / 2 + offset.x)
+      );
+      const preferredTop = hotspotRect.top - tooltipRect.height - 14 + offset.y;
+      const top = preferredTop >= margin ? preferredTop : hotspotRect.bottom + 14 + offset.y;
+      tooltip.style.left = `${left}px`;
+      tooltip.style.top = `${top}px`;
+    }
+
+    function hideCollectedEvidenceTooltip() {
+      const tooltip = document.querySelector("#collectedEvidenceTooltip");
+      if (!tooltip) return;
+      tooltip.classList.remove("show");
+      tooltip.setAttribute("aria-hidden", "true");
+    }
+
     function setupEvidenceScreen(screenId) {
       const screen = document.getElementById(screenId);
       if (!screen) return;
 
       const evidenceHotspots = [...screen.querySelectorAll(".hotspot[data-evidence-name], #hopaeHotspot, #portraitHotspot")];
-      evidenceHotspots.forEach((hotspot) => hotspot.classList.add("evidence-hotspot"));
+      evidenceHotspots.forEach((hotspot) => {
+        hotspot.classList.add("evidence-hotspot");
+        if (!isSpaceTheme || hotspot.dataset.collectedTooltipBound === "true") return;
+        hotspot.dataset.collectedTooltipBound = "true";
+        hotspot.addEventListener("mouseenter", () => showCollectedEvidenceTooltip(hotspot));
+        hotspot.addEventListener("mouseleave", hideCollectedEvidenceTooltip);
+        hotspot.addEventListener("focus", () => showCollectedEvidenceTooltip(hotspot));
+        hotspot.addEventListener("blur", hideCollectedEvidenceTooltip);
+      });
       readStoredNames(collectedEvidenceKey).forEach((name) => {
         screen.querySelectorAll(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((item) => {
           item.classList.add("collected");
-          if (item instanceof HTMLButtonElement) item.disabled = true;
+          if (item instanceof HTMLButtonElement) item.disabled = !isSpaceTheme;
           item.setAttribute("aria-disabled", "true");
         });
       });
@@ -1471,7 +1641,11 @@
         hint.appendChild(hintText);
       }
       hint.addEventListener("click", () => {
-        const remainingEvidence = evidenceHotspots.filter((hotspot) => !hotspot.classList.contains("collected"));
+        const collectedNames = isSpaceTheme ? new Set(readStoredNames(collectedEvidenceKey)) : null;
+        const remainingEvidence = isSpaceTheme
+          ? [...screen.querySelectorAll(".hotspot[data-evidence-name]")]
+              .filter((hotspot) => !collectedNames.has(hotspot.dataset.evidenceName || ""))
+          : evidenceHotspots.filter((hotspot) => !hotspot.classList.contains("collected"));
         if (!remainingEvidence.length) {
           showToast("이 장면의 증거를 모두 찾았습니다.", { variant: "hint" });
           return;
@@ -1487,9 +1661,11 @@
 
     window.addEventListener("samunmong:screen-change", (event) => {
       const screenId = event.detail?.screenId || getActiveScreenId();
+      hideCollectedEvidenceTooltip();
       refreshFieldGuideNodes();
       setupEvidenceScreen(screenId);
       updateCurrentLocation(screenId);
+      syncMagicMapProgress();
     });
 
     const fieldGuideTargets = {
@@ -1600,6 +1776,7 @@
       "/assets/space-station/ui-icons-v3/orbit-blueprint.webp",
       "/assets/space-station/ui-icons-v3/evidence-vault.webp",
       "/assets/space-station/ui-icons-v3/log-record.webp",
+      "/assets/space-station/ui-icons-v3/case-briefing.webp",
       "/assets/space-station/ui-icons-v3/scan-tool.webp",
       "/assets/space-station/ui-icons-v3/final-report.webp",
       "/assets/space-station/ui-icons-v3/accuse-target.webp",
@@ -1620,6 +1797,7 @@
       "/assets/space-station/evidence/engineer-tool-clamp.webp",
       "/assets/space-station/evidence/coffee-tumbler.webp",
       "/assets/space-station/evidence/unauthorized-drug-ampoule.webp",
+      "/assets/space-station/panels/digital-human-scan-v3.png",
       "/assets/space-station/loading/space-transition-bg.webp"
     ];
     const themeStartAssets = isSpaceTheme ? spaceThemeStartAssets : isMagicTheme ? magicThemeStartAssets : joseonThemeStartAssets;
@@ -2135,8 +2313,12 @@
       const button = event.target instanceof Element ? event.target.closest("[data-go]") : null;
       if (!button || isFieldGuideBlockingControls()) return;
       const target = button.dataset.go;
+      if (!canAccessMagicScreen(target)) {
+        showToast(getMagicLockMessage(target));
+        return;
+      }
       const isJournalBriefing = target === "briefingScreen";
-      if (isJournalBriefing && !isMagicTheme && !isSpaceTheme) {
+      if (isJournalBriefing && !isMagicTheme) {
         event.preventDefault();
         openBriefingJournal();
         return;
@@ -2147,6 +2329,8 @@
       }
     });
     briefingJournalCloseButton?.addEventListener("click", closeBriefingJournal);
+    window.addEventListener("samunmong:briefing-journal-ready", revealBriefingJournal);
+    window.addEventListener("samunmong:briefing-journal-close-request", closeBriefingJournal);
     on("#accuseButton", "click", openResultPage);
 
     let hopaeCollected = false;
@@ -3256,7 +3440,7 @@
     function markEvidenceCollectedInScene(name) {
       document.querySelectorAll(`[data-evidence-name="${name}"]`).forEach((item) => {
         item.classList.add("collected");
-        if (item instanceof HTMLButtonElement) item.disabled = true;
+        if (item instanceof HTMLButtonElement) item.disabled = !isSpaceTheme;
         item.setAttribute("aria-disabled", "true");
       });
       const propSelectors = {
@@ -5949,14 +6133,22 @@
 
     function updateSuspect(shouldAnnounce = true) {
       const suspect = suspects[suspectIndex];
-      document.querySelector("#suspectName").textContent = suspect.name;
+      const suspectNamePanel = document.querySelector("#suspectName");
+      const suspectNameValue = suspectNamePanel?.querySelector(".suspect-name-value");
+      const suspectAuthId = suspectNamePanel?.querySelector(".suspect-auth-id");
+      if (suspectNameValue) {
+        suspectNameValue.textContent = suspect.name;
+        if (suspectAuthId) suspectAuthId.textContent = suspect.authId || "";
+      } else if (suspectNamePanel) {
+        suspectNamePanel.textContent = suspect.name;
+      }
       document.querySelector("#suspectStage").dataset.suspect = suspect.id;
       const interrogationScreen = document.querySelector("#interrogationScreen");
       setLieExpressionOverlay(false);
       if (isMagicTheme || isSpaceTheme) {
         document.querySelector("#interrogationPlate").src = suspect.scene;
       } else {
-        document.querySelector("#interrogationPlate").src = "/samunmong/assets/scene-interrogation-room-empty.png";
+        document.querySelector("#interrogationPlate").src = "/samunmong/assets/interactions/interrogation-candle/interrogation-room-common-clean-v2.png";
         interrogationScreen.dataset.characterScene = sleeveCheckedSuspects.has(suspect.id) ? suspect.sleeveScene : suspect.scene;
       }
       const suspectSprite = document.querySelector("#suspectSprite");
@@ -5970,7 +6162,7 @@
       activeNoteSuspectId = suspect.id;
       renderConversationNotes();
       syncVisibleSuspectReply();
-      if (shouldAnnounce && getActiveScreenId() === "interrogationScreen") {
+      if (shouldAnnounce && !isSpaceTheme && getActiveScreenId() === "interrogationScreen") {
         showToast(`${suspect.name} 심문으로 전환`);
       }
     }
@@ -6122,6 +6314,7 @@
     const globalPanels = [...document.querySelectorAll(".global-panel")];
 
     function openGlobalPanel(id) {
+      if (isSpaceTheme && id === "toolPanel") return;
       if (id !== "mapPanel" && isFieldGuideBlockingControls()) return;
       if (document.querySelector("#mainScreen")?.classList.contains("active")) {
         globalPanels.forEach((panel) => {
@@ -6249,6 +6442,10 @@
       button.addEventListener("blur", () => button.classList.remove("pressing"));
       button.addEventListener("click", () => {
         const target = button.dataset.mapGo;
+        if (!canAccessMagicScreen(target)) {
+          showToast(getMagicLockMessage(target));
+          return;
+        }
         button.classList.add("pressing");
         playSfx("move", 0.82);
         if (["map-click", "map-open"].includes(fieldGuideStep)) {
@@ -6601,7 +6798,7 @@
         if (isMagicTheme || isSpaceTheme) {
           document.querySelector("#interrogationPlate").src = suspect.scene;
         } else {
-          document.querySelector("#interrogationPlate").src = "/samunmong/assets/scene-interrogation-room-empty.png";
+          document.querySelector("#interrogationPlate").src = "/samunmong/assets/interactions/interrogation-candle/interrogation-room-common-clean-v2.png";
           document.querySelector("#interrogationScreen").dataset.characterScene = sleeveCheckedSuspects.has(suspect.id) ? suspect.sleeveScene : suspect.scene;
         }
         if (isMagicTheme && suspect.sprite) document.querySelector("#suspectSprite").src = suspect.sprite;
@@ -6750,6 +6947,7 @@
     renderTools();
     restoreConversationNotes();
     restoreSavedInvestigation();
+    syncMagicMapProgress();
     syncEvidenceBagUnreadIndicator();
     renderConversationNotes();
     setupButtonGuides();

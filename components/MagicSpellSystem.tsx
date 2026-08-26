@@ -181,7 +181,7 @@ export default function MagicSpellSystem({
   }
 
   return (
-    <div className="magic-spell-system">
+    <div className={`magic-spell-system phase-${phase}`}>
       <button
         className={`magic-spell-toggle${menuOpen ? " active" : ""}`}
         type="button"

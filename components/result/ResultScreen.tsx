@@ -86,6 +86,36 @@ const spaceSuspects = [
   }
 ] as const;
 
+const magicSchoolSuspects = [
+  {
+    id: "malpoi",
+    name: "말포이",
+    image: "/samunmong/assets/magic-school/interrogation/malpoi-sprite.webp",
+    slot: { left: "24%", top: "36.56%", width: "13.94%", height: "31.24%" },
+    nameLeft: "30.97%",
+    stampLeft: "35.07%",
+    offsetX: "0%"
+  },
+  {
+    id: "malposam",
+    name: "말포삼",
+    image: "/samunmong/assets/magic-school/interrogation/malposam-sprite.webp",
+    slot: { left: "43%", top: "36.56%", width: "13.94%", height: "31.24%" },
+    nameLeft: "49.97%",
+    stampLeft: "54.07%",
+    offsetX: "0%"
+  },
+  {
+    id: "malpoil",
+    name: "말포일",
+    image: "/samunmong/assets/magic-school/interrogation/malpoil-sprite.webp",
+    slot: { left: "62%", top: "36.56%", width: "13.94%", height: "31.24%" },
+    nameLeft: "68.97%",
+    stampLeft: "73.07%",
+    offsetX: "0%"
+  }
+] as const;
+
 const joseonRequiredEvidence = [
   "호패 조각",
   "점순의 목 압박 흔적",
@@ -108,6 +138,14 @@ const spaceRequiredEvidence = [
   "접속 키카드 칩",
   "암호화된 연구 보상 계약",
   "마지막 무전 로그"
+] as const;
+
+const magicSchoolRequiredEvidence = [
+  "부러진 지팡이",
+  "화염 감지 룬스톤",
+  "도서관 대출 기록부",
+  "조작된 기록 수정구",
+  "말포삼의 자백"
 ] as const;
 
 const correctSuspectByTheme = {
@@ -147,6 +185,27 @@ const outcomeCopy = {
       "이 자의 죄로는 꿈이 풀리지 않는다.",
       "사라진 말과 남은 흔적이 아직 맞물리지 않았다.",
       "진술의 틈으로 다시 돌아가라."
+    ]
+  }
+} as const;
+
+const magicSchoolOutcomeCopy = {
+  success: {
+    kicker: "마법 판결",
+    stamp: "진범",
+    lines: [
+      "얼어붙은 룬스톤과 금서의 기록이 하나의 주문으로 이어졌다.",
+      "조작된 수정구와 말포삼의 자백이 거짓 알리바이를 깨뜨렸다.",
+      "마법학교 방화사건의 진실이 마침내 모습을 드러낸다."
+    ]
+  },
+  failure: {
+    kicker: "판정 불일치",
+    stamp: "무고",
+    lines: [
+      "이 학생을 향한 의심만으로는 방화 주문이 완성되지 않는다.",
+      "얼어붙은 경보와 지워진 출입 기록을 다시 연결해야 한다.",
+      "교무 조사실로 돌아가 남은 진술을 확인하라."
     ]
   }
 } as const;
@@ -375,12 +434,20 @@ export default function ResultScreen() {
   const resultRouteState = searchParams.toString();
   const { playButtonSfx, playTypingSfx } = useResultAudio();
   const theme = (searchParams.get("theme") === "spaceStation" ? "spaceStation" : searchParams.get("theme") === "magicSchool" ? "magicSchool" : "joseon") satisfies ResultTheme;
-  const activeSuspects = theme === "spaceStation" ? spaceSuspects : suspects;
-  const requiredEvidence = theme === "spaceStation" ? spaceRequiredEvidence : joseonRequiredEvidence;
+  const activeSuspects = theme === "spaceStation" ? spaceSuspects : theme === "magicSchool" ? magicSchoolSuspects : suspects;
+  const requiredEvidence = theme === "spaceStation" ? spaceRequiredEvidence : theme === "magicSchool" ? magicSchoolRequiredEvidence : joseonRequiredEvidence;
   const correctSuspectId = correctSuspectByTheme[theme];
-  const resultBg = theme === "spaceStation" ? "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp" : "/samunmong/assets/final-accusation-bg.webp";
-  const accusationTitle = theme === "spaceStation" ? "최종 보고 대상 지목" : "최종 범인 지목";
-  const backToInterrogationHref = theme === "spaceStation" ? "/?start=interrogationScreen&theme=spaceStation" : "/interrogation";
+  const resultBg = theme === "spaceStation"
+    ? "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp"
+    : theme === "magicSchool"
+      ? "/samunmong/assets/magic-school/interrogation/office-empty.webp"
+      : "/samunmong/assets/final-accusation-bg.webp";
+  const accusationTitle = theme === "spaceStation" ? "최종 보고 대상 지목" : theme === "magicSchool" ? "최종 방화범 지목" : "최종 범인 지목";
+  const backToInterrogationHref = theme === "spaceStation"
+    ? "/?start=interrogationScreen&theme=spaceStation"
+    : theme === "magicSchool"
+      ? "/?start=interrogationScreen&theme=magicSchool"
+      : "/interrogation";
   const initialSuspectId = searchParams.get("suspectId");
   const [selectedSuspectId, setSelectedSuspectId] = useState(
     activeSuspects.some((suspect) => suspect.id === initialSuspectId) ? initialSuspectId : activeSuspects[0].id
@@ -489,14 +556,23 @@ export default function ResultScreen() {
 
   if (searchParams.get("accused") === "1") {
     const outcome = searchParams.get("outcome") === "success" ? "success" : "failure";
-    const copy = outcomeCopy[outcome];
     const accusedSuspect =
       activeSuspects.find((suspect) => suspect.id === searchParams.get("suspectId")) ??
       activeSuspects.find((suspect) => suspect.name === searchParams.get("suspect")) ??
       selectedSuspect;
+    const baseCopy = outcomeCopy[outcome];
+    const magicCopy = magicSchoolOutcomeCopy[outcome];
+    const copy = theme === "magicSchool"
+      ? {
+          ...magicCopy,
+          title: outcome === "success"
+            ? `${accusedSuspect.name}이 진범이다`
+            : `${accusedSuspect.name}${objectParticle(accusedSuspect.name)} 잘못 지목했다`
+        }
+      : baseCopy;
 
     return (
-      <main className={`result-screen result-verdict result-${outcome}`} onClickCapture={handleResultClick}>
+      <main className={`result-screen result-verdict result-${outcome} theme-${theme}`} onClickCapture={handleResultClick}>
         <img className="result-full-bg" src={resultBg} alt="" />
         <section className="verdict-stage" aria-labelledby="resultTitle">
           <article
@@ -520,7 +596,7 @@ export default function ResultScreen() {
             <h1 id="resultTitle">{copy.title}</h1>
             <TypewriterLines lines={copy.lines} onType={playTypingSfx} />
             <div className="verdict-actions">
-              {outcome === "success" && accusedSuspect.id === correctSuspectId ? (
+              {theme === "joseon" && outcome === "success" && accusedSuspect.id === correctSuspectId ? (
                 <button
                   className="wood-result-button"
                   type="button"
@@ -528,11 +604,19 @@ export default function ResultScreen() {
                 >
                   해몽하기
                 </button>
+              ) : theme === "magicSchool" && outcome === "success" ? (
+                <button
+                  className="wood-result-button"
+                  type="button"
+                  onClick={() => navigateWithLoading("/?start=briefingScreen&theme=magicSchool")}
+                >
+                  사건 다시 보기
+                </button>
               ) : (
                 <button
                   className="wood-result-button"
                   type="button"
-                  onClick={() => navigateWithLoading("/?start=briefingScreen", returnToBriefingWithProgress)}
+                  onClick={() => navigateWithLoading(backToInterrogationHref, theme === "joseon" ? returnToBriefingWithProgress : undefined)}
                 >
                   다시 조사하기
                 </button>
@@ -578,7 +662,7 @@ export default function ResultScreen() {
   }
 
   return (
-    <main className="result-screen accusation-screen" onClickCapture={handleResultClick}>
+    <main className={`result-screen accusation-screen theme-${theme}`} onClickCapture={handleResultClick}>
       <section className="accusation-stage" aria-labelledby="resultTitle">
         <img className="accusation-bg" src={resultBg} alt="" />
         <h1 id="resultTitle" className="accusation-title">
@@ -590,6 +674,7 @@ export default function ResultScreen() {
             className={`accusation-suspect ${selectedSuspectId === suspect.id ? "selected" : ""}`}
             type="button"
             key={suspect.id}
+            data-suspect-id={suspect.id}
             onClick={() => setSelectedSuspectId(suspect.id)}
             aria-label={`${suspect.name} 지목`}
             aria-pressed={selectedSuspectId === suspect.id}
@@ -616,15 +701,15 @@ export default function ResultScreen() {
           aria-hidden="true"
           style={{ left: selectedSuspect.stampLeft }}
         >
-          지목
+          {theme === "magicSchool" ? "선택" : "지목"}
         </div>
 
         <div className="accusation-actions">
           <button className="wood-result-button primary" type="button" onClick={() => confirmAccusation()}>
-            이 자를 지목한다
+            {theme === "magicSchool" ? "이 학생을 지목한다" : "이 자를 지목한다"}
           </button>
           <Link className="wood-result-button" href={backToInterrogationHref}>
-            {theme === "spaceStation" ? "보안 조사실로 돌아간다" : "취조실로 돌아간다"}
+            {theme === "spaceStation" ? "보안 조사실로 돌아간다" : theme === "magicSchool" ? "교무 조사실로 돌아간다" : "취조실로 돌아간다"}
           </Link>
         </div>
       </section>
@@ -632,11 +717,11 @@ export default function ResultScreen() {
       {showWarning ? (
         <div className="accusation-dialog-backdrop" role="presentation">
           <section className="accusation-dialog" role="alertdialog" aria-modal="true" aria-labelledby="warningTitle">
-            <h2 id="warningTitle">사또님...</h2>
-            <p>아직 맞춰 보지 못한 흔적이 있습니다. 그래도 이 자를 지목하시겠습니까?</p>
+            <h2 id="warningTitle">{theme === "magicSchool" ? "선생님..." : "사또님..."}</h2>
+            <p>{theme === "magicSchool" ? "아직 해석하지 못한 마력 흔적이 있습니다. 그래도 이 학생을 지목하시겠습니까?" : "아직 맞춰 보지 못한 흔적이 있습니다. 그래도 이 자를 지목하시겠습니까?"}</p>
             <div className="accusation-dialog-actions">
               <button className="wood-result-button primary" type="button" onClick={() => confirmAccusation(true)}>
-                그래도 지목한다
+                {theme === "magicSchool" ? "판정을 내린다" : "그래도 지목한다"}
               </button>
               <button className="wood-result-button" type="button" onClick={() => setShowWarning(false)}>
                 더 조사한다

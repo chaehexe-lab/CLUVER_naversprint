@@ -3,8 +3,7 @@
 import AccuseSuspect from "@/components/AccuseSuspect";
 import EvidenceInventory from "@/components/EvidenceInventory";
 import InvestigationNote from "@/components/InvestigationNote";
-import InterrogationCandle3D from "@/components/effects/InterrogationCandle3D";
-import InterrogationCharacterRig3D from "@/components/effects/InterrogationCharacterRig3D";
+import InterrogationCharacter2D from "@/components/effects/InterrogationCharacter2D";
 import type { GameTheme } from "@/lib/gameTheme";
 import type { CSSProperties } from "react";
 
@@ -164,16 +163,17 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
     ? "/samunmong/assets/magic-school/interrogation/office-empty.webp"
     : isSpaceTheme
       ? "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp"
-    : "/samunmong/assets/scene-interrogation-room-empty.png";
+    : "/samunmong/assets/interactions/interrogation-candle/interrogation-room-common-clean-v2.png";
   const initialSuspect = isSpaceTheme ? "harry" : isMagicTheme ? "malpoi" : "dolsoe";
   const initialSprite = isSpaceTheme ? "/assets/space-station/characters/harry-upper-transparent.webp" : isMagicTheme ? "/samunmong/assets/magic-school/interrogation/malpoi-sprite.webp" : "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707";
   const initialName = isSpaceTheme ? "해리" : isMagicTheme ? "말포이" : "돌쇠";
   const mapIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/orbit-blueprint.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-school-map.webp" : "/samunmong/assets/labels/transparent/tool-village-map.webp";
   const noteIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/log-record.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/labels/transparent/tool-note-short.webp";
+  const briefingIcon = "/assets/space-station/ui-icons-v3/case-briefing.webp";
   const journalIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/final-report.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/ui-generated/tool-case-journal.webp";
   const bagIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/evidence-vault.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-magic-bag.webp" : "/samunmong/assets/labels/transparent/tool-bag-short.webp";
   const toolIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/scan-tool.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-mana-tools.webp" : "/samunmong/assets/labels/transparent/tool-investigation-tools.webp";
-  const hintIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/hint-beacon.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-mana-hint.webp" : "/samunmong/assets/ui-generated/tool-hint.webp";
+  const hintIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/hint-beacon.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-arcane-hint-compass.png" : "/samunmong/assets/ui-generated/tool-hint.webp";
   const accuseIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/accuse-target.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-final-accuse.webp" : "/samunmong/assets/labels/transparent/tool-accuse-short.webp";
   const bagPanelStyle = isSpaceTheme
     ? ({ backgroundImage: "url('/assets/space-station/panels/evidence-vault-panel-v2.webp')" } satisfies CSSProperties)
@@ -211,7 +211,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           src={initialPlate}
           alt="취조실"
         />
-        {!isMagicTheme && !isSpaceTheme ? <InterrogationCharacterRig3D initialTexture={initialSprite} /> : null}
+        {!isMagicTheme && !isSpaceTheme ? <InterrogationCharacter2D /> : null}
         <div className="shade" />
 
         <div className="suspect-stage" id="suspectStage" data-suspect={initialSuspect} aria-hidden="true">
@@ -223,15 +223,6 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           />
         </div>
         <div className="interrogation-desk-foreground" aria-hidden="true" />
-        {!isMagicTheme && !isSpaceTheme ? (
-          <>
-            <div className="interrogation-candle-patch" aria-hidden="true" />
-            <div className="interrogation-candle" id="interrogationCandle" data-state="calm" aria-hidden="true">
-              <span className="candle-light" />
-              <InterrogationCandle3D />
-            </div>
-          </>
-        ) : null}
 
         <div className="new-fact-toast" id="newFactToast" role="status" aria-live="polite" aria-hidden="true">
           <span>수사 노트</span>
@@ -239,7 +230,18 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
         </div>
 
         <div className="hud suspect-name" id="suspectName">
-          {initialName}
+          {isSpaceTheme ? (
+            <>
+              <div className="suspect-name-line">
+                <span>이름 :</span>
+                <strong className="suspect-name-value">{initialName}</strong>
+              </div>
+              <fieldset className="suspect-auth-card">
+                <legend>정거장 개인 인증 ID</legend>
+                <strong className="suspect-auth-id">ORBIT-13-DAT-0319</strong>
+              </fieldset>
+            </>
+          ) : initialName}
         </div>
         <div className="suspect-switch">
           <button
@@ -271,6 +273,12 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             <img src={noteIcon} alt="" />
             <span className="sr-only">{copy.note}</span>
           </button>
+          {isSpaceTheme ? (
+            <button className="scene-chip briefing-chip" data-go="briefingScreen" type="button" aria-label="사건 브리핑 다시 보기">
+              <img src={briefingIcon} alt="" draggable={false} />
+              <span className="sr-only">사건 브리핑</span>
+            </button>
+          ) : null}
           {!isSpaceTheme ? (
             <button className="scene-chip journal-chip" data-go="briefingScreen" type="button" aria-label={`${copy.journal} 다시 보기`}>
               <img src={journalIcon} alt="" />
@@ -287,10 +295,12 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             <img src={bagIcon} alt="" />
             <span className="sr-only">{copy.bag}</span>
           </button>
-          <button className="scene-chip tool-chip open-tool-panel" type="button" aria-label={`${copy.tools} 열기`}>
-            <img src={toolIcon} alt="" />
-            <span className="sr-only">{copy.tools}</span>
-          </button>
+          {!isSpaceTheme ? (
+            <button className="scene-chip tool-chip open-tool-panel" type="button" aria-label={`${copy.tools} 열기`}>
+              <img src={toolIcon} alt="" />
+              <span className="sr-only">{copy.tools}</span>
+            </button>
+          ) : null}
           <button className="tool-prop hint-prop" id="interrogationHint" type="button" aria-label="심문 힌트">
             <img src={hintIcon} alt="" />
             <span className="sr-only">힌트</span>
@@ -736,6 +746,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               className="map-pin-button"
               type="button"
               data-map-go={location.goTo}
+              data-location-screen={location.screen}
               style={mapPinStyle(location)}
               aria-label={location.label}
               disabled={!location.goTo}
@@ -743,6 +754,11 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               key={`pin-${location.screen}`}
             />
           ))}
+          {isMagicTheme ? (
+            <p className="magic-map-progress" id="magicMapProgress" aria-live="polite">
+              첫 조사 장소에서 증거를 모두 찾으면 다음 장소의 봉인이 풀립니다.
+            </p>
+          ) : null}
         </div>
       </aside>
 
