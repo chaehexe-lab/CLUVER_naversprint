@@ -5,6 +5,7 @@ import { type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } fr
 import { useRouter, useSearchParams } from "next/navigation";
 import { finalCulpritId } from "@/lib/persona";
 import { joseonAjeonAssets, joseonSatoSkillAssets } from "@/lib/joseonSatoSkillAssets";
+import { spaceStationResultSuspects, spaceStationTheme } from "@/lib/spaceStationTheme";
 
 type ResultTheme = "joseon" | "magicSchool" | "spaceStation";
 
@@ -47,45 +48,6 @@ const suspects = [
   }
 ] as const;
 
-const spaceSuspects = [
-  {
-    id: "harry",
-    name: "해리",
-    image: "/assets/space-station/characters/harry-upper.webp",
-    slot: { left: "13.22%", top: "38.5%", width: "13.5%", height: "30%" },
-    nameLeft: "19.9%",
-    stampLeft: "23.8%",
-    offsetX: "0%"
-  },
-  {
-    id: "mers",
-    name: "메르스",
-    image: "/assets/space-station/characters/mers-upper.webp",
-    slot: { left: "32.78%", top: "37%", width: "13.5%", height: "31%" },
-    nameLeft: "39.5%",
-    stampLeft: "43.4%",
-    offsetX: "0%"
-  },
-  {
-    id: "aladdindin",
-    name: "알라딘딘",
-    image: "/assets/space-station/characters/aladdindin-upper.webp",
-    slot: { left: "52.57%", top: "37.8%", width: "13.5%", height: "30.4%" },
-    nameLeft: "59.3%",
-    stampLeft: "63.2%",
-    offsetX: "0%"
-  },
-  {
-    id: "einspanner",
-    name: "아인슈페너",
-    image: "/assets/space-station/characters/einspanner-upper.webp",
-    slot: { left: "72.01%", top: "38.2%", width: "13.5%", height: "30%" },
-    nameLeft: "78.7%",
-    stampLeft: "82.6%",
-    offsetX: "0%"
-  }
-] as const;
-
 const magicSchoolSuspects = [
   {
     id: "malpoi",
@@ -115,7 +77,6 @@ const magicSchoolSuspects = [
     offsetX: "0%"
   }
 ] as const;
-
 const joseonRequiredEvidence = [
   "호패 조각",
   "점순의 목 압박 흔적",
@@ -130,15 +91,7 @@ const joseonRequiredAnalysisSteps = [
   ["찢어진 약속 편지::먹빛 시험석", "찢어진 약속 편지 먹빛 대조"]
 ] as const;
 
-const spaceRequiredEvidence = [
-  "얼어붙은 추진 레버 젤",
-  "손상된 압력 센서",
-  "조작된 지연 타이머",
-  "삭제된 의료 기록",
-  "접속 키카드 칩",
-  "암호화된 연구 보상 계약",
-  "마지막 무전 로그"
-] as const;
+const spaceRequiredEvidence = spaceStationTheme.requiredEvidence;
 
 const magicSchoolRequiredEvidence = [
   "부러진 지팡이",
@@ -151,7 +104,7 @@ const magicSchoolRequiredEvidence = [
 const correctSuspectByTheme = {
   joseon: process.env.NEXT_PUBLIC_SAMUNMONG_CULPRIT_ID || finalCulpritId,
   magicSchool: "malpoil",
-  spaceStation: "mers"
+  spaceStation: spaceStationTheme.culpritId
 } as const;
 const soundBase = "/samunmong/sound";
 const resultBgmPath = `${soundBase}/bgm/joseon.mp3`;
@@ -434,7 +387,7 @@ export default function ResultScreen() {
   const resultRouteState = searchParams.toString();
   const { playButtonSfx, playTypingSfx } = useResultAudio();
   const theme = (searchParams.get("theme") === "spaceStation" ? "spaceStation" : searchParams.get("theme") === "magicSchool" ? "magicSchool" : "joseon") satisfies ResultTheme;
-  const activeSuspects = theme === "spaceStation" ? spaceSuspects : theme === "magicSchool" ? magicSchoolSuspects : suspects;
+  const activeSuspects = theme === "spaceStation" ? spaceStationResultSuspects : theme === "magicSchool" ? magicSchoolSuspects : suspects;
   const requiredEvidence = theme === "spaceStation" ? spaceRequiredEvidence : theme === "magicSchool" ? magicSchoolRequiredEvidence : joseonRequiredEvidence;
   const correctSuspectId = correctSuspectByTheme[theme];
   const resultBg = theme === "spaceStation"

@@ -212,7 +212,7 @@ function buildSystemPrompt(persona: SuspectPersona, evidenceNames: string[], rea
   const isSpacePersona = SPACE_SUSPECT_IDS.has(persona.id);
   const caseSubjectRule = isSpacePersona
     ? `질문 맥락 확인 규칙:
-- 플레이어가 우주정거장, 오르빗, 데이비드, 에어록, 우주복, 레버, 무전, 의료 기록, 산소 발생기, 정전, 로봇 팔 등 사건 대상을 직접 말하지 않은 질문에서는 먼저 사건 전말이나 진범을 꺼내지 않는다.
+- 플레이어가 우주정거장, 오르빗, 데이비드, 에어록, 우주복, 레버, 무전, 의료 기록, 산소 발생기, 정전, 외벽 패널이나 안전 로프 등 사건 대상을 직접 말하지 않은 질문에서는 먼저 사건 전말이나 진범을 꺼내지 않는다.
 - 질문 대상이 모호하면 "어느 기록을 말씀하십니까"처럼 조심스럽게 확인하거나, 자신이 들은 범위 안에서만 일반적으로 답한다.
 - 플레이어가 우주정거장 살인사건이나 데이비드 사고를 언급한 뒤에는 사건 관련 답변을 해도 된다.`
     : isMagicPersona
