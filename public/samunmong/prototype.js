@@ -2771,7 +2771,7 @@
     // their story meaning in the inventory before the player examines them.
     const joseonUnexaminedEvidenceNames = {
       "호패 조각": "글자 지워진 나무패",
-      "돌쇠의 그림": "붉은 끈 두루마리",
+      "돌쇠의 그림": "의문의 그림",
       "무덕의 번진 일기": "먹 번진 책자",
       "진흙 묻은 짚신": "흙 묻은 짚신",
       "찢어진 옷고름": "찢긴 비단끈",

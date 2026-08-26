@@ -30,7 +30,7 @@ import {
 } from "@/lib/gameTheme";
 
 const CONTENT_SCRIPT = "/samunmong/content.js?v=20260824-evidence-scene-v3";
-const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260826-joseon-evidence-story-v122";
+const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260826-joseon-evidence-story-v123";
 const MAIN_SCREEN = "mainScreen";
 
 const INVESTIGATION_SCENE_COMPONENTS: Record<string, ComponentType> = {
