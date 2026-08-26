@@ -8714,16 +8714,23 @@ html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-requir
 .magic-school-screen.magic-light-required.light-magic-active .magic-shade { opacity: 0; }
 .magic-light-bloom { position: absolute; z-index: 3; inset: 0; opacity: 0; pointer-events: none; background: radial-gradient(circle at 50% 46%, rgba(255,251,202,.74), rgba(245,203,104,.25) 24%, transparent 62%); mix-blend-mode: screen; }
 .magic-school-screen.light-magic-active .magic-light-bloom { animation: magicSceneIlluminate 2.8s ease-out both; }
-.magic-holy-particles { position: absolute; z-index: 90; inset: 0; overflow: hidden; pointer-events: none; }
-.holy-particle { position: absolute; left: 50%; top: 47%; width: var(--particle-size); height: var(--particle-size); opacity: 0; border-radius: 50%; background: #ffe77a; box-shadow: 0 0 5px #fffbd2,0 0 12px #ffd84d,0 0 24px #e9a92e; }
-.holy-particle::before,.holy-particle::after { content: ""; position: absolute; left: 50%; top: 50%; border-radius: 999px; background: linear-gradient(90deg,transparent,#fff9bf,transparent); transform: translate(-50%,-50%); }
+.magic-heavenly-light { position: absolute; z-index: 89; inset: 0; overflow: hidden; opacity: 0; pointer-events: none; mix-blend-mode: screen; isolation: isolate; will-change: opacity; transform: translateZ(0); }
+.heavenly-light-beam { position: absolute; left: var(--beam-start-x); top: var(--beam-start-y); width: var(--beam-length); height: calc(var(--beam-width) * 1.35); opacity: 0; clip-path: polygon(0 44%,100% 0,100% 100%,0 56%); background: linear-gradient(90deg,rgba(255,239,137,.7),rgba(255,205,45,.58) 34%,rgba(230,154,12,.28) 76%,rgba(183,103,0,0)); filter: brightness(var(--beam-brightness)) blur(1.8px) drop-shadow(0 0 18px rgba(255,217,90,.72)) drop-shadow(0 0 48px rgba(217,140,11,.5)); transform: translateX(-1%) rotate(var(--beam-angle)) scaleX(.02); transform-origin: 0 50%; }
+.heavenly-light-beam::after { content: ""; position: absolute; left: 0; right: 7%; top: 42%; height: 7%; min-height: 4px; background: linear-gradient(90deg,rgba(255,240,160,.72),rgba(255,201,40,.62) 48%,transparent); box-shadow: 0 0 14px rgba(255,233,137,.7),0 0 32px rgba(233,169,22,.55); }
+.magic-school-screen.light-magic-active .magic-heavenly-light { animation: magicHeavenlyLayerFade 4.6s linear both; }
+.magic-school-screen.light-magic-active .heavenly-light-beam { animation: magicHeavenlyDownpour 1.05s cubic-bezier(.12,.72,.2,1) var(--beam-delay) both; }
+.magic-holy-particles { position: absolute; z-index: 90; inset: 0; overflow: hidden; contain: strict; pointer-events: none; transform: translateZ(0); }
+.holy-particle { position: absolute; left: var(--particle-start-x); top: -9%; width: var(--particle-size); height: var(--particle-size); opacity: 0; border-radius: 50%; background: radial-gradient(circle,#fff9bf 0 22%,#ffd74e 46%,rgba(226,150,25,.35) 72%,transparent 75%); box-shadow: 0 0 9px rgba(255,216,77,.72); }
+.holy-particle::before,.holy-particle::after { content: ""; display: none; position: absolute; left: 50%; top: 50%; border-radius: 999px; background: linear-gradient(90deg,transparent,#fff9bf,transparent); transform: translate(-50%,-50%); }
+.holy-particle.star::before,.holy-particle.star::after { display: block; }
 .holy-particle::before { width: calc(var(--particle-size) * 4.2); height: 1px; }
 .holy-particle::after { width: 1px; height: calc(var(--particle-size) * 4.2); background: linear-gradient(transparent,#fff9bf,transparent); }
-.holy-particle.star { border-radius: 1px; background: #fff4a3; box-shadow: 0 0 7px #fff,0 0 18px #ffd84d,0 0 34px #f2b739; }
-.magic-school-screen.light-magic-active .holy-particle { animation: magicHolyParticleBurst var(--particle-duration) cubic-bezier(.12,.72,.2,1) var(--particle-delay) both; }
+.holy-particle.star { border-radius: 1px; background: #fff1a0; box-shadow: 0 0 12px rgba(255,216,77,.82); }
+.magic-school-screen.light-magic-active .holy-particle { animation: magicHolyParticleFall var(--particle-duration) linear calc(.2s + var(--particle-delay)) both; }
 .magic-spell-system { position: absolute; z-index: 88; inset: 0; pointer-events: none; color: #eafcff; font-family: "Nanum BareunJeongsin", serif; }
 .magic-spell-toggle { pointer-events: auto; position: absolute; right: calc(2.4% + 11px); bottom: 47%; width: 96px; min-height: 94px; display: grid; place-items: center; align-content: center; gap: 4px; padding: 7px; color: #effcff; border: 1px solid rgba(132,226,255,.55); border-radius: 48% 48% 13px 13px; background: radial-gradient(circle at 50% 33%,rgba(82,196,239,.34),rgba(15,29,60,.95) 62%); box-shadow: inset 0 0 22px rgba(114,226,255,.24),0 9px 26px #000c; cursor: pointer; transition: transform .2s ease,box-shadow .2s ease; }
 .magic-spell-toggle:hover,.magic-spell-toggle.active { transform: translateX(-5px) scale(1.04); box-shadow: inset 0 0 28px rgba(154,239,255,.38),0 0 22px rgba(90,210,255,.48),0 12px 28px #000d; }
+.magic-spell-toggle:disabled { opacity: .62; cursor: wait; }
 .magic-spell-toggle-rune { width: 50px; height: 50px; display: grid; place-items: center; border: 1px solid rgba(195,247,255,.7); border-radius: 50%; color: #fffbd2; box-shadow: inset 0 0 18px #75dfff40,0 0 12px #83dfff65; animation: magicRuneBreathe 1.8s ease-in-out infinite alternate; }
 .magic-spell-toggle-rune svg { width: 34px; height: 34px; overflow: visible; fill: #fffbd2; filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 11px #63d9ff); }
 .magic-spell-toggle > span:last-child { font-size: 15px; letter-spacing: .04em; }
@@ -8739,7 +8746,6 @@ button.magic-spell-card:hover { border-color: #a5edff; background: rgba(31,74,11
 .spell-card-icon { width: 60px; height: 60px; display: grid; place-items: center; border: 1px solid #8bdfffa8; border-radius: 50%; color: #fff6b1; font-family: serif; font-size: 43px; text-align: center; text-shadow: 0 0 15px #e8fdff; }
 .magic-spell-card.locked { filter: grayscale(.9); opacity: .46; }
 .magic-spell-backdrop { pointer-events: auto; position: absolute; inset: 0; border: 0; background: rgba(1,3,12,.82); backdrop-filter: blur(6px); }
-.magic-spell-system.phase-casting .magic-spell-backdrop,.magic-spell-system.phase-complete .magic-spell-backdrop { animation: magicBackdropRelease 2.1s ease-out both; }
 .magic-circle-modal { pointer-events: auto; position: absolute; left: 50%; top: 50%; width: min(1040px,88%); height: min(790px,88%); overflow: hidden; transform: translate(-50%,-50%); border: 1px solid rgba(137,226,255,.62); border-radius: 24px; background: radial-gradient(circle at 50% 62%,rgba(28,70,110,.72),transparent 45%),linear-gradient(155deg,#101b3cf7,#050817fc); box-shadow: inset 0 0 60px #5ddcff18,0 28px 100px #000f,0 0 35px #53d7ff40; }
 .magic-spell-close { position: absolute; z-index: 5; right: 19px; top: 17px; width: 44px; height: 44px; color: #dffaff; border: 1px solid #82dfffa3; border-radius: 50%; background: #0d1939e8; font-size: 28px; cursor: pointer; }
 .magic-circle-modal > header { height: 130px; display: flex; align-items: center; gap: 18px; padding: 19px 78px 13px 28px; border-bottom: 1px solid rgba(131,221,255,.24); background: linear-gradient(90deg,rgba(20,54,88,.75),rgba(6,13,35,.3)); }
@@ -8750,7 +8756,6 @@ button.magic-spell-card:hover { border-color: #a5edff; background: rgba(31,74,11
 .magic-trace-board { width: min(650px,75%); height: 500px; overflow: visible; cursor: crosshair; touch-action: none; user-select: none; }
 .magic-guide-runes { fill: none; stroke: rgba(180,235,255,.2); stroke-width: 7; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 7px rgba(93,207,255,.2)); }
 .magic-player-strokes { fill: none; stroke: #fffbd0; stroke-width: 11; stroke-linecap: round; stroke-linejoin: round; }
-.magic-cast-burst { fill: rgba(255,253,204,.25); stroke: #fffbd5; stroke-width: 5; transform-origin: center; animation: magicCastBurst .9s ease-out infinite; }
 .magic-trace-status { position: absolute; right: 27px; top: 50%; width: 190px; display: grid; gap: 8px; transform: translateY(-50%); }
 .magic-trace-status > span { height: 12px; overflow: hidden; border: 1px solid rgba(132,220,255,.55); border-radius: 999px; background: #050a19; }
 .magic-trace-status i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#4bc9ff,#fff9b4); box-shadow: 0 0 14px #83ecff; transition: width .18s ease; }
@@ -8761,22 +8766,32 @@ button.magic-spell-card:hover { border-color: #a5edff; background: rgba(31,74,11
 .magic-circle-modal > footer .magic-keyboard-cast { opacity: .7; }
 .magic-circle-modal > footer .magic-cast-button { min-width: 150px; color: #071426; border-color: #fff5ad; background: linear-gradient(135deg,#8de9ff,#fff3a5); box-shadow: 0 0 20px #7fe5ff70; font-weight: 700; }
 .magic-circle-modal > footer button:disabled { opacity: .38; filter: grayscale(.65); box-shadow: none; cursor: not-allowed; }
-.magic-circle-modal.phase-casting,.magic-circle-modal.phase-complete { animation: magicModalAnswer .7s ease-in-out infinite alternate; }
-.magic-circle-modal.phase-complete .magic-player-strokes { stroke: #fff; }
 @keyframes magicSceneIlluminate { 0% { opacity: 0; } 24% { opacity: .92; } 62% { opacity: .5; } 100% { opacity: 0; } }
-@keyframes magicHolyParticleBurst {
-  0% { opacity: 0; transform: translate(-50%,-50%) scale(.15) rotate(0deg); }
-  12% { opacity: 1; }
-  58% { opacity: .95; }
-  100% { opacity: 0; transform: translate(calc(-50% + var(--particle-x)),calc(-50% + var(--particle-y))) scale(.35) rotate(var(--particle-spin)); }
+@keyframes magicHolyParticleFall {
+  0% { opacity: 0; transform: translate3d(0,-10vh,0) scale(.35) rotate(0deg); }
+  10% { opacity: var(--particle-opacity); }
+  68% { opacity: var(--particle-opacity); }
+  88% { opacity: .38; }
+  100% { opacity: 0; transform: translate3d(var(--particle-drift),var(--particle-fall),0) scale(.78) rotate(var(--particle-spin)); }
 }
-@keyframes magicBackdropRelease { from { background: rgba(1,3,12,.82); backdrop-filter: blur(6px); } to { background: rgba(8,6,2,.08); backdrop-filter: blur(0); } }
+@keyframes magicHeavenlyDownpour {
+  0% { opacity: 0; transform: translateX(-1%) rotate(var(--beam-angle)) scaleX(.02); }
+  18% { opacity: .6; }
+  100% { opacity: .74; transform: translateX(-1%) rotate(var(--beam-angle)) scaleX(1); }
+}
+@keyframes magicHeavenlyLayerFade {
+  0% { opacity: 0; }
+  9% { opacity: 1; }
+  56% { opacity: 1; }
+  68% { opacity: .82; }
+  80% { opacity: .52; }
+  91% { opacity: .22; }
+  100% { opacity: 0; }
+}
 @keyframes magicRuneBreathe { to { transform: scale(1.06) rotate(8deg); box-shadow: inset 0 0 22px #bff9ff55,0 0 17px #83dfff8c; } }
-@keyframes magicCastBurst { from { opacity: .9; transform: scale(.12); } to { opacity: 0; transform: scale(1.45); } }
-@keyframes magicModalAnswer { to { box-shadow: inset 0 0 90px #fff7bb22,0 28px 100px #000f,0 0 58px #9deaff88; } }
 @media (prefers-reduced-motion: reduce) {
-  .magic-spell-toggle-rune,.magic-circle-modal.phase-casting,.magic-circle-modal.phase-complete,.magic-cast-burst,.holy-particle { animation: none; }
-  .magic-holy-particles { display: none; }
+  .magic-spell-toggle-rune,.holy-particle,.heavenly-light-beam { animation: none; }
+  .magic-holy-particles,.magic-heavenly-light { display: none; }
   .magic-school-screen.magic-light-required .plate,.magic-school-screen.magic-light-required .magic-shade { transition-duration: .15s; }
 }
 
