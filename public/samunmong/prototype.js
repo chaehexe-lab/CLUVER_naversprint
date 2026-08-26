@@ -112,11 +112,18 @@
       { name: "말포삼", id: "malposam", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malposam-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
       { name: "말포일", id: "malpoil", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malpoil-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" }
     ];
+    const spacePersonnelAuthIds = {
+      david: "ORBIT-13-ENG-0714",
+      mers: "ORBIT-13-MED-0427",
+      harry: "ORBIT-13-DAT-0319",
+      aladdindin: "ORBIT-13-MNT-0821",
+      einspanner: "ORBIT-13-SCI-0516"
+    };
     const spaceSuspects = [
-      { name: "해리", id: "harry", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/harry-upper-transparent.webp", sleeveScene: "/assets/space-station/characters/harry-upper-transparent.webp" },
-      { name: "메르스", id: "mers", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/mers-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/mers-upper-aligned.webp" },
-      { name: "알라딘딘", id: "aladdindin", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/aladdindin-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/aladdindin-upper-aligned.webp" },
-      { name: "아인슈페너", id: "einspanner", scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/einspanner-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/einspanner-upper-aligned.webp" }
+      { name: "해리", id: "harry", authId: spacePersonnelAuthIds.harry, scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/harry-upper-transparent.webp", sleeveScene: "/assets/space-station/characters/harry-upper-transparent.webp" },
+      { name: "메르스", id: "mers", authId: spacePersonnelAuthIds.mers, scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/mers-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/mers-upper-aligned.webp" },
+      { name: "알라딘딘", id: "aladdindin", authId: spacePersonnelAuthIds.aladdindin, scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/aladdindin-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/aladdindin-upper-aligned.webp" },
+      { name: "아인슈페너", id: "einspanner", authId: spacePersonnelAuthIds.einspanner, scene: "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp", sprite: "/assets/space-station/characters/einspanner-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/einspanner-upper-aligned.webp" }
     ];
     const suspects = isSpaceTheme ? spaceSuspects : isMagicTheme ? magicSuspects : window.SAMUNMONG_CONTENT?.suspects || [
       { name: "돌쇠", id: "dolsoe", scene: "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707", sleeveScene: "/samunmong/assets/scene-interrogation-dolsoe-sleeve.webp?v=sleeve-20260707", lieScene: "/samunmong/assets/interrogation-expressions/scene-interrogation-dolsoe-lie.png?v=lie-20260824" },
@@ -5995,7 +6002,15 @@
 
     function updateSuspect(shouldAnnounce = true) {
       const suspect = suspects[suspectIndex];
-      document.querySelector("#suspectName").textContent = suspect.name;
+      const suspectNamePanel = document.querySelector("#suspectName");
+      const suspectNameValue = suspectNamePanel?.querySelector(".suspect-name-value");
+      const suspectAuthId = suspectNamePanel?.querySelector(".suspect-auth-id");
+      if (suspectNameValue) {
+        suspectNameValue.textContent = suspect.name;
+        if (suspectAuthId) suspectAuthId.textContent = suspect.authId || "";
+      } else if (suspectNamePanel) {
+        suspectNamePanel.textContent = suspect.name;
+      }
       document.querySelector("#suspectStage").dataset.suspect = suspect.id;
       const interrogationScreen = document.querySelector("#interrogationScreen");
       setLieExpressionOverlay(false);
@@ -6016,7 +6031,7 @@
       activeNoteSuspectId = suspect.id;
       renderConversationNotes();
       syncVisibleSuspectReply();
-      if (shouldAnnounce && getActiveScreenId() === "interrogationScreen") {
+      if (shouldAnnounce && !isSpaceTheme && getActiveScreenId() === "interrogationScreen") {
         showToast(`${suspect.name} 심문으로 전환`);
       }
     }

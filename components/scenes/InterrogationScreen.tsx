@@ -240,7 +240,18 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
         </div>
 
         <div className="hud suspect-name" id="suspectName">
-          {initialName}
+          {isSpaceTheme ? (
+            <>
+              <div className="suspect-name-line">
+                <span>이름 :</span>
+                <strong className="suspect-name-value">{initialName}</strong>
+              </div>
+              <fieldset className="suspect-auth-card">
+                <legend>정거장 개인 인증 ID</legend>
+                <strong className="suspect-auth-id">ORBIT-13-DAT-0319</strong>
+              </fieldset>
+            </>
+          ) : initialName}
         </div>
         <div className="suspect-switch">
           <button
