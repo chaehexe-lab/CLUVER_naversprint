@@ -1,7 +1,8 @@
 "use client";
 
 import { mainMenu, screenImages } from "@/lib/gameData";
-import type { CSSProperties } from "react";
+import { useState } from "react";
+import type { CSSProperties, MouseEvent } from "react";
 import MainRealtimeRig from "@/components/front/MainRealtimeRig";
 import styles from "./MainScreen.module.css";
 
@@ -14,6 +15,8 @@ type MainScreenProps = {
 };
 
 export default function MainScreen({ active = false }: MainScreenProps) {
+  const [showNewDreamWarning, setShowNewDreamWarning] = useState(false);
+
   const requestScreen = (screenId: string) => {
     window.dispatchEvent(new CustomEvent("samunmong:screen-request", {
       cancelable: true,
@@ -21,10 +24,25 @@ export default function MainScreen({ active = false }: MainScreenProps) {
     }));
   };
 
-  const handleMenuClick = (itemId: string) => {
+  const startNewDream = () => {
+    setShowNewDreamWarning(false);
+    window.sessionStorage.setItem("samunmong-new-dream-mode", "1");
+    window.sessionStorage.removeItem("samunmong-field-guide-pending");
+    window.dispatchEvent(new CustomEvent("samunmong:new-dream-confirmed"));
+    requestScreen("tutorialScreen");
+  };
+
+  const handleMenuClick = (itemId: string, event: MouseEvent<HTMLButtonElement>) => {
     if (itemId === "newDream") {
-      window.sessionStorage.setItem("samunmong-new-dream-mode", "1");
-      requestScreen("tutorialScreen");
+      const hasSavedProgress = !document.querySelector<HTMLButtonElement>("#continueDream")?.disabled;
+      if (hasSavedProgress) {
+        // The legacy prototype also listens to this button. Stop this saved-game
+        // branch here so it cannot bypass the warning and open the tutorial.
+        event.stopPropagation();
+        setShowNewDreamWarning(true);
+        return;
+      }
+      startNewDream();
       return;
     }
     if (itemId === "continueDream") {
@@ -76,12 +94,46 @@ export default function MainScreen({ active = false }: MainScreenProps) {
             aria-disabled={requiresSave}
             data-requires-save={requiresSave ? "true" : undefined}
             style={{ "--menu-y": item.menuY } as MenuButtonStyle}
-            onClick={() => handleMenuClick(item.id)}
+            onClick={(event) => handleMenuClick(item.id, event)}
           >
             {item.label}
           </button>
         );
       })}
+
+      <div
+        className={`main-dialog new-dream-dialog${showNewDreamWarning ? " open" : ""}`}
+        id="newDreamDialog"
+        role="alertdialog"
+        aria-modal="true"
+        aria-labelledby="newDreamWarningTitle"
+        aria-describedby="newDreamWarningCopy"
+      >
+        <div className="main-dialog-panel new-dream-warning-panel">
+          <button
+            className="new-dream-warning-close"
+            type="button"
+            aria-label="새 게임 경고 닫기"
+            onClick={() => setShowNewDreamWarning(false)}
+          >
+            ×
+          </button>
+          <p className="new-dream-warning-kicker">DREAM RECORD</p>
+          <h2 id="newDreamWarningTitle">새 꿈을 시작하시겠습니까?</h2>
+          <div className="settings-reset-confirm">
+            <strong>이어 하던 수사 기록이 있습니다.</strong>
+            <p id="newDreamWarningCopy">계속하면 저장된 꿈의 수사 기록과 이어하기 지점이 모두 지워집니다.</p>
+          </div>
+          <div className="dialog-actions">
+            <button className="button" type="button" onClick={() => setShowNewDreamWarning(false)}>
+              돌아가기
+            </button>
+            <button className="button danger" type="button" onClick={startNewDream}>
+              기록 지우고 시작
+            </button>
+          </div>
+        </div>
+      </div>
 
       <aside className="dream-notice-dialog save-slot-dialog" id="saveSlotDialog" aria-hidden="true" role="dialog" aria-labelledby="saveSlotTitle">
         <div className="dream-notice-panel save-slot-panel">

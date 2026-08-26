@@ -468,9 +468,9 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               </div>
               <div className="tool-conclusion" id="toolConclusion" hidden>
                 <span className="tool-conclusion-seal" id="toolConclusionRole">동선</span>
-                <div><small>확인된 사실</small><strong id="toolConclusionFact">새로운 흔적을 확인했습니다.</strong></div>
+                <div><small>눈에 밟히는 흔적</small><strong id="toolConclusionFact">새로운 흔적이 보입니다.</strong></div>
                 <i aria-hidden="true">→</i>
-                <div><small>사건에서의 의미</small><b id="toolConclusionMeaning">사건 흐름과 이어집니다.</b></div>
+                <div><small>남은 의문</small><b id="toolConclusionMeaning">사건과 어떤 관계가 있는 것일까?</b></div>
               </div>
             </div>
           </section>

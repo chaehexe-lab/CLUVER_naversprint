@@ -183,6 +183,7 @@
     const analyzedEvidenceKey = `samunmong-analyzed-evidence-${themeStorageSuffix}`;
     const examinedCluesKey = `samunmong-examined-clues-${themeStorageSuffix}`;
     const linkedEvidenceKey = `samunmong-linked-evidence-${themeStorageSuffix}`;
+    const retiredJoseonEvidenceNames = new Set(["헐거워진 노리개"]);
     const conversationNotesKey = `samunmong-conversation-notes-${themeStorageSuffix}`;
     const interrogationQuestionCountKey = `samunmong-interrogation-question-count-${themeStorageSuffix}`;
     const interrogationKnownFactsKey = `samunmong-interrogation-known-facts-${themeStorageSuffix}`;
@@ -267,8 +268,10 @@
       catch { return fallback; }
     }
 
+    const nonResumableScreenIds = new Set(["mainScreen", "tutorialScreen", "dreamScreen"]);
+
     function isValidSavedProgress(saved = readStored(saveKey, null)) {
-      return knownScreenIds.has(saved?.screenId) && saved.screenId !== "mainScreen";
+      return knownScreenIds.has(saved?.screenId) && !nonResumableScreenIds.has(saved.screenId);
     }
 
     function readSaveSlots() {
@@ -439,7 +442,7 @@
     }
 
     function saveProgress(screenId) {
-      if (screenId === "mainScreen") return;
+      if (nonResumableScreenIds.has(screenId)) return;
       const slot = { theme: themeId, screenId, savedAt: Date.now() };
       const slots = readSaveSlots();
       slots[themeId] = slot;
@@ -535,7 +538,7 @@
     function readStoredNames(key) {
       const stored = readStored(key, []);
       return Array.isArray(stored)
-        ? stored.filter((name) => typeof name === "string" && name.trim())
+        ? stored.filter((name) => typeof name === "string" && name.trim() && !(themeId === "joseon" && retiredJoseonEvidenceNames.has(name)))
         : [];
     }
 
@@ -1922,12 +1925,31 @@
     });
 
     on("#newDream", "click", () => {
+      // React owns the saved-progress warning. Do not let this legacy target
+      // listener navigate before the confirmation dialog can open.
+      if (getValidSaveSlots().length) return;
       sessionStorage.setItem(newDreamModeKey, "1");
       sessionStorage.removeItem(fieldGuidePendingKey);
       conversationNotes.clear();
       updateContinueButtonState();
       updateInterrogationQuestionLimitUI();
       go("tutorialScreen");
+    });
+    window.addEventListener("samunmong:new-dream-confirmed", () => {
+      // "기록 지우고 시작" must invalidate every continue source now, not
+      // later when a theme is selected. Otherwise returning to the main menu
+      // revives CONTINUE from the untouched slot/legacy save.
+      Object.keys(themeLabels).forEach((theme) => clearThemeProgress(theme));
+      writeSaveSlots({});
+      localStorage.removeItem(saveKey);
+      conversationNotes.clear();
+      renderSaveSlots();
+      updateContinueButtonState();
+      updateInterrogationQuestionLimitUI();
+    });
+    window.addEventListener("samunmong:progress-cleared", () => {
+      renderSaveSlots();
+      updateContinueButtonState();
     });
     on("#continueDream", "click", () => {
       if (!getValidSaveSlots().length) return;
@@ -2518,7 +2540,7 @@
       },
       "돌쇠의 팔 상처": {
         note: "심문 중 돌쇠의 소매 아래에서 확인한 상처. 붕대를 감았던 흔적과 함께 봐야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp"
+        img: "/samunmong/assets/evidence-transparent/evidence-dolsoe-work-cut-v3.png"
       },
       "도망 보따리": {
         note: "급히 싼 듯한 보따리. 점순과 돌쇠가 떠나려 했고, 그 사실이 누군가의 감정을 건드렸는지 확인해야 한다.",
@@ -2553,12 +2575,46 @@
       "하인 장부": "/samunmong/assets/evidence-transparent/evidence-servant-ledger.webp",
       "혼서 조각": "/samunmong/assets/evidence-transparent/evidence-marriage-letter.webp",
       "피 묻은 붕대": "/samunmong/assets/evidence-transparent/evidence-bloodied-bandage.webp",
-      "돌쇠의 팔 상처": "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp",
+      "돌쇠의 팔 상처": "/samunmong/assets/evidence-transparent/evidence-dolsoe-work-cut-v3.png",
       "도망 보따리": "/samunmong/assets/evidence-transparent/evidence-escape-bundle.webp",
       "긁힌 팔 흔적": "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp",
       "작은 발자국": "/samunmong/assets/evidence-transparent/evidence-small-footprints.webp",
       "끊어진 호패끈": "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord.webp",
       "찢어진 약속 편지": "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg"
+    };
+
+    // Keep canonical evidence keys for saves/interrogation, but do not reveal
+    // their story meaning in the inventory before the player examines them.
+    const joseonUnexaminedEvidenceNames = {
+      "호패 조각": "글자 지워진 나무패",
+      "돌쇠의 그림": "붉은 끈 두루마리",
+      "무덕의 번진 일기": "먹 번진 책자",
+      "진흙 묻은 짚신": "흙 묻은 짚신",
+      "찢어진 옷고름": "찢긴 비단끈",
+      "빈 호패 주머니": "빈 가죽 주머니",
+      "하인 장부": "낡은 기록 장부",
+      "혼서 조각": "글씨 적힌 종잇조각",
+      "피 묻은 붕대": "붉은 얼룩 천",
+      "도망 보따리": "단단히 묶인 보따리",
+      "작은 발자국": "작은 신발 자국",
+      "끊어진 호패끈": "끊어진 매듭끈",
+      "찢어진 약속 편지": "찢어진 편지 조각"
+    };
+
+    const joseonUnexaminedEvidenceSummaries = {
+      "호패 조각": "낡은 나무패의 글자 부분이 긁혀 있다.",
+      "돌쇠의 그림": "붉은 끈이 단단히 감겨 안쪽이 보이지 않는다.",
+      "무덕의 번진 일기": "표지와 종이에 번진 먹 때문에 내용을 읽기 어렵다.",
+      "진흙 묻은 짚신": "밑창에 마르지 않은 흙이 붙어 있다.",
+      "찢어진 옷고름": "찢긴 결이 고운 천 조각이다.",
+      "빈 호패 주머니": "안에 무엇이 들었는지 알 수 없는 빈 주머니다.",
+      "하인 장부": "몇몇 줄이 흐리고 덧칠되어 있다.",
+      "혼서 조각": "글과 인장이 잘려 전체 뜻을 읽을 수 없다.",
+      "피 묻은 붕대": "붉고 검게 마른 얼룩이 남아 있다.",
+      "도망 보따리": "매듭이 단단해 내용물을 볼 수 없다.",
+      "작은 발자국": "젖은 마당에 짧고 좁은 자국이 이어진다.",
+      "끊어진 호패끈": "한쪽 끝이 거칠게 끊긴 짧은 끈이다.",
+      "찢어진 약속 편지": "찢어진 글줄 몇 자만 흩어져 보인다."
     };
 
     function getEvidenceImage(name, fallback = "/samunmong/assets/evidence-wooden-tag.webp") {
@@ -2673,7 +2729,7 @@
       "헐거워진 노리개": ["동선", "급하게 움직인 흔적"],
       "무덕의 번진 일기": ["진술", "도망 계획을 아는 인물"],
       "진흙 묻은 짚신": ["동선", "짚신 ≠ 작은 발자국"],
-      "찢어진 옷고름": ["수법", "비단 끈 → 목 졸림"],
+      "찢어진 옷고름": ["수법", "좁게 눌린 비단 끈"],
       "빈 호패 주머니": ["누명", "방에서 사라진 호패"],
       "하인 장부": ["동선", "지워진 출입 기록"],
       "혼서 조각": ["동기", "강요된 혼인 → 압박"],
@@ -2687,36 +2743,35 @@
     };
 
     const evidenceStoryMeanings = {
-      "점순의 목 압박 흔적": "범행 도구의 폭과 재질을 대조할 기준",
-      "점순의 손톱 밑 흔적": "상대에게 남긴 상처를 대조할 기준",
-      "호패 조각": "글자가 나중에 훼손된 흔적",
-      "돌쇠의 그림": "숨겨 둔 감정을 보여 주는 단서",
-      "헐거워진 노리개": "급히 움직인 사람의 흔적",
-      "무덕의 번진 일기": "도망 계획을 아는 사람이 있음",
-      "진흙 묻은 짚신": "현장 발자국의 주인과 다름",
-      "찢어진 옷고름": "목을 조른 물건과 이어짐",
-      "빈 호패 주머니": "호패가 일부러 옮겨졌을 가능성",
-      "하인 장부": "누군가 출입 기록을 감춤",
-      "혼서 조각": "강요된 혼인이 갈등을 만듦",
-      "피 묻은 붕대": "숨긴 팔 상처와 이어짐",
-      "돌쇠의 팔 상처": "붕대를 감았던 자리와 맞음",
-      "도망 보따리": "점순과 돌쇠가 떠날 준비를 함",
-      "긁힌 팔 흔적": "점순이 마지막에 저항함",
-      "작은 발자국": "뒷문으로 움직인 작은 발",
-      "끊어진 호패끈": "호패가 우연히 떨어진 것이 아님",
-      "찢어진 약속 편지": "돌쇠가 쓴 편지가 아닐 가능성"
+      "점순의 목 압박 흔적": "이 폭과 닮은 끈이 따로 있는 것일까?",
+      "점순의 손톱 밑 흔적": "마지막에 붙잡은 누군가의 흔적인 것 같다.",
+      "호패 조각": "이름을 감추려 뒤늦게 긁어 낸 것인가?",
+      "돌쇠의 그림": "여러 번 고쳐 그릴 만큼 마음에 둔 사람이 있었던 것 같다.",
+      "헐거워진 노리개": "이 증거는 현재 수사에서 제외되었다.",
+      "무덕의 번진 일기": "밤의 기척을 들은 사람이 있었던 것 같다.",
+      "진흙 묻은 짚신": "작은 발자국과 맞지 않는다면 다른 동선의 흔적인가?",
+      "찢어진 옷고름": "목의 흔적과 닮았지만, 정말 같은 끈인 것일까?",
+      "빈 호패 주머니": "주인이 꺼낸 것일까, 누군가 몰래 가져간 것일까?",
+      "하인 장부": "감추고 싶은 출입이 한 줄쯤 있었던 것 같다.",
+      "혼서 조각": "원치 않은 혼인이 누군가의 마음을 뒤틀어 놓은 것일까?",
+      "피 묻은 붕대": "몸싸움의 피인가, 그보다 먼저 생긴 상처의 피인가?",
+      "돌쇠의 팔 상처": "붕대를 감았던 자리 같지만, 언제 생긴 상처일까?",
+      "도망 보따리": "두 사람이 함께 떠날 준비를 했던 것 같다.",
+      "긁힌 팔 흔적": "점순이 마지막으로 붙잡은 사람에게 남긴 것인가?",
+      "작은 발자국": "뒷문을 지난 사람은 짧고 좁은 신을 신었던 것 같다.",
+      "끊어진 호패끈": "저절로 끊어진 것이 아니라 누군가 손을 댄 것인가?",
+      "찢어진 약속 편지": "돌쇠의 말투를 흉내 낸 글은 아닐까?"
     };
 
     const evidenceConnections = [
-      ["호패 조각", "빈 호패 주머니", "주머니의 눌린 자리와 호패 크기가 맞아 원래 함께 보관됐던 물건임을 보여 준다."],
-      ["호패 조각", "끊어진 호패끈", "끈의 굵기와 호패 구멍의 마찰 홈이 맞아 원래 연결됐던 물건임을 보여 준다."],
-      ["빈 호패 주머니", "끊어진 호패끈", "주머니 안쪽의 붉은 섬유와 끊어진 끈의 결이 서로 맞는다."],
-      ["진흙 묻은 짚신", "작은 발자국", "짚신의 크기와 현장의 작은 발자국이 서로 맞지 않는다."],
-      ["피 묻은 붕대", "돌쇠의 팔 상처", "붕대를 감았던 자리와 돌쇠의 팔 상처가 맞아떨어진다."],
-      ["도망 보따리", "무덕의 번진 일기", "도망 준비가 기록되어 있어 계획을 아는 사람이 있었음을 보여준다."],
-      ["찢어진 옷고름", "긁힌 팔 흔적", "찢어진 옷고름과 긁힌 팔은 마지막 몸싸움이 있었음을 가리킨다."],
-      ["찢어진 옷고름", "점순의 목 압박 흔적", "옷고름의 폭과 마찰 자국이 목에 남은 좁은 압박 흔적과 맞는다."],
-      ["긁힌 팔 흔적", "점순의 손톱 밑 흔적", "팔의 긁힌 방향과 손톱 밑 흔적이 마지막 몸싸움의 직접 접촉을 가리킨다."]
+      ["호패 조각", "빈 호패 주머니", "크기는 맞는다. 그렇다면 호패는 이 주머니에서 빠져나온 것인가?"],
+      ["호패 조각", "끊어진 호패끈", "마찰 홈과 끈은 이어지는 듯하다. 누가 끈을 끊었을까?"],
+      ["빈 호패 주머니", "끊어진 호패끈", "안쪽 섬유와 끈의 결이 닮았다. 원래 한 물건이었던 것인가?"],
+      ["진흙 묻은 짚신", "작은 발자국", "크기가 맞지 않는다. 서로 다른 사람이 지나간 것일까?"],
+      ["피 묻은 붕대", "돌쇠의 팔 상처", "감긴 자리는 닮았다. 하지만 이 상처가 그날 밤 생긴 것인지는 알 수 없다."],
+      ["도망 보따리", "무덕의 번진 일기", "도망 준비를 눈치챈 사람이 있었던 것 같다. 이야기는 어디까지 퍼졌을까?"],
+      ["찢어진 옷고름", "점순의 목 압박 흔적", "폭과 마찰 자국은 닮았다. 정말 같은 끈이 남긴 흔적일까?"],
+      ["긁힌 팔 흔적", "점순의 손톱 밑 흔적", "세 흔적의 간격과 방향이 닮았다. 같은 접촉에서 남은 것일까?"]
     ];
 
     function getEvidenceSource(name) {
@@ -2916,8 +2971,17 @@
     }
 
     function getEvidenceDisplayName(name) {
-      if (name === "돌쇠의 그림" && !isEvidenceMeaningRevealed(name)) return "의문의 그림";
+      if (isJoseonToolInteraction && !isEvidenceMeaningRevealed(name)) {
+        return joseonUnexaminedEvidenceNames[name] || "정체 모를 물건";
+      }
       return name;
+    }
+
+    function getEvidenceCardSummary(name, data = evidenceData[name] || {}) {
+      if (isJoseonToolInteraction && !isEvidenceMeaningRevealed(name, data)) {
+        return joseonUnexaminedEvidenceSummaries[name] || "도구로 살펴봐야 정체를 알 수 있다.";
+      }
+      return sentenceBreakText(data.note || "현장에서 발견된 단서입니다.").split("\n").find(Boolean) || "";
     }
 
     function refreshEvidenceCard(name) {
@@ -2994,7 +3058,7 @@
 
     function evidenceCardHtml(name) {
       const data = evidenceData[name] || {};
-      const summary = sentenceBreakText(data.note || "현장에서 발견된 단서입니다.").split("\n").find(Boolean) || "";
+      const summary = getEvidenceCardSummary(name, data);
       const meaningRevealed = isEvidenceMeaningRevealed(name, data);
       const stateFrame = data.derived
         ? data.isNew
@@ -3274,23 +3338,19 @@
       }],
       [["진흙 묻은 짚신", "작은 발자국"], {
         result: "뒤꿈치를 맞춰 겹치자 짚신이 발자국보다 길고 폭도 넓다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/expanded/result-footprint-comparison.png"
+        asset: "/samunmong/assets/interactions/evidence-tools/expanded/result-footprint-shoe-mismatch-v3.png"
       }],
       [["피 묻은 붕대", "돌쇠의 팔 상처"], {
-        result: "붕대를 감은 방향과 상처의 피가 번진 중심이 맞물린다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-bandage-wound-link.webp"
-      }],
-      [["찢어진 옷고름", "긁힌 팔 흔적"], {
-        result: "상처 끝에 남은 가는 섬유와 옷고름의 풀린 비단실이 같은 방향으로 꼬여 있다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/secondary/result-fiber-match.png"
+        result: "감긴 방향은 돌쇠의 팔과 닮았다. 그러나 한 줄로 아문 상처는 손톱에 긁힌 흔적과 달라 보인다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-bandage-work-cut-v2.png"
       }],
       [["찢어진 옷고름", "점순의 목 압박 흔적"], {
         result: "옷고름의 폭과 눌린 마찰 자국이 목에 남은 좁은 압박 흔적과 맞는다.",
         asset: "/samunmong/assets/interactions/evidence-tools/expanded/result-fiber-comparison.png"
       }],
       [["긁힌 팔 흔적", "점순의 손톱 밑 흔적"], {
-        result: "팔의 긁힌 방향과 손톱 밑에 남은 접촉 흔적이 서로 맞물린다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-bandage-wound-link.webp"
+        result: "세 흔적의 간격과 방향이 닮았다. 같은 접촉에서 남은 것일까?",
+        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-nail-trace-scratch-v2.png"
       }]
     ].map(([names, comparison]) => [evidencePairKey(names[0], names[1]), comparison]));
 
@@ -3327,7 +3387,7 @@
       button.addEventListener("dragstart", (event) => {
         event.dataTransfer?.setData("text/x-samunmong-evidence", name);
         if (event.dataTransfer) event.dataTransfer.effectAllowed = "link";
-        showToast(`${name} · 다른 증거에 겹쳐 보기`);
+        showToast(`${getEvidenceDisplayName(name)} · 다른 증거에 겹쳐 보기`);
       });
       button.addEventListener("dragover", (event) => {
         const sourceName = event.dataTransfer?.types.includes("text/x-samunmong-evidence");
@@ -3478,9 +3538,9 @@
       }
       playSfx("buttonAlt", 0.62);
       const presented = document.querySelector("#presentedEvidence");
-      if (presented) presented.textContent = selectedEvidence;
+      if (presented) presented.textContent = getEvidenceDisplayName(selectedEvidence);
       updateEvidenceInterrogationUI(selectedEvidence);
-      showToast(`증거 선택: ${selectedEvidence}`);
+      showToast(`증거 선택: ${getEvidenceDisplayName(selectedEvidence)}`);
     }
 
     function showEvidenceStoryPreview(name) {
@@ -3497,7 +3557,7 @@
       document.querySelector("#evidencePreviewObject").textContent = getEvidenceDisplayName(data.source || name);
       document.querySelector("#evidencePreviewFact").textContent = meaningRevealed ? fact : "도구함에서 이 증거를 감식하십시오.";
       document.querySelector("#evidencePreviewRole").textContent = meaningRevealed ? `${role} 증거` : "???";
-      document.querySelector("#evidencePreviewMeaning").textContent = meaningRevealed ? getEvidenceStoryMeaning(name, data) : "감식을 마치면 사건에서의 의미가 열립니다.";
+      document.querySelector("#evidencePreviewMeaning").textContent = meaningRevealed ? getEvidenceStoryMeaning(name, data) : "감식을 마치면 이 증거가 남긴 의문이 열립니다.";
       renderEvidencePeople(name);
       const connectionResult = document.querySelector("#evidenceConnectionResult");
       if (connectionResult) {
@@ -3573,7 +3633,7 @@
       suspectIndex = targetIndex;
       updateSuspect(false);
       const presented = document.querySelector("#presentedEvidence");
-      if (presented) presented.textContent = name;
+      if (presented) presented.textContent = getEvidenceDisplayName(name);
       updateEvidenceInterrogationUI(name);
       closeEvidenceStoryPreview();
       closeToolResultPopup();
@@ -3624,13 +3684,13 @@
     document.querySelector("#confirmEvidencePresent")?.addEventListener("click", () => {
       if (!selectedEvidence) return;
       const presented = document.querySelector("#presentedEvidence");
-      if (presented) presented.textContent = selectedEvidence;
+      if (presented) presented.textContent = getEvidenceDisplayName(selectedEvidence);
       updateEvidenceInterrogationUI(selectedEvidence);
       closeEvidenceStoryPreview();
       setEvidenceBag(false);
       dispatchEvidenceFeedback(selectedEvidence, button);
       playSfx("buttonAlt", 0.62);
-      showToast(`증거 제시: ${selectedEvidence}`);
+      showToast(`증거 제시: ${getEvidenceDisplayName(selectedEvidence)}`);
     });
 
     document.querySelector("#openEvidenceThread")?.addEventListener("click", () => {
@@ -3737,7 +3797,7 @@
         mode: "light"
       },
       "발자국 실측줄": {
-        primary: "/samunmong/assets/interactions/evidence-tools/expanded/result-footprint-comparison.png",
+        primary: "/samunmong/assets/interactions/evidence-tools/expanded/result-footprint-shoe-mismatch-v3.png",
         secondary: "/samunmong/assets/interactions/evidence-tools/expanded/result-evidence-confirmed.png",
         mode: "measure"
       },
@@ -3777,7 +3837,7 @@
         mode: "soil"
       },
       "상처 대조첩": {
-        primary: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-bandage-wound-link.webp",
+        primary: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-bandage-work-cut-v2.png",
         secondary: "/samunmong/assets/interactions/evidence-tools/crosscheck/feedback-stain-patterns.webp",
         mode: "wound"
       },
@@ -4184,49 +4244,33 @@
     }
 
     const joseonDreamTraceByEvidence = {
-      "호패 조각": {
-        image: "/samunmong/assets/interactions/dream-traces/empty-hopae-pouch-v2.png",
-        alt: "정체를 감춘 인물이 주머니에서 호패를 훔쳐 꺼내는 몽흔"
-      },
       "도망 보따리": {
-        image: "/samunmong/assets/interactions/dream-traces/escape-plan-overheard-v1.png",
-        alt: "두 사람이 도망 보따리를 준비하는 동안 누군가 문밖에서 엿듣는 몽흔"
+        image: "/samunmong/assets/interactions/dream-traces/escape-bundle-packed-v2.png",
+        alt: "정체를 감춘 두 사람이 함께 떠날 보따리를 꾸리는 몽흔"
       },
       "작은 발자국": {
-        image: "/samunmong/assets/interactions/dream-traces/straw-shoe-mismatch-v2.png",
-        alt: "정체를 감춘 인물이 큰 짚신을 작은 발자국 옆에 내려놓는 몽흔"
+        image: "/samunmong/assets/interactions/dream-traces/small-shoeprints-natural-v2.png",
+        alt: "정체를 감춘 인물이 뒷문을 지나며 작은 신발 자국을 자연스럽게 남기는 몽흔"
       },
       "빈 호패 주머니": {
         image: "/samunmong/assets/interactions/dream-traces/empty-hopae-pouch-v2.png",
         alt: "정체를 감춘 인물이 주머니에서 호패를 훔쳐 꺼내는 몽흔"
-      },
-      "진흙 묻은 짚신": {
-        image: "/samunmong/assets/interactions/dream-traces/straw-shoe-mismatch-v2.png",
-        alt: "정체를 감춘 인물이 큰 짚신을 작은 발자국 옆에 내려놓는 몽흔"
-      },
-      "찢어진 옷고름": {
-        image: "/samunmong/assets/interactions/dream-traces/torn-collar-struggle-v1.png",
-        alt: "두 인물이 실랑이를 벌이는 사이 짙은 비단 옷고름이 당겨져 찢어지는 몽흔"
-      },
-      "헐거워진 노리개": {
-        image: "/samunmong/assets/interactions/dream-traces/norigae-snag-v2.png",
-        alt: "두 인물이 갈라지는 순간 노리개가 남색 소매에 걸려 찢기는 몽흔"
       },
       "하인 장부": {
         image: "/samunmong/assets/interactions/dream-traces/ledger-record-erased-v1.png",
         alt: "정체를 감춘 인물이 이미 적힌 출입 기록을 먹으로 덮어 지우는 몽흔"
       },
       "찢어진 약속 편지": {
-        image: "/samunmong/assets/interactions/dream-traces/false-letter-written-v1.png",
-        alt: "정체를 감춘 인물이 격식 있는 편지를 대신 쓰고 찢는 몽흔"
+        image: "/samunmong/assets/interactions/dream-traces/false-letter-written-v2.png",
+        alt: "정체를 감춘 인물이 다른 이의 말투를 흉내 낸 편지를 쓰고 찢는 몽흔"
       },
       "돌쇠의 그림": {
         image: "/samunmong/assets/interactions/dream-traces/portrait-redrawn-v1.png",
         alt: "정체를 감춘 인물이 돌쇠의 초상을 여러 번 덧그리는 몽흔"
       },
       "무덕의 번진 일기": {
-        image: "/samunmong/assets/interactions/dream-traces/diary-secret-record-v1.png",
-        alt: "정체를 감춘 인물이 밤중에 목격한 움직임을 번진 일기에 기록하는 몽흔"
+        image: "/samunmong/assets/interactions/dream-traces/diary-heard-at-door-v2.png",
+        alt: "어린 하인이 닫힌 문밖의 소리를 듣고 번진 일기에 기록하는 몽흔"
       }
     };
 
@@ -4610,7 +4654,7 @@
         ],
         wound: [
           "/samunmong/assets/interactions/evidence-reverse/bloodied-bandage-inner-v2.png",
-          "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp",
+          "/samunmong/assets/evidence-transparent/evidence-dolsoe-work-cut-v3.png",
           ""
         ],
         link: [
@@ -5213,7 +5257,7 @@
           <li class="${index === records.length - 1 ? "erased" : ""}">
             <time>${escapeHtml(time)}</time><b>${escapeHtml(name)}</b><span>${escapeHtml(action)}</span>
           </li>`).join("")}</ol>
-        <p>모두 다녀간 기록임. 마지막 한 줄만 이름을 알아볼 수 없게 나중에 덮었음.</p>
+        <p>여러 사람이 오간 기록 사이에서 마지막 이름만 덮였음. 누가 지웠고 누구의 이름인지는 이 장부만으로 알 수 없음.</p>
         <button type="button">장부에 옮겨 적기</button>`;
       reveal.querySelector("button")?.addEventListener("click", () => {
         finishTactilePuzzle("촛불 비추기");
@@ -5270,8 +5314,8 @@
             ? ["", "크기가 다른 두 벌의 옷과 두 끼분 식량, 노잣돈이 함께 싸여 있습니다. 두 사람이 떠날 준비였고, 젖은 마당 흙이 묻은 뒤 마른 실내에서 한 번 열렸습니다."][specialPuzzleStep]
             : specialPuzzleMode === "bandage"
               ? ["", "왼쪽의 짙은 최초 혈흔에서 오른쪽으로 옅어지는 반복 자국이 이어집니다. 좁은 팔에 감았던 붕대이며, 팔 상처와 대조해야 주인을 알 수 있습니다."][specialPuzzleStep]
-            : specialPuzzleMode === "silk"
-              ? ["", "조임 자리는 마찰로 번들거리고 찢긴 끝의 긴 섬유가 한 방향으로 늘어났습니다. 칼로 자른 것이 아니라 강한 힘에 조여진 뒤 끊어진 옷고름입니다."][specialPuzzleStep]
+          : specialPuzzleMode === "silk"
+            ? ["", "조임 자리는 마찰로 번들거리고 찢긴 끝은 한 방향으로 늘어났습니다. 바깥 흙 위에 실내 먼지가 앉아, 밖에서 주워 온 물건일 가능성도 있습니다."][specialPuzzleStep]
               : specialPuzzleMode === "hopaeThread"
                 ? ["", "끈 굵기와 호패 구멍, 오래 닳아 반질거리는 마찰 홈이 정확히 맞습니다. 따로 발견된 끈은 이 호패에 매여 있던 끈입니다."][specialPuzzleStep]
                 : specialPuzzleMode === "stride"
@@ -5545,7 +5589,7 @@
       if (previewNote) previewNote.textContent = sentenceBreakText(resultText).split("\n").find(Boolean) || "새로운 흔적을 확인했습니다.";
       showToolConclusion(examinedClueName, resultText);
       updateEvidenceThreadUI();
-      showToast(`결론 기록 · ${getEvidenceStoryMeaning(examinedClueName, evidenceData[examinedClueName] || {})}`);
+      showToast(`의문 기록 · ${getEvidenceStoryMeaning(examinedClueName, evidenceData[examinedClueName] || {})}`);
     }
 
     function beginToolSwipe(event) {
@@ -5746,7 +5790,7 @@
       if (data.tool) setAnalysisTarget(name);
 
       document.querySelector("#genericEvidenceImage").src = getEvidenceImage(name);
-      document.querySelector("#genericEvidenceTitle").textContent = name;
+      document.querySelector("#genericEvidenceTitle").textContent = getEvidenceDisplayName(name);
       document.querySelector("#genericEvidenceText").textContent = data.tool ? sentenceBreakText(TOOL_NEEDED_HINT) : "";
       document.querySelector("#genericEvidenceText").hidden = !data.tool;
       document.querySelector("#genericEvidenceInspect").classList.add("show");
@@ -6474,7 +6518,7 @@
       pendingConfrontationQuestion = question;
       confrontationStep = 0;
       document.querySelector("#confrontationTitle").textContent = `${suspects[suspectIndex].name}에게 증거 대면`;
-      document.querySelector("#confrontationEvidenceName").textContent = selectedEvidence;
+      document.querySelector("#confrontationEvidenceName").textContent = getEvidenceDisplayName(selectedEvidence);
       document.querySelector("#confrontationGuide").textContent = "증거패를 심문상에 올린 뒤 관인을 끌어 찍어 대면을 확정하십시오.";
       document.querySelector("#confrontationImage").src = "/samunmong/assets/interactions/confrontation-puzzle/state-1.png";
       resetRitualDrag("confrontation");
