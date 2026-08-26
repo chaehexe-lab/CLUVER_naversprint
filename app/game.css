@@ -15203,6 +15203,16 @@ html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel .special-touch-p
   pointer-events: none;
 }
 
+html[data-samunmong-theme="joseon"] #interrogationScreen .interrogation-desk-foreground,
+.game-shell[data-initial-theme="joseon"] #interrogationScreen .interrogation-desk-foreground {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  display: block;
+  background: url("/samunmong/assets/interactions/interrogation-candle/interrogation-desk-foreground-v2.png") center / cover no-repeat;
+  pointer-events: none;
+}
+
 .game-shell input,
 .game-shell textarea,
 .game-shell [contenteditable="true"] {

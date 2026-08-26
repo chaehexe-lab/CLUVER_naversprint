@@ -3,8 +3,7 @@
 import AccuseSuspect from "@/components/AccuseSuspect";
 import EvidenceInventory from "@/components/EvidenceInventory";
 import InvestigationNote from "@/components/InvestigationNote";
-import InterrogationCandle3D from "@/components/effects/InterrogationCandle3D";
-import InterrogationCharacterRig3D from "@/components/effects/InterrogationCharacterRig3D";
+import InterrogationCharacter2D from "@/components/effects/InterrogationCharacter2D";
 import type { GameTheme } from "@/lib/gameTheme";
 import type { CSSProperties } from "react";
 
@@ -164,7 +163,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
     ? "/samunmong/assets/magic-school/interrogation/office-empty.webp"
     : isSpaceTheme
       ? "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp"
-    : "/samunmong/assets/scene-interrogation-room-empty.png";
+    : "/samunmong/assets/interactions/interrogation-candle/interrogation-room-common-clean-v2.png";
   const initialSuspect = isSpaceTheme ? "harry" : isMagicTheme ? "malpoi" : "dolsoe";
   const initialSprite = isSpaceTheme ? "/assets/space-station/characters/harry-upper-transparent.webp" : isMagicTheme ? "/samunmong/assets/magic-school/interrogation/malpoi-sprite.webp" : "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707";
   const initialName = isSpaceTheme ? "해리" : isMagicTheme ? "말포이" : "돌쇠";
@@ -212,7 +211,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           src={initialPlate}
           alt="취조실"
         />
-        {!isMagicTheme && !isSpaceTheme ? <InterrogationCharacterRig3D initialTexture={initialSprite} /> : null}
+        {!isMagicTheme && !isSpaceTheme ? <InterrogationCharacter2D /> : null}
         <div className="shade" />
 
         <div className="suspect-stage" id="suspectStage" data-suspect={initialSuspect} aria-hidden="true">
@@ -224,15 +223,6 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           />
         </div>
         <div className="interrogation-desk-foreground" aria-hidden="true" />
-        {!isMagicTheme && !isSpaceTheme ? (
-          <>
-            <div className="interrogation-candle-patch" aria-hidden="true" />
-            <div className="interrogation-candle" id="interrogationCandle" data-state="calm" aria-hidden="true">
-              <span className="candle-light" />
-              <InterrogationCandle3D />
-            </div>
-          </>
-        ) : null}
 
         <div className="new-fact-toast" id="newFactToast" role="status" aria-live="polite" aria-hidden="true">
           <span>수사 노트</span>
