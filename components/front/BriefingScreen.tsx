@@ -204,7 +204,7 @@ function SpaceStationBriefingScreen() {
           left: "50%",
           top: "50%",
           gap: "12px",
-          padding: briefingStep === 0 ? "34px 44px 10px" : isJournalOpen ? "20px 40px" : "20px 40px 8px",
+          padding: briefingStep === 0 ? "34px 44px 10px" : isJournalOpen ? "20px 40px 32px" : "20px 40px 8px",
           border: "1px solid rgba(160, 207, 229, .36)",
           borderRadius: "22px",
           color: "#eaf6ff",
@@ -230,7 +230,14 @@ function SpaceStationBriefingScreen() {
                   <img src="/assets/space-station/characters/david-upper.png" alt="데이비드 대원 프로필" draggable={false} />
                   <span className="space-critical-status">STATUS CRITICAL</span>
                 </div>
-                <div><strong>데이비드</strong><p>오르빗-13 수석 엔지니어</p></div>
+                <div className="space-profile-copy">
+                  <strong>데이비드</strong>
+                  <p>오르빗-13 수석 엔지니어</p>
+                  <div className="space-profile-auth-line">
+                    <span>ID :</span>
+                    <strong>ORBIT-13-ENG-0714</strong>
+                  </div>
+                </div>
               </div>
             </section>
             <div className="space-status-chip"><span>현재 상태</span><strong>시신 미회수 · 사망 추정</strong></div>
