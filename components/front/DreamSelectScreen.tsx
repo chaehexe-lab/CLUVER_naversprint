@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import { dreamOptions, screenImages } from "@/lib/gameData";
+import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 
 type DreamStyle = CSSProperties & {
@@ -8,6 +9,19 @@ type DreamStyle = CSSProperties & {
 };
 
 export default function DreamSelectScreen() {
+  const [unplayedOnly, setUnplayedOnly] = useState(false);
+  const [playedThemes, setPlayedThemes] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    setUnplayedOnly(window.sessionStorage.getItem("samunmong-new-dream-mode") === "unplayed");
+    try {
+      const slots = JSON.parse(window.localStorage.getItem("samunmong-save-slots") || "{}");
+      setPlayedThemes(new Set(Object.keys(slots || {})));
+    } catch {
+      setPlayedThemes(new Set());
+    }
+  }, []);
+
   const chooseDream = (id?: string) => {
     const themeById: Record<string, string> = {
       chooseJoseon: "joseon",
@@ -16,6 +30,7 @@ export default function DreamSelectScreen() {
     };
     const theme = id ? themeById[id] : undefined;
     if (!theme) return;
+    if (unplayedOnly && playedThemes.has(theme)) return;
     window.localStorage.setItem("samunmong-current-theme", theme);
     window.location.assign(`/?start=briefingScreen&theme=${theme}`);
   };
@@ -29,23 +44,36 @@ export default function DreamSelectScreen() {
           <h2>어떤 꿈을 꾸시겠습니까?</h2>
         </div>
         <div className="dream-grid">
-          {dreamOptions.map((dream) => (
-            <button
+          {dreamOptions.map((dream) => {
+            const dreamId = "id" in dream ? dream.id : undefined;
+            const themeById: Record<string, string> = {
+              chooseJoseon: "joseon",
+              chooseMagicSchool: "magicSchool",
+              chooseSpaceStation: "spaceStation"
+            };
+            const theme = dreamId ? themeById[dreamId] : undefined;
+            const alreadyPlayed = Boolean(theme && playedThemes.has(theme));
+            const disabled = dream.disabled || (unplayedOnly && alreadyPlayed);
+
+            return <button
               key={dream.kicker}
-              className={`dream${dream.disabled ? " disabled" : ""}`}
-              id={"id" in dream ? dream.id : undefined}
+              className={`dream${disabled ? " disabled" : ""}`}
+              id={dreamId}
               type="button"
-              data-dream-disabled={dream.disabled ? "true" : undefined}
+              disabled={disabled}
+              data-dream-disabled={disabled ? "true" : undefined}
               style={{ "--dream-image": `url('${dream.image}')` } as DreamStyle}
               aria-label={dream.ariaLabel}
-              onClick={() => chooseDream("id" in dream ? dream.id : undefined)}
+              onClick={() => chooseDream(dreamId)}
             >
-              <span className={`dream-state${dream.disabled ? "" : " playable"}`}>{dream.state}</span>
+              <span className={`dream-state${disabled ? "" : " playable"}`}>
+                {unplayedOnly && alreadyPlayed ? "진행 기록 있음" : dream.state}
+              </span>
               <span className="dream-kicker">{dream.kicker}</span>
               <strong>{dream.title}</strong>
               <span className="dream-desc">{dream.description}</span>
-            </button>
-          ))}
+            </button>;
+          })}
         </div>
       </article>
       <aside className="dream-notice-dialog" id="dreamNoticeDialog" aria-hidden="true" role="dialog" aria-labelledby="dreamNoticeTitle">
