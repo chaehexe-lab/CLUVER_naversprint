@@ -158,7 +158,7 @@ export const evidenceCatalog = [
     aliases: ["결빙 화면", "결빙 기록", "추진 레버 기록", "추진 레버 결빙", "레버 진단 기록"]
   },
   {
-    name: "마지막 무전 로그",
+    name: "마지막 무전 기록",
     aliases: ["마지막 무전", "무전 로그", "통신 기록", "구조 요청", "개인 채널", "채널 차단"]
   },
   {
@@ -415,7 +415,7 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "해리 계정이 쓰인 것은 인정하지만, 접속 위치가 의료실 보조 단말이라는 점에 놀란다. 추궁하면 21시 43분경 메르스가 의료 단말기 오류를 확인한다며 키카드를 빌려 갔고 손상된 채 돌려줬다고 밝힌다."
       },
       {
-        evidenceNames: ["마지막 무전 로그"],
+        evidenceNames: ["마지막 무전 기록"],
         intentTags: ["radioLog", "privateChannel"],
         responseGuide: "마지막 무전 끝의 개인 채널 흔적을 복구할 수 있다고 말한다. 그 신호가 구조 요청만은 아닌 것 같다고 조심스럽게 암시한다."
       }
@@ -456,7 +456,7 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "미승인 약물 투여와 부작용을 더는 부정하지 못한다. 하지만 치료 가능성을 시험한 것이며 기록 삭제는 성급한 오해를 막기 위한 조치였다고 합리화한다."
       },
       {
-        evidenceNames: ["마지막 무전 로그"],
+        evidenceNames: ["마지막 무전 기록"],
         intentTags: ["blockedRescueCall", "finalSignal"],
         responseGuide: "데이비드의 구조 요청을 수신하고 채널을 차단했다는 기록에 크게 흔들린다. 통신 장애였다고 주장하지만 수동 차단 로그는 설명하지 못한다."
       },
@@ -466,7 +466,7 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "계약과 앰풀이 자신의 의료 권한에 연결된다는 점을 부정하다가, 연구 성과와 우선 귀환권을 잃을 수 없었다는 탐욕을 드러낸다."
       }
     ],
-    breakEvidenceNames: ["추진 레버 결빙 기록", "소독천과 장갑", "손상된 압력 센서", "조작된 지연 타이머", "삭제된 의료 기록", "암호화된 연구 보상 계약", "미승인 약물 앰풀", "마지막 무전 로그"],
+    breakEvidenceNames: ["추진 레버 결빙 기록", "소독천과 장갑", "손상된 압력 센서", "조작된 지연 타이머", "삭제된 의료 기록", "암호화된 연구 보상 계약", "미승인 약물 앰풀", "마지막 무전 기록"],
     finalBehavior: "불법 임상시험과 부작용 은폐, 구조 채널 차단이 드러나고 공개되지 않은 증상 시각과 투여량을 말실수한 뒤 연구 보상과 지구 귀환 특혜를 잃을 수 없었다는 악의적 동기를 드러낸다."
   },
   {

@@ -15897,7 +15897,7 @@ html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card.activ
     0 8px 20px rgba(39, 70, 104, .08);
 }
 
-html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card[data-evidence="마지막 무전 로그"].active {
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card[data-evidence="마지막 무전 기록"].active {
   border-color: rgba(255, 255, 255, .72);
   background: rgba(239, 247, 255, .32);
   box-shadow:
@@ -15905,8 +15905,8 @@ html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card[data-
     0 8px 20px rgba(39, 70, 104, .08);
 }
 
-html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card[data-evidence="마지막 무전 로그"].active:hover,
-html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card[data-evidence="마지막 무전 로그"].active:focus-visible {
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card[data-evidence="마지막 무전 기록"].active:hover,
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card[data-evidence="마지막 무전 기록"].active:focus-visible {
   border-color: rgba(31, 112, 166, .72);
   background: rgba(235, 247, 255, .5);
 }
@@ -16313,6 +16313,18 @@ html[data-samunmong-theme="spaceStation"] .space-evidence-detail-copy p {
   line-height: 1.8;
   word-break: keep-all;
   white-space: pre-line;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="마지막 무전 기록"] {
+  height: 390px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="마지막 무전 기록"] .space-evidence-detail-copy p {
+  max-height: 205px;
+  padding-right: 12px;
+  overflow-y: auto;
+  scrollbar-color: rgba(70, 135, 178, .72) rgba(7, 31, 53, .12);
+  scrollbar-width: thin;
 }
 
 html[data-samunmong-theme="spaceStation"] .space-evidence-detail-close {

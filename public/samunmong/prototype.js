@@ -1519,7 +1519,7 @@
     const collectedEvidenceTooltipOffsets = {
       "엔지니어 공구 클램프": { x: -10, y: 30 },
       "추진 레버 결빙 기록": { x: 60, y: 60 },
-      "마지막 무전 로그": { x: -130, y: 95 },
+      "마지막 무전 기록": { x: -130, y: 95 },
       "소독천과 장갑": { x: 40, y: 35 },
       "삭제된 의료 기록": { x: 35, y: 70 },
       "조작된 지연 타이머": { x: -45, y: 25 },
@@ -1588,6 +1588,13 @@
         image: "/assets/space-station/evidence/engineer-tool-clamp.webp",
         imageAlt: "엔지니어 공구 클램프",
         description: "- 사용 목적: 우주복 점검\n- 공구함 반납 시각: OST 21:37\n- 마지막 사용자 ID: ORBIT-13-MNT-0821\n- 점검 결과: 우주복 손상 및 특이 잔류물 없음"
+      },
+      "마지막 무전 기록": {
+        kicker: "ORBIT-13 · COMMUNICATION LOG",
+        title: "마지막 무전 기록",
+        image: "/assets/space-station/evidence/final-radio-log.webp",
+        imageAlt: "데이비드의 마지막 무전 기록 장치",
+        description: "[OST 22:14]\n“오르빗-13 관제실, 데이비드다.\n외부 통신 장치 점검을 시작한다.\n안전 로프와 우주복 상태 모두 정상이다.”\n\n[OST 22:19]\n“관제실, 심박이 갑자기 불규칙해졌다.\n손에도 힘이 잘 들어가지 않아.\n우주복 문제인지 확인해 줘.”\n\n[OST 22:21]\n“비상 추진 장치를 점검 중이다.\n레버 작동 신호는 들어가는데 가스 밸브가 반응하지 않는다.”\n\n“레버 연결부에 투명한 물질이 붙어 있어.\n외부 온도에서 완전히 얼어붙은 것 같다.”\n\n[OST 22:22]\n“우주복 산소 수치가 급격히 떨어지고 있다.\n누출 경고는 없는데 잔량만 계속 감소한다.\n관제실, 즉시 복귀 허가를 요청한다.”\n\n[OST 22:23]\n“외벽 통신 장치의 고정 전력이 끊겼다!\n패널 하나가 구조물에서 이탈했다.”\n\n“외벽 패널이 안전 로프를 쳤다.\n연결 고리가 파손됐다!”\n\n“정거장에서 멀어지고 있다.\n몸이 계속 회전해… 추진 레버도 움직이지 않아.”\n\n[OST 22:24]\n“오르빗-13, 응답해.\n안전 로프가 끊어졌고 비상 추진 장치도 작동하지 않는다.”\n\n“정거장 뒤편의 통신 음영 구역(Shadow Zone)으로 진입하고 있다.\n태양광이 사라졌고 외부 온도가 계속 내려간다.\n아직 정거장 신호는 잡힌다. 구조 장비를 보내 줘..”"
       }
     };
 
@@ -1599,6 +1606,7 @@
       if (open) {
         const detail = detailedSpaceEvidence[evidenceName];
         if (!detail) return;
+        panel.dataset.evidence = evidenceName;
         const image = panel.querySelector("#spaceEvidenceDetailImage");
         const kicker = panel.querySelector("#spaceEvidenceDetailKicker");
         const title = panel.querySelector("#spaceEvidenceDetailTitle");
@@ -2668,7 +2676,11 @@
       if (!isSpaceTheme) return;
       const stored = readStored(collectedEvidenceKey, []);
       if (!Array.isArray(stored)) return;
-      const valid = [...new Set(stored.filter((name) => typeof name === "string" && evidenceData[name]))];
+      const renamedEvidence = {
+        "마지막 무전 로그": "마지막 무전 기록"
+      };
+      const migrated = stored.map((name) => renamedEvidence[name] || name);
+      const valid = [...new Set(migrated.filter((name) => typeof name === "string" && evidenceData[name]))];
       if (JSON.stringify(valid) !== JSON.stringify(stored)) {
         localStorage.setItem(collectedEvidenceKey, JSON.stringify(valid));
       }
