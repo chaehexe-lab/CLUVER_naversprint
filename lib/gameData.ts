@@ -106,8 +106,8 @@ export const fieldOneScene = {
   alt: "유문석 집 문 앞에 쓰러진 점순과 조사할 증거가 놓인 사건 현장",
   props: [] as SceneProp[],
   hotspots: [
-    { className: "scene-evidence-object field-letter-evidence", evidenceName: "찢어진 약속 편지", ariaLabel: "찢어진 약속 편지 조사", x: "72.7%", y: "87.3%", w: "8.2%", h: "8.5%", clipPath: "polygon(7% 35%, 44% 8%, 94% 24%, 98% 76%, 32% 96%, 2% 70%)", radius: "12px", rot: "7deg" },
-    { id: "hopaeHotspot", className: "scene-evidence-object field-hopae-evidence hopae-glow", evidenceName: "호패 조각", ariaLabel: "호패 조각 조사", x: "62.8%", y: "87.2%", w: "5.2%", h: "8.5%", clipPath: "polygon(26% 6%, 75% 8%, 96% 58%, 70% 96%, 24% 90%, 3% 43%)", radius: "14px", rot: "-10deg" }
+    { className: "scene-evidence-object field-letter-evidence", evidenceName: "찢어진 약속 편지", ariaLabel: "찢어진 편지 조각 조사", x: "72.7%", y: "87.3%", w: "8.2%", h: "8.5%", clipPath: "polygon(7% 35%, 44% 8%, 94% 24%, 98% 76%, 32% 96%, 2% 70%)", radius: "12px", rot: "7deg" },
+    { id: "hopaeHotspot", className: "scene-evidence-object field-hopae-evidence hopae-glow", evidenceName: "호패 조각", ariaLabel: "글자 지워진 나무패 조사", x: "62.8%", y: "87.2%", w: "5.2%", h: "8.5%", clipPath: "polygon(26% 6%, 75% 8%, 96% 58%, 70% 96%, 24% 90%, 3% 43%)", radius: "14px", rot: "-10deg" }
   ] satisfies SceneHotspot[],
   dock: [
     { id: "openMapFromField", ...investigationDock[0], className: "map-chip" },
@@ -120,7 +120,7 @@ export const fieldOneScene = {
   inspect: {
     id: "hopaeInspect",
     image: "/samunmong/assets/evidence-wooden-tag.webp",
-    title: "호패 조각",
+    title: "글자 지워진 나무패",
     text: "특정 도구를 이용해 자세히 알아봐야 할 것 같다.",
     closeButtonId: "closeHopaeInspect",
     closeButtonLabel: "호패 조각 팝업 닫기"
@@ -133,7 +133,6 @@ export const chunwolRoomScene = {
   alt: "춘월의 방과 초상화 그림 증거",
   props: [] as SceneProp[],
   hotspots: [
-    { className: "hanging-evidence hanging-norigae", evidenceName: "헐거워진 노리개", ariaLabel: "헐거워진 노리개 조사", x: "57%", y: "45.5%", w: "4.8%", h: "18%", clipPath: "polygon(28% 0, 70% 0, 88% 28%, 98% 100%, 3% 100%, 12% 28%)", radius: "18px", rot: "-2deg" },
     { id: "portraitHotspot", className: "scene-evidence-object portrait-glow", evidenceName: "돌쇠의 그림", ariaLabel: "붉은 끈으로 묶인 의문의 두루마리 조사", x: "74%", y: "55.5%", w: "8%", h: "18%", clipPath: "polygon(18% 4%, 92% 16%, 81% 98%, 8% 84%)", radius: "8px", rot: "4deg" }
   ] satisfies SceneHotspot[],
   lights: [{ x: "27.6%", y: "58.2%", size: "7.5%", strength: 0.38 }],

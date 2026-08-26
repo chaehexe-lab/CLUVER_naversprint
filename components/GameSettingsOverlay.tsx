@@ -117,11 +117,13 @@ export default function GameSettingsOverlay() {
     const suffix = theme === "magicSchool" ? "magic-school" : theme === "spaceStation" ? "space-station" : "joseon";
     const progressKeys = [
       `samunmong-collected-evidence-${suffix}`,
+      `samunmong-unread-evidence-${suffix}`,
       `samunmong-analyzed-evidence-${suffix}`,
       `samunmong-examined-clues-${suffix}`,
       `samunmong-linked-evidence-${suffix}`,
       `samunmong-conversation-notes-${suffix}`,
-      `samunmong-interrogation-question-count-${suffix}`
+      `samunmong-interrogation-question-count-${suffix}`,
+      `samunmong-interrogation-known-facts-${suffix}`
     ];
 
     progressKeys.forEach((key) => window.localStorage.removeItem(key));
@@ -157,6 +159,7 @@ export default function GameSettingsOverlay() {
     window.sessionStorage.removeItem("samunmong-field-guide-pending");
     window.sessionStorage.removeItem("samunmong-new-dream-mode");
     window.sessionStorage.removeItem("samunmong-truth-unlocked");
+    window.dispatchEvent(new CustomEvent("samunmong:progress-cleared"));
     window.location.assign("/");
   };
 
