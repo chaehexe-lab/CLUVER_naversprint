@@ -107,10 +107,13 @@ const correctSuspectByTheme = {
   spaceStation: spaceStationTheme.culpritId
 } as const;
 const soundBase = "/samunmong/sound";
-const resultBgmPath = `${soundBase}/bgm/joseon.mp3`;
 const buttonSfxPath = `${soundBase}/sfx/button.mp3`;
 const bgmStateKey = "samunmong-bgm-state";
-const joseonBgmKey = "joseon";
+const accusationBgmByTheme = {
+  joseon: { key: "joseon", path: `${soundBase}/bgm/joseon.mp3` },
+  magicSchool: { key: "magicSchoolAccusation", path: `${soundBase}/bgm/magic-accusation.mp3` },
+  spaceStation: { key: "spaceStationAccusation", path: `${soundBase}/bgm/space-accusation.mp3` }
+} as const;
 const truthUnlockKey = "samunmong-truth-unlocked";
 const typeSfxPaths = [
   `${soundBase}/sfx/type-1.mp3`,
@@ -235,14 +238,14 @@ function readBgmState() {
   }
 }
 
-function writeBgmState(track: HTMLAudioElement) {
+function writeBgmState(trackKey: string, track: HTMLAudioElement) {
   if (typeof window === "undefined" || !Number.isFinite(track.currentTime)) return;
   const previous = readBgmState();
   window.localStorage.setItem(
     bgmStateKey,
     JSON.stringify({
       ...previous,
-      [joseonBgmKey]: {
+      [trackKey]: {
         time: track.currentTime,
         savedAt: Date.now()
       }
@@ -250,27 +253,28 @@ function writeBgmState(track: HTMLAudioElement) {
   );
 }
 
-function restoreBgmState(track: HTMLAudioElement) {
-  const state = readBgmState()[joseonBgmKey];
+function restoreBgmState(trackKey: string, track: HTMLAudioElement) {
+  const state = readBgmState()[trackKey];
   if (!state || !Number.isFinite(state.time) || !track.duration) return;
   const age = Date.now() - Number(state.savedAt || 0);
   if (age > 1000 * 60 * 30) return;
   track.currentTime = Math.min(Number(state.time), Math.max(0, track.duration - 0.2));
 }
 
-function useResultAudio() {
+function useResultAudio(theme: ResultTheme) {
   const typeIndexRef = useRef(0);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const audio = new Audio(resultBgmPath);
+    const bgm = accusationBgmByTheme[theme];
+    const audio = new Audio(bgm.path);
     audio.loop = true;
     audio.preload = "auto";
     audio.volume = readAudioVolume() * 0.7;
 
     let disposed = false;
-    const restore = () => restoreBgmState(audio);
+    const restore = () => restoreBgmState(bgm.key, audio);
     const playBgm = () => {
       if (disposed) return;
       audio.volume = readAudioVolume() * 0.7;
@@ -280,22 +284,22 @@ function useResultAudio() {
     audio.addEventListener("loadedmetadata", restore, { once: true });
     if (audio.readyState) restore();
     playBgm();
-    const handlePageHide = () => writeBgmState(audio);
+    const handlePageHide = () => writeBgmState(bgm.key, audio);
     window.addEventListener("pointerdown", playBgm, { once: true });
     window.addEventListener("keydown", playBgm, { once: true });
     window.addEventListener("pagehide", handlePageHide);
-    const saveTimer = window.setInterval(() => writeBgmState(audio), 1200);
+    const saveTimer = window.setInterval(() => writeBgmState(bgm.key, audio), 1200);
 
     return () => {
       disposed = true;
-      writeBgmState(audio);
+      writeBgmState(bgm.key, audio);
       window.clearInterval(saveTimer);
       window.removeEventListener("pointerdown", playBgm);
       window.removeEventListener("keydown", playBgm);
       window.removeEventListener("pagehide", handlePageHide);
       audio.pause();
     };
-  }, []);
+  }, [theme]);
 
   const playButtonSfx = useCallback(() => {
     if (typeof window === "undefined") return;
@@ -385,8 +389,8 @@ export default function ResultScreen() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const resultRouteState = searchParams.toString();
-  const { playButtonSfx, playTypingSfx } = useResultAudio();
   const theme = (searchParams.get("theme") === "spaceStation" ? "spaceStation" : searchParams.get("theme") === "magicSchool" ? "magicSchool" : "joseon") satisfies ResultTheme;
+  const { playButtonSfx, playTypingSfx } = useResultAudio(theme);
   const activeSuspects = theme === "spaceStation" ? spaceStationResultSuspects : theme === "magicSchool" ? magicSchoolSuspects : suspects;
   const requiredEvidence = theme === "spaceStation" ? spaceRequiredEvidence : theme === "magicSchool" ? magicSchoolRequiredEvidence : joseonRequiredEvidence;
   const correctSuspectId = correctSuspectByTheme[theme];

@@ -316,7 +316,9 @@
     const soundBase = "/samunmong/sound";
     const bgmTracks = {
       main: document.querySelector("#mainBgm") || new Audio(`${soundBase}/bgm/main.mp3`),
-      joseon: new Audio(`${soundBase}/bgm/joseon.mp3`)
+      joseon: new Audio(`${soundBase}/bgm/joseon.mp3`),
+      magicSchool: new Audio(`${soundBase}/bgm/magic-main.mp3`),
+      spaceStation: new Audio(`${soundBase}/bgm/space-main.mp3`)
     };
     const sfxPaths = {
       ask: `${soundBase}/sfx/ask.mp3`,
@@ -705,6 +707,8 @@
 
     function bgmForScreen(screenId) {
       if (screenId === "mainScreen" || screenId === "tutorialScreen" || screenId === "dreamScreen") return "main";
+      if (isMagicTheme) return "magicSchool";
+      if (isSpaceTheme) return "spaceStation";
       return "joseon";
     }
 
