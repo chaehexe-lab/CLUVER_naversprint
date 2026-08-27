@@ -869,6 +869,40 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               <button id="spaceAnalysisBack" type="button">다른 증거 분석</button>
             </div>
           </aside>
+          <div className="space-keycard-terminal-overlay" id="spaceKeycardTerminalOverlay" aria-hidden="true" />
+          <aside
+            className="space-keycard-terminal-panel"
+            id="spaceKeycardTerminalPanel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="spaceKeycardTerminalTitle"
+            aria-hidden="true"
+          >
+            <button className="space-evidence-detail-close" id="closeSpaceKeycardTerminal" type="button" aria-label="접속 단말기 닫기">
+              ×
+            </button>
+            <span>ORBIT-13 · ACCESS RECOVERY TERMINAL</span>
+            <h2 id="spaceKeycardTerminalTitle">접속 기록 복구</h2>
+            <div className="space-keycard-terminal-choice" id="spaceKeycardTerminalChoice">
+              <p>연결할 칩을 선택하십시오.</p>
+              <button id="spaceKeycardTerminalChip" type="button">
+                <img src="/assets/space-station/evidence/access-keycard-chip.webp" alt="" />
+                <strong>접속 키카드 칩</strong>
+              </button>
+            </div>
+            <div className="space-keycard-terminal-loading" id="spaceKeycardTerminalLoading" hidden>
+              <div className="space-keycard-loading-spinner" aria-hidden="true">
+                {Array.from({ length: 10 }, (_, index) => <i key={`keycard-spinner-${index}`} />)}
+              </div>
+              <p>접속 키카드 칩의 손상된 기록을 복구하고 있습니다.</p>
+            </div>
+            <div className="space-keycard-terminal-result" id="spaceKeycardTerminalResult" aria-live="polite" hidden>
+              <p>▪ 등록 대원: HARRY</p>
+              <p>▪ 대원 ID: ORBIT-13-DAT-0319</p>
+              <p>▪ 최근 접속: OST 22:31 의료실 보조 단말</p>
+              <p>▪ 실행 명령: MEDICAL RECORD / DELETE</p>
+            </div>
+          </aside>
         </>
       ) : null}
 

@@ -16476,6 +16476,210 @@ html[data-samunmong-theme="spaceStation"] #spaceMedicalAnalyzer.analysis-device-
   cursor: pointer;
 }
 
+html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminal {
+  pointer-events: none;
+  cursor: default;
+}
+
+html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminal.space-keycard-terminal-unlocked {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-overlay {
+  position: fixed;
+  z-index: 74;
+  inset: 0;
+  visibility: hidden;
+  background: rgba(0, 0, 0, .48);
+  opacity: 0;
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-overlay.show {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-panel {
+  position: fixed;
+  z-index: 75;
+  left: 50%;
+  top: 50%;
+  box-sizing: border-box;
+  width: min(720px, 86vw);
+  min-height: 410px;
+  display: none;
+  padding: 42px 52px 46px;
+  border: 1px solid rgba(188, 229, 255, .9);
+  border-radius: 24px;
+  color: #102b44;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .16), transparent 19%),
+    radial-gradient(ellipse at 24% 0%, rgba(214, 240, 252, .24), transparent 48%),
+    linear-gradient(145deg, rgba(221, 233, 248, .94), rgba(185, 204, 229, .9));
+  box-shadow:
+    0 26px 76px rgba(0, 0, 0, .58),
+    0 0 22px rgba(112, 205, 255, .2),
+    inset 0 0 0 1px rgba(226, 246, 255, .34),
+    inset 0 -18px 38px rgba(64, 105, 154, .1);
+  transform: translate(-50%, -50%);
+  -webkit-backdrop-filter: blur(12px) saturate(1.08);
+  backdrop-filter: blur(12px) saturate(1.08);
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-panel::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(132, 198, 238, .52);
+  border-radius: 18px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .24);
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-panel.show {
+  display: block;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-panel [hidden] {
+  display: none !important;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-panel > span {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-bottom: 7px;
+  color: rgba(16, 59, 88, .68);
+  font-size: 12px;
+  letter-spacing: .12em;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-panel h2 {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 22px;
+  color: #102b44;
+  font-size: clamp(27px, 2.4vw, 36px);
+  font-weight: 500;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-choice {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-choice > p {
+  margin: 0 0 18px;
+  color: #24445f;
+  font-size: 16px;
+}
+
+html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip {
+  width: 100%;
+  min-height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 18px 28px;
+  border: 1px solid rgba(74, 129, 166, .42);
+  border-radius: 14px;
+  color: #102b44;
+  background: rgba(234, 244, 252, .46);
+  box-shadow: inset 0 0 18px rgba(57, 112, 148, .1);
+  cursor: pointer;
+}
+
+html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip:hover,
+html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip:focus-visible {
+  border-color: rgba(54, 145, 196, .82);
+  background: rgba(229, 245, 255, .72);
+  box-shadow: 0 0 0 2px rgba(85, 184, 235, .15), inset 0 0 18px rgba(57, 112, 148, .1);
+  outline: none;
+}
+
+html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip img {
+  width: 120px;
+  height: 120px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .24));
+}
+
+html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip strong {
+  font-size: 20px;
+  font-weight: 500;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-loading {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  gap: 24px;
+  padding-top: 30px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-loading p {
+  margin: 0;
+  color: #24445f;
+  font-size: 17px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-loading-spinner {
+  position: relative;
+  width: 88px;
+  height: 88px;
+  animation: spaceKeycardSpinnerRotate 1.35s linear infinite;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-loading-spinner i {
+  --dot-angle: 0deg;
+  position: absolute;
+  left: calc(50% - 5px);
+  top: calc(50% - 5px);
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #398bb9;
+  box-shadow: 0 0 10px rgba(69, 173, 226, .65);
+  opacity: .72;
+  transform: rotate(var(--dot-angle)) translateY(-34px);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-loading-spinner i:nth-child(2) { --dot-angle: 36deg; }
+html[data-samunmong-theme="spaceStation"] .space-keycard-loading-spinner i:nth-child(3) { --dot-angle: 72deg; }
+html[data-samunmong-theme="spaceStation"] .space-keycard-loading-spinner i:nth-child(4) { --dot-angle: 108deg; }
+html[data-samunmong-theme="spaceStation"] .space-keycard-loading-spinner i:nth-child(5) { --dot-angle: 144deg; }
+html[data-samunmong-theme="spaceStation"] .space-keycard-loading-spinner i:nth-child(6) { --dot-angle: 180deg; }
+html[data-samunmong-theme="spaceStation"] .space-keycard-loading-spinner i:nth-child(7) { --dot-angle: 216deg; }
+html[data-samunmong-theme="spaceStation"] .space-keycard-loading-spinner i:nth-child(8) { --dot-angle: 252deg; }
+html[data-samunmong-theme="spaceStation"] .space-keycard-loading-spinner i:nth-child(9) { --dot-angle: 288deg; }
+html[data-samunmong-theme="spaceStation"] .space-keycard-loading-spinner i:nth-child(10) { --dot-angle: 324deg; }
+
+@keyframes spaceKeycardSpinnerRotate {
+  to { transform: rotate(360deg); }
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-result {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-result p {
+  margin: 0;
+  padding: 13px 4px;
+  border-bottom: 1px solid rgba(36, 84, 118, .16);
+  color: #0a2840;
+  font-size: 18px;
+  line-height: 1.5;
+}
+
 html[data-samunmong-theme="spaceStation"] .space-analysis-overlay {
   position: fixed;
   z-index: 72;

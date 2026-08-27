@@ -188,6 +188,7 @@
     const linkedEvidenceKey = `samunmong-linked-evidence-${themeStorageSuffix}`;
     const spaceMedicalRecordRecoveryKey = "samunmong-space-medical-record-recovered";
     const spaceAnalysisResultsKey = "samunmong-space-analysis-results";
+    const spaceKeycardRecoveryKey = "samunmong-space-keycard-recovered";
     const retiredJoseonEvidenceNames = new Set(["헐거워진 노리개"]);
     const conversationNotesKey = `samunmong-conversation-notes-${themeStorageSuffix}`;
     const interrogationQuestionCountKey = `samunmong-interrogation-question-count-${themeStorageSuffix}`;
@@ -204,6 +205,7 @@
     let interrogationThinkingSoundTimer = 0;
     let newFactToastTimer = 0;
     let spaceAnalysisTimer = 0;
+    let spaceKeycardRecoveryTimer = 0;
 
     const magicLinearProgression = [
       { screenId: "magicAlchemyLab", name: "제1 연금술 실습실", evidence: ["부러진 지팡이", "화염 감지 룬스톤", "기록의 수정구"] },
@@ -489,6 +491,7 @@
       if (normalizedTheme === "spaceStation") {
         localStorage.removeItem(spaceMedicalRecordRecoveryKey);
         localStorage.removeItem(spaceAnalysisResultsKey);
+        localStorage.removeItem(spaceKeycardRecoveryKey);
       }
       if (normalizedTheme === "joseon") localStorage.removeItem(fieldGuideSeenKey);
 
@@ -540,6 +543,7 @@
       collected.add(name);
       localStorage.setItem(collectedEvidenceKey, JSON.stringify([...collected]));
       syncSpaceAnalysisDevice();
+      syncSpaceKeycardTerminal();
       if (isNewEvidence) markEvidenceBagUnread();
       if (isNewEvidence) syncMagicMapProgress({ announce: true });
     }
@@ -1622,11 +1626,11 @@
         title: "접속 키카드 칩",
         image: "/assets/space-station/evidence/access-keycard-chip.webp",
         imageAlt: "해리의 계정 정보가 기록된 접속 키카드 칩",
-        description: "",
-        items: [
+        description: "사용자 정보가 손상된 휴대용 인증 칩이다. 단말기에 연결하면 남은 접속 기록을 확인할 수 있을 것 같다.",
+        recoveredItems: [
           "등록 대원: HARRY",
           "대원 ID: ORBIT-13-DAT-0319",
-          "최근 접속: OST 22:31",
+          "최근 접속: OST 22:31 의료실 보조 단말",
           "실행 명령: MEDICAL RECORD / DELETE"
         ]
       },
@@ -1665,7 +1669,11 @@
         const hasCompleteResidueAnalysis = evidenceName === "소독천과 장갑"
           && completedAnalysis.has("cloth")
           && completedAnalysis.has("glove");
-        const detail = baseDetail;
+        const keycardRecovered = evidenceName === "접속 키카드 칩"
+          && localStorage.getItem(spaceKeycardRecoveryKey) === "1";
+        const detail = keycardRecovered
+          ? { ...baseDetail, description: "", items: baseDetail.recoveredItems }
+          : baseDetail;
         panel.classList.toggle("residue-analysis-complete", hasCompleteResidueAnalysis);
         panel.setAttribute(
           "aria-labelledby",
@@ -1885,11 +1893,75 @@
     });
     document.querySelector("#spaceAnalysisBack")?.addEventListener("click", showSpaceAnalysisChooser);
 
+    function syncSpaceKeycardTerminal() {
+      if (!isSpaceTheme) return;
+      const terminal = document.querySelector("#spaceKeycardTerminal");
+      if (!terminal) return;
+      const unlocked = readStoredNames(collectedEvidenceKey).includes("접속 키카드 칩");
+      const recovered = localStorage.getItem(spaceKeycardRecoveryKey) === "1";
+      terminal.classList.toggle("space-keycard-terminal-unlocked", unlocked);
+      terminal.classList.toggle("keycard-recovered", recovered);
+      terminal.classList.toggle("evidence-hotspot", unlocked && !recovered);
+      terminal.toggleAttribute("disabled", !unlocked);
+      terminal.setAttribute("aria-disabled", String(!unlocked));
+    }
+
+    function showSpaceKeycardTerminalResult() {
+      const choice = document.querySelector("#spaceKeycardTerminalChoice");
+      const loading = document.querySelector("#spaceKeycardTerminalLoading");
+      const result = document.querySelector("#spaceKeycardTerminalResult");
+      if (choice) choice.hidden = true;
+      if (loading) loading.hidden = true;
+      if (result) result.hidden = false;
+    }
+
+    function startSpaceKeycardRecovery() {
+      const choice = document.querySelector("#spaceKeycardTerminalChoice");
+      const loading = document.querySelector("#spaceKeycardTerminalLoading");
+      const result = document.querySelector("#spaceKeycardTerminalResult");
+      if (choice) choice.hidden = true;
+      if (loading) loading.hidden = false;
+      if (result) result.hidden = true;
+      clearTimeout(spaceKeycardRecoveryTimer);
+      spaceKeycardRecoveryTimer = setTimeout(() => {
+        localStorage.setItem(spaceKeycardRecoveryKey, "1");
+        showSpaceKeycardTerminalResult();
+        syncSpaceKeycardTerminal();
+        refreshEvidenceCard("접속 키카드 칩");
+        playSfx("evidence", 0.55);
+      }, 1800);
+    }
+
+    function setSpaceKeycardTerminalPanel(open) {
+      if (!isSpaceTheme) return;
+      const panel = document.querySelector("#spaceKeycardTerminalPanel");
+      const overlay = document.querySelector("#spaceKeycardTerminalOverlay");
+      const choice = document.querySelector("#spaceKeycardTerminalChoice");
+      const loading = document.querySelector("#spaceKeycardTerminalLoading");
+      const result = document.querySelector("#spaceKeycardTerminalResult");
+      if (!panel || !overlay) return;
+      panel.classList.toggle("show", open);
+      overlay.classList.toggle("show", open);
+      panel.setAttribute("aria-hidden", String(!open));
+      overlay.setAttribute("aria-hidden", String(!open));
+      clearTimeout(spaceKeycardRecoveryTimer);
+      if (!open) return;
+      hideCollectedEvidenceTooltip();
+      const recovered = localStorage.getItem(spaceKeycardRecoveryKey) === "1";
+      if (choice) choice.hidden = recovered;
+      if (loading) loading.hidden = true;
+      if (result) result.hidden = !recovered;
+      document.querySelector("#closeSpaceKeycardTerminal")?.focus();
+    }
+
+    document.querySelector("#spaceKeycardTerminalChip")?.addEventListener("click", startSpaceKeycardRecovery);
+
     function setupEvidenceScreen(screenId) {
       const screen = document.getElementById(screenId);
       if (!screen) return;
 
       syncSpaceAnalysisDevice();
+      syncSpaceKeycardTerminal();
 
       const evidenceHotspots = [...screen.querySelectorAll(".hotspot[data-evidence-name], #hopaeHotspot, #portraitHotspot")];
       evidenceHotspots.forEach((hotspot) => {
@@ -1943,7 +2015,7 @@
       hint.addEventListener("click", () => {
         const collectedNames = isSpaceTheme ? new Set(readStoredNames(collectedEvidenceKey)) : null;
         const activeAnalysisDevice = isSpaceTheme
-          ? screen.querySelector("#spaceMedicalAnalyzer.analysis-device-unlocked")
+          ? screen.querySelector("#spaceMedicalAnalyzer.analysis-device-unlocked, #spaceKeycardTerminal.space-keycard-terminal-unlocked:not(.keycard-recovered)")
           : null;
         const remainingEvidence = isSpaceTheme
           ? [...screen.querySelectorAll(".hotspot[data-evidence-name]")]
@@ -3378,6 +3450,14 @@
       if (isJoseonToolInteraction) {
         const transformed = readExaminedClues().filter((clue) => clue.source === name).at(-1);
         if (transformed?.note) return transformed.note;
+      }
+      if (
+        isSpaceTheme
+        && name === "접속 키카드 칩"
+        && localStorage.getItem(spaceKeycardRecoveryKey) === "1"
+        && data.recoveredCardNote
+      ) {
+        return data.recoveredCardNote;
       }
       if (data.cardNote) return data.cardNote;
       return sentenceBreakText(data.note || "현장에서 발견된 단서입니다.").split("\n").find(Boolean) || "";
@@ -6357,6 +6437,18 @@
 
       if (target.closest("#closeSpaceAnalysis, #spaceAnalysisOverlay")) {
         setSpaceAnalysisPanel(false);
+        return;
+      }
+
+      if (target.closest("#closeSpaceKeycardTerminal, #spaceKeycardTerminalOverlay")) {
+        setSpaceKeycardTerminalPanel(false);
+        return;
+      }
+
+      const keycardTerminal = target.closest("#spaceKeycardTerminal.space-keycard-terminal-unlocked");
+      if (keycardTerminal) {
+        setSpaceKeycardTerminalPanel(true);
+        playSfx("buttonAlt", 0.48);
         return;
       }
 

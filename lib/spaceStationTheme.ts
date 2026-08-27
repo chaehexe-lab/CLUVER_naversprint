@@ -44,7 +44,7 @@ export const spaceStationTheme = {
     "삭제된 의료 기록": { role: "동기 증거", location: "의료실", note: "데이비드의 의료 기록 일부가 삭제되었다.", logic: "불법 임상시험과 약물 부작용 은폐를 보여준다.", relatedSuspects: ["해리", "메르스", "데이비드"], img: "/assets/space-station/evidence/deleted-medical-record.webp" },
     "손상된 압력 센서": { role: "수법 증거", location: "산소 발생기실", note: "P-02 센서가 손상돼 정상 상태를 거짓 보고한다.", logic: "산소 부족을 자동제어가 감지하지 못하게 만든 고의 조작이다.", relatedSuspects: ["메르스"], img: "/assets/space-station/evidence/damaged-pressure-sensor.webp" },
     "조작된 지연 타이머": { role: "알리바이 파괴 증거", location: "산소 발생기실", note: "AUX-04 회로의 타이머가 22시 05분 명령을 22시 18분에 실행했다.", logic: "사고가 미리 예약된 계획 범행임을 확정한다.", relatedSuspects: ["메르스", "알라딘딘"], img: "/assets/space-station/evidence/tampered-delay-timer.webp" },
-    "접속 키카드 칩": { role: "계정 도용 증거", location: "데이터실", note: "해리 계정과 의료실 보조 단말 접근 기록이 함께 남은 접속 칩.", logic: "기록 삭제가 해리의 실수가 아니라 계정 도용임을 보강한다.", relatedSuspects: ["해리", "메르스"], img: "/assets/space-station/evidence/access-keycard-chip.webp" },
+    "접속 키카드 칩": { role: "계정 도용 증거", location: "데이터실", note: "해리 계정과 의료실 보조 단말 접근 기록이 함께 남은 접속 칩.", cardNote: "사용자 정보가 손상된 휴대용 인증 칩이다.", recoveredCardNote: "해리의 계정 정보와 의료실 보조 단말 접속 기록이 남아 있는 인증 칩이다.", logic: "기록 삭제가 해리의 실수가 아니라 계정 도용임을 보강한다.", relatedSuspects: ["해리", "메르스"], img: "/assets/space-station/evidence/access-keycard-chip.webp" },
     "암호화된 연구 보상 계약": { role: "결정적 동기 증거", location: "데이터실", note: "임상 자료 대가로 연구 보상과 우선 귀환권을 약속한 암호화 계약.", logic: "메르스가 폭로를 막으려 한 악의적 동기를 보여준다.", relatedSuspects: ["메르스", "해리"], img: "/assets/space-station/evidence/encrypted-research-contract.webp" },
     "커피 텀블러": { role: "미끼 증거", location: "과학 실험실", note: "아인슈페너의 텀블러. 숨긴 개인 실험을 의심하게 한다.", logic: "아인슈페너를 의심하게 하지만 살인 수법과 연결되지 않는다.", relatedSuspects: ["아인슈페너"], img: "/assets/space-station/evidence/coffee-tumbler.webp" },
     "미승인 약물 앰풀": { role: "위장 및 동기 증거", location: "과학 실험실", note: "삭제된 투약 기록과 같은 제조 코드가 남은 파란 근육 재생 약물 앰풀.", cardNote: "정식 의료 목록에 등록되지 않은 청색 약물 앰풀. 일부가 사용된 상태다.", logic: "메르스가 불법 약물을 숨기고 아인슈페너에게 책임을 씌우려 했다.", relatedSuspects: ["메르스", "아인슈페너"], img: "/assets/space-station/evidence/unauthorized-drug-ampoule.webp" }
@@ -78,7 +78,8 @@ const hotspots: Record<string, SceneHotspot[]> = {
   ],
   spaceDataCore: [
     { evidenceName: "접속 키카드 칩", ariaLabel: "접속 키카드 칩 조사", x: "28%", y: "79%", w: "10%", h: "10%", clipPath: "polygon(5% 20%, 88% 8%, 98% 72%, 18% 96%)", radius: "12px", rot: "0deg" },
-    { evidenceName: "암호화된 연구 보상 계약", ariaLabel: "암호화된 연구 보상 계약 조사", x: "75.2%", y: "57%", w: "14%", h: "18%", clipPath: "polygon(9% 7%, 92% 8%, 96% 88%, 4% 94%)", radius: "12px", rot: "0deg" }
+    { evidenceName: "암호화된 연구 보상 계약", ariaLabel: "암호화된 연구 보상 계약 조사", x: "75.2%", y: "57%", w: "14%", h: "18%", clipPath: "polygon(9% 7%, 92% 8%, 96% 88%, 4% 94%)", radius: "12px", rot: "0deg" },
+    { id: "spaceKeycardTerminal", className: "space-keycard-terminal", ariaLabel: "데이터실 중앙 접속 단말기", x: "53.5%", y: "45.4%", w: "11%", h: "14%", clipPath: "polygon(4% 4%, 96% 4%, 94% 94%, 6% 96%)", radius: "10px", rot: "0deg" }
   ],
   spaceScienceLab: [
     { evidenceName: "커피 텀블러", ariaLabel: "커피 텀블러 조사", x: "38%", y: "55.7%", w: "5%", h: "13%", clipPath: "polygon(23% 2%, 76% 2%, 87% 96%, 14% 96%)", radius: "18px", rot: "0deg" },
