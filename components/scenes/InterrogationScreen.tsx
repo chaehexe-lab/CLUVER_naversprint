@@ -836,7 +836,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               <div className="space-medical-recovered-record" id="spaceMedicalRecoveredRecord" aria-live="polite" hidden>
                 <p>▪ 투약 시각: OST 21:52</p>
                 <p>▪ 환자: 데이비드</p>
-                <p>▪ 계정: harry0319@orbit.sys</p>
+                <p>▪ 담당 의사: 메르스</p>
                 <p>▪ 삭제 시각: OST 22:31</p>
               </div>
             </div>
