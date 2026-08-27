@@ -8,7 +8,7 @@ export default function FieldOneScene() {
       dockAriaLabel="현장 메뉴"
       propClassName="field-evidence-prop"
       backgroundStates={[
-        { state: "all", image: "/samunmong/assets/scenes-integrated/scene-field-one-all-evidence-v6.png" },
+        { state: "all", image: "/samunmong/assets/scene-motion/field-one-all-evidence-cloud-clean-v1.png" },
         { state: "letter-only", image: "/samunmong/assets/scenes-integrated/scene-field-one-letter-only-v6.png" },
         { state: "hopae-only", image: "/samunmong/assets/scenes-integrated/scene-field-one-hopae-only-v6.png" },
         { state: "none", image: "/samunmong/assets/scenes-integrated/scene-field-one-clean-v3.png" }

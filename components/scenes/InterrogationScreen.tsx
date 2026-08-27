@@ -4,6 +4,7 @@ import AccuseSuspect from "@/components/AccuseSuspect";
 import EvidenceInventory from "@/components/EvidenceInventory";
 import InvestigationNote from "@/components/InvestigationNote";
 import InterrogationCharacter2D from "@/components/effects/InterrogationCharacter2D";
+import JoseonMapCandle3D from "@/components/effects/JoseonMapCandle3D";
 import type { GameTheme } from "@/lib/gameTheme";
 import { spaceStationInterrogationCopy, spaceStationMap, spaceStationTheme } from "@/lib/spaceStationTheme";
 import type { CSSProperties } from "react";
@@ -36,7 +37,7 @@ type MapLocation = {
 
 const THEME_MAPS: Record<GameTheme, { image: string; alt: string; locations: MapLocation[] }> = {
   joseon: {
-    image: "/samunmong/assets/joseon-village-map-seven-locations-v2.webp",
+    image: "/samunmong/assets/interactions/map-candle/joseon-village-map-flame-clean-v1.png",
     alt: "조사 장소가 붉은 인장으로 표시된 조선시대 수사 지도",
     locations: [
       { screen: "fieldOne", goTo: "fieldOne", text: "유문석 집 앞", label: "유문석 집 앞 현장으로 이동", x: "29%", y: "32%", labelY: "24%", rot: "-4deg" },
@@ -736,6 +737,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
         </button>
         <div className="map-board">
           <img src={themeMap.image} alt={themeMap.alt} />
+          {initialTheme === "joseon" ? <JoseonMapCandle3D /> : null}
           {themeMap.locations.map((location) => (
             <span className="map-label" data-location-screen={location.screen} style={mapPositionStyle({ x: location.x, y: location.labelY ?? location.y, rot: location.rot })} key={location.screen}>
               {location.text}
