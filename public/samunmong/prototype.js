@@ -1634,6 +1634,13 @@
           "실행 명령: MEDICAL RECORD / DELETE"
         ]
       },
+      "커피 텀블러": {
+        kicker: "ORBIT-13 · LABORATORY ITEM",
+        title: "커피 텀블러",
+        image: "/assets/space-station/evidence/coffee-tumbler-front.png",
+        imageAlt: "과학 실험실에서 발견된 커피 텀블러",
+        description: "아이슈페너가 사용하던 커피 텀블러. 사건 당일 과학 실험실 작업대에 놓여 있었다."
+      },
       "미승인 약물 앰풀": {
         kicker: "ORBIT-13 · MEDICAL SUBSTANCE REPORT",
         title: "미승인 약물 앰풀",
@@ -2168,7 +2175,7 @@
       "/assets/space-station/evidence/access-keycard-chip.webp",
       "/assets/space-station/evidence/encrypted-research-contract.webp",
       "/assets/space-station/evidence/engineer-tool-clamp.webp",
-      "/assets/space-station/evidence/coffee-tumbler.webp",
+      "/assets/space-station/evidence/coffee-tumbler-front.png",
       "/assets/space-station/evidence/unauthorized-drug-ampoule.webp",
       "/assets/space-station/panels/digital-human-scan-v3.png",
       "/assets/space-station/loading/space-transition-bg.webp"
