@@ -15,7 +15,7 @@
 ### 바로 확인 링크
 
 - [메인 화면](https://cluver-naversprint.vercel.app)
-- [우주정거장 살인사건 브리핑](https://cluver-naversprint.vercel.app/?start=briefingScreen&theme=spaceStation)
+- [우주정거장 의문사 사건 브리핑](https://cluver-naversprint.vercel.app/?start=briefingScreen&theme=spaceStation)
 
 ## 프로젝트 목표
 

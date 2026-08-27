@@ -22,8 +22,9 @@ export default function SpaceStationScene({ scene }: { scene: SpaceScene }) {
 
       {scene.hotspots.map((hotspot) => (
         <button
-          key={`${scene.id}-${hotspot.evidenceName}`}
-          className="hotspot object-outline"
+          key={`${scene.id}-${hotspot.id ?? hotspot.evidenceName ?? hotspot.ariaLabel}`}
+          className={`hotspot object-outline${hotspot.className ? ` ${hotspot.className}` : ""}`}
+          id={hotspot.id}
           type="button"
           data-evidence-name={hotspot.evidenceName}
           aria-label={hotspot.ariaLabel}

@@ -16269,6 +16269,74 @@ html[data-samunmong-theme="spaceStation"] .space-evidence-detail.show {
   display: grid;
 }
 
+html[data-samunmong-theme="spaceStation"] .space-residue-analysis-summary {
+  display: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail.residue-analysis-complete {
+  grid-template-columns: minmax(0, 1fr);
+  align-items: stretch;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail.residue-analysis-complete .space-evidence-detail-visual,
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail.residue-analysis-complete .space-evidence-detail-copy {
+  display: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail.residue-analysis-complete .space-residue-analysis-summary {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-residue-analysis-summary > span {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(16, 59, 88, .68);
+  font-size: 12px;
+  letter-spacing: .12em;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-residue-analysis-summary > h2 {
+  margin: 0 0 24px;
+  color: #102b44;
+  font-size: clamp(25px, 2.3vw, 34px);
+  font-weight: 500;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-residue-analysis-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-residue-analysis-grid article {
+  min-height: 210px;
+  padding: 22px 24px;
+  border: 1px solid rgba(74, 129, 166, .42);
+  border-radius: 14px;
+  background: rgba(234, 244, 252, .42);
+  box-shadow: inset 0 0 18px rgba(57, 112, 148, .1);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-residue-analysis-grid h3 {
+  margin: 0 0 14px;
+  color: #123650;
+  font-size: 21px;
+  font-weight: 500;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-residue-analysis-grid p {
+  margin: 0;
+  padding: 8px 2px;
+  border-bottom: 1px solid rgba(36, 84, 118, .14);
+  color: #0a2840;
+  font-size: 16px;
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
 html[data-samunmong-theme="spaceStation"] .space-evidence-detail-visual {
   display: grid;
   place-items: center;
@@ -16396,6 +16464,221 @@ html[data-samunmong-theme="spaceStation"] .space-medical-recovered-record p {
   font-size: clamp(16px, 1.4vw, 19px);
   line-height: 1.55;
   white-space: normal;
+}
+
+html[data-samunmong-theme="spaceStation"] #spaceMedicalAnalyzer {
+  pointer-events: none;
+  cursor: default;
+}
+
+html[data-samunmong-theme="spaceStation"] #spaceMedicalAnalyzer.analysis-device-unlocked {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-overlay {
+  position: fixed;
+  z-index: 72;
+  inset: 0;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  background: rgba(0, 0, 0, .48);
+  transition: opacity .16s ease, visibility .16s ease;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-overlay.show {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-panel {
+  position: fixed;
+  z-index: 73;
+  left: 50%;
+  top: 50%;
+  box-sizing: border-box;
+  width: min(900px, 88vw);
+  min-height: 470px;
+  display: none;
+  padding: 42px 52px 46px;
+  border: 1px solid rgba(188, 229, 255, .9);
+  border-radius: 24px;
+  color: #102b44;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .16), transparent 19%),
+    radial-gradient(ellipse at 24% 0%, rgba(214, 240, 252, .24), transparent 48%),
+    linear-gradient(145deg, rgba(221, 233, 248, .94), rgba(185, 204, 229, .9));
+  box-shadow:
+    0 26px 76px rgba(0, 0, 0, .58),
+    0 0 22px rgba(112, 205, 255, .2),
+    inset 0 0 0 1px rgba(226, 246, 255, .34),
+    inset 0 -18px 38px rgba(64, 105, 154, .1);
+  transform: translate(-50%, -50%);
+  -webkit-backdrop-filter: blur(12px) saturate(1.08);
+  backdrop-filter: blur(12px) saturate(1.08);
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-panel::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(132, 198, 238, .52);
+  border-radius: 18px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .24);
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-panel.show {
+  display: block;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-panel [hidden] {
+  display: none !important;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-kicker {
+  display: block;
+  margin-bottom: 7px;
+  color: rgba(16, 59, 88, .68);
+  font-size: 12px;
+  letter-spacing: .12em;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-panel h2 {
+  margin: 0 0 12px;
+  color: #102b44;
+  font-size: clamp(27px, 2.4vw, 36px);
+  font-weight: 500;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-guide {
+  margin: 0 0 20px;
+  color: #24445f;
+  font-size: 16px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-evidence-list {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 18px;
+  width: 100%;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-evidence-option {
+  min-width: 0;
+  min-height: 170px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 18px 24px;
+  border: 1px solid rgba(74, 129, 166, .42);
+  border-radius: 12px;
+  color: #102b44;
+  background: rgba(234, 244, 252, .46);
+  box-shadow: inset 0 0 14px rgba(57, 112, 148, .08);
+  text-align: center;
+  cursor: pointer;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-evidence-option:hover,
+html[data-samunmong-theme="spaceStation"] .space-analysis-evidence-option:focus-visible {
+  border-color: rgba(54, 145, 196, .8);
+  background: rgba(229, 245, 255, .72);
+  box-shadow: 0 0 0 2px rgba(85, 184, 235, .15), inset 0 0 18px rgba(57, 112, 148, .1);
+  outline: 0;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-evidence-option img {
+  width: 118px;
+  height: 118px;
+  object-fit: contain;
+  filter: drop-shadow(0 7px 8px rgba(0, 0, 0, .22));
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-evidence-option strong {
+  overflow-wrap: anywhere;
+  font-size: 19px;
+  line-height: 1.45;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-progress {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 18px;
+  padding: 64px 24px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-progress strong {
+  color: #173b57;
+  font-size: 19px;
+  text-align: center;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-progress-track {
+  height: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(57, 122, 164, .6);
+  border-radius: 999px;
+  background: rgba(11, 39, 60, .15);
+  box-shadow: inset 0 2px 7px rgba(5, 28, 46, .2);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-progress-track span {
+  width: 0;
+  height: 100%;
+  display: block;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2f91c5, #72d8ff);
+  box-shadow: 0 0 14px rgba(76, 193, 242, .65);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-progress-track span.analyzing {
+  animation: spaceAnalysisFill 1.8s linear forwards;
+}
+
+@keyframes spaceAnalysisFill {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-result {
+  position: relative;
+  z-index: 1;
+  padding-top: 14px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-result h3 {
+  margin: 0 0 18px;
+  color: #123650;
+  font-size: 22px;
+  font-weight: 500;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-result p {
+  margin: 0;
+  padding: 10px 4px;
+  border-bottom: 1px solid rgba(36, 84, 118, .16);
+  color: #0a2840;
+  font-size: 17px;
+}
+
+html[data-samunmong-theme="spaceStation"] #spaceAnalysisBack {
+  margin-top: 20px;
+  padding: 10px 18px;
+  border: 1px solid rgba(47, 116, 159, .78);
+  border-radius: 9px;
+  color: #e9f8ff;
+  background: linear-gradient(180deg, rgba(48, 131, 180, .92), rgba(24, 83, 124, .94));
+  font: inherit;
+  cursor: pointer;
 }
 
 html[data-samunmong-theme="spaceStation"] .space-evidence-detail-close {

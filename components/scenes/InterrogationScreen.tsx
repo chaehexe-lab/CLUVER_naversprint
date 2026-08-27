@@ -776,6 +776,25 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             <button className="space-evidence-detail-close" id="closeSpaceEvidenceDetail" type="button" aria-label="증거 상세 닫기">
               ×
             </button>
+            <section className="space-residue-analysis-summary" id="spaceResidueAnalysisSummary">
+              <span>ORBIT-13 · MATERIAL ANALYSIS RESULT</span>
+              <h2 id="spaceResidueAnalysisTitle">소독천과 장갑 분석 결과</h2>
+              <div className="space-residue-analysis-grid">
+                <article>
+                  <h3>소독천 분석 결과</h3>
+                  <p>▪ 생체 활성 화합물 검출</p>
+                  <p>▪ 성분 코드: RX-47B</p>
+                  <p>▪ 분류: 근육 조직 재생 촉진제</p>
+                  <p>▪ 승인 상태: 승인 기록 없음</p>
+                </article>
+                <article>
+                  <h3>수술용 장갑 분석 결과</h3>
+                  <p>▪ 투명 고분자 화합물 검출</p>
+                  <p>▪ 상온 상태: 점성 젤</p>
+                  <p>▪ 저온 상태: 급속 경화</p>
+                </article>
+              </div>
+            </section>
             <div className="space-evidence-detail-visual">
               <img
                 id="spaceEvidenceDetailImage"
@@ -791,6 +810,12 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
                 정체불명의 투명한 결빙 물질로 뒤덮여 있다. 레버 작동 신호는 입력됐지만 추진 가스
                 밸브는 열리지 않았다. 기록만으로는 결빙 물질의 정확한 성분을 확인할 수 없다.
               </p>
+              <div
+                className="space-medical-recovered-record"
+                id="spaceEvidenceStructuredRecord"
+                aria-live="polite"
+                hidden
+              />
               <form className="space-medical-recovery-form" id="spaceMedicalRecoveryForm" hidden>
                 <label htmlFor="spaceMedicalRecoveryPassword">
                   의료 기록을 복구하려면 비밀번호 4자리를 입력하시오.
@@ -814,6 +839,34 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
                 <p>▪ 계정: harry0319@orbit.sys</p>
                 <p>▪ 삭제 시각: OST 22:31</p>
               </div>
+            </div>
+          </aside>
+          <div className="space-analysis-overlay" id="spaceAnalysisOverlay" aria-hidden="true" />
+          <aside
+            className="space-analysis-panel"
+            id="spaceAnalysisPanel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="spaceAnalysisTitle"
+            aria-hidden="true"
+          >
+            <button className="space-evidence-detail-close" id="closeSpaceAnalysis" type="button" aria-label="성분 분석 닫기">
+              ×
+            </button>
+            <span className="space-analysis-kicker">ORBIT-13 · MATERIAL ANALYZER</span>
+            <h2 id="spaceAnalysisTitle">성분 분석</h2>
+            <p className="space-analysis-guide" id="spaceAnalysisGuide">어떤 증거를 분석하시겠습니까?</p>
+            <div className="space-analysis-evidence-list" id="spaceAnalysisEvidenceList" />
+            <div className="space-analysis-progress" id="spaceAnalysisProgress" hidden>
+              <strong id="spaceAnalysisProgressLabel">시료 분석 중</strong>
+              <div className="space-analysis-progress-track" aria-hidden="true">
+                <span id="spaceAnalysisProgressBar" />
+              </div>
+            </div>
+            <div className="space-analysis-result" id="spaceAnalysisResult" aria-live="polite" hidden>
+              <h3 id="spaceAnalysisResultTitle" />
+              <div id="spaceAnalysisResultLines" />
+              <button id="spaceAnalysisBack" type="button">다른 증거 분석</button>
             </div>
           </aside>
         </>

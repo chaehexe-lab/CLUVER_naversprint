@@ -46,8 +46,8 @@ export const dreamOptions: DreamOption[] = [
     id: "chooseSpaceStation",
     state: "PLAYABLE",
     kicker: "DREAM 03",
-    title: "우주정거장 살인사건",
-    description: "오르빗-13의 정전 이후, 한 우주비행사가 궤도 밖 어둠 속으로 사라졌습니다.",
+    title: "우주정거장 의문사 사건",
+    description: "오르빗-13의 정전 직후, 한 우주비행사가 정거장 밖 어둠 속으로 사라졌습니다.",
     meta: "에어록 · 산소 기록 · 마지막 무전",
     image: "/assets/space-station/backgrounds/orbit-13-airlock.webp",
     disabled: false

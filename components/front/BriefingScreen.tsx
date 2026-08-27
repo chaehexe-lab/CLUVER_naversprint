@@ -217,7 +217,7 @@ function SpaceStationBriefingScreen() {
           닫기
         </button>
         {briefingStep === 0 ? <p className="briefing-kicker">ORBIT-13 INCIDENT LOG</p> : null}
-        <h2>{briefingStep === 0 ? "우주정거장 살인사건" : "데이비드의 마지막 생체 기록"}</h2>
+        <h2>{briefingStep === 0 ? "우주정거장 의문사 사건" : "데이비드의 마지막 생체 기록"}</h2>
         <div className={`briefing-step${briefingStep === 0 ? " active" : ""}`} data-briefing-panel="0">
           <div className="briefing-copy" id="briefingCopy" aria-live="polite" />
         </div>

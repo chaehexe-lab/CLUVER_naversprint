@@ -154,7 +154,7 @@ export default function MainScreen({ active = false }: MainScreenProps) {
               <span>저장된 꿈이 없습니다</span>
             </button>
             <button className="save-slot-item" type="button" data-save-slot-theme="spaceStation" disabled>
-              <strong>우주정거장 살인사건</strong>
+              <strong>우주정거장 의문사 사건</strong>
               <span>저장된 꿈이 없습니다</span>
             </button>
           </div>

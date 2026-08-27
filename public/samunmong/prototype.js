@@ -101,7 +101,7 @@
     if (isMagicTheme || isSpaceTheme) startCaseLabel = "조사 시작";
     document.documentElement.dataset.samunmongTheme = activeTheme;
     const magicBriefingText = sentenceBreakText("“선생님, 제1 연금술 실습실이 밤새 불탔습니다.”\n\n당신은 이 꿈에서 갓 부임한 마법 교사입니다.\n마력의 시선으로 잔류 마법을 살피고, 학생과 교직원을 심문해 방화의 진범을 찾아야 합니다.");
-    const spaceBriefingText = sentenceBreakText("“오르빗-13에서 외부 작업 중 대원이 궤도 밖으로 이탈했습니다.”\n\n당신은 이 꿈에서 정거장 사고 조사관입니다.\n정전 기록, 산소 장치, 우주복 점검 로그와 마지막 무전을 맞춰 보며 사고처럼 보이는 죽음의 진실을 추적해야 합니다.");
+    const spaceBriefingText = sentenceBreakText("“오르빗-13에서 외부 작업 중 정거장 밖으로 이탈했습니다.”\n\n당신은 이 꿈에서 사건 조사관입니다.\n현장에 남겨진 단서와 대원들의 진술을 맞춰 보며,\n사고처럼 보이는 죽음의 진실을 추적해야 합니다.");
     const briefingText = isSpaceTheme
       ? spaceBriefingText
       : isMagicTheme
@@ -173,7 +173,7 @@
     const themeLabels = {
       joseon: "조선시대 살인사건",
       magicSchool: "마법학교 방화사건",
-      spaceStation: "우주정거장 살인사건"
+      spaceStation: "우주정거장 의문사 사건"
     };
     const themeSuffixes = {
       joseon: "joseon",
@@ -187,6 +187,7 @@
     const examinedCluesKey = `samunmong-examined-clues-${themeStorageSuffix}`;
     const linkedEvidenceKey = `samunmong-linked-evidence-${themeStorageSuffix}`;
     const spaceMedicalRecordRecoveryKey = "samunmong-space-medical-record-recovered";
+    const spaceAnalysisResultsKey = "samunmong-space-analysis-results";
     const retiredJoseonEvidenceNames = new Set(["헐거워진 노리개"]);
     const conversationNotesKey = `samunmong-conversation-notes-${themeStorageSuffix}`;
     const interrogationQuestionCountKey = `samunmong-interrogation-question-count-${themeStorageSuffix}`;
@@ -202,6 +203,7 @@
     let interrogationReactionTimer = 0;
     let interrogationThinkingSoundTimer = 0;
     let newFactToastTimer = 0;
+    let spaceAnalysisTimer = 0;
 
     const magicLinearProgression = [
       { screenId: "magicAlchemyLab", name: "제1 연금술 실습실", evidence: ["부러진 지팡이", "화염 감지 룬스톤", "기록의 수정구"] },
@@ -484,7 +486,10 @@
       localStorage.removeItem(`samunmong-conversation-notes-${suffix}`);
       localStorage.removeItem(`samunmong-interrogation-question-count-${suffix}`);
       localStorage.removeItem(`samunmong-interrogation-known-facts-${suffix}`);
-      if (normalizedTheme === "spaceStation") localStorage.removeItem(spaceMedicalRecordRecoveryKey);
+      if (normalizedTheme === "spaceStation") {
+        localStorage.removeItem(spaceMedicalRecordRecoveryKey);
+        localStorage.removeItem(spaceAnalysisResultsKey);
+      }
       if (normalizedTheme === "joseon") localStorage.removeItem(fieldGuideSeenKey);
 
       const slots = readSaveSlots();
@@ -534,6 +539,7 @@
       const isNewEvidence = !collected.has(name);
       collected.add(name);
       localStorage.setItem(collectedEvidenceKey, JSON.stringify([...collected]));
+      syncSpaceAnalysisDevice();
       if (isNewEvidence) markEvidenceBagUnread();
       if (isNewEvidence) syncMagicMapProgress({ announce: true });
     }
@@ -830,7 +836,7 @@
         return;
       }
 
-      const roleText = "당신은 이 꿈에서 정거장 사고 조사관입니다.";
+      const roleText = "당신은 이 꿈에서 사건 조사관입니다.";
       const roleStart = briefingText.indexOf(roleText);
       if (roleStart < 0 || text.length <= roleStart) {
         briefingCopy.textContent = text;
@@ -841,7 +847,7 @@
       const visibleRoleText = text.slice(roleStart, roleEnd);
       const roleLine = document.createElement("span");
       roleLine.className = "space-briefing-role-line";
-      const emphasisText = "정거장 사고 조사관";
+      const emphasisText = "사건 조사관";
       const emphasisStart = roleText.indexOf(emphasisText);
       const emphasisEnd = emphasisStart + emphasisText.length;
       const emphasis = document.createElement("strong");
@@ -1523,7 +1529,7 @@
       "추진 레버 결빙 기록": { x: 60, y: 60 },
       "마지막 무전 기록": { x: -130, y: 95 },
       "소독천과 장갑": { x: 40, y: 35 },
-      "삭제된 의료 기록": { x: 35, y: 70 },
+      "삭제된 의료 기록": { x: 10, y: 30 },
       "조작된 지연 타이머": { x: -45, y: 25 },
       "손상된 압력 센서": { x: -47, y: 25 },
       "접속 키카드 칩": { x: 20, y: 34 },
@@ -1589,7 +1595,20 @@
         title: "공구함 반납 기록",
         image: "/assets/space-station/evidence/engineer-tool-clamp.webp",
         imageAlt: "엔지니어 공구 클램프",
-        description: "- 사용 목적: 우주복 점검\n- 공구함 반납 시각: OST 21:37\n- 마지막 사용자 ID: ORBIT-13-MNT-0821\n- 점검 결과: 우주복 손상 및 특이 잔류물 없음"
+        description: "",
+        items: [
+          "사용 목적: 우주복 점검",
+          "공구함 반납 시각: OST 21:37",
+          "마지막 사용자 ID: ORBIT-13-MNT-0821",
+          "점검 결과: 우주복 손상 및 특이 잔류물 없음"
+        ]
+      },
+      "소독천과 장갑": {
+        kicker: "ORBIT-13 · UNKNOWN RESIDUE",
+        title: "소독천과 장갑",
+        image: "/assets/space-station/evidence/disinfectant-cloth-glove.webp",
+        imageAlt: "정체를 알 수 없는 물질이 묻은 소독천과 수술용 장갑",
+        description: "표면에 알 수 없는 물질이 묻어 있다. 분석장치를 찾아 성분을 분석해야 한다."
       },
       "마지막 무전 기록": {
         kicker: "ORBIT-13 · COMMUNICATION LOG",
@@ -1615,8 +1634,18 @@
       if (!panel || !overlay) return;
       let focusRecoveryInput = false;
       if (open) {
-        const detail = detailedSpaceEvidence[evidenceName];
-        if (!detail) return;
+        const baseDetail = detailedSpaceEvidence[evidenceName];
+        if (!baseDetail) return;
+        const completedAnalysis = new Set(readStoredNames(spaceAnalysisResultsKey));
+        const hasCompleteResidueAnalysis = evidenceName === "소독천과 장갑"
+          && completedAnalysis.has("cloth")
+          && completedAnalysis.has("glove");
+        const detail = baseDetail;
+        panel.classList.toggle("residue-analysis-complete", hasCompleteResidueAnalysis);
+        panel.setAttribute(
+          "aria-labelledby",
+          hasCompleteResidueAnalysis ? "spaceResidueAnalysisTitle" : "spaceEvidenceDetailTitle"
+        );
         panel.dataset.evidence = evidenceName;
         const image = panel.querySelector("#spaceEvidenceDetailImage");
         const kicker = panel.querySelector("#spaceEvidenceDetailKicker");
@@ -1624,6 +1653,7 @@
         const description = panel.querySelector("#spaceEvidenceDetailDescription");
         const recoveryForm = panel.querySelector("#spaceMedicalRecoveryForm");
         const recoveredRecord = panel.querySelector("#spaceMedicalRecoveredRecord");
+        const structuredRecord = panel.querySelector("#spaceEvidenceStructuredRecord");
         const recoveryError = panel.querySelector("#spaceMedicalRecoveryError");
         if (image) {
           image.src = detail.image;
@@ -1633,7 +1663,16 @@
         if (title) title.textContent = detail.title;
         if (description) {
           description.textContent = detail.description;
-          description.hidden = Boolean(detail.requiresRecovery);
+          description.hidden = Boolean(detail.requiresRecovery || detail.items);
+        }
+        if (structuredRecord) {
+          structuredRecord.replaceChildren();
+          structuredRecord.hidden = !detail.items;
+          detail.items?.forEach((item) => {
+            const row = document.createElement("p");
+            row.textContent = `▪ ${item}`;
+            structuredRecord.appendChild(row);
+          });
         }
         const recovered = detail.requiresRecovery && localStorage.getItem(spaceMedicalRecordRecoveryKey) === "1";
         if (recoveryForm) {
@@ -1676,9 +1715,156 @@
       playSfx("evidence", 0.5);
     });
 
+    const spaceAnalysisSamples = {
+      cloth: {
+        title: "소독천 분석 결과",
+        lines: [
+          "생체 활성 화합물 검출",
+          "성분 코드: RX-47B",
+          "분류: 근육 조직 재생 촉진제",
+          "승인 상태: 승인 기록 없음"
+        ]
+      },
+      glove: {
+        title: "수술용 장갑 분석 결과",
+        lines: [
+          "투명 고분자 화합물 검출",
+          "상온 상태: 점성 젤",
+          "저온 상태: 급속 경화"
+        ]
+      }
+    };
+
+    function syncSpaceAnalysisDevice() {
+      if (!isSpaceTheme) return;
+      const device = document.querySelector("#spaceMedicalAnalyzer");
+      if (!device) return;
+      const unlocked = readStoredNames(collectedEvidenceKey).includes("소독천과 장갑");
+      device.classList.toggle("analysis-device-unlocked", unlocked);
+      device.classList.toggle("evidence-hotspot", unlocked);
+      device.toggleAttribute("disabled", !unlocked);
+      device.setAttribute("aria-disabled", String(!unlocked));
+    }
+
+    function renderSpaceAnalysisChoices() {
+      const list = document.querySelector("#spaceAnalysisEvidenceList");
+      if (!list) return;
+      list.replaceChildren();
+      const samples = [
+        { id: "cloth", label: "소독천" },
+        { id: "glove", label: "수술용 장갑" }
+      ];
+      samples.forEach((sample) => {
+        const button = document.createElement("button");
+        const image = document.createElement("img");
+        const label = document.createElement("strong");
+        button.type = "button";
+        button.className = "space-analysis-evidence-option";
+        button.dataset.analysisSample = sample.id;
+        image.src = getEvidenceImage("소독천과 장갑");
+        image.alt = "";
+        label.textContent = sample.label;
+        button.append(image, label);
+        list.appendChild(button);
+      });
+    }
+
+    function showSpaceAnalysisChooser() {
+      clearTimeout(spaceAnalysisTimer);
+      const guide = document.querySelector("#spaceAnalysisGuide");
+      const list = document.querySelector("#spaceAnalysisEvidenceList");
+      const progress = document.querySelector("#spaceAnalysisProgress");
+      const result = document.querySelector("#spaceAnalysisResult");
+      const bar = document.querySelector("#spaceAnalysisProgressBar");
+      if (guide) guide.textContent = "어떤 증거를 분석하시겠습니까?";
+      if (list) list.hidden = false;
+      if (progress) progress.hidden = true;
+      if (result) result.hidden = true;
+      bar?.classList.remove("analyzing");
+      renderSpaceAnalysisChoices();
+    }
+
+    function showSpaceAnalysisResult(sampleId) {
+      const config = spaceAnalysisSamples[sampleId];
+      if (!config) return;
+      const guide = document.querySelector("#spaceAnalysisGuide");
+      const list = document.querySelector("#spaceAnalysisEvidenceList");
+      const progress = document.querySelector("#spaceAnalysisProgress");
+      const result = document.querySelector("#spaceAnalysisResult");
+      const title = document.querySelector("#spaceAnalysisResultTitle");
+      const lines = document.querySelector("#spaceAnalysisResultLines");
+      if (guide) guide.textContent = "분석 결과";
+      if (list) list.hidden = true;
+      if (progress) progress.hidden = true;
+      if (result) result.hidden = false;
+      if (title) title.textContent = config.title;
+      if (lines) {
+        lines.replaceChildren();
+        config.lines.forEach((line) => {
+          const row = document.createElement("p");
+          row.textContent = `▪ ${line}`;
+          lines.appendChild(row);
+        });
+      }
+    }
+
+    function startSpaceAnalysis(sampleId) {
+      const config = spaceAnalysisSamples[sampleId];
+      if (!config) return;
+      const analyzed = new Set(readStoredNames(spaceAnalysisResultsKey));
+      const guide = document.querySelector("#spaceAnalysisGuide");
+      const list = document.querySelector("#spaceAnalysisEvidenceList");
+      const progress = document.querySelector("#spaceAnalysisProgress");
+      const result = document.querySelector("#spaceAnalysisResult");
+      const label = document.querySelector("#spaceAnalysisProgressLabel");
+      const bar = document.querySelector("#spaceAnalysisProgressBar");
+      if (guide) guide.textContent = "시료의 성분을 확인하고 있습니다.";
+      if (list) list.hidden = true;
+      if (progress) progress.hidden = false;
+      if (result) result.hidden = true;
+      if (label) label.textContent = `${sampleId === "cloth" ? "소독천" : "수술용 장갑"} 분석 중`;
+      bar?.classList.remove("analyzing");
+      void bar?.offsetWidth;
+      bar?.classList.add("analyzing");
+      clearTimeout(spaceAnalysisTimer);
+      spaceAnalysisTimer = setTimeout(() => {
+        analyzed.add(sampleId);
+        localStorage.setItem(spaceAnalysisResultsKey, JSON.stringify([...analyzed]));
+        showSpaceAnalysisResult(sampleId);
+        playSfx("evidence", 0.55);
+      }, 1800);
+    }
+
+    function setSpaceAnalysisPanel(open) {
+      if (!isSpaceTheme) return;
+      const panel = document.querySelector("#spaceAnalysisPanel");
+      const overlay = document.querySelector("#spaceAnalysisOverlay");
+      if (!panel || !overlay) return;
+      panel.classList.toggle("show", open);
+      overlay.classList.toggle("show", open);
+      panel.setAttribute("aria-hidden", String(!open));
+      overlay.setAttribute("aria-hidden", String(!open));
+      if (open) {
+        hideCollectedEvidenceTooltip();
+        showSpaceAnalysisChooser();
+        document.querySelector("#closeSpaceAnalysis")?.focus();
+      } else {
+        clearTimeout(spaceAnalysisTimer);
+      }
+    }
+
+    document.querySelector("#spaceAnalysisEvidenceList")?.addEventListener("click", (event) => {
+      const button = event.target.closest("[data-analysis-sample]");
+      if (!button) return;
+      startSpaceAnalysis(button.dataset.analysisSample || "");
+    });
+    document.querySelector("#spaceAnalysisBack")?.addEventListener("click", showSpaceAnalysisChooser);
+
     function setupEvidenceScreen(screenId) {
       const screen = document.getElementById(screenId);
       if (!screen) return;
+
+      syncSpaceAnalysisDevice();
 
       const evidenceHotspots = [...screen.querySelectorAll(".hotspot[data-evidence-name], #hopaeHotspot, #portraitHotspot")];
       evidenceHotspots.forEach((hotspot) => {
@@ -1731,11 +1917,14 @@
       }
       hint.addEventListener("click", () => {
         const collectedNames = isSpaceTheme ? new Set(readStoredNames(collectedEvidenceKey)) : null;
+        const activeAnalysisDevice = isSpaceTheme
+          ? screen.querySelector("#spaceMedicalAnalyzer.analysis-device-unlocked")
+          : null;
         const remainingEvidence = isSpaceTheme
           ? [...screen.querySelectorAll(".hotspot[data-evidence-name]")]
               .filter((hotspot) => !collectedNames.has(hotspot.dataset.evidenceName || ""))
           : evidenceHotspots.filter((hotspot) => !hotspot.classList.contains("collected"));
-        if (!remainingEvidence.length) {
+        if (!remainingEvidence.length && !activeAnalysisDevice) {
           showToast("이 장면의 증거를 모두 찾았습니다.", { variant: "hint" });
           return;
         }
@@ -2164,7 +2353,7 @@
     const exitDialog = document.querySelector("#exitDialog");
     const defaultSettings = { volume: 70, highContrast: false };
     applySettings({ ...defaultSettings, ...readStored(settingsKey, {}) });
-    if (briefingTitle && isSpaceTheme) briefingTitle.textContent = "우주정거장 살인사건";
+    if (briefingTitle && isSpaceTheme) briefingTitle.textContent = "우주정거장 의문사 사건";
     applyMagicUiCopies();
     setMagicRecordTab("0");
     updateMagicStudentPage(0);
@@ -3165,7 +3354,7 @@
         const transformed = readExaminedClues().filter((clue) => clue.source === name).at(-1);
         if (transformed?.note) return transformed.note;
       }
-      return sentenceBreakText(data.note || "현장에서 발견된 단서입니다.").split("\n").find(Boolean) || "";
+      return sentenceBreakText(data.cardNote || data.note || "현장에서 발견된 단서입니다.").split("\n").find(Boolean) || "";
     }
 
     function refreshEvidenceCard(name) {
@@ -6139,6 +6328,18 @@
     document.addEventListener("click", (event) => {
       const target = event.target instanceof Element ? event.target : null;
       if (!target) return;
+
+      if (target.closest("#closeSpaceAnalysis, #spaceAnalysisOverlay")) {
+        setSpaceAnalysisPanel(false);
+        return;
+      }
+
+      const analysisDevice = target.closest("#spaceMedicalAnalyzer.analysis-device-unlocked");
+      if (analysisDevice) {
+        setSpaceAnalysisPanel(true);
+        playSfx("buttonAlt", 0.48);
+        return;
+      }
 
       if (target.closest("#closeSpaceEvidenceDetail, #spaceEvidenceDetailOverlay")) {
         setSpaceEvidenceDetail(false);

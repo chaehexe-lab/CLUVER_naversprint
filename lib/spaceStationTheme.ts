@@ -4,7 +4,7 @@ const room = "/assets/space-station/backgrounds/emergency-investigation-room-v2.
 
 export const spaceStationTheme = {
   id: "spaceStation",
-  title: "우주정거장 살인사건",
+  title: "우주정거장 의문사 사건",
   subtitle: "오르빗-13 임상 은폐 살인 사건",
   station: { id: "ORBIT-13", name: "오르빗-13", formalName: "지구 저궤도 생명과학 연구정거장 ORBIT-13" },
   playerRole: "비상 조사관",
@@ -40,7 +40,7 @@ export const spaceStationTheme = {
     "엔지니어 공구 클램프": { role: "무혐의 증거", location: "에어록", note: "공구함 반납 기록을 확인할 수 있다.", logic: "알라딘딘이 장비를 조작했다는 의혹을 약화한다.", relatedSuspects: ["알라딘딘"], img: "/assets/space-station/evidence/engineer-tool-clamp.webp" },
     "추진 레버 결빙 기록": { role: "수법 증거", location: "에어록", note: "데이비드의 우주복 원격 진단 기록을 확인할 수 있다.", logic: "추진 레버는 데이비드와 함께 표류했지만 관제 기록을 통해 결빙 시점과 작동 불능 상태를 확인할 수 있다.", relatedSuspects: ["메르스", "알라딘딘"], img: "/assets/space-station/evidence/control-terminal.webp" },
     "마지막 무전 기록": { role: "결정타 증거", location: "에어록", note: "사건 당시 데이비드가 송신한 무전 기록을 시간순으로 확인할 수 있다.", logic: "메르스가 구조 요청을 받고도 채널을 차단했다.", relatedSuspects: ["데이비드", "메르스"], img: "/assets/space-station/evidence/final-radio-log.webp" },
-    "소독천과 장갑": { role: "연결 증거", location: "의료실", note: "흰 소독천과 수술용 장갑에 투명 젤 성분이 남아 있다.", logic: "추진 레버를 막은 젤과 의료실을 연결한다.", relatedSuspects: ["메르스"], img: "/assets/space-station/evidence/disinfectant-cloth-glove.webp" },
+    "소독천과 장갑": { role: "연결 증거", location: "의료실", note: "흰 소독천과 수술용 장갑에 투명 젤 성분이 남아 있다.", cardNote: "흰 소독천과 수술용 장갑에 정체를 알 수 없는 물질이 묻어 있다.", logic: "추진 레버를 막은 젤과 의료실을 연결한다.", relatedSuspects: ["메르스"], img: "/assets/space-station/evidence/disinfectant-cloth-glove.webp" },
     "삭제된 의료 기록": { role: "동기 증거", location: "의료실", note: "데이비드의 의료 기록 일부가 삭제되었다.", logic: "불법 임상시험과 약물 부작용 은폐를 보여준다.", relatedSuspects: ["해리", "메르스", "데이비드"], img: "/assets/space-station/evidence/deleted-medical-record.webp" },
     "손상된 압력 센서": { role: "수법 증거", location: "산소 발생기실", note: "P-02 센서가 손상돼 정상 상태를 거짓 보고한다.", logic: "산소 부족을 자동제어가 감지하지 못하게 만든 고의 조작이다.", relatedSuspects: ["메르스"], img: "/assets/space-station/evidence/damaged-pressure-sensor.webp" },
     "조작된 지연 타이머": { role: "알리바이 파괴 증거", location: "산소 발생기실", note: "AUX-04 회로의 타이머가 22시 05분 명령을 22시 18분에 실행했다.", logic: "사고가 미리 예약된 계획 범행임을 확정한다.", relatedSuspects: ["메르스", "알라딘딘"], img: "/assets/space-station/evidence/tampered-delay-timer.webp" },
@@ -69,7 +69,8 @@ const hotspots: Record<string, SceneHotspot[]> = {
   ],
   spaceMedicalBay: [
     { evidenceName: "소독천과 장갑", ariaLabel: "소독천과 장갑 조사", x: "10.8%", y: "71.4%", w: "11%", h: "9.5%", clipPath: "polygon(4% 28%, 90% 8%, 98% 78%, 14% 96%)", radius: "14px", rot: "0deg" },
-    { evidenceName: "삭제된 의료 기록", ariaLabel: "삭제된 의료 기록 조사", x: "77.3%", y: "53%", w: "6%", h: "13%", clipPath: "polygon(8% 4%, 90% 8%, 96% 94%, 6% 98%)", radius: "10px", rot: "0deg" }
+    { evidenceName: "삭제된 의료 기록", ariaLabel: "삭제된 의료 기록 조사", x: "77.3%", y: "53%", w: "6%", h: "13%", clipPath: "polygon(8% 4%, 90% 8%, 96% 94%, 6% 98%)", radius: "10px", rot: "0deg" },
+    { id: "spaceMedicalAnalyzer", className: "space-analysis-device", ariaLabel: "의료실 성분 분석 장치", x: "83.7%", y: "55%", w: "7.5%", h: "11.5%", clipPath: "polygon(8% 12%, 84% 4%, 98% 78%, 14% 96%)", radius: "10px", rot: "0deg" }
   ],
   spaceOxygenGenerator: [
     { evidenceName: "조작된 지연 타이머", ariaLabel: "조작된 지연 타이머 조사", x: "17.5%", y: "54%", w: "7%", h: "8%", clipPath: "polygon(6% 10%, 94% 8%, 98% 88%, 8% 96%)", radius: "12px", rot: "0deg" },
