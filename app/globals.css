@@ -3,6 +3,7 @@
   --cursor-click: url("/test_image/pixellab-detective-s-magnifying-glass-1783517078454 (2).png") 16 16, pointer;
   --cursor-input: url("/test_image/pixellab-detective-s-magnifying-glass-1783517078454 (3).png") 16 16, text;
   --cursor-disabled: url("/test_image/pixellab-detective-s-magnifying-glass-1783517078454 (4).png") 16 16, not-allowed;
+  --cursor-magic-wand: url("/samunmong/assets/magic-school/ui/magic-wand-cursor.svg") 10 10, crosshair;
 }
 
 * {
@@ -864,6 +865,11 @@ body.tool-cursor-active,
 body.tool-cursor-active .tool-preview-image,
 body.tool-cursor-active .tool-preview-image * {
   cursor: none !important;
+}
+
+html body.magic-wand-cursor-active,
+html body.magic-wand-cursor-active * {
+  cursor: var(--cursor-magic-wand) !important;
 }
 
 .interpretation-screen {
