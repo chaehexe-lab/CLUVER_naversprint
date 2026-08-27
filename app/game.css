@@ -4684,6 +4684,16 @@
       user-select: none;
     }
 
+    .joseon-map-candle-rig-3d {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      display: block;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+
     .map-pin-button {
       position: absolute;
       left: var(--x);
@@ -15666,8 +15676,15 @@ html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-preview-image
 }
 
 .scene-lantern-layer { position:absolute; z-index:2; inset:0; overflow:hidden; pointer-events:none; }
+.joseon-scene-rig,
+.joseon-scene-rig-canvas,
+.field-one-dynamic-rig-3d { position:absolute; z-index:2; inset:0; display:block; width:100%; height:100%; pointer-events:none; }
+.joseon-scene-rig-canvas,
+.field-one-dynamic-rig-3d { z-index:auto; }
 .scene-lantern-light { --scene-light-strength:.32; position:absolute; aspect-ratio:1; border-radius:50%; background:radial-gradient(circle,rgba(255,220,145,var(--scene-light-strength)) 0 7%,rgba(222,141,55,.15) 25%,transparent 70%); filter:blur(5px); mix-blend-mode:screen; transform:translate(-50%,-50%) scale(.88); animation:sceneLanternBreathe 2.7s ease-in-out infinite; }
 .scene-lantern-light::before { content:""; position:absolute; left:50%; top:50%; width:12%; aspect-ratio:.7; background:url("/samunmong/assets/interactions/interrogation-candle/candle-flame-idle-12.png") 0 0/1200% 100% no-repeat; transform:translate(-50%,-58%); animation:sceneLanternSpriteFrames 1.35s steps(11,end) infinite; }
+.scene-lantern-light--painted { background:radial-gradient(circle,rgba(255,226,166,var(--scene-light-strength)) 0 9%,rgba(230,159,76,.1) 31%,transparent 70%); filter:blur(4px); opacity:.18; animation:scenePaintedLanternPulse 5.8s ease-in-out infinite; }
+.scene-lantern-light--painted::before { content:none; display:none; }
 .hotspot.hanging-evidence { overflow:visible; transform-origin:50% 0; }
 .hotspot.hanging-evidence .hotspot-evidence-visual { position:absolute; left:50%; top:0; width:100%; height:100%; object-fit:contain; opacity:.84; filter:brightness(.86) saturate(.8) drop-shadow(0 7px 7px rgba(0,0,0,.62)); transform:translateX(-50%) rotate(-1.5deg); transform-origin:50% 4%; pointer-events:none; animation:hangingEvidenceSway 4.6s ease-in-out infinite alternate; }
 .hotspot.hanging-evidence.collected .hotspot-evidence-visual { opacity:0; animation:none; }
@@ -15680,11 +15697,97 @@ html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-preview-image
 .hotspot.field-hopae-evidence .hotspot-evidence-visual { opacity:.5; filter:brightness(.56) contrast(.9) saturate(.48) sepia(.14) drop-shadow(0 2px 3px rgba(0,0,0,.38)); }
 @keyframes sceneLanternBreathe { 0%,100%{opacity:.38;transform:translate(-50%,-50%) scale(.88)} 34%{opacity:.9;transform:translate(-50%,-50%) scale(1.06)} 51%{opacity:.56;transform:translate(-50%,-50%) scale(.97)} 76%{opacity:1;transform:translate(-50%,-50%) scale(1.1)} }
 @keyframes sceneLanternSpriteFrames { from{background-position:0 0} to{background-position:100% 0} }
+@keyframes scenePaintedLanternPulse { 0%,42%,100%{opacity:.16;transform:translate(-50%,-50%) scale(.94)} 51%{opacity:.42;transform:translate(-50%,-50%) scale(1.025)} 60%{opacity:.2;transform:translate(-50%,-50%) scale(.98)} }
 @keyframes hangingEvidenceSway { 0%{transform:translateX(-50%) rotate(-2.1deg)} 52%{transform:translateX(-50%) rotate(.35deg)} 100%{transform:translateX(-50%) rotate(2deg)} }
 @media (prefers-reduced-motion:reduce) {
   .scene-lantern-light { animation:sceneLanternBreathe 4.5s ease-in-out infinite !important; }
   .scene-lantern-light::before { animation:sceneLanternSpriteFrames 1.8s steps(11,end) infinite !important; }
+  .scene-lantern-light--painted { animation:scenePaintedLanternPulse 8s ease-in-out infinite !important; }
   .hotspot.hanging-evidence .hotspot-evidence-visual { animation:hangingEvidenceSway 7s ease-in-out infinite alternate !important; }
+}
+
+.scene-object-comment-layer {
+  position: absolute;
+  z-index: 5;
+  inset: 0;
+  pointer-events: none;
+}
+
+.backgate-atmosphere {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+#backGateCourtyard .shade {
+  background:
+    radial-gradient(circle at 50% 45%, transparent 0 52%, rgba(0, 0, 0, .16) 80%, rgba(0, 0, 0, .3)),
+    linear-gradient(180deg, rgba(0, 0, 0, .01), rgba(0, 0, 0, .22));
+}
+
+.scene-object-comment-hitbox {
+  position: absolute;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  outline: 0;
+  clip-path: var(--object-hit-clip);
+}
+
+.scene-object-comment-hitbox::before,
+.scene-object-comment-hitbox::after {
+  content: none !important;
+}
+
+.scene-object-comment {
+  position: absolute;
+  z-index: 65;
+  left: 50%;
+  bottom: 12.5%;
+  width: max-content;
+  max-width: calc(100% - 56px);
+  margin: 0;
+  padding: 10px 18px;
+  border: 1px solid rgba(199, 161, 105, .48);
+  border-radius: 4px;
+  color: #f2e3c5;
+  background: rgba(19, 13, 9, .88);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, .48);
+  font-family: "Nanum BareunJeongsin", serif;
+  font-size: 18px;
+  line-height: 1.45;
+  text-align: center;
+  white-space: nowrap;
+  letter-spacing: 0;
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(-50%, 8px, 0);
+  transition: opacity .18s ease, transform .24s ease;
+}
+
+.scene-object-comment.show {
+  opacity: 1;
+  transform: translate3d(-50%, 0, 0);
+}
+
+@media (max-width: 720px) {
+  .scene-object-comment {
+    width: auto;
+    max-width: calc(100% - 28px);
+    font-size: 15px;
+    white-space: normal;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scene-object-comment { transition: none; }
 }
 
 /* Space-station evidence storage: calm, brighter steel-blue glass. */

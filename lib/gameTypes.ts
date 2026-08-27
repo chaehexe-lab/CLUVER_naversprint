@@ -31,6 +31,7 @@ export type SceneLight = {
   size?: string;
   strength?: number;
   delay?: string;
+  mode?: "flame" | "painted";
 };
 
 export type SceneDockAction = {

@@ -3,6 +3,9 @@
 import { useLayoutEffect, type CSSProperties, type ReactNode } from "react";
 import type { InvestigationSceneData } from "@/lib/gameTypes";
 import { hotspotStyle, propStyle } from "./hotspotStyle";
+import SceneObjectComments from "./SceneObjectComments";
+import BackGateAtmosphere from "@/components/effects/BackGateAtmosphere";
+import JoseonSceneRig3D from "@/components/effects/JoseonSceneRig3D";
 
 type InvestigationSceneProps = {
   scene: InvestigationSceneData;
@@ -74,14 +77,16 @@ export default function InvestigationScene({
           ))}
         </div>
       )}
+      {scene.id === "backGateCourtyard" && <BackGateAtmosphere />}
+      {scene.id !== "backGateCourtyard" && <JoseonSceneRig3D sceneId={scene.id} imageUrl={scene.image} />}
       <div className="shade" />
 
-      {scene.lights && scene.lights.length > 0 && (
+      {scene.id === "backGateCourtyard" && scene.lights && scene.lights.length > 0 && (
         <div className="scene-lantern-layer" aria-hidden="true">
           {scene.lights.map((light, index) => (
             <i
               key={`${scene.id}-light-${index}`}
-              className="scene-lantern-light"
+              className={`scene-lantern-light${light.mode === "painted" ? " scene-lantern-light--painted" : ""}`}
               style={{ left: light.x, top: light.y, width: light.size ?? "7%", "--scene-light-strength": light.strength ?? 0.32, animationDelay: light.delay ?? `${index * -0.63}s` } as CSSProperties}
             />
           ))}
@@ -112,6 +117,8 @@ export default function InvestigationScene({
           {hotspot.image && <img className="hotspot-evidence-visual" src={hotspot.image} alt="" draggable={false} />}
         </button>
       ))}
+
+      <SceneObjectComments sceneId={scene.id} />
 
       <nav className="hud scene-dock" aria-label={dockAriaLabel}>
         {scene.dock.map((action) => (

@@ -103,6 +103,11 @@ export const fieldOneScene = {
     { className: "scene-evidence-object field-letter-evidence", evidenceName: "찢어진 약속 편지", ariaLabel: "찢어진 편지 조각 조사", x: "72.7%", y: "87.3%", w: "8.2%", h: "8.5%", clipPath: "polygon(7% 35%, 44% 8%, 94% 24%, 98% 76%, 32% 96%, 2% 70%)", radius: "12px", rot: "7deg" },
     { id: "hopaeHotspot", className: "scene-evidence-object field-hopae-evidence hopae-glow", evidenceName: "호패 조각", ariaLabel: "글자 지워진 나무패 조사", x: "62.8%", y: "87.2%", w: "5.2%", h: "8.5%", clipPath: "polygon(26% 6%, 75% 8%, 96% 58%, 70% 96%, 24% 90%, 3% 43%)", radius: "14px", rot: "-10deg" }
   ] satisfies SceneHotspot[],
+  lights: [
+    { x: "18.5%", y: "39.2%", size: "4.6%", strength: 0.12, mode: "painted" },
+    { x: "59.5%", y: "27.4%", size: "5.2%", strength: 0.14, delay: "-1.7s", mode: "painted" },
+    { x: "80.4%", y: "20.5%", size: "6%", strength: 0.15, delay: "-3.2s", mode: "painted" }
+  ],
   dock: [
     { id: "openMapFromField", ...investigationDock[0], className: "map-chip" },
     { id: "openBagFromField", ...investigationDock[1], className: "bag-chip" },
@@ -202,7 +207,7 @@ export const backGateCourtyardScene = {
     { className: "scene-evidence-object backgate-footprints-evidence", evidenceName: "작은 발자국", ariaLabel: "작은 발자국 조사", x: "58%", y: "77.5%", w: "8%", h: "16%", clipPath: "polygon(8% 34%, 24% 12%, 52% 18%, 68% 4%, 96% 34%, 82% 88%, 22% 96%)", radius: "999px", rot: "8deg" },
     { className: "scene-evidence-object backgate-cord-evidence", evidenceName: "끊어진 호패끈", ariaLabel: "끊어진 호패끈 조사", x: "17.8%", y: "81.8%", w: "14.2%", h: "11.5%", clipPath: "polygon(1% 43%, 18% 20%, 49% 5%, 82% 19%, 99% 48%, 84% 78%, 52% 96%, 17% 84%)", radius: "999px", rot: "-5deg" }
   ] satisfies SceneHotspot[],
-  lights: [{ x: "70.5%", y: "28.5%", size: "7%", strength: 0.4 }],
+  lights: [{ x: "69.7%", y: "28.5%", size: "6.2%", strength: 0.16, mode: "painted" }],
   dock: investigationDock
 } as const;
 
