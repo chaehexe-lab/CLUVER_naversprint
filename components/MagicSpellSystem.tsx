@@ -76,10 +76,16 @@ export default function MagicSpellSystem({
   const hasDrawing = useMemo(() => strokes.some((stroke) => stroke.length > 0), [strokes]);
   const canCast = hasDrawing && progress >= REQUIRED_COVERAGE;
   const spellLocked = phase === "casting" || phase === "complete";
+  const wandCursorActive = menuOpen || spellLocked;
 
   useEffect(() => {
     onLightChange(false);
   }, [onLightChange, sceneId]);
+
+  useEffect(() => {
+    document.body.classList.toggle("magic-wand-cursor-active", wandCursorActive);
+    return () => document.body.classList.remove("magic-wand-cursor-active");
+  }, [wandCursorActive]);
 
   function castSpell() {
     if (!canCast || phase !== "draw" || completionStarted.current) return;

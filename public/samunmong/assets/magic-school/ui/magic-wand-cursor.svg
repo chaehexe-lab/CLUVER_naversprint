@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" shape-rendering="crispEdges">
+  <!-- 청록색 마력 잔광 -->
+  <g fill="#164f70">
+    <rect x="1" y="4" width="1" height="4"/>
+    <rect x="2" y="2" width="1" height="2"/>
+    <rect x="3" y="1" width="3" height="1"/>
+    <rect x="7" y="1" width="2" height="1"/>
+    <rect x="9" y="2" width="2" height="1"/>
+    <rect x="10" y="3" width="1" height="2"/>
+    <rect x="2" y="9" width="1" height="1"/>
+    <rect x="3" y="10" width="3" height="1"/>
+  </g>
+  <g fill="#42ddea">
+    <rect x="1" y="5" width="1" height="2"/>
+    <rect x="3" y="2" width="3" height="1"/>
+    <rect x="8" y="2" width="2" height="1"/>
+    <rect x="10" y="4" width="1" height="1"/>
+    <rect x="3" y="9" width="2" height="1"/>
+  </g>
+  <g fill="#c7ffff">
+    <rect x="1" y="3" width="1" height="1"/>
+    <rect x="6" y="1" width="1" height="1"/>
+    <rect x="11" y="2" width="1" height="1"/>
+    <rect x="1" y="9" width="1" height="1"/>
+  </g>
+
+  <!-- 지팡이의 한 칸 그림자 -->
+  <path d="M8 8h2l14 14v2h-3L7 10V9Z" fill="#05040a"/>
+
+  <!-- 짙은 목재 몸체 -->
+  <path d="M8 7h2l14 14v2h-3L7 9V8Z" fill="#24151b"/>
+  <path d="m10 10 1-1 11 11-1 1Z" fill="#6b3e28"/>
+  <path d="m12 11 1-1 9 9-1 1Z" fill="#9b6631"/>
+  <path d="m12 13 1-1 1 1-1 1Zm3 3 1-1 1 1-1 1Zm3 3 1-1 1 1-1 1Z" fill="#d6a84d"/>
+
+  <!-- 황동 연결 고리 -->
+  <path d="M7 7h3l3 3-3 3-3-3Z" fill="#382309"/>
+  <path d="M8 7h2l3 3-2 2-4-4Z" fill="#d5a13d"/>
+  <path d="m9 8 1-1 2 2-1 1Z" fill="#ffe08a"/>
+
+  <!-- 남청색 보석과 황금 별 장식 -->
+  <path d="M3 1h4l3 3v4l-3 3H3L0 8V4Z" fill="#090813"/>
+  <path d="M3 1h4l2 2v5l-2 2H3L1 8V3Z" fill="#8d5b18"/>
+  <path d="M4 1h2v1h2v2h1v3H8v2H6v1H3V9H2V7H1V4h1V3h2Z" fill="#e0ad42"/>
+  <path d="M4 2h2v1h2v4H7v2H3V8H2V4h2Z" fill="#142968"/>
+  <path d="M4 3h2v1h1v3H6v1H3V5h1Z" fill="#2d6ad2"/>
+  <path d="M4 3h2v1H5v1H3V4h1Z" fill="#79e8f5"/>
+  <rect x="4" y="4" width="1" height="1" fill="#efffff"/>
+
+  <!-- 보석 중앙의 도트 별빛 -->
+  <g fill="#fff2a1">
+    <rect x="4" y="1" width="1" height="2"/>
+    <rect x="4" y="7" width="1" height="2"/>
+    <rect x="1" y="4" width="2" height="1"/>
+    <rect x="7" y="4" width="2" height="1"/>
+    <rect x="4" y="4" width="1" height="1" fill="#ffffff"/>
+  </g>
+
+  <!-- 손잡이 끝의 황동과 보석 -->
+  <path d="m19 20 2-2 3 3v2l-1 1h-2Z" fill="#382309"/>
+  <path d="m20 20 1-1 3 3v1l-1 1Z" fill="#d6a345"/>
+  <path d="m21 22 1-1 2 1v2h-2Z" fill="#204a91"/>
+  <rect x="22" y="22" width="1" height="1" fill="#6ee7f2"/>
+</svg>
