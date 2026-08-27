@@ -1630,6 +1630,18 @@
           "실행 명령: MEDICAL RECORD / DELETE"
         ]
       },
+      "미승인 약물 앰풀": {
+        kicker: "ORBIT-13 · MEDICAL SUBSTANCE REPORT",
+        title: "미승인 약물 앰풀",
+        image: "/assets/space-station/evidence/unauthorized-drug-ampoule.webp",
+        imageAlt: "일부가 사용된 청색 미승인 약물 앰풀",
+        description: "",
+        items: [
+          "약물: 실험용 근육 재생제",
+          "의료 승인: 없음",
+          "부작용: 근력 저하, 심박 이상, 저산소 반응"
+        ]
+      },
       "삭제된 의료 기록": {
         kicker: "ORBIT-13 · MEDICAL ARCHIVE",
         title: "삭제된 의료 기록",
@@ -3367,7 +3379,8 @@
         const transformed = readExaminedClues().filter((clue) => clue.source === name).at(-1);
         if (transformed?.note) return transformed.note;
       }
-      return sentenceBreakText(data.cardNote || data.note || "현장에서 발견된 단서입니다.").split("\n").find(Boolean) || "";
+      if (data.cardNote) return data.cardNote;
+      return sentenceBreakText(data.note || "현장에서 발견된 단서입니다.").split("\n").find(Boolean) || "";
     }
 
     function refreshEvidenceCard(name) {

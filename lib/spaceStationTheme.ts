@@ -47,7 +47,7 @@ export const spaceStationTheme = {
     "접속 키카드 칩": { role: "계정 도용 증거", location: "데이터실", note: "해리 계정과 의료실 보조 단말 접근 기록이 함께 남은 접속 칩.", logic: "기록 삭제가 해리의 실수가 아니라 계정 도용임을 보강한다.", relatedSuspects: ["해리", "메르스"], img: "/assets/space-station/evidence/access-keycard-chip.webp" },
     "암호화된 연구 보상 계약": { role: "결정적 동기 증거", location: "데이터실", note: "임상 자료 대가로 연구 보상과 우선 귀환권을 약속한 암호화 계약.", logic: "메르스가 폭로를 막으려 한 악의적 동기를 보여준다.", relatedSuspects: ["메르스", "해리"], img: "/assets/space-station/evidence/encrypted-research-contract.webp" },
     "커피 텀블러": { role: "미끼 증거", location: "과학 실험실", note: "아인슈페너의 텀블러. 숨긴 개인 실험을 의심하게 한다.", logic: "아인슈페너를 의심하게 하지만 살인 수법과 연결되지 않는다.", relatedSuspects: ["아인슈페너"], img: "/assets/space-station/evidence/coffee-tumbler.webp" },
-    "미승인 약물 앰풀": { role: "위장 및 동기 증거", location: "과학 실험실", note: "삭제된 투약 기록과 같은 제조 코드가 남은 파란 근육 재생 약물 앰풀.", logic: "메르스가 불법 약물을 숨기고 아인슈페너에게 책임을 씌우려 했다.", relatedSuspects: ["메르스", "아인슈페너"], img: "/assets/space-station/evidence/unauthorized-drug-ampoule.webp" }
+    "미승인 약물 앰풀": { role: "위장 및 동기 증거", location: "과학 실험실", note: "삭제된 투약 기록과 같은 제조 코드가 남은 파란 근육 재생 약물 앰풀.", cardNote: "정식 의료 목록에 등록되지 않은 청색 약물 앰풀. 일부가 사용된 상태다.", logic: "메르스가 불법 약물을 숨기고 아인슈페너에게 책임을 씌우려 했다.", relatedSuspects: ["메르스", "아인슈페너"], img: "/assets/space-station/evidence/unauthorized-drug-ampoule.webp" }
   },
   requiredEvidence: ["추진 레버 결빙 기록", "손상된 압력 센서", "조작된 지연 타이머", "삭제된 의료 기록", "접속 키카드 칩", "암호화된 연구 보상 계약", "마지막 무전 기록"],
   deductionRoute: ["외벽 장비 담당 알라딘딘이 먼저 의심받는다.", "약물 앰풀 때문에 아인슈페너가 의심받는다.", "삭제 로그 때문에 해리가 의심받는다.", "산소 복구 과정에서 사고가 예약 실행됐음이 드러난다.", "심문과 의료실 증거가 메르스의 행동을 완성한다.", "최종 지목은 메르스다."]
