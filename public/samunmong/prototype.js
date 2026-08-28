@@ -1660,9 +1660,16 @@
       "조작된 전압 센서": {
         kicker: "ORBIT-13 · POWER CONTROL SENSOR",
         title: "조작된 전압 센서",
-        image: "/assets/space-station/evidence/damaged-pressure-sensor.webp",
+        image: "/assets/space-station/evidence/voltage-sensor-no-scalpel.png",
         imageAlt: "전력 이상 감지 신호가 조작된 전압 센서",
         description: "전력 이상을 감지하지 못하도록 조작된 센서다. 타이머가 보조 전력선에 연결된 사실을 감춰 경고가 울리지 않았으며, 정전 직전까지 정상 신호를 보냈다."
+      },
+      "비인가 지연 타이머": {
+        kicker: "ORBIT-13 · UNAUTHORIZED DELAY TIMER",
+        title: "비인가 지연 타이머",
+        image: "/assets/space-station/evidence/tampered-delay-timer.webp",
+        imageAlt: "보조 전력선에 연결된 비인가 지연 타이머",
+        description: "누군가 OST 22:05에 외부 작업 구역의 보조 전력을 차단하도록 타이머를 예약했다. 타이머는 13분 후인 OST 22:18에 작동하여 해당 구역의 전력 공급을 일시적으로 끊었다."
       },
       "삭제된 의료 기록": {
         kicker: "ORBIT-13 · MEDICAL ARCHIVE",
@@ -1714,7 +1721,7 @@
         if (title) title.textContent = detail.title;
         if (description) {
           description.textContent = detail.description;
-          description.hidden = Boolean(detail.requiresRecovery || detail.items);
+          description.hidden = Boolean(detail.requiresRecovery || !detail.description);
         }
         if (structuredRecord) {
           structuredRecord.replaceChildren();
@@ -2181,7 +2188,7 @@
       "/assets/space-station/evidence/final-radio-log.webp",
       "/assets/space-station/evidence/disinfectant-cloth-glove.webp",
       "/assets/space-station/evidence/deleted-medical-record.webp",
-      "/assets/space-station/evidence/damaged-pressure-sensor.webp",
+      "/assets/space-station/evidence/voltage-sensor-no-scalpel.png",
       "/assets/space-station/evidence/tampered-delay-timer.webp",
       "/assets/space-station/evidence/access-keycard-chip.webp",
       "/assets/space-station/evidence/encrypted-research-contract.webp",
