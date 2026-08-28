@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState, type CSSProperties } from "react";
-import MagicSpellSystem from "@/components/MagicSpellSystem";
+import MagicSpellSystem, { type MagicSpellId, type MagicSpellResult } from "@/components/MagicSpellSystem";
 import { magicSchoolScenes } from "@/lib/gameData";
 import { hotspotStyle } from "./hotspotStyle";
 
@@ -81,6 +81,9 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
     setLightEnabled(enabled);
     if (enabled) setLightCastCount((count) => count + 1);
   }, []);
+  const handleSpellCast = useCallback((spellId: MagicSpellId): MagicSpellResult => {
+    return spellId === "light" ? "success" : "no-effect";
+  }, []);
   const lightClassName = `${requiresLightSpell ? " magic-light-required" : ""}${lightEnabled ? " light-magic-active" : ""}`;
 
   return (
@@ -139,7 +142,7 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
           );
         })}
       </nav>
-      <MagicSpellSystem sceneId={scene.id} onLightChange={handleLightChange} />
+      <MagicSpellSystem sceneId={scene.id} onLightChange={handleLightChange} onSpellCast={handleSpellCast} />
     </section>
   );
 }

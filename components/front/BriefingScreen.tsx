@@ -6,24 +6,69 @@ import { useEffect, useState } from "react";
 
 const magicRecordCards = [
   {
-    name: "기록 책",
-    kind: "세 권의 기록",
-    image: "/samunmong/assets/magic-school/intro/final-ui/archive-books-closed.webp"
+    name: "말포이",
+    kind: "학생기록부",
+    variant: "student",
+    background: "/samunmong/assets/magic-school/intro/final-ui/student-record-open.webp",
+    portrait: "/samunmong/assets/magic-school/interrogation/malpoi-sprite.webp",
+    role: "세쌍둥이 둘째 · 천재형 문제아",
+    fields: [
+      "마력이 강하지만 충동적이다. 지팡이를 자주 부수며 화염 마법 사용 흔적이 많다.",
+      "화염 마법 강의 수강을 마쳤다. 섬세한 빙결 마법은 다루기 어렵다는 기록이 있다.",
+      "부러진 지팡이 때문에 의심받지만, 경보 룬스톤을 얼릴 능력은 부족해 보인다."
+    ]
   },
   {
     name: "말포일",
     kind: "학생기록부",
-    image: "/samunmong/assets/magic-school/intro/final-ui/student-record-open.webp"
+    variant: "student",
+    background: "/samunmong/assets/magic-school/intro/final-ui/student-record-open.webp",
+    portrait: "/samunmong/assets/magic-school/interrogation/malpoil-sprite.webp",
+    role: "세쌍둥이 첫째 · 모범생",
+    fields: [
+      "예의 바르고 성적이 우수하다. 매일 도서관에 머물며 교칙을 잘 지키는 학생이다.",
+      "5대 원소 기초 강의를 모두 수강했다. 보안 기기 관련 도서 대출 기록이 확인된다.",
+      "말포이를 향한 열등감을 감추고 있다. 지나치게 매끄러운 태도를 주의할 필요가 있다."
+    ]
+  },
+  {
+    name: "말포삼",
+    kind: "학생기록부",
+    variant: "student",
+    background: "/samunmong/assets/magic-school/intro/final-ui/student-record-open.webp",
+    portrait: "/samunmong/assets/magic-school/interrogation/malposam-sprite.webp",
+    role: "세쌍둥이 셋째 · 환각 마법 관심",
+    fields: [
+      "소심하고 눈을 잘 마주치지 못한다. 도서관에서 환각 마법 기록을 즐겨 본다.",
+      "환각 마법에 집착한다. 다른 사람의 부탁을 쉽게 거절하지 못하는 성향이다.",
+      "기록 수정구의 보라색 환각층과 연결될 가능성이 있다. 누가 부탁했는지 확인해야 한다."
+    ]
   },
   {
     name: "건달프",
     kind: "경비근무일지",
-    image: "/samunmong/assets/magic-school/intro/final-ui/guard-log-open.webp"
+    variant: "guard",
+    background: "/samunmong/assets/magic-school/intro/final-ui/guard-log-open.webp",
+    portrait: "/samunmong/assets/magic-school/interrogation/gandalf-sprite.webp",
+    role: "교내 경비원",
+    fields: [
+      "성실하고 규정에 엄격하다. 학생 안전 문제에는 즉각 반응한다.",
+      "사건 당일 밤 제1 연금술 실습실 인근 순찰을 강화했다.",
+      "덩쿨도어를 의심하지만, 말포일이 매일 도서관에 간다는 사실도 언급했다."
+    ]
   },
   {
     name: "덩쿨도어",
     kind: "교직원 기록",
-    image: "/samunmong/assets/magic-school/intro/final-ui/faculty-record-open.webp"
+    variant: "faculty",
+    background: "/samunmong/assets/magic-school/intro/final-ui/faculty-record-open.webp",
+    portrait: "/samunmong/assets/magic-school/interrogation/dunguldoor-sprite.webp",
+    role: "학년부장 · 화염 마법 담당",
+    fields: [
+      "화염 마법 담당 교사로 제1 연금술 실습실 수업 관리 권한을 가지고 있다.",
+      "냉담하고 무관심한 태도가 잦다. 학생 문제에 깊게 관여하지 않는다.",
+      "사건 직후 몸에서 탄 냄새가 났고 현장 근처에서 목격되어 의심받고 있다."
+    ]
   }
 ] as const;
 
@@ -485,7 +530,7 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
 
           {isMagicTheme ? (
             <div className="briefing-step" data-briefing-panel="2" aria-hidden="true">
-              <p className="briefing-caption strong">세 권의 기록 책을 차례로 펼쳐 보십시오, 선생님.</p>
+              <p className="briefing-caption strong">다섯 명의 관계자 기록을 차례로 확인하십시오, 선생님.</p>
               <div className="magic-record-intro" data-record-kind="card">
                 <nav className="magic-record-tabs" aria-label="관계자 기록 바로가기">
                   {magicRecordCards.map((record, index) => (
@@ -509,14 +554,33 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
                       data-record-card={index}
                       key={record.name}
                     >
-                      <img src={record.image} alt={`${record.name} ${record.kind}`} draggable={false} />
-                      {index === 0 ? (
-                        <div className="magic-book-click-zones" aria-label="기록 책 선택">
-                          <button type="button" data-record-card-tab="1" aria-label="학생기록부 펼치기" />
-                          <button type="button" data-record-card-tab="2" aria-label="경비근무일지 펼치기" />
-                          <button type="button" data-record-card-tab="3" aria-label="교직원 기록 펼치기" />
+                      <img
+                        className="magic-record-original-form"
+                        src={record.background}
+                        alt={`${record.kind} 원본 양식`}
+                        draggable={false}
+                      />
+                      <div className={`magic-record-filled-content magic-record-filled-${record.variant}`}>
+                        {record.variant === "student" ? (
+                          <div className="magic-student-index-covers" aria-hidden="true">
+                            <span />
+                            <span />
+                            <span />
+                          </div>
+                        ) : null}
+                        <div className="magic-record-portrait-slot">
+                          <img src={record.portrait} alt={`${record.name} 인물 사진`} draggable={false} />
                         </div>
-                      ) : null}
+                        <div className="magic-record-identity">
+                          <strong>{record.name}</strong>
+                          <span>{record.role}</span>
+                        </div>
+                        <div className="magic-record-field-copy">
+                          {record.fields.map((field, fieldIndex) => (
+                            <p key={`${record.name}-${fieldIndex}`}>{field}</p>
+                          ))}
+                        </div>
+                      </div>
                     </article>
                   ))}
                   <div className="magic-record-page-controls" aria-label="관계자 기록 넘기기">
