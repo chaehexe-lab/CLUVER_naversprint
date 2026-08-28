@@ -1,4 +1,5 @@
 import { spaceStationScenes } from "@/lib/gameData";
+import SpaceSceneRig3D from "@/components/effects/SpaceSceneRig3D";
 import { hotspotStyle, propStyle } from "./hotspotStyle";
 
 type SpaceScene = (typeof spaceStationScenes)[number];
@@ -7,6 +8,7 @@ export default function SpaceStationScene({ scene }: { scene: SpaceScene }) {
   return (
     <section className="screen use-text-ui" id={scene.id}>
       <img className="plate" src={scene.image} alt={scene.alt} />
+      <SpaceSceneRig3D sceneId={scene.id} />
       <div className="shade" />
 
       {scene.props.map((prop) => (

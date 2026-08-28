@@ -31,9 +31,9 @@ export const spaceStationTheme = {
   locations: [
     { id: "spaceAirlock", name: "에어록", map: { x: "50.1%", y: "17%", labelY: "26.4%" }, indicator: { x: "50%", y: "14%" }, image: "/assets/space-station/backgrounds/orbit-13-airlock-evidence-v4.webp", alt: "오르빗-13 에어록과 외부 작업 사고 현장" },
     { id: "spaceMedicalBay", name: "의료실", map: { x: "28.5%", y: "33%", labelY: "43.4%" }, indicator: { x: "29%", y: "31%" }, image: "/assets/space-station/backgrounds/medical-bay-evidence-v2.webp", alt: "오르빗-13 의료실" },
-    { id: "spaceOxygenGenerator", name: "전력 제어실", map: { x: "71.9%", y: "33%", labelY: "43.4%" }, indicator: { x: "72%", y: "31%" }, image: "/assets/space-station/backgrounds/oxygen-generator-evidence-v2.webp", alt: "오르빗-13 전력 제어실" },
+    { id: "spaceOxygenGenerator", name: "전력 제어실", map: { x: "71.9%", y: "33%", labelY: "43.4%" }, indicator: { x: "72%", y: "31%" }, image: "/assets/space-station/backgrounds/oxygen-generator-motion-base-v1.webp", alt: "오르빗-13 전력 제어실" },
     { id: "spaceDataCore", name: "데이터실", map: { x: "28.5%", y: "63.5%", labelY: "73.5%" }, indicator: { x: "29%", y: "61%" }, image: "/assets/space-station/backgrounds/data-core-evidence-v2.webp", alt: "오르빗-13 데이터실" },
-    { id: "spaceScienceLab", name: "과학 실험실", map: { x: "71.5%", y: "63%", labelY: "73.5%" }, indicator: { x: "72%", y: "61%" }, image: "/assets/space-station/backgrounds/science-lab-blood-report.png", alt: "오르빗-13 과학 실험실" },
+    { id: "spaceScienceLab", name: "과학 실험실", map: { x: "71.5%", y: "63%", labelY: "73.5%" }, indicator: { x: "72%", y: "61%" }, image: "/assets/space-station/backgrounds/science-lab-motion-base-v2.png", alt: "오르빗-13 과학 실험실" },
     { id: "interrogationScreen", name: "보안 조사실", map: { x: "50.2%", y: "79%", labelY: "88.6%" }, indicator: { x: "50%", y: "76%" }, image: room, alt: "오르빗-13 보안 조사실" }
   ],
   evidence: {
