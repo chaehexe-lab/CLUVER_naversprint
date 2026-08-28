@@ -37,6 +37,16 @@ type HologramSpec = {
   phase: number;
 };
 
+type ScenePoint = readonly [number, number];
+type SceneQuad = readonly [ScenePoint, ScenePoint, ScenePoint, ScenePoint];
+
+type ServerRackSpec = {
+  corners: SceneQuad;
+  rows: number;
+  columns: number;
+  phase: number;
+};
+
 const LIGHTS: Partial<Record<string, readonly LightSpec[]>> = {
   spaceOxygenGenerator: [
     { center: [0.18, 0.52], size: [0.055, 0.06], color: 0x42bfff, phase: 0.7, intensity: 0.12 },
@@ -73,6 +83,16 @@ const HOLOGRAMS: Partial<Record<string, readonly HologramSpec[]>> = {
     { center: [0.472, 0.255], size: [0.105, 0.135], color: 0x79cfff, phase: 0.4 },
     { center: [0.686, 0.255], size: [0.185, 0.145], color: 0x6ec8ff, phase: 2.1 },
     { center: [0.438, 0.372], size: [0.082, 0.098], color: 0x82dcff, phase: 4.7 }
+  ]
+};
+
+const SERVER_LED_RACKS: Partial<Record<string, readonly ServerRackSpec[]>> = {
+  spaceDataCore: [
+    { corners: [[0.002, 0.205], [0.029, 0.208], [0.028, 0.525], [0.002, 0.522]], rows: 10, columns: 2, phase: 0.4 },
+    { corners: [[0.048, 0.205], [0.105, 0.208], [0.101, 0.534], [0.046, 0.528]], rows: 12, columns: 3, phase: 1.3 },
+    { corners: [[0.116, 0.205], [0.169, 0.208], [0.165, 0.53], [0.112, 0.528]], rows: 12, columns: 3, phase: 2.2 },
+    { corners: [[0.742, 0.242], [0.784, 0.241], [0.781, 0.526], [0.743, 0.527]], rows: 11, columns: 3, phase: 5.2 },
+    { corners: [[0.948, 0.237], [0.997, 0.239], [0.994, 0.52], [0.948, 0.519]], rows: 11, columns: 3, phase: 6.4 }
   ]
 };
 
@@ -281,6 +301,93 @@ function makeHolograms(specs: readonly HologramSpec[]) {
   return group;
 }
 
+function makeServerLeds(specs: readonly ServerRackSpec[], pixelRatio: number) {
+  const group = new THREE.Group();
+
+  specs.forEach((spec, rackIndex) => {
+    const [topLeft, topRight, bottomRight, bottomLeft] = spec.corners;
+    const positions: number[] = [];
+    const seeds: number[] = [];
+    const phases: number[] = [];
+    const sizes: number[] = [];
+    const colors: number[] = [];
+
+    for (let row = 0; row < spec.rows; row += 1) {
+      for (let column = 0; column < spec.columns; column += 1) {
+        const source = Math.sin((rackIndex + 1) * 91.731 + (row + 1) * 37.117 + (column + 1) * 17.913) * 43758.5453;
+        const seed = source - Math.floor(source);
+        if (seed < 0.38) continue;
+
+        const horizontal = (column + 0.5 + (seed - 0.5) * 0.24) / spec.columns;
+        const vertical = (row + 0.5 + (seed - 0.5) * 0.16) / spec.rows;
+        const topX = THREE.MathUtils.lerp(topLeft[0], topRight[0], horizontal);
+        const topY = THREE.MathUtils.lerp(topLeft[1], topRight[1], horizontal);
+        const bottomX = THREE.MathUtils.lerp(bottomLeft[0], bottomRight[0], horizontal);
+        const bottomY = THREE.MathUtils.lerp(bottomLeft[1], bottomRight[1], horizontal);
+        const point = uvToWorld([
+          THREE.MathUtils.lerp(topX, bottomX, vertical),
+          THREE.MathUtils.lerp(topY, bottomY, vertical)
+        ], 0.49);
+        const color = new THREE.Color(seed > 0.87 ? 0xf0a85a : seed > 0.68 ? 0x63dcff : 0x2d8fd5);
+
+        positions.push(point.x, point.y, point.z);
+        seeds.push(seed);
+        phases.push(spec.phase + row * 0.41 + column * 0.73);
+        sizes.push((2.8 + seed * 1.9) * pixelRatio);
+        colors.push(color.r, color.g, color.b);
+      }
+    }
+
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+    geometry.setAttribute("seed", new THREE.Float32BufferAttribute(seeds, 1));
+    geometry.setAttribute("phase", new THREE.Float32BufferAttribute(phases, 1));
+    geometry.setAttribute("pointSize", new THREE.Float32BufferAttribute(sizes, 1));
+    geometry.setAttribute("ledColor", new THREE.Float32BufferAttribute(colors, 3));
+
+    const material = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+      uniforms: { time: { value: 0 } },
+      vertexShader: `
+        attribute float seed;
+        attribute float phase;
+        attribute float pointSize;
+        attribute vec3 ledColor;
+        uniform float time;
+        varying float vAlpha;
+        varying vec3 vColor;
+        void main() {
+          float slow = .5 + .5 * sin(time * (.48 + seed * .72) + phase);
+          float packet = smoothstep(.82, .98, .5 + .5 * sin(time * (1.4 + seed * 1.8) + phase * 2.7));
+          float gateNoise = fract(sin(floor(time * (.36 + seed * .52)) + phase * 19.17) * 43758.5453);
+          float gate = step(.16, gateNoise);
+          vAlpha = gate * (.16 + slow * .38 + packet * .38);
+          vColor = ledColor;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+          gl_PointSize = pointSize * (.92 + packet * .18);
+        }
+      `,
+      fragmentShader: `
+        varying float vAlpha;
+        varying vec3 vColor;
+        void main() {
+          vec2 point = abs(gl_PointCoord - .5);
+          float core = (1.0 - smoothstep(.28, .5, point.x)) * (1.0 - smoothstep(.1, .26, point.y));
+          float halo = (1.0 - smoothstep(.38, .5, point.x)) * (1.0 - smoothstep(.24, .5, point.y)) * .28;
+          gl_FragColor = vec4(vColor, (core + halo) * vAlpha);
+        }
+      `
+    });
+    const points = new THREE.Points(geometry, material);
+    points.userData.material = material;
+    group.add(points);
+  });
+
+  return group;
+}
+
 function makeCapsuleSpecimen(renderer: THREE.WebGLRenderer) {
   const texture = new THREE.TextureLoader().load("/assets/space-station/effects/science-capsule-specimen-v1.png");
   texture.colorSpace = THREE.SRGBColorSpace;
@@ -363,13 +470,13 @@ function addSceneLight(scene: THREE.Scene, light: LightSpec) {
 
 export default function SpaceSceneRig3D({ sceneId }: { sceneId: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const hasSceneEffects = Boolean(LIGHTS[sceneId]);
+  const hasSceneEffects = Boolean(LIGHTS[sceneId]?.length || SERVER_LED_RACKS[sceneId]?.length);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const root = document.getElementById(sceneId);
-    const lights = LIGHTS[sceneId];
-    if (!canvas || !root || !lights) return;
+    const lights = LIGHTS[sceneId] || [];
+    if (!canvas || !root || !hasSceneEffects) return;
 
     const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: "high-performance" });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -383,6 +490,7 @@ export default function SpaceSceneRig3D({ sceneId }: { sceneId: string }) {
     scene.add(makeSteam(STEAM[sceneId] || []));
     scene.add(makeSparks(SPARKS[sceneId] || []));
     scene.add(makeHolograms(HOLOGRAMS[sceneId] || []));
+    scene.add(makeServerLeds(SERVER_LED_RACKS[sceneId] || [], renderer.getPixelRatio()));
 
     const specimen = sceneId === "spaceScienceLab" ? makeCapsuleSpecimen(renderer) : null;
     if (specimen) scene.add(specimen);
@@ -448,7 +556,7 @@ export default function SpaceSceneRig3D({ sceneId }: { sceneId: string }) {
       });
       renderer.dispose();
     };
-  }, [sceneId]);
+  }, [hasSceneEffects, sceneId]);
 
   if (!hasSceneEffects) return null;
 
