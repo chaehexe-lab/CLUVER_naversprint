@@ -630,9 +630,11 @@
 
     function readStoredNames(key) {
       const stored = readStored(key, []);
-      return Array.isArray(stored)
-        ? stored.filter((name) => typeof name === "string" && name.trim() && !(themeId === "joseon" && retiredJoseonEvidenceNames.has(name)))
-        : [];
+      if (!Array.isArray(stored)) return [];
+      const migrated = isSpaceTheme
+        ? stored.map((name) => name === "커피 텀블러" ? "혈액 시료 분석 기록" : name)
+        : stored;
+      return [...new Set(migrated.filter((name) => typeof name === "string" && name.trim() && !(themeId === "joseon" && retiredJoseonEvidenceNames.has(name))))];
     }
 
     function readInterrogationQuestionCount() {
@@ -1545,7 +1547,7 @@
       "조작된 전압 센서": { x: -47, y: 25 },
       "접속 키카드 칩": { x: 20, y: 34 },
       "암호화된 연구 보상 계약": { x: -55, y: 20 },
-      "커피 텀블러": { x: 25, y: 65 },
+      "혈액 시료 분석 기록": { x: -55, y: 15 },
       "미승인 약물 앰풀": { x: 31, y: 60 }
     };
 
@@ -1641,12 +1643,18 @@
           "실행 명령: MEDICAL RECORD / DELETE"
         ]
       },
-      "커피 텀블러": {
-        kicker: "ORBIT-13 · LABORATORY ITEM",
-        title: "커피 텀블러",
-        image: "/assets/space-station/evidence/coffee-tumbler-front.png",
-        imageAlt: "과학 실험실에서 발견된 커피 텀블러",
-        description: "아이슈페너가 사용하던 커피 텀블러. 사건 당일 과학 실험실 작업대에 놓여 있었다."
+      "혈액 시료 분석 기록": {
+        kicker: "ORBIT-13 · BLOOD SAMPLE ANALYSIS",
+        title: "혈액 시료 분석 기록",
+        image: "/assets/space-station/evidence/blood-sample-analysis-report.png",
+        imageAlt: "데이비드의 혈액 시료 분석 보고서",
+        description: "데이비드의 혈액에서 정식 처방 기록에 없는 약물 성분이 검출되었다. 결과를 확인한 데이비드는 관련 자료를 직접 조사하기 시작했다.",
+        items: [
+          "시료 제공자: ORBIT-13-ENG-0714",
+          "분석 담당자: 아인슈페너",
+          "검출 성분: RX-47B",
+          "분석 시각: 사건 전날 OST 19:26"
+        ]
       },
       "미승인 약물 앰풀": {
         kicker: "ORBIT-13 · MEDICAL SUBSTANCE REPORT",
@@ -2264,7 +2272,7 @@
       "/assets/space-station/backgrounds/medical-bay-evidence-v2.webp",
       "/assets/space-station/backgrounds/oxygen-generator-evidence-v2.webp",
       "/assets/space-station/backgrounds/data-core-evidence-v2.webp",
-      "/assets/space-station/backgrounds/science-lab-evidence-v2.webp",
+      "/assets/space-station/backgrounds/science-lab-blood-report.png",
       "/assets/space-station/panels/log-record-panel-v2.webp",
       "/assets/space-station/panels/evidence-vault-panel-v2.webp",
       "/assets/space-station/maps/orbit-13-six-location-map.webp",
@@ -2291,7 +2299,7 @@
       "/assets/space-station/evidence/power-control-access-card.png",
       "/assets/space-station/evidence/encrypted-research-contract.webp",
       "/assets/space-station/evidence/engineer-tool-clamp.webp",
-      "/assets/space-station/evidence/coffee-tumbler-front.png",
+      "/assets/space-station/evidence/blood-sample-analysis-report.png",
       "/assets/space-station/evidence/unauthorized-drug-ampoule.webp",
       "/assets/space-station/panels/digital-human-scan-v3.png",
       "/assets/space-station/loading/space-transition-bg.webp"

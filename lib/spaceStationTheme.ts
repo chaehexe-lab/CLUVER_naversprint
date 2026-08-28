@@ -33,7 +33,7 @@ export const spaceStationTheme = {
     { id: "spaceMedicalBay", name: "의료실", map: { x: "28.5%", y: "33%", labelY: "43.4%" }, indicator: { x: "29%", y: "31%" }, image: "/assets/space-station/backgrounds/medical-bay-evidence-v2.webp", alt: "오르빗-13 의료실" },
     { id: "spaceOxygenGenerator", name: "전력 제어실", map: { x: "71.9%", y: "33%", labelY: "43.4%" }, indicator: { x: "72%", y: "31%" }, image: "/assets/space-station/backgrounds/oxygen-generator-evidence-v2.webp", alt: "오르빗-13 전력 제어실" },
     { id: "spaceDataCore", name: "데이터실", map: { x: "28.5%", y: "63.5%", labelY: "73.5%" }, indicator: { x: "29%", y: "61%" }, image: "/assets/space-station/backgrounds/data-core-evidence-v2.webp", alt: "오르빗-13 데이터실" },
-    { id: "spaceScienceLab", name: "과학 실험실", map: { x: "71.5%", y: "63%", labelY: "73.5%" }, indicator: { x: "72%", y: "61%" }, image: "/assets/space-station/backgrounds/science-lab-evidence-v2.webp", alt: "오르빗-13 과학 실험실" },
+    { id: "spaceScienceLab", name: "과학 실험실", map: { x: "71.5%", y: "63%", labelY: "73.5%" }, indicator: { x: "72%", y: "61%" }, image: "/assets/space-station/backgrounds/science-lab-blood-report.png", alt: "오르빗-13 과학 실험실" },
     { id: "interrogationScreen", name: "보안 조사실", map: { x: "50.2%", y: "79%", labelY: "88.6%" }, indicator: { x: "50%", y: "76%" }, image: room, alt: "오르빗-13 보안 조사실" }
   ],
   evidence: {
@@ -47,7 +47,7 @@ export const spaceStationTheme = {
     "접속 키카드 칩": { role: "계정 도용 증거", location: "데이터실", note: "해리 계정과 의료실 보조 단말 접근 기록이 함께 남은 접속 칩.", cardNote: "사용자 정보가 손상된 휴대용 인증 칩이다.", recoveredCardNote: "해리의 계정 정보와 의료실 보조 단말 접속 기록이 남아 있는 인증 칩이다.", logic: "기록 삭제가 해리의 실수가 아니라 계정 도용임을 보강한다.", relatedSuspects: ["해리", "메르스"], img: "/assets/space-station/evidence/access-keycard-chip.webp" },
     "전력 제어실 출입 카드": { role: "출입 권한", location: "보안 조사실", note: "알라딘딘에게서 받은 전력 제어실 출입 카드다.", logic: "전력 제어실의 잠금을 해제한다.", relatedSuspects: ["알라딘딘"], img: "/assets/space-station/evidence/power-control-access-card.png" },
     "암호화된 연구 보상 계약": { role: "결정적 동기 증거", location: "데이터실", note: "임상 자료 대가로 연구 보상과 우선 귀환권을 약속한 암호화 계약.", logic: "메르스가 폭로를 막으려 한 악의적 동기를 보여준다.", relatedSuspects: ["메르스", "해리"], img: "/assets/space-station/evidence/encrypted-research-contract.webp" },
-    "커피 텀블러": { role: "미끼 증거", location: "과학 실험실", note: "아인슈페너의 텀블러. 숨긴 개인 실험을 의심하게 한다.", logic: "아인슈페너를 의심하게 하지만 살인 수법과 연결되지 않는다.", relatedSuspects: ["아인슈페너"], img: "/assets/space-station/evidence/coffee-tumbler-front.png" },
+    "혈액 시료 분석 기록": { role: "불법 투약 추적 증거", location: "과학 실험실", note: "데이비드가 사건 전날 과학 실험실에 맡긴 혈액 시료의 분석 기록이다.", logic: "데이비드가 미승인 약물 투여 사실을 알아내고 관련 자료를 직접 조사하기 시작했음을 보여준다.", relatedSuspects: ["데이비드", "아인슈페너", "메르스"], img: "/assets/space-station/evidence/blood-sample-analysis-report.png" },
     "미승인 약물 앰풀": { role: "위장 및 동기 증거", location: "과학 실험실", note: "삭제된 투약 기록과 같은 제조 코드가 남은 파란 근육 재생 약물 앰풀.", cardNote: "정식 의료 목록에 등록되지 않은 청색 약물 앰풀. 일부가 사용된 상태다.", logic: "메르스가 불법 약물을 숨기고 아인슈페너에게 책임을 씌우려 했다.", relatedSuspects: ["메르스", "아인슈페너"], img: "/assets/space-station/evidence/unauthorized-drug-ampoule.webp" }
   },
   requiredEvidence: ["추진 레버 결빙 기록", "조작된 전압 센서", "비인가 지연 타이머", "삭제된 의료 기록", "접속 키카드 칩", "암호화된 연구 보상 계약", "마지막 무전 기록"],
@@ -83,7 +83,7 @@ const hotspots: Record<string, SceneHotspot[]> = {
     { id: "spaceKeycardTerminal", className: "space-keycard-terminal", ariaLabel: "데이터실 중앙 접속 단말기", x: "53.5%", y: "45.4%", w: "11%", h: "14%", clipPath: "polygon(4% 4%, 96% 4%, 94% 94%, 6% 96%)", radius: "10px", rot: "0deg" }
   ],
   spaceScienceLab: [
-    { evidenceName: "커피 텀블러", ariaLabel: "커피 텀블러 조사", x: "38%", y: "55.7%", w: "5%", h: "13%", clipPath: "polygon(23% 2%, 76% 2%, 87% 96%, 14% 96%)", radius: "18px", rot: "0deg" },
+    { evidenceName: "혈액 시료 분석 기록", ariaLabel: "혈액 시료 분석 기록 조사", x: "39.5%", y: "60%", w: "10%", h: "5.5%", clipPath: "polygon(3% 3%, 97% 3%, 96% 96%, 4% 96%)", radius: "4px", rot: "0deg" },
     { evidenceName: "미승인 약물 앰풀", ariaLabel: "미승인 약물 앰풀 조사", x: "66.7%", y: "62.3%", w: "6.2%", h: "13.3%", clipPath: "polygon(28% 2%, 75% 4%, 94% 91%, 7% 96%)", radius: "999px", rot: "0deg" }
   ]
 };

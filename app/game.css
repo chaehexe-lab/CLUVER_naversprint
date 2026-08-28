@@ -16559,6 +16559,10 @@ html[data-samunmong-theme="spaceStation"] .space-medical-recovered-record:not([h
   gap: 12px;
 }
 
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="혈액 시료 분석 기록"] .space-medical-recovered-record {
+  margin-top: 14px;
+}
+
 html[data-samunmong-theme="spaceStation"] .space-medical-recovered-record p {
   margin: 0;
   padding-bottom: 8px;
