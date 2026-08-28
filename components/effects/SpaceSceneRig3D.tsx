@@ -296,7 +296,7 @@ function makeCapsuleSpecimen(renderer: THREE.WebGLRenderer) {
     toneMapped: true
   });
   const specimen = new THREE.Mesh(new THREE.PlaneGeometry(0.48, 0.72), material);
-  specimen.position.copy(uvToWorld([0.629, 0.465], 0.46));
+  specimen.position.copy(uvToWorld([0.631, 0.465], 0.46));
   specimen.userData.texture = texture;
   return specimen;
 }
@@ -363,6 +363,7 @@ function addSceneLight(scene: THREE.Scene, light: LightSpec) {
 
 export default function SpaceSceneRig3D({ sceneId }: { sceneId: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const hasSceneEffects = Boolean(LIGHTS[sceneId]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -418,7 +419,7 @@ export default function SpaceSceneRig3D({ sceneId }: { sceneId: string }) {
         if (material?.uniforms.time) material.uniforms.time.value = seconds;
       });
       if (specimen) {
-        const anchor = uvToWorld([0.629, 0.465], 0.46);
+        const anchor = uvToWorld([0.631, 0.465], 0.46);
         specimen.position.set(
           anchor.x + Math.sin(seconds * 0.31) * 0.008,
           anchor.y + Math.sin(seconds * 0.72) * 0.075,
@@ -448,6 +449,8 @@ export default function SpaceSceneRig3D({ sceneId }: { sceneId: string }) {
       renderer.dispose();
     };
   }, [sceneId]);
+
+  if (!hasSceneEffects) return null;
 
   return <canvas ref={canvasRef} className="space-scene-rig-3d" aria-hidden="true" data-scene-id={sceneId} />;
 }
