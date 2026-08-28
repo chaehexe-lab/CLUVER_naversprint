@@ -8736,6 +8736,131 @@ html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-requir
 .holy-particle::after { width: 1px; height: calc(var(--particle-size) * 4.2); background: linear-gradient(transparent,#fff9bf,transparent); }
 .holy-particle.star { border-radius: 1px; background: #fff1a0; box-shadow: 0 0 12px rgba(255,216,77,.82); }
 .magic-school-screen.light-magic-active .holy-particle { animation: magicHolyParticleFall var(--particle-duration) linear calc(.2s + var(--particle-delay)) both; }
+
+/* 두 번째 마법학교 조사 구역으로 이어지는 자물쇠 해제 주문 화면 */
+.magic-unlock-screen { isolation:isolate; overflow:hidden; color:#f3ead5; background:#090810; font-family:"Nanum BareunJeongsin",serif; }
+.magic-unlock-backdrop { position:absolute; inset:0; background:linear-gradient(180deg,rgba(7,5,12,.24),rgba(4,4,8,.75)),url("/samunmong/assets/magic-school/scenes/dorm-hallway.webp") center 42%/cover no-repeat; filter:saturate(.76) brightness(.62); transform:scale(1.025); }
+.magic-unlock-backdrop::before,.magic-unlock-backdrop::after { content:""; position:absolute; inset:0; pointer-events:none; }
+.magic-unlock-backdrop::before { opacity:.72; background:linear-gradient(90deg,rgba(8,5,13,.94),transparent 22% 78%,rgba(8,5,13,.94)),linear-gradient(180deg,rgba(5,4,9,.62),transparent 25% 68%,rgba(4,3,7,.88)); }
+.magic-unlock-backdrop::after { background:radial-gradient(ellipse at 50% 51%,transparent 15%,rgba(12,7,17,.22) 44%,rgba(1,1,4,.84) 100%); }
+.magic-door-halo { position:absolute; left:50%; top:52%; width:610px; height:690px; border-radius:48% 48% 10% 10%; background:radial-gradient(ellipse at 50% 56%,rgba(92,57,125,.18),transparent 66%); box-shadow:0 0 120px rgba(42,25,57,.36); transform:translate(-50%,-50%); }
+.corridor-sconce { position:absolute; z-index:2; top:38%; width:42px; height:96px; border-radius:40% 40% 10px 10px; background:linear-gradient(90deg,#2a160e,#9b7140 48%,#321a10); box-shadow:0 10px 18px #000c; }
+.corridor-sconce::before { content:""; position:absolute; left:50%; top:-13px; width:58px; height:76px; border:3px solid #6f522f; border-radius:48% 48% 34% 34%; background:radial-gradient(circle at 50% 44%,rgba(255,218,123,.72),rgba(193,91,24,.22) 34%,rgba(18,8,6,.8) 72%); transform:translateX(-50%); box-shadow:0 0 34px rgba(255,157,53,.48); }
+.corridor-sconce i { position:absolute; z-index:2; left:50%; top:1px; width:16px; height:31px; border-radius:56% 44% 52% 48%; background:radial-gradient(ellipse at 50% 70%,#fff4b0,#f0ad38 42%,#a64119 73%,transparent 76%); filter:drop-shadow(0 0 10px #ffb43f); transform:translateX(-50%); animation:unlockLanternFlicker 1.9s ease-in-out infinite alternate; }
+.sconce-left { left:calc(50% - 390px); }
+.sconce-right { right:calc(50% - 390px); }
+.magic-unlock-copy { position:absolute; z-index:8; left:50%; top:4.2%; width:min(820px,74%); padding:14px 34px 16px; border:1px solid rgba(165,126,71,.62); border-radius:4px 4px 14px 14px; background:linear-gradient(180deg,rgba(30,20,25,.92),rgba(12,9,15,.82)); box-shadow:inset 0 0 0 3px rgba(75,51,36,.34),0 12px 34px #000b; text-align:center; transform:translateX(-50%); text-shadow:0 3px 16px #000; }
+.magic-unlock-copy::before,.magic-unlock-copy::after { content:"✦"; position:absolute; top:50%; color:#a67b43; font-size:18px; transform:translateY(-50%); }
+.magic-unlock-copy::before { left:15px; }
+.magic-unlock-copy::after { right:15px; }
+.magic-unlock-copy p { margin:0 0 5px; color:#c6a56d; font-size:13px; letter-spacing:.2em; }
+.magic-unlock-copy h1 { margin:0 0 5px; color:#f2e5c7; font-family:"ChosunNm",serif; font-size:clamp(25px,2.45vw,39px); font-weight:500; letter-spacing:.025em; }
+.magic-unlock-copy>span { color:#c8bda9; font-size:15px; }
+.magic-door-stage { position:absolute; z-index:4; left:50%; top:56%; width:470px; height:570px; transform:translate(-50%,-50%); }
+.magic-door-frame { position:absolute; inset:0; overflow:hidden; border:17px solid #2a1712; border-top-width:25px; border-radius:44% 44% 5px 5px; background:#090709; box-shadow:inset 0 0 42px #000,0 0 0 4px #6d5030,0 0 0 10px #171014,0 20px 75px #000e; perspective:1100px; }
+.magic-door-frame::before { content:""; position:absolute; z-index:6; inset:7px; border:2px solid rgba(178,132,66,.5); border-radius:43% 43% 2px 2px; pointer-events:none; box-shadow:inset 0 0 10px #000b; }
+.magic-door-frame::after { content:""; position:absolute; z-index:7; left:50%; top:-26px; width:290px; height:110px; border:3px double #8e6938; border-bottom:0; border-radius:50% 50% 0 0; transform:translateX(-50%); pointer-events:none; }
+.magic-door-opening { position:absolute; inset:0; display:grid; place-items:end center; padding-bottom:64px; color:#d8c68f; background:linear-gradient(rgba(10,6,13,.1),rgba(3,3,5,.84)),url("/samunmong/assets/magic-school/scenes/cleaning-closet.webp") center/cover no-repeat; font-size:18px; letter-spacing:.22em; text-shadow:0 2px 8px #000,0 0 16px #a87936; }
+.magic-door-opening span { padding:8px 18px; border:1px solid rgba(158,118,62,.58); background:rgba(13,9,10,.76); box-shadow:0 8px 20px #0009; }
+.magic-door-leaf { position:absolute; z-index:3; top:0; bottom:0; width:50.4%; overflow:hidden; background:repeating-linear-gradient(90deg,transparent 0 40px,rgba(0,0,0,.24) 41px 44px),linear-gradient(90deg,#160b08,#44271b 22%,#2d170f 55%,#120906); box-shadow:inset 0 0 44px #000c,inset 0 0 0 3px rgba(110,70,37,.45); transition:transform 1.15s cubic-bezier(.2,.75,.18,1); }
+.magic-door-leaf::before { content:""; position:absolute; inset:14% 12% 10%; border:4px double rgba(130,87,45,.75); border-radius:42% 42% 3px 3px; box-shadow:inset 0 0 30px #000c; }
+.magic-door-leaf::after { content:""; position:absolute; left:8%; right:8%; top:48%; height:15px; border:1px solid #20100b; background:linear-gradient(#5a3420,#24120c 44%,#6f4326); box-shadow:0 10px 18px #0009; }
+.magic-door-leaf .door-carving { position:absolute; left:50%; top:35%; width:112px; height:150px; border:2px solid rgba(151,104,54,.56); border-radius:50% 50% 18% 18%; transform:translate(-50%,-50%); box-shadow:inset 0 0 24px #000b; }
+.magic-door-leaf .door-carving::before { content:"✦"; position:absolute; left:50%; top:50%; color:rgba(175,129,67,.64); font-size:40px; transform:translate(-50%,-50%); text-shadow:0 2px 5px #000; }
+.magic-door-leaf .door-hinge { position:absolute; top:auto; width:72px; height:13px; border:1px solid #2a170d; border-radius:2px 60% 60% 2px; background:linear-gradient(#a17a45,#4f361d 48%,#8b6537); box-shadow:0 4px 7px #000c; transform:none; }
+.magic-door-leaf .door-hinge::after { content:""; position:absolute; top:50%; width:10px; height:20px; border-radius:3px; background:#493019; transform:translateY(-50%); }
+.magic-door-leaf .hinge-top { top:28%; }
+.magic-door-leaf .hinge-bottom { bottom:23%; }
+.door-left { left:0; border-right:3px solid #0b0605; transform-origin:left center; }
+.door-right { right:0; border-left:3px solid #0b0605; transform-origin:right center; }
+.door-left .door-hinge { left:0; }
+.door-left .door-hinge::after { left:2px; }
+.door-right .door-hinge { right:0; border-radius:60% 2px 2px 60%; }
+.door-right .door-hinge::after { right:2px; }
+.phase-unlocked .door-left { transform:perspective(900px) rotateY(-105deg); }
+.phase-unlocked .door-right { transform:perspective(900px) rotateY(105deg); }
+.door-crest { position:absolute; z-index:8; left:50%; top:6.5%; width:56px; height:56px; display:grid; place-items:center; color:#d1a75e; border:3px double #8a6030; border-radius:50%; background:radial-gradient(circle,#3e2518,#140b09 72%); font-size:26px; text-shadow:0 0 9px #b37a39; transform:translateX(-50%); box-shadow:0 5px 14px #000c; }
+.door-nameplate { position:absolute; z-index:8; left:50%; top:19%; min-width:235px; padding:8px 18px 7px; color:#d3b678; border:2px ridge #8b683b; border-radius:2px; background:linear-gradient(#49331f,#21150e); font-size:15px; letter-spacing:.16em; text-align:center; text-shadow:0 2px 4px #000; transform:translateX(-50%); box-shadow:0 6px 12px #000b; }
+.enchanted-padlock { position:absolute; z-index:9; left:50%; top:55%; width:168px; height:205px; transform:translate(-50%,-50%); filter:drop-shadow(0 19px 13px #000c); }
+.lock-state-locked { opacity:1; transition:opacity .18s ease,transform .28s ease; }
+.lock-state-unlocked { left:68%; top:74%; opacity:0; transform:translate(-50%,-50%) rotate(12deg) scale(.68); transition:opacity .38s ease .16s,transform .62s cubic-bezier(.16,.84,.26,1) .12s; }
+.lock-chain { position:absolute; z-index:-1; top:90px; width:137px; height:19px; border:5px double #765731; border-radius:999px; background:repeating-linear-gradient(90deg,#ae8750 0 7px,#503719 8px 14px); box-shadow:0 5px 9px #000b; }
+.chain-left { right:73%; transform:rotate(16deg); }
+.chain-right { left:73%; transform:rotate(-16deg); }
+.lock-shackle { position:absolute; left:50%; top:0; width:96px; height:111px; border:17px ridge #8d6b3d; border-bottom:0; border-radius:54px 54px 0 0; background:transparent; transform:translateX(-50%); box-shadow:inset 0 0 7px #c7a66c88,0 0 7px #000; transform-origin:17px 104px; transition:transform .7s cubic-bezier(.16,.84,.26,1); }
+.lock-shackle::before { content:""; position:absolute; inset:7px; border:2px solid rgba(35,20,12,.74); border-bottom:0; border-radius:38px 38px 0 0; }
+.lock-body { position:absolute; left:0; bottom:0; width:168px; height:130px; overflow:hidden; border:5px ridge #8f6938; border-radius:12px 12px 30px 30px; background:radial-gradient(circle at 50% 25%,#83623b,#3a2517 53%,#140c08); box-shadow:inset 0 0 24px #000a,inset 0 0 0 3px rgba(203,160,89,.34),0 0 14px #000; }
+.lock-body::before { content:""; position:absolute; inset:9px; border:1px solid rgba(193,151,82,.54); border-radius:8px 8px 22px 22px; }
+.lock-rune { position:absolute; left:50%; top:13px; color:#8dd9cd; font-size:52px; font-style:normal; transform:translateX(-50%); text-shadow:0 0 8px #3ad3c2,0 0 20px rgba(92,57,147,.9); }
+.lock-keyhole { position:absolute; left:50%; bottom:17px; width:13px; height:29px; border-radius:8px 8px 4px 4px; background:#080504; transform:translateX(-50%); box-shadow:inset 0 1px 2px #000,0 0 0 1px #9a7444; }
+.lock-keyhole::before { content:""; position:absolute; left:50%; top:-7px; width:20px; height:20px; border-radius:50%; background:#080504; transform:translateX(-50%); box-shadow:0 0 0 1px #9a7444; }
+.lock-engraving { position:absolute; top:37px; width:34px; height:46px; border-top:2px solid rgba(184,139,70,.65); border-bottom:2px solid rgba(184,139,70,.65); }
+.engraving-left { left:15px; border-left:2px solid rgba(184,139,70,.65); border-radius:70% 0 0 70%; transform:rotate(-17deg); }
+.engraving-right { right:15px; border-right:2px solid rgba(184,139,70,.65); border-radius:0 70% 70% 0; transform:rotate(17deg); }
+.lock-state-unlocked .lock-shackle { transform:translateX(-50%) rotate(-43deg) translate(-18px,-17px); }
+.lock-state-unlocked .chain-left { right:78%; transform:translate(-18px,17px) rotate(34deg); }
+.lock-state-unlocked .chain-right { left:78%; transform:translate(18px,17px) rotate(-34deg); }
+.lock-state-unlocked .lock-rune { opacity:.2; color:#d5b56d; text-shadow:none; }
+.lock-state-unlocked .lock-keyhole { box-shadow:0 0 0 1px #b58a4f,0 0 13px rgba(113,223,205,.42); }
+.lock-release-glow { position:absolute; z-index:-2; left:50%; top:58%; width:230px; height:230px; border:1px solid rgba(91,216,200,.38); border-radius:50%; background:radial-gradient(circle,rgba(102,220,204,.2),rgba(109,59,153,.12) 38%,transparent 68%); transform:translate(-50%,-50%); box-shadow:0 0 34px rgba(91,216,200,.24); }
+.unlock-spell-rings { position:absolute; z-index:8; left:50%; top:55%; width:390px; height:390px; opacity:0; pointer-events:none; transform:translate(-50%,-50%) scale(.55); }
+.unlock-spell-rings i { position:absolute; inset:0; border:2px solid rgba(99,220,205,.74); border-radius:50%; box-shadow:inset 0 0 18px rgba(74,213,199,.22),0 0 25px rgba(110,61,172,.52); }
+.unlock-spell-rings i:nth-child(2) { inset:35px; border-style:dashed; }
+.unlock-spell-rings i:nth-child(3) { inset:76px; border-color:rgba(224,182,96,.8); }
+.unlock-spell-rings svg { width:100%; height:100%; fill:none; stroke:#d8b76b; stroke-width:1.4; filter:drop-shadow(0 0 6px #61d8c9) drop-shadow(0 0 11px #7342a3); }
+.lock-spark { position:absolute; left:50%; top:58%; width:6px; height:6px; border-radius:50%; opacity:0; background:#fff5bd; box-shadow:0 0 8px #fff,0 0 18px #60ddcf,0 0 28px #8e53bf; }
+.phase-casting .unlock-spell-rings { animation:unlockCircleCast 1.9s cubic-bezier(.17,.77,.22,1) both; }
+.phase-casting .unlock-spell-rings i:first-child { animation:unlockRuneSpin 1.7s linear infinite; }
+.phase-casting .unlock-spell-rings i:nth-child(2) { animation:unlockRuneSpin 1.2s linear infinite reverse; }
+.phase-casting .lock-state-locked .lock-rune { animation:unlockRuneBreak 1.8s ease-in both; }
+.phase-casting .lock-state-locked .lock-body { box-shadow:inset 0 0 24px #0008,inset 0 0 0 3px rgba(203,160,89,.42),0 0 28px rgba(75,218,205,.5),0 0 52px rgba(115,61,159,.42); }
+.phase-casting .lock-state-locked .lock-spark { animation:unlockSpark 1.15s ease-out .35s both; }
+.phase-casting .spark-two { transform:rotate(120deg); animation-delay:.58s; }
+.phase-casting .spark-three { transform:rotate(245deg); animation-delay:.76s; }
+.phase-unlocked .lock-state-locked { opacity:0; transform:translate(-50%,-50%) scale(1.12); }
+.phase-unlocked .lock-state-unlocked { opacity:1; transform:translate(-50%,-50%) rotate(8deg) scale(.72); }
+.magic-unlock-actions { position:absolute; z-index:12; left:50%; bottom:4.2%; transform:translateX(-50%); }
+.unlock-spell-button,.unlock-enter-button { min-width:300px; min-height:66px; padding:10px 28px; color:#f3e6c7; border:2px ridge #8e693b; border-radius:5px; background:radial-gradient(circle at 50% 10%,rgba(109,67,47,.6),transparent 60%),linear-gradient(#342018,#160e0d); box-shadow:inset 0 0 0 2px rgba(185,139,72,.18),inset 0 0 22px #0007,0 15px 32px #000c; cursor:pointer; transition:transform .2s ease,box-shadow .2s ease,border-color .2s ease; }
+.unlock-spell-button:hover,.unlock-spell-button:focus-visible,.unlock-enter-button:hover,.unlock-enter-button:focus-visible { border-color:#d2aa63; transform:translateY(-3px); box-shadow:inset 0 0 26px rgba(123,65,157,.3),0 0 24px rgba(70,213,197,.26),0 18px 35px #000d; }
+.unlock-spell-button span { margin-right:10px; color:#d9b96d; font-size:25px; text-shadow:0 0 9px #9a6335; }
+.unlock-spell-button strong { font-size:19px; }
+.unlock-spell-button small { display:block; margin-top:3px; color:#83cfc3; letter-spacing:.22em; }
+.unlock-enter-button { color:#29180d; border-color:#a87d42; background:linear-gradient(135deg,#d7bd83,#a77b42); font-size:19px; font-weight:800; text-shadow:0 1px #f5e5bc; }
+.unlock-casting-status { display:flex; align-items:center; gap:12px; padding:13px 22px; color:#e2d3b0; border:1px solid #806039; background:rgba(19,12,15,.88); font-size:17px; letter-spacing:.12em; text-shadow:0 0 10px #5d3d73; box-shadow:0 12px 26px #000b; }
+.unlock-casting-status i { width:25px; height:25px; border:2px solid #7cbdaf66; border-top-color:#e5c676; border-radius:50%; animation:unlockRuneSpin .8s linear infinite; }
+.magic-unlock-return { position:absolute; z-index:12; left:3%; bottom:4%; padding:10px 16px; color:#c4b69a; border:1px solid #715433; border-radius:4px; background:linear-gradient(#2a1b16dd,#100b0ddd); box-shadow:0 7px 18px #0009; cursor:pointer; }
+.magic-unlock-return:hover,.magic-unlock-return:focus-visible { color:#f0dfb8; border-color:#b0854c; }
+@keyframes unlockCircleCast { 0%{opacity:0;transform:translate(-50%,-50%) scale(.4) rotate(-28deg)} 28%{opacity:1} 78%{opacity:1;transform:translate(-50%,-50%) scale(1.08) rotate(5deg)} 100%{opacity:0;transform:translate(-50%,-50%) scale(1.3) rotate(10deg)} }
+@keyframes unlockRuneSpin { to{transform:rotate(360deg)} }
+@keyframes unlockRuneBreak { 0%,45%{opacity:1;transform:translateX(-50%) scale(1)} 72%{opacity:1;transform:translateX(-50%) scale(1.5)} 100%{opacity:0;transform:translateX(-50%) scale(2.3)} }
+@keyframes unlockSpark { 0%{opacity:0;transform:translate(0,0) scale(.4)} 25%{opacity:1} 100%{opacity:0;transform:translate(145px,-105px) scale(2)} }
+@keyframes unlockLanternFlicker { 0%{opacity:.78;transform:translateX(-50%) scale(.94) rotate(-2deg)} 45%{opacity:1;transform:translateX(-50%) scale(1.08) rotate(2deg)} 100%{opacity:.86;transform:translateX(-50%) scale(.98) rotate(-1deg)} }
+@media (max-width:850px) { .magic-unlock-copy { width:88%; top:3%; padding-inline:28px; } .magic-unlock-copy>span { font-size:13px; } .magic-door-stage { top:56%; width:min(430px,62vw); height:min(540px,64vh); } .sconce-left { left:6%; } .sconce-right { right:6%; } .magic-unlock-actions { bottom:3%; } .magic-unlock-return { left:2%; bottom:2.5%; } }
+@media (prefers-reduced-motion:reduce) { .magic-unlock-screen *,.magic-unlock-screen *::before,.magic-unlock-screen *::after { animation-duration:.01ms!important; transition-duration:.01ms!important; } }
+
+/* 생성형 배경 자산으로 기존 마법학교 맵과 화풍을 맞춘 봉인 문 장면 */
+.magic-unlock-backdrop { overflow:hidden; background:#070509; filter:none; transform:none; }
+.magic-unlock-backdrop::before,.magic-unlock-backdrop::after { display:none; }
+.magic-door-scene-image { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:center; transition:opacity .7s ease,filter .8s ease,transform 1.9s ease; }
+.door-scene-locked { opacity:1; }
+.door-scene-unlocked { opacity:0; }
+.phase-casting .door-scene-locked { filter:brightness(1.08) saturate(1.1); transform:scale(1.008); }
+.phase-unlocked .door-scene-locked { opacity:0; }
+.phase-unlocked .door-scene-unlocked { opacity:1; }
+.magic-door-vignette { position:absolute; inset:0; background:radial-gradient(ellipse at 50% 50%,transparent 38%,rgba(3,2,6,.16) 68%,rgba(2,1,4,.72) 100%),linear-gradient(180deg,rgba(2,1,5,.12),transparent 24% 72%,rgba(2,1,4,.32)); pointer-events:none; }
+.magic-unlock-copy { left:2.3%; top:13.5%; width:340px; padding:15px 18px 16px 24px; border:1px solid rgba(183,133,65,.76); border-left:4px solid #ba7c34; border-radius:3px; background:linear-gradient(110deg,rgba(39,21,24,.96),rgba(18,11,18,.9)); box-shadow:inset 0 0 20px rgba(180,102,43,.1),0 12px 34px #000b,0 0 22px rgba(116,56,151,.12); text-align:left; transform:none; }
+.magic-unlock-copy::before,.magic-unlock-copy::after { display:none; }
+.magic-unlock-copy p { margin-bottom:6px; color:#c79452; font-size:12px; letter-spacing:.16em; }
+.magic-unlock-copy h1 { margin-bottom:6px; font-size:30px; line-height:1.08; }
+.magic-unlock-copy>span { display:block; color:#cfc0aa; font-size:14px; line-height:1.45; }
+.magic-door-stage { top:55%; width:520px; height:520px; pointer-events:none; }
+.unlock-spell-rings { top:50%; }
+.phase-casting .unlock-spell-rings { filter:drop-shadow(0 0 22px rgba(108,70,181,.72)); }
+.magic-unlock-actions { bottom:5.2%; }
+.unlock-spell-button,.unlock-enter-button { min-width:310px; background:linear-gradient(180deg,rgba(51,32,27,.96),rgba(19,13,17,.97)); backdrop-filter:blur(5px); }
+.unlock-enter-button { color:#2b180c; background:linear-gradient(135deg,#e2c78e,#b38447); }
+.magic-unlock-return { bottom:4.2%; backdrop-filter:blur(5px); }
+@media (max-width:850px) { .magic-unlock-copy { left:2.5%; top:12%; width:min(330px,42vw); padding:12px 15px 13px 19px; } .magic-unlock-copy h1 { font-size:24px; } .magic-unlock-copy>span { font-size:12px; } .magic-door-stage { top:55%; width:min(480px,58vw); height:min(480px,58vw); } }
 .magic-spell-system { position: absolute; z-index: 88; inset: 0; pointer-events: none; color: #eafcff; font-family: "Nanum BareunJeongsin", serif; }
 .magic-spell-toggle { pointer-events: auto; position: absolute; right: calc(2.4% + 11px); bottom: 47%; width: 96px; min-height: 94px; display: grid; place-items: center; align-content: center; gap: 4px; padding: 7px; color: #effcff; border: 1px solid rgba(132,226,255,.55); border-radius: 48% 48% 13px 13px; background: radial-gradient(circle at 50% 33%,rgba(82,196,239,.34),rgba(15,29,60,.95) 62%); box-shadow: inset 0 0 22px rgba(114,226,255,.24),0 9px 26px #000c; cursor: pointer; transition: transform .2s ease,box-shadow .2s ease; }
 .magic-spell-toggle:hover,.magic-spell-toggle.active { transform: translateX(-5px) scale(1.04); box-shadow: inset 0 0 28px rgba(154,239,255,.38),0 0 22px rgba(90,210,255,.48),0 12px 28px #000d; }
@@ -8775,6 +8900,7 @@ button.magic-spell-card:hover { border-color: #a5edff; background: rgba(31,74,11
 .magic-circle-modal > footer .magic-keyboard-cast { opacity: .7; }
 .magic-circle-modal > footer .magic-cast-button { min-width: 150px; color: #071426; border-color: #fff5ad; background: linear-gradient(135deg,#8de9ff,#fff3a5); box-shadow: 0 0 20px #7fe5ff70; font-weight: 700; }
 .magic-circle-modal > footer button:disabled { opacity: .38; filter: grayscale(.65); box-shadow: none; cursor: not-allowed; }
+.magic-spell-feedback { pointer-events:none; position:absolute; z-index:102; left:50%; bottom:14%; min-width:280px; padding:16px 28px; color:#e8e0d0; border:1px solid rgba(150,195,215,.52); border-radius:7px; background:linear-gradient(145deg,rgba(13,25,48,.96),rgba(8,10,24,.97)); box-shadow:inset 0 0 20px rgba(102,197,235,.08),0 16px 42px #000d; font-size:20px; letter-spacing:.08em; text-align:center; transform:translateX(-50%); animation:magicNoEffectMessage 1.5s ease both; }
 @keyframes magicSceneIlluminate { 0% { opacity: 0; } 24% { opacity: .92; } 62% { opacity: .5; } 100% { opacity: 0; } }
 @keyframes magicHolyParticleFall {
   0% { opacity: 0; transform: translate3d(0,-10vh,0) scale(.35) rotate(0deg); }
@@ -8798,6 +8924,7 @@ button.magic-spell-card:hover { border-color: #a5edff; background: rgba(31,74,11
   100% { opacity: 0; }
 }
 @keyframes magicRuneBreathe { to { transform: scale(1.06) rotate(8deg); box-shadow: inset 0 0 22px #bff9ff55,0 0 17px #83dfff8c; } }
+@keyframes magicNoEffectMessage { 0% { opacity:0; transform:translate(-50%,12px); } 18%,78% { opacity:1; transform:translate(-50%,0); } 100% { opacity:0; transform:translate(-50%,-6px); } }
 @media (prefers-reduced-motion: reduce) {
   .magic-spell-toggle-rune,.holy-particle,.heavenly-light-beam { animation: none; }
   .magic-holy-particles,.magic-heavenly-light { display: none; }
@@ -13828,6 +13955,159 @@ html[data-samunmong-theme="magicSchool"] .magic-record-card img {
   height: 100% !important;
   display: block !important;
   object-fit: cover !important;
+}
+
+/* Keep the original open-record artwork and only fill its empty photo/text slots. */
+html[data-samunmong-theme="magicSchool"] .magic-record-card .magic-record-original-form {
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: 0 !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-content {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  color: #e8c995;
+  font-family: var(--font-body);
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-student-index-covers {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-student-index-covers span {
+  position: absolute;
+  left: 7.2%;
+  width: 10.7%;
+  height: 10.2%;
+  border-radius: 0 16px 16px 0;
+  background:
+    radial-gradient(circle at 92% 50%, rgba(79, 43, 98, .18), transparent 46%),
+    linear-gradient(90deg, rgba(7, 5, 8, .99), rgba(14, 9, 12, .98));
+  box-shadow: inset -2px 0 rgba(112, 73, 54, .18), 8px 0 18px rgba(0, 0, 0, .32);
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-student-index-covers span:nth-child(1) { top: 24.2%; }
+html[data-samunmong-theme="magicSchool"] .magic-student-index-covers span:nth-child(2) { top: 37.2%; }
+html[data-samunmong-theme="magicSchool"] .magic-student-index-covers span:nth-child(3) { top: 50.2%; }
+
+html[data-samunmong-theme="magicSchool"] .magic-record-portrait-slot {
+  position: absolute;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-card .magic-record-portrait-slot img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  object-position: center bottom !important;
+  filter: sepia(.12) brightness(.78) contrast(1.08) drop-shadow(0 12px 18px rgba(0, 0, 0, .58));
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-identity {
+  position: absolute;
+  display: grid;
+  gap: 2px;
+  text-align: center;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-identity strong {
+  color: #e5c28a;
+  font-size: clamp(17px, 1.25vw, 22px);
+  line-height: 1;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-identity span {
+  color: rgba(222, 194, 149, .78);
+  font-size: clamp(10px, .72vw, 13px);
+  line-height: 1.15;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-field-copy {
+  position: absolute;
+  display: grid;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-field-copy p {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  color: #e7c995;
+  font-size: clamp(12px, .9vw, 16px);
+  line-height: 1.38;
+  word-break: keep-all;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .9);
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-student .magic-record-portrait-slot {
+  left: 22.4%;
+  top: 24.2%;
+  width: 20.7%;
+  height: 43.5%;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-student .magic-record-identity {
+  left: 21.4%;
+  top: 68.7%;
+  width: 23.1%;
+  min-height: 8.2%;
+  padding: 9px 8px 6px;
+  justify-content: center;
+  align-content: center;
+  border: 1px solid rgba(157, 106, 58, .66);
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(46, 32, 28, .98), rgba(19, 15, 17, .98));
+  box-shadow: inset 0 0 12px rgba(207, 149, 76, .08);
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-student .magic-record-field-copy {
+  left: 55.8%;
+  top: 19.7%;
+  width: 28.2%;
+  height: 59.5%;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 4.8%;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-student .magic-record-field-copy p {
+  padding: 11% 6% 3%;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-guard .magic-record-portrait-slot,
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-faculty .magic-record-portrait-slot {
+  left: 21.8%;
+  top: 21.3%;
+  width: 21.3%;
+  height: 47.5%;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-guard .magic-record-identity,
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-faculty .magic-record-identity {
+  left: 21.7%;
+  top: 68.9%;
+  width: 21.8%;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-guard .magic-record-field-copy,
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-faculty .magic-record-field-copy {
+  left: 58.4%;
+  top: 16.6%;
+  width: 28%;
+  height: 63.5%;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 5.5%;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-guard .magic-record-field-copy p,
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-faculty .magic-record-field-copy p {
+  padding: 12% 5% 3%;
 }
 
 html[data-samunmong-theme="magicSchool"] .magic-record-intro[data-record-kind="card"] .magic-record-page-controls {

@@ -27,6 +27,7 @@ const promptLines = [
 type MapLocation = {
   screen: string;
   goTo?: string;
+  gateway?: string;
   text: string;
   label: string;
   x: string;
@@ -54,7 +55,7 @@ const THEME_MAPS: Record<GameTheme, { image: string; alt: string; locations: Map
     alt: "마법학교 조사 장소가 표시된 학교 지도",
     locations: [
       { screen: "magicAlchemyLab", goTo: "magicAlchemyLab", text: "제1 연금술 실습실", label: "제1 연금술 실습실로 이동", x: "23.4%", y: "27.6%", labelY: "15.6%" },
-      { screen: "magicCleaningCloset", goTo: "magicCleaningCloset", text: "청소도구함", label: "청소도구함으로 이동", x: "44%", y: "27.2%", labelY: "15.2%" },
+      { screen: "magicCleaningCloset", goTo: "magicCleaningCloset", gateway: "magicUnlockDoor", text: "청소도구함", label: "청소도구함으로 이동", x: "44%", y: "27.2%", labelY: "15.2%" },
       { screen: "magicLibrary", goTo: "magicLibrary", text: "도서관", label: "도서관으로 이동", x: "65.7%", y: "23.8%", labelY: "11.8%" },
       { screen: "magicRecordCrystalRoom", goTo: "magicRecordCrystalRoom", text: "기록 수정구실", label: "기록 수정구실로 이동", x: "78.4%", y: "47.4%", labelY: "35.4%" },
       { screen: "magicDormHallway", goTo: "magicDormHallway", text: "학생들 기숙사", label: "학생들 기숙사로 이동", x: "27.3%", y: "61%", labelY: "49%" },
@@ -155,7 +156,13 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
     : undefined;
   const toolPanelStyle = undefined;
 
-  const moveFromMap = (screenId?: string) => {
+  const moveFromMap = (location: MapLocation) => {
+    if (!location.goTo) return;
+    const needsGateway = Boolean(
+      location.gateway
+      && window.localStorage.getItem("samunmong-magic-cleaning-closet-unlocked") !== "1"
+    );
+    const screenId = needsGateway ? location.gateway : location.goTo;
     if (!screenId) return;
     if (isSpaceTheme && screenId === "spaceOxygenGenerator") {
       window.dispatchEvent(new CustomEvent("samunmong:space-power-access-request"));
@@ -752,11 +759,12 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               className="map-pin-button"
               type="button"
               data-map-go={location.goTo}
+              data-map-gateway={location.gateway}
               data-location-screen={location.screen}
               style={mapPinStyle(location)}
               aria-label={location.label}
               disabled={!location.goTo}
-              onClick={() => moveFromMap(location.goTo)}
+              onClick={() => moveFromMap(location)}
               key={`pin-${location.screen}`}
             />
           ))}

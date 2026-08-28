@@ -17,6 +17,7 @@ import DolsoeQuartersScene from "@/components/scenes/DolsoeQuartersScene";
 import FieldOneScene from "@/components/scenes/FieldOneScene";
 import InterrogationScreen from "@/components/scenes/InterrogationScreen";
 import MagicSchoolScene from "@/components/scenes/MagicSchoolScene";
+import MagicUnlockDoorScene from "@/components/scenes/MagicUnlockDoorScene";
 import MudeokServantRoomScene from "@/components/scenes/MudeokServantRoomScene";
 import SpaceStationScene from "@/components/scenes/SpaceStationScene";
 import YoomunseokSarangbangScene from "@/components/scenes/YoomunseokSarangbangScene";
@@ -31,7 +32,7 @@ import {
 } from "@/lib/gameTheme";
 
 const CONTENT_SCRIPT = "/samunmong/content.js?v=20260824-evidence-scene-v3";
-const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260826-clean-evidence-cutouts-v129";
+const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260828-magic-door-gateway-v130";
 const MAIN_SCREEN = "mainScreen";
 
 const INVESTIGATION_SCENE_COMPONENTS: Record<string, ComponentType> = {
@@ -86,6 +87,8 @@ function ensureRequestedStartScreen(initialScreen?: string) {
 }
 
 function ActiveInvestigationScene({ screenId }: { screenId: string }) {
+  if (screenId === "magicUnlockDoor") return <MagicUnlockDoorScene />;
+
   const InvestigationComponent = INVESTIGATION_SCENE_COMPONENTS[screenId];
   if (InvestigationComponent) return <InvestigationComponent />;
 

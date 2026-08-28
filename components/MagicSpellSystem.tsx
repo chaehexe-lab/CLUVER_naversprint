@@ -5,6 +5,44 @@ import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointer
 type Point = { x: number; y: number };
 type SpellPhase = "select" | "draw" | "casting" | "complete";
 
+export type MagicSpellId = "light" | "unlock";
+export type MagicSpellResult = "success" | "no-effect";
+
+type MagicSpellDefinition = {
+  id: MagicSpellId;
+  name: string;
+  incantation: string;
+  description: string;
+  symbol: string;
+  drawingTitle: string;
+  trace: "star" | "key";
+  traceName: string;
+};
+
+const lightSpell: MagicSpellDefinition = {
+  id: "light",
+  name: "빛의 마법",
+  incantation: "LUMEN",
+  description: "어둠을 걷어 내고 주변을 밝힌다",
+  symbol: "☼",
+  drawingTitle: "밑그림을 따라 마법진을 그리세요",
+  trace: "star",
+  traceName: "별",
+};
+
+const unlockSpell: MagicSpellDefinition = {
+  id: "unlock",
+  name: "자물쇠 해제 마법",
+  incantation: "ALOHOMORA",
+  description: "문에 걸린 마법 봉인과 자물쇠를 해제한다",
+  symbol: "✦",
+  drawingTitle: "열쇠 모양을 따라 해제 마법진을 그리세요",
+  trace: "key",
+  traceName: "열쇠",
+};
+
+const availableSpells = [lightSpell, unlockSpell];
+
 const VIEWBOX_WIDTH = 600;
 const VIEWBOX_HEIGHT = 470;
 const REQUIRED_COVERAGE = 72;
@@ -27,7 +65,7 @@ function cubicBezierPoints(from: Point, controlA: Point, controlB: Point, to: Po
   });
 }
 
-const tracePoints: Point[] = [
+const starTrace: Point[] = [
   ...cubicBezierPoints(
     { x: 300, y: 55 }, { x: 310, y: 135 }, { x: 385, y: 220 }, { x: 500, y: 235 }, 32
   ),
@@ -41,6 +79,44 @@ const tracePoints: Point[] = [
     { x: 100, y: 235 }, { x: 215, y: 220 }, { x: 290, y: 135 }, { x: 300, y: 55 }, 32
   ),
 ];
+
+function linePoints(from: Point, to: Point, count: number) {
+  return Array.from({ length: count }, (_, index) => {
+    const ratio = index / (count - 1);
+    return {
+      x: from.x + (to.x - from.x) * ratio,
+      y: from.y + (to.y - from.y) * ratio,
+    };
+  });
+}
+
+const keyBowTrace: Point[] = Array.from({ length: 65 }, (_, index) => {
+  const angle = (Math.PI * 2 * index) / 64;
+  return { x: 205 + Math.cos(angle) * 82, y: 235 + Math.sin(angle) * 82 };
+});
+
+const keyShaftTrace: Point[] = [
+  ...linePoints({ x: 287, y: 235 }, { x: 485, y: 235 }, 34),
+  ...linePoints({ x: 485, y: 235 }, { x: 485, y: 292 }, 12),
+  ...linePoints({ x: 485, y: 292 }, { x: 440, y: 292 }, 10),
+  ...linePoints({ x: 440, y: 292 }, { x: 440, y: 264 }, 7),
+  ...linePoints({ x: 440, y: 264 }, { x: 398, y: 264 }, 10),
+  ...linePoints({ x: 398, y: 264 }, { x: 398, y: 235 }, 7),
+];
+
+const traceSets = {
+  star: {
+    paths: ["M300 55 C310 135 385 220 500 235 C385 250 310 335 300 415 C290 335 215 250 100 235 C215 220 290 135 300 55 Z"],
+    strokes: [starTrace],
+  },
+  key: {
+    paths: [
+      "M287 235 A82 82 0 1 1 123 235 A82 82 0 1 1 287 235",
+      "M287 235 H485 V292 H440 V264 H398 V235",
+    ],
+    strokes: [keyBowTrace, keyShaftTrace],
+  },
+};
 
 function toSvgPoint(event: ReactPointerEvent<SVGSVGElement>): Point {
   const bounds = event.currentTarget.getBoundingClientRect();
@@ -57,21 +133,32 @@ function pathFromStroke(stroke: Point[]) {
 export default function MagicSpellSystem({
   sceneId,
   onLightChange,
+  onSpellCast,
+  spells = availableSpells,
+  showLockedSpell = true,
 }: {
   sceneId: string;
-  onLightChange: (enabled: boolean) => void;
+  onLightChange?: (enabled: boolean) => void;
+  onSpellCast?: (spellId: MagicSpellId) => MagicSpellResult;
+  spells?: MagicSpellDefinition[];
+  showLockedSpell?: boolean;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [phase, setPhase] = useState<SpellPhase>("select");
+  const [selectedSpellId, setSelectedSpellId] = useState<MagicSpellId>(spells[0]?.id ?? "light");
   const [strokes, setStrokes] = useState<Point[][]>([]);
   const [matched, setMatched] = useState<Set<number>>(() => new Set());
   const [isDrawing, setIsDrawing] = useState(false);
+  const [feedback, setFeedback] = useState<string | null>(null);
   const completionStarted = useRef(false);
   const closeTimer = useRef<number | null>(null);
+  const selectedSpell = spells.find((spell) => spell.id === selectedSpellId) ?? spells[0] ?? lightSpell;
+  const activeTrace = traceSets[selectedSpell.trace];
+  const tracePoints = activeTrace.strokes.flat();
 
   const progress = useMemo(
     () => Math.min(100, Math.round((matched.size / tracePoints.length) * 100)),
-    [matched]
+    [matched, tracePoints.length]
   );
   const hasDrawing = useMemo(() => strokes.some((stroke) => stroke.length > 0), [strokes]);
   const canCast = hasDrawing && progress >= REQUIRED_COVERAGE;
@@ -79,7 +166,7 @@ export default function MagicSpellSystem({
   const wandCursorActive = menuOpen || spellLocked;
 
   useEffect(() => {
-    onLightChange(false);
+    onLightChange?.(false);
   }, [onLightChange, sceneId]);
 
   useEffect(() => {
@@ -92,13 +179,16 @@ export default function MagicSpellSystem({
     completionStarted.current = true;
     setMenuOpen(false);
     setPhase("casting");
-    onLightChange(true);
+    const result = onSpellCast?.(selectedSpell.id) ?? "success";
+    if (selectedSpell.id === "light" && result === "success") onLightChange?.(true);
     closeTimer.current = window.setTimeout(() => {
       setPhase("complete");
+      if (result === "no-effect") setFeedback("아무일도 없었다");
       closeTimer.current = window.setTimeout(() => {
         setMenuOpen(false);
         setPhase("select");
-      }, 1200);
+        setFeedback(null);
+      }, 1500);
     }, 900);
   }
 
@@ -122,8 +212,10 @@ export default function MagicSpellSystem({
     setIsDrawing(false);
   }
 
-  function openSpellDrawing() {
+  function openSpellDrawing(spellId: MagicSpellId) {
+    setSelectedSpellId(spellId);
     resetDrawing();
+    setFeedback(null);
     setPhase("draw");
   }
 
@@ -134,6 +226,7 @@ export default function MagicSpellSystem({
     setMenuOpen(false);
     setPhase("select");
     setIsDrawing(false);
+    setFeedback(null);
   }
 
   function recordPoint(point: Point) {
@@ -184,7 +277,7 @@ export default function MagicSpellSystem({
 
   function drawForKeyboard() {
     if (completionStarted.current || phase !== "draw") return;
-    setStrokes([[...tracePoints]]);
+    setStrokes(activeTrace.strokes.map((stroke) => [...stroke]));
     setMatched(new Set(tracePoints.map((_, index) => index)));
   }
 
@@ -214,28 +307,32 @@ export default function MagicSpellSystem({
       {menuOpen && phase === "select" ? (
         <aside className="magic-spell-drawer" aria-label="사용할 마법 선택">
           <header><small>보유 주문</small><strong>사용할 마법을 선택하세요</strong></header>
-          <button className="magic-spell-card available" type="button" onClick={openSpellDrawing}>
-            <span className="spell-card-icon" aria-hidden="true">☼</span>
-            <span><strong>빛의 마법</strong><small>어둠을 걷어 내고 주변을 밝힌다</small></span>
-          </button>
-          <div className="magic-spell-card locked" aria-label="아직 잠긴 마법">
-            <span className="spell-card-icon" aria-hidden="true">◇</span>
-            <span><strong>미지의 마법</strong><small>아직 배울 수 없습니다</small></span>
-          </div>
+          {spells.map((spell) => (
+            <button className="magic-spell-card available" type="button" onClick={() => openSpellDrawing(spell.id)} key={spell.id}>
+              <span className="spell-card-icon" aria-hidden="true">{spell.symbol}</span>
+              <span><strong>{spell.name}</strong><small>{spell.description}</small></span>
+            </button>
+          ))}
+          {showLockedSpell ? (
+            <div className="magic-spell-card locked" aria-label="아직 잠긴 마법">
+              <span className="spell-card-icon" aria-hidden="true">◇</span>
+              <span><strong>미지의 마법</strong><small>아직 배울 수 없습니다</small></span>
+            </div>
+          ) : null}
         </aside>
       ) : null}
 
       {menuOpen && phase === "draw" ? (
         <>
           <button className="magic-spell-backdrop" type="button" aria-label="마법진 닫기" onClick={closeSpellUi} />
-          <section className="magic-circle-modal phase-draw" role="dialog" aria-modal="true" aria-labelledby="lightSpellTitle">
+          <section className="magic-circle-modal phase-draw" role="dialog" aria-modal="true" aria-labelledby={`${sceneId}SpellTitle`}>
             <button className="magic-spell-close" type="button" onClick={closeSpellUi} aria-label="닫기">×</button>
             <header>
-              <div className="magic-spell-emblem" aria-hidden="true">☼</div>
+              <div className="magic-spell-emblem" aria-hidden="true">{selectedSpell.symbol}</div>
               <div>
-                <small>빛의 마법 · LUMEN</small>
-                <h2 id="lightSpellTitle">밑그림을 따라 마법진을 그리세요</h2>
-                <p>{`별을 그려 일치율 ${REQUIRED_COVERAGE}% 이상을 만든 뒤 마법 발동을 누르세요. 기준을 만족해도 자동으로 발동되지는 않습니다.`}</p>
+                <small>{`${selectedSpell.name} · ${selectedSpell.incantation}`}</small>
+                <h2 id={`${sceneId}SpellTitle`}>{selectedSpell.drawingTitle}</h2>
+                <p>{`${selectedSpell.traceName} 모양을 그려 일치율 ${REQUIRED_COVERAGE}% 이상을 만든 뒤 마법 발동을 누르세요. 기준을 만족해도 자동으로 발동되지는 않습니다.`}</p>
               </div>
             </header>
 
@@ -244,7 +341,7 @@ export default function MagicSpellSystem({
                 className="magic-trace-board"
                 viewBox={`0 0 ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
                 role="application"
-                aria-label="빛의 마법진 그리기 영역"
+                aria-label={`${selectedSpell.name} 마법진 그리기 영역`}
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={finishStroke}
@@ -257,7 +354,7 @@ export default function MagicSpellSystem({
                   </filter>
                 </defs>
                 <g className="magic-guide-runes">
-                  <path d="M300 55 C310 135 385 220 500 235 C385 250 310 335 300 415 C290 335 215 250 100 235 C215 220 290 135 300 55 Z" />
+                  {activeTrace.paths.map((path) => <path d={path} key={path} />)}
                 </g>
                 <g className="magic-player-strokes" filter={`url(#lightGlow-${sceneId})`}>
                   {strokes.map((stroke, index) => <path d={pathFromStroke(stroke)} key={`${index}-${stroke.length}`} />)}
@@ -271,12 +368,13 @@ export default function MagicSpellSystem({
 
             <footer>
               <button type="button" onClick={resetDrawing}>다시 그리기</button>
-              <button className="magic-keyboard-cast" type="button" onClick={drawForKeyboard}>별 문양 자동 그리기</button>
+              <button className="magic-keyboard-cast" type="button" onClick={drawForKeyboard}>{`${selectedSpell.traceName} 문양 자동 그리기`}</button>
               <button className="magic-cast-button" type="button" onClick={castSpell} disabled={!canCast}>마법 발동</button>
             </footer>
           </section>
         </>
       ) : null}
+      {feedback ? <div className="magic-spell-feedback" role="status">{feedback}</div> : null}
     </div>
   );
 }

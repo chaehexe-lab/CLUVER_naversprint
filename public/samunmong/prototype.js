@@ -5,7 +5,7 @@
     const knownScreenIds = new Set([
       "mainScreen", "tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne",
       "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters",
-      "backGateCourtyard", "magicAlchemyLab", "magicCleaningCloset", "magicLibrary",
+      "backGateCourtyard", "magicAlchemyLab", "magicUnlockDoor", "magicCleaningCloset", "magicLibrary",
       "magicRecordCrystalRoom", "magicDormHallway", "spaceAirlock", "spaceMedicalBay",
       "spaceOxygenGenerator", "spaceDataCore", "spaceScienceLab", "interrogationScreen"
     ]);
@@ -198,6 +198,7 @@
     const interrogationKnownFactsKey = `samunmong-interrogation-known-facts-${themeStorageSuffix}`;
     const fieldGuidePendingKey = "samunmong-field-guide-pending";
     const fieldGuideSeenKey = "samunmong-field-guide-seen";
+    const magicCleaningClosetDoorKey = "samunmong-magic-cleaning-closet-unlocked";
     const settingsKey = "samunmong-demo-settings";
     const bgmStateKey = "samunmong-bgm-state";
     const interrogationQuestionLimit = 50;
@@ -1441,7 +1442,7 @@
       }
 
       const suspectCaption = document.querySelector("[data-briefing-panel='2'] .briefing-caption");
-      if (suspectCaption) suspectCaption.textContent = "세 권의 기록 책을 차례로 펼쳐 보십시오, 선생님.";
+      if (suspectCaption) suspectCaption.textContent = "다섯 명의 관계자 기록을 차례로 확인하십시오, 선생님.";
 
       const suspectGrid = document.querySelector(".briefing-suspect-tags");
       if (suspectGrid && !magicRecordIntro) {
@@ -2326,6 +2327,7 @@
     const magicThemeLoadingScreens = new Set([
       "briefingScreen",
       "magicAlchemyLab",
+      "magicUnlockDoor",
       "magicCleaningCloset",
       "magicLibrary",
       "magicRecordCrystalRoom",
@@ -2556,7 +2558,7 @@
 
     function showInitialScreenFromSetup() {
       const startScreen = entryParams.get("start") || document.querySelector(".game-shell")?.dataset.startScreen;
-      const allowedScreens = new Set(["tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne", "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters", "backGateCourtyard", "magicAlchemyLab", "magicCleaningCloset", "magicLibrary", "magicRecordCrystalRoom", "magicDormHallway", "spaceAirlock", "spaceMedicalBay", "spaceOxygenGenerator", "spaceDataCore", "spaceScienceLab", "interrogationScreen"]);
+      const allowedScreens = new Set(["tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne", "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters", "backGateCourtyard", "magicAlchemyLab", "magicUnlockDoor", "magicCleaningCloset", "magicLibrary", "magicRecordCrystalRoom", "magicDormHallway", "spaceAirlock", "spaceMedicalBay", "spaceOxygenGenerator", "spaceDataCore", "spaceScienceLab", "interrogationScreen"]);
 
       if (!allowedScreens.has(startScreen)) {
         return;
@@ -7097,6 +7099,11 @@
           showToast(getMagicLockMessage(target));
           return;
         }
+        const needsGateway = Boolean(
+          button.dataset.mapGateway
+          && localStorage.getItem(magicCleaningClosetDoorKey) !== "1"
+        );
+        const resolvedTarget = needsGateway ? button.dataset.mapGateway : target;
         button.classList.add("pressing");
         playSfx("move", 0.82);
         if (["map-click", "map-open"].includes(fieldGuideStep)) {
@@ -7104,7 +7111,7 @@
           return;
         }
         closeGlobalPanel();
-        go(target, isSpaceTheme ? "정거장 지도에서 이동 중..." : isMagicTheme ? "학교 지도에서 이동 중..." : "마을 지도에서 이동 중...");
+        go(resolvedTarget, isSpaceTheme ? "정거장 지도에서 이동 중..." : isMagicTheme ? "학교 지도에서 이동 중..." : "마을 지도에서 이동 중...");
       });
     });
 

@@ -13,8 +13,8 @@ const PARTICLES = Array.from({ length: 16 }, (_, index) => {
   const angle = (Math.PI * 2 * index) / 16 + (index % 3) * 0.12;
   const distance = 46 + (index % 5) * 14;
   return {
-    dx: Math.cos(angle) * distance,
-    dy: Math.sin(angle) * distance,
+    dx: Number((Math.cos(angle) * distance).toFixed(3)),
+    dy: Number((Math.sin(angle) * distance).toFixed(3)),
     delay: (index % 4) * 12
   };
 });
