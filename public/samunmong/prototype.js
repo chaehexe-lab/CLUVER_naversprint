@@ -101,7 +101,7 @@
     if (isMagicTheme || isSpaceTheme) startCaseLabel = "조사 시작";
     document.documentElement.dataset.samunmongTheme = activeTheme;
     const magicBriefingText = sentenceBreakText("“선생님, 제1 연금술 실습실이 밤새 불탔습니다.”\n\n당신은 이 꿈에서 갓 부임한 마법 교사입니다.\n마력의 시선으로 잔류 마법을 살피고, 학생과 교직원을 심문해 방화의 진범을 찾아야 합니다.");
-    const spaceBriefingText = sentenceBreakText("“오르빗-13에서 외부 작업 중 정거장 밖으로 이탈했습니다.”\n\n당신은 이 꿈에서 사건 조사관입니다.\n현장에 남겨진 단서와 대원들의 진술을 맞춰 보며,\n사고처럼 보이는 죽음의 진실을 추적해야 합니다.");
+    const spaceBriefingText = sentenceBreakText("“오르빗-13에서 한 대원이 외부 작업 중 정거장 밖으로 이탈했습니다.”\n\n당신은 이 꿈에서 사건 조사관입니다.\n현장에 남겨진 단서와 대원들의 진술을 맞춰 보며,\n사고처럼 보이는 죽음의 진실을 추적해야 합니다.");
     const briefingText = isSpaceTheme
       ? spaceBriefingText
       : isMagicTheme
@@ -841,6 +841,20 @@
       clearInterval(typeBriefing.timer);
       clearTimeout(typeBriefing.decodeTimer);
       clearTimeout(briefingRestoreTimer);
+    }
+
+    function handleBriefingStepChange(event) {
+      const requestedStep = Number(event instanceof CustomEvent ? event.detail?.step : NaN);
+      if (!Number.isInteger(requestedStep)) return;
+      stopBriefingTyping();
+      briefingStepIndex = requestedStep;
+      isBriefingTyped = true;
+      if (briefingCopy && requestedStep !== 0) {
+        briefingCopy.replaceChildren();
+        briefingCopy.classList.add("done");
+        briefingCopy.classList.remove("rune-decoding");
+      }
+      updateBriefingStep();
     }
 
     function renderBriefingText(text) {
@@ -1613,7 +1627,7 @@
           "사용 목적: 우주복 점검",
           "공구함 반납 시각: OST 21:37",
           "마지막 사용자 ID: ORBIT-13-MNT-0821",
-          "점검 결과: 우주복 손상 및 특이 잔류물 없음"
+          "점검 결과: 실내 작동 점검 정상"
         ]
       },
       "소독천과 장갑": {
@@ -2821,6 +2835,7 @@
       }
     });
     briefingJournalCloseButton?.addEventListener("click", closeBriefingJournal);
+    window.addEventListener("samunmong:briefing-step-change", handleBriefingStepChange);
     window.addEventListener("samunmong:briefing-journal-ready", revealBriefingJournal);
     window.addEventListener("samunmong:briefing-journal-close-request", closeBriefingJournal);
     on("#accuseButton", "click", openResultPage);

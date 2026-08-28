@@ -168,6 +168,7 @@ function SpaceStationBriefingScreen() {
 
   useEffect(() => {
     const openJournal = () => {
+      window.dispatchEvent(new CustomEvent("samunmong:briefing-step-change", { detail: { step: 1 } }));
       setBriefingStep(1);
       setIsJournalOpen(true);
     };
@@ -247,9 +248,9 @@ function SpaceStationBriefingScreen() {
               <h3>최종 원격 판정 기록</h3>
               <div className="space-report-summary-body">
                 <div className="space-report-summary-copy">
-                  <p>외부 작업 중 갑작스러운 심박 이상과 근력 저하가 감지되었습니다.<br />직후 추진 레버가 응답하지 않았고 산소 수치가 비정상적으로 감소했습니다.</p>
-                  <p>안전줄 체결 신호가 해제된 뒤 구조 가능 궤도를 벗어났으며,<br />생체 신호와 통신이 모두 끊겼습니다.</p>
-                  <p className="space-report-verdict">시신을 회수하지 못해 정확한 사인은 확정할 수 없으나,<br />이탈 전부터 이어진 신체 이상과 장비 오류는 단순 외부 작업 사고로 보기 어렵습니다.</p>
+                  <p>외부 작업 중 갑작스러운 심장 이상과 근력 저하가 확인되었습니다.<br />곧이어 추진 레버가 작동하지 않았고 산소 수치도 빠르게 떨어졌습니다.</p>
+                  <p>안전줄 연결이 끊어진 뒤 정거장으로 돌아오지 못했으며,<br />생체 신호와 통신도 모두 끊겼습니다.</p>
+                  <p>시신을 찾지 못해 정확한 사망 원인은 알 수 없지만,<br />사고 전부터 나타난 신체 이상과 장비 고장은 단순 사고로 보기 어렵습니다.</p>
                 </div>
                 <img
                   className="space-body-scan-image"
@@ -288,6 +289,7 @@ function SpaceStationBriefingScreen() {
             onClick={briefingStep === 0 ? ((event) => {
               event.preventDefault();
               event.stopPropagation();
+              window.dispatchEvent(new CustomEvent("samunmong:briefing-step-change", { detail: { step: 1 } }));
               setBriefingStep(1);
             }) : undefined}
             aria-label={briefingStep === 0 ? "생체 기록 보기" : "에어록으로 이동"}
