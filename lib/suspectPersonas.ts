@@ -182,8 +182,8 @@ export const evidenceCatalog = [
     aliases: ["키카드", "접속 칩", "해리 계정", "계정 도용", "접속 기록", "데이터실"]
   },
   {
-    name: "암호화된 연구 보상 계약",
-    aliases: ["연구 계약", "보상 계약", "암호화 계약", "연구 보상", "우선 귀환권", "임상 자료"]
+    name: "암호화된 파일",
+    aliases: ["연구 계약", "보상 계약", "암호화 계약", "연구 보상", "우선 귀환권", "임상 자료", "성과보상 계약서"]
   },
   {
     name: "엔지니어 공구 클램프",
@@ -410,7 +410,7 @@ export const suspectPersonas: SuspectPersona[] = [
     ],
     evidenceReactions: [
       {
-        evidenceNames: ["삭제된 의료 기록", "접속 키카드 칩", "암호화된 연구 보상 계약"],
+        evidenceNames: ["삭제된 의료 기록", "접속 키카드 칩", "암호화된 파일"],
         intentTags: ["deletedMedicalRecord", "accountSpoofing"],
         responseGuide: "해리 계정이 쓰인 것은 인정하지만, 접속 위치가 의료실 보조 단말이라는 점에 놀란다. 추궁하면 21시 43분경 메르스가 의료 단말기 오류를 확인한다며 키카드를 빌려 갔고 손상된 채 돌려줬다고 밝힌다."
       },
@@ -420,7 +420,7 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "마지막 무전 끝의 개인 채널 흔적을 복구할 수 있다고 말한다. 그 신호가 구조 요청만은 아닌 것 같다고 조심스럽게 암시한다."
       }
     ],
-    breakEvidenceNames: ["삭제된 의료 기록", "접속 키카드 칩", "암호화된 연구 보상 계약"],
+    breakEvidenceNames: ["삭제된 의료 기록", "접속 키카드 칩", "암호화된 파일"],
     finalBehavior: "자책이 흔들리고, 삭제 기록이 의료실 단말과 이어진다는 점을 분명히 말한다."
   },
   {
@@ -461,12 +461,12 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "데이비드의 구조 요청을 수신하고 채널을 차단했다는 기록에 크게 흔들린다. 통신 장애였다고 주장하지만 수동 차단 로그는 설명하지 못한다."
       },
       {
-        evidenceNames: ["암호화된 연구 보상 계약", "미승인 약물 앰풀"],
+        evidenceNames: ["암호화된 파일", "미승인 약물 앰풀"],
         intentTags: ["illegalTrial", "researchReward"],
         responseGuide: "계약과 앰풀이 자신의 의료 권한에 연결된다는 점을 부정하다가, 연구 성과와 우선 귀환권을 잃을 수 없었다는 탐욕을 드러낸다."
       }
     ],
-    breakEvidenceNames: ["추진 레버 결빙 기록", "소독천과 장갑", "조작된 전압 센서", "비인가 지연 타이머", "삭제된 의료 기록", "암호화된 연구 보상 계약", "미승인 약물 앰풀", "마지막 무전 기록"],
+    breakEvidenceNames: ["추진 레버 결빙 기록", "소독천과 장갑", "조작된 전압 센서", "비인가 지연 타이머", "삭제된 의료 기록", "암호화된 파일", "미승인 약물 앰풀", "마지막 무전 기록"],
     finalBehavior: "불법 임상시험과 부작용 은폐, 구조 채널 차단이 드러나고 공개되지 않은 증상 시각과 투여량을 말실수한 뒤 연구 보상과 지구 귀환 특혜를 잃을 수 없었다는 악의적 동기를 드러낸다."
   },
   {

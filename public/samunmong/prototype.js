@@ -187,6 +187,7 @@
     const examinedCluesKey = `samunmong-examined-clues-${themeStorageSuffix}`;
     const linkedEvidenceKey = `samunmong-linked-evidence-${themeStorageSuffix}`;
     const spaceMedicalRecordRecoveryKey = "samunmong-space-medical-record-recovered";
+    const spaceEncryptedFileDecryptionKey = "samunmong-space-encrypted-file-decrypted";
     const spaceAnalysisResultsKey = "samunmong-space-analysis-results";
     const spaceKeycardRecoveryKey = "samunmong-space-keycard-recovered";
     const spacePowerAccessCardName = "전력 제어실 출입 카드";
@@ -496,6 +497,7 @@
       localStorage.removeItem(`samunmong-interrogation-known-facts-${suffix}`);
       if (normalizedTheme === "spaceStation") {
         localStorage.removeItem(spaceMedicalRecordRecoveryKey);
+        localStorage.removeItem(spaceEncryptedFileDecryptionKey);
         localStorage.removeItem(spaceAnalysisResultsKey);
         localStorage.removeItem(spaceKeycardRecoveryKey);
       }
@@ -633,7 +635,11 @@
       const stored = readStored(key, []);
       if (!Array.isArray(stored)) return [];
       const migrated = isSpaceTheme
-        ? stored.map((name) => name === "커피 텀블러" ? "혈액 시료 분석 기록" : name)
+        ? stored.map((name) => {
+          if (name === "커피 텀블러") return "혈액 시료 분석 기록";
+          if (name === "암호화된 연구 보상 계약") return "암호화된 파일";
+          return name;
+        })
         : stored;
       return [...new Set(migrated.filter((name) => typeof name === "string" && name.trim() && !(themeId === "joseon" && retiredJoseonEvidenceNames.has(name))))];
     }
@@ -1561,7 +1567,7 @@
       "비인가 지연 타이머": { x: -45, y: 25 },
       "조작된 전압 센서": { x: -47, y: 25 },
       "접속 키카드 칩": { x: 20, y: 34 },
-      "암호화된 연구 보상 계약": { x: -55, y: 20 },
+      "암호화된 파일": { x: -55, y: 20 },
       "혈액 시료 분석 기록": { x: -55, y: 15 },
       "미승인 약물 앰풀": { x: 31, y: 60 }
     };
@@ -1656,6 +1662,37 @@
           "대원 ID: ORBIT-13-DAT-0319",
           "최근 접속: OST 22:31 의료실 보조 단말",
           "실행 명령: MEDICAL RECORD / DELETE"
+        ]
+      },
+      "암호화된 파일": {
+        kicker: "ORBIT-13 · ENCRYPTED RESEARCH FILE",
+        title: "RX-47B 임상연구 성과보상 계약서",
+        lockedTitle: "암호화된 파일",
+        lockedDescription: "",
+        image: "/assets/space-station/evidence/encrypted-research-contract.webp",
+        imageAlt: "외부 연구 기관과 체결된 RX-47B 임상연구 성과보상 계약 파일",
+        description: "본 계약은 미승인 근육 재생 약물 RX-47B의 임상 자료 제출과 보상 조건을 정한다.",
+        sections: [
+          {
+            title: "제1조 연구 정보",
+            items: [
+              "연구 책임자: 메르스",
+              "연구 대상자: 데이비드",
+              "제출 기한: 사건 발생 당일 23:00 OST"
+            ]
+          },
+          {
+            title: "제2조 보상 조건",
+            paragraphs: ["연구 책임자가 기한 내 임상 자료를 완성하여 전송할 경우, 연구 성과금과 지구 귀환 우선권을 지급한다."]
+          },
+          {
+            title: "제3조 비밀유지 및 계약 취소",
+            paragraphs: ["연구가 중단되거나 관련 정보가 외부에 공개될 경우 계약은 즉시 취소되며, 모든 보상과 귀환 권한은 회수된다."]
+          }
+        ],
+        footerItems: [
+          "연구 책임자: 메르스",
+          "계약 상태: 조건부 보상 승인"
         ]
       },
       "혈액 시료 분석 기록": {
@@ -1816,10 +1853,21 @@
           && completedAnalysis.has("glove");
         const keycardRecovered = evidenceName === "접속 키카드 칩"
           && localStorage.getItem(spaceKeycardRecoveryKey) === "1";
-        const detail = keycardRecovered
+        const contractEncrypted = evidenceName === "암호화된 파일"
+          && localStorage.getItem(spaceEncryptedFileDecryptionKey) !== "1";
+        const detail = contractEncrypted
+          ? {
+            ...baseDetail,
+            title: baseDetail.lockedTitle,
+            description: baseDetail.lockedDescription,
+            sections: null,
+            footerItems: null
+          }
+          : keycardRecovered
           ? { ...baseDetail, description: "", items: baseDetail.recoveredItems }
           : baseDetail;
         panel.classList.toggle("residue-analysis-complete", hasCompleteResidueAnalysis);
+        panel.classList.toggle("contract-decrypted", evidenceName === "암호화된 파일" && !contractEncrypted);
         panel.setAttribute(
           "aria-labelledby",
           hasCompleteResidueAnalysis ? "spaceResidueAnalysisTitle" : "spaceEvidenceDetailTitle"
@@ -1830,9 +1878,11 @@
         const title = panel.querySelector("#spaceEvidenceDetailTitle");
         const description = panel.querySelector("#spaceEvidenceDetailDescription");
         const recoveryForm = panel.querySelector("#spaceMedicalRecoveryForm");
+        const contractForm = panel.querySelector("#spaceContractDecryptionForm");
         const recoveredRecord = panel.querySelector("#spaceMedicalRecoveredRecord");
         const structuredRecord = panel.querySelector("#spaceEvidenceStructuredRecord");
         const recoveryError = panel.querySelector("#spaceMedicalRecoveryError");
+        const contractError = panel.querySelector("#spaceContractDecryptionError");
         if (image) {
           image.src = detail.image;
           image.alt = detail.imageAlt;
@@ -1845,20 +1895,67 @@
         }
         if (structuredRecord) {
           structuredRecord.replaceChildren();
-          structuredRecord.hidden = !detail.items;
+          structuredRecord.hidden = !(detail.items || detail.sections || detail.footerItems);
           detail.items?.forEach((item) => {
             const row = document.createElement("p");
             row.textContent = `▪ ${item}`;
             structuredRecord.appendChild(row);
           });
+          detail.sections?.forEach((sectionData) => {
+            const section = document.createElement("section");
+            section.className = "space-contract-section";
+            const heading = document.createElement("h3");
+            heading.textContent = sectionData.title;
+            section.appendChild(heading);
+            sectionData.items?.forEach((item) => {
+              const row = document.createElement("p");
+              const separatorIndex = item.indexOf(":");
+              row.className = "space-contract-item";
+              if (separatorIndex < 0) {
+                row.textContent = `▪ ${item}`;
+              } else {
+                row.append(document.createTextNode(`▪ ${item.slice(0, separatorIndex + 1)} `));
+                const value = document.createElement("strong");
+                value.textContent = item.slice(separatorIndex + 1).trim();
+                row.appendChild(value);
+              }
+              section.appendChild(row);
+            });
+            sectionData.paragraphs?.forEach((text) => {
+              const paragraph = document.createElement("p");
+              paragraph.className = "space-contract-paragraph";
+              paragraph.textContent = text;
+              section.appendChild(paragraph);
+            });
+            structuredRecord.appendChild(section);
+          });
+          if (detail.footerItems) {
+            const footer = document.createElement("footer");
+            footer.className = "space-contract-footer";
+            detail.footerItems.forEach((item) => {
+              const row = document.createElement("p");
+              const separatorIndex = item.indexOf(":");
+              row.append(document.createTextNode(`${item.slice(0, separatorIndex + 1)} `));
+              const value = document.createElement("strong");
+              value.textContent = item.slice(separatorIndex + 1).trim();
+              row.appendChild(value);
+              footer.appendChild(row);
+            });
+            structuredRecord.appendChild(footer);
+          }
         }
         const recovered = detail.requiresRecovery && localStorage.getItem(spaceMedicalRecordRecoveryKey) === "1";
         if (recoveryForm) {
           recoveryForm.hidden = !detail.requiresRecovery || recovered;
           if (detail.requiresRecovery && !recovered) recoveryForm.reset();
         }
+        if (contractForm) {
+          contractForm.hidden = !contractEncrypted;
+          if (contractEncrypted) contractForm.reset();
+        }
         if (recoveredRecord) recoveredRecord.hidden = !detail.requiresRecovery || !recovered;
         if (recoveryError) recoveryError.textContent = "";
+        if (contractError) contractError.textContent = "";
         focusRecoveryInput = Boolean(detail.requiresRecovery && !recovered);
       }
       panel.classList.toggle("show", open);
@@ -1867,9 +1964,32 @@
       overlay.setAttribute("aria-hidden", String(!open));
       if (open) {
         hideCollectedEvidenceTooltip();
-        document.querySelector(focusRecoveryInput ? "#spaceMedicalRecoveryPassword" : "#closeSpaceEvidenceDetail")?.focus();
+        const focusTarget = panel.querySelector("#spaceContractDecryptionForm:not([hidden]) input")
+          || document.querySelector(focusRecoveryInput ? "#spaceMedicalRecoveryPassword" : "#closeSpaceEvidenceDetail");
+        focusTarget?.focus();
       }
     }
+
+    document.querySelector("#spaceContractDecryptionForm")?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      const form = event.currentTarget;
+      const inputs = [...form.querySelectorAll("input")];
+      const values = inputs.map((input) => input.value.trim().toUpperCase());
+      const error = form.querySelector("#spaceContractDecryptionError");
+      const isCorrect = values[0] === "RX47B" && values[1] === "02" && values[2] === "1308";
+      if (!isCorrect) {
+        if (error) error.textContent = "보안 키가 일치하지 않습니다.";
+        form.reset();
+        inputs[0]?.focus();
+        playSfx("buttonAlt", 0.38);
+        return;
+      }
+      localStorage.setItem(spaceEncryptedFileDecryptionKey, "1");
+      if (error) error.textContent = "";
+      refreshEvidenceCard("암호화된 파일");
+      setSpaceEvidenceDetail(true, "암호화된 파일");
+      playSfx("evidence", 0.5);
+    });
 
     document.querySelector("#spaceMedicalRecoveryForm")?.addEventListener("submit", (event) => {
       event.preventDefault();
@@ -3583,6 +3703,14 @@
     }
 
     function getEvidenceDisplayName(name) {
+      if (
+        isSpaceTheme
+        && name === "암호화된 파일"
+        && localStorage.getItem(spaceEncryptedFileDecryptionKey) === "1"
+        && evidenceData[name]?.recoveredName
+      ) {
+        return evidenceData[name].recoveredName;
+      }
       if (isJoseonToolInteraction && !isEvidenceMeaningRevealed(name)) {
         return joseonUnexaminedEvidenceNames[name] || "정체 모를 물건";
       }
@@ -3605,6 +3733,14 @@
         isSpaceTheme
         && name === "접속 키카드 칩"
         && localStorage.getItem(spaceKeycardRecoveryKey) === "1"
+        && data.recoveredCardNote
+      ) {
+        return data.recoveredCardNote;
+      }
+      if (
+        isSpaceTheme
+        && name === "암호화된 파일"
+        && localStorage.getItem(spaceEncryptedFileDecryptionKey) === "1"
         && data.recoveredCardNote
       ) {
         return data.recoveredCardNote;
