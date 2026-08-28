@@ -65,7 +65,7 @@ export const screenLocationLabels = {
   magicDormHallway: "학생들 기숙사",
   spaceAirlock: "에어록",
   spaceMedicalBay: "의료실",
-  spaceOxygenGenerator: "산소 발생기실",
+  spaceOxygenGenerator: "전력 제어실",
   spaceDataCore: "데이터실",
   spaceScienceLab: "과학 실험실",
   interrogationScreen: "\uCDE8\uC870\uC2E4"

@@ -1538,8 +1538,8 @@
       "마지막 무전 기록": { x: -130, y: 95 },
       "소독천과 장갑": { x: 40, y: 35 },
       "삭제된 의료 기록": { x: -32, y: 30 },
-      "조작된 지연 타이머": { x: -45, y: 25 },
-      "손상된 압력 센서": { x: -47, y: 25 },
+      "비인가 지연 타이머": { x: -45, y: 25 },
+      "조작된 전압 센서": { x: -47, y: 25 },
       "접속 키카드 칩": { x: 20, y: 34 },
       "암호화된 연구 보상 계약": { x: -55, y: 20 },
       "커피 텀블러": { x: 25, y: 65 },
@@ -1656,6 +1656,13 @@
           "의료 승인: 없음",
           "부작용: 근력 저하, 심박 이상, 저산소 반응"
         ]
+      },
+      "조작된 전압 센서": {
+        kicker: "ORBIT-13 · POWER CONTROL SENSOR",
+        title: "조작된 전압 센서",
+        image: "/assets/space-station/evidence/damaged-pressure-sensor.webp",
+        imageAlt: "전력 이상 감지 신호가 조작된 전압 센서",
+        description: "전력 이상을 감지하지 못하도록 조작된 센서다. 타이머가 보조 전력선에 연결된 사실을 감춰 경고가 울리지 않았으며, 정전 직전까지 정상 신호를 보냈다."
       },
       "삭제된 의료 기록": {
         kicker: "ORBIT-13 · MEDICAL ARCHIVE",
@@ -3021,7 +3028,9 @@
       const stored = readStored(collectedEvidenceKey, []);
       if (!Array.isArray(stored)) return;
       const renamedEvidence = {
-        "마지막 무전 로그": "마지막 무전 기록"
+        "마지막 무전 로그": "마지막 무전 기록",
+        "손상된 압력 센서": "조작된 전압 센서",
+        "조작된 지연 타이머": "비인가 지연 타이머"
       };
       const migrated = stored.map((name) => renamedEvidence[name] || name);
       const valid = [...new Set(migrated.filter((name) => typeof name === "string" && evidenceData[name]))];

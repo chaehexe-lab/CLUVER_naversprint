@@ -31,7 +31,7 @@ export const spaceStationTheme = {
   locations: [
     { id: "spaceAirlock", name: "에어록", map: { x: "50.1%", y: "17%", labelY: "26.4%" }, indicator: { x: "50%", y: "14%" }, image: "/assets/space-station/backgrounds/orbit-13-airlock-evidence-v4.webp", alt: "오르빗-13 에어록과 외부 작업 사고 현장" },
     { id: "spaceMedicalBay", name: "의료실", map: { x: "28.5%", y: "33%", labelY: "43.4%" }, indicator: { x: "29%", y: "31%" }, image: "/assets/space-station/backgrounds/medical-bay-evidence-v2.webp", alt: "오르빗-13 의료실" },
-    { id: "spaceOxygenGenerator", name: "산소 발생기실", map: { x: "71.9%", y: "33%", labelY: "43.4%" }, indicator: { x: "72%", y: "31%" }, image: "/assets/space-station/backgrounds/oxygen-generator-evidence-v2.webp", alt: "오르빗-13 산소 발생기실" },
+    { id: "spaceOxygenGenerator", name: "전력 제어실", map: { x: "71.9%", y: "33%", labelY: "43.4%" }, indicator: { x: "72%", y: "31%" }, image: "/assets/space-station/backgrounds/oxygen-generator-evidence-v2.webp", alt: "오르빗-13 전력 제어실" },
     { id: "spaceDataCore", name: "데이터실", map: { x: "28.5%", y: "63.5%", labelY: "73.5%" }, indicator: { x: "29%", y: "61%" }, image: "/assets/space-station/backgrounds/data-core-evidence-v2.webp", alt: "오르빗-13 데이터실" },
     { id: "spaceScienceLab", name: "과학 실험실", map: { x: "71.5%", y: "63%", labelY: "73.5%" }, indicator: { x: "72%", y: "61%" }, image: "/assets/space-station/backgrounds/science-lab-evidence-v2.webp", alt: "오르빗-13 과학 실험실" },
     { id: "interrogationScreen", name: "보안 조사실", map: { x: "50.2%", y: "79%", labelY: "88.6%" }, indicator: { x: "50%", y: "76%" }, image: room, alt: "오르빗-13 보안 조사실" }
@@ -42,14 +42,14 @@ export const spaceStationTheme = {
     "마지막 무전 기록": { role: "결정타 증거", location: "에어록", note: "사건 당시 데이비드가 송신한 무전 기록을 시간순으로 확인할 수 있다.", logic: "메르스가 구조 요청을 받고도 채널을 차단했다.", relatedSuspects: ["데이비드", "메르스"], img: "/assets/space-station/evidence/final-radio-log.webp" },
     "소독천과 장갑": { role: "연결 증거", location: "의료실", note: "흰 소독천과 수술용 장갑에 투명 젤 성분이 남아 있다.", cardNote: "흰 소독천과 수술용 장갑에 정체를 알 수 없는 물질이 묻어 있다.", logic: "추진 레버를 막은 젤과 의료실을 연결한다.", relatedSuspects: ["메르스"], img: "/assets/space-station/evidence/disinfectant-cloth-glove.webp" },
     "삭제된 의료 기록": { role: "동기 증거", location: "의료실", note: "데이비드의 의료 기록 일부가 삭제되었다.", logic: "불법 임상시험과 약물 부작용 은폐를 보여준다.", relatedSuspects: ["해리", "메르스", "데이비드"], img: "/assets/space-station/evidence/deleted-medical-record.webp" },
-    "손상된 압력 센서": { role: "수법 증거", location: "산소 발생기실", note: "P-02 센서가 손상돼 정상 상태를 거짓 보고한다.", logic: "산소 부족을 자동제어가 감지하지 못하게 만든 고의 조작이다.", relatedSuspects: ["메르스"], img: "/assets/space-station/evidence/damaged-pressure-sensor.webp" },
-    "조작된 지연 타이머": { role: "알리바이 파괴 증거", location: "산소 발생기실", note: "AUX-04 회로의 타이머가 22시 05분 명령을 22시 18분에 실행했다.", logic: "사고가 미리 예약된 계획 범행임을 확정한다.", relatedSuspects: ["메르스", "알라딘딘"], img: "/assets/space-station/evidence/tampered-delay-timer.webp" },
+    "조작된 전압 센서": { role: "수법 증거", location: "전력 제어실", note: "전력 이상을 감지하지 못하도록 센서가 조작되어 있다.", logic: "타이머가 보조 전력선에 연결된 사실을 감춰 정전 직전까지 정상 신호를 보내게 한 고의 조작이다.", relatedSuspects: ["메르스"], img: "/assets/space-station/evidence/damaged-pressure-sensor.webp" },
+    "비인가 지연 타이머": { role: "알리바이 파괴 증거", location: "전력 제어실", note: "AUX-04 회로의 타이머가 22시 05분 명령을 22시 18분에 실행했다.", logic: "사고가 미리 예약된 계획 범행임을 확정한다.", relatedSuspects: ["메르스", "알라딘딘"], img: "/assets/space-station/evidence/tampered-delay-timer.webp" },
     "접속 키카드 칩": { role: "계정 도용 증거", location: "데이터실", note: "해리 계정과 의료실 보조 단말 접근 기록이 함께 남은 접속 칩.", cardNote: "사용자 정보가 손상된 휴대용 인증 칩이다.", recoveredCardNote: "해리의 계정 정보와 의료실 보조 단말 접속 기록이 남아 있는 인증 칩이다.", logic: "기록 삭제가 해리의 실수가 아니라 계정 도용임을 보강한다.", relatedSuspects: ["해리", "메르스"], img: "/assets/space-station/evidence/access-keycard-chip.webp" },
     "암호화된 연구 보상 계약": { role: "결정적 동기 증거", location: "데이터실", note: "임상 자료 대가로 연구 보상과 우선 귀환권을 약속한 암호화 계약.", logic: "메르스가 폭로를 막으려 한 악의적 동기를 보여준다.", relatedSuspects: ["메르스", "해리"], img: "/assets/space-station/evidence/encrypted-research-contract.webp" },
     "커피 텀블러": { role: "미끼 증거", location: "과학 실험실", note: "아인슈페너의 텀블러. 숨긴 개인 실험을 의심하게 한다.", logic: "아인슈페너를 의심하게 하지만 살인 수법과 연결되지 않는다.", relatedSuspects: ["아인슈페너"], img: "/assets/space-station/evidence/coffee-tumbler-front.png" },
     "미승인 약물 앰풀": { role: "위장 및 동기 증거", location: "과학 실험실", note: "삭제된 투약 기록과 같은 제조 코드가 남은 파란 근육 재생 약물 앰풀.", cardNote: "정식 의료 목록에 등록되지 않은 청색 약물 앰풀. 일부가 사용된 상태다.", logic: "메르스가 불법 약물을 숨기고 아인슈페너에게 책임을 씌우려 했다.", relatedSuspects: ["메르스", "아인슈페너"], img: "/assets/space-station/evidence/unauthorized-drug-ampoule.webp" }
   },
-  requiredEvidence: ["추진 레버 결빙 기록", "손상된 압력 센서", "조작된 지연 타이머", "삭제된 의료 기록", "접속 키카드 칩", "암호화된 연구 보상 계약", "마지막 무전 기록"],
+  requiredEvidence: ["추진 레버 결빙 기록", "조작된 전압 센서", "비인가 지연 타이머", "삭제된 의료 기록", "접속 키카드 칩", "암호화된 연구 보상 계약", "마지막 무전 기록"],
   deductionRoute: ["외벽 장비 담당 알라딘딘이 먼저 의심받는다.", "약물 앰풀 때문에 아인슈페너가 의심받는다.", "삭제 로그 때문에 해리가 의심받는다.", "산소 복구 과정에서 사고가 예약 실행됐음이 드러난다.", "심문과 의료실 증거가 메르스의 행동을 완성한다.", "최종 지목은 메르스다."]
 } as const;
 
@@ -73,8 +73,8 @@ const hotspots: Record<string, SceneHotspot[]> = {
     { id: "spaceMedicalAnalyzer", className: "space-analysis-device", ariaLabel: "의료실 성분 분석 장치", x: "83.7%", y: "55%", w: "7.5%", h: "11.5%", clipPath: "polygon(8% 12%, 84% 4%, 98% 78%, 14% 96%)", radius: "10px", rot: "0deg" }
   ],
   spaceOxygenGenerator: [
-    { evidenceName: "조작된 지연 타이머", ariaLabel: "조작된 지연 타이머 조사", x: "17.5%", y: "54%", w: "7%", h: "8%", clipPath: "polygon(6% 10%, 94% 8%, 98% 88%, 8% 96%)", radius: "12px", rot: "0deg" },
-    { evidenceName: "손상된 압력 센서", ariaLabel: "손상된 압력 센서 조사", x: "65%", y: "46%", w: "7%", h: "11%", clipPath: "ellipse(46% 44% at 50% 50%)", radius: "999px", rot: "0deg" }
+    { evidenceName: "비인가 지연 타이머", ariaLabel: "비인가 지연 타이머 조사", x: "17.5%", y: "54%", w: "7%", h: "8%", clipPath: "polygon(6% 10%, 94% 8%, 98% 88%, 8% 96%)", radius: "12px", rot: "0deg" },
+    { evidenceName: "조작된 전압 센서", ariaLabel: "조작된 전압 센서 조사", x: "65%", y: "46%", w: "7%", h: "11%", clipPath: "ellipse(46% 44% at 50% 50%)", radius: "999px", rot: "0deg" }
   ],
   spaceDataCore: [
     { evidenceName: "접속 키카드 칩", ariaLabel: "접속 키카드 칩 조사", x: "28%", y: "79%", w: "10%", h: "10%", clipPath: "polygon(5% 20%, 88% 8%, 98% 72%, 18% 96%)", radius: "12px", rot: "0deg" },
