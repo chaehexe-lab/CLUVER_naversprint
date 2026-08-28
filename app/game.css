@@ -16670,6 +16670,208 @@ html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-panel h2 {
   font-weight: 500;
 }
 
+html[data-samunmong-theme="spaceStation"] .space-power-access-overlay {
+  position: fixed;
+  z-index: 76;
+  inset: 0;
+  visibility: hidden;
+  background: rgba(0, 0, 0, .48);
+  opacity: 0;
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-overlay.show {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-panel {
+  position: fixed;
+  z-index: 77;
+  left: 50%;
+  top: 50%;
+  box-sizing: border-box;
+  width: min(650px, 86vw);
+  display: none;
+  padding: 42px 52px 46px;
+  border: 1px solid rgba(188, 229, 255, .9);
+  border-radius: 24px;
+  color: #102b44;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .16), transparent 19%),
+    radial-gradient(ellipse at 24% 0%, rgba(214, 240, 252, .24), transparent 48%),
+    linear-gradient(145deg, rgba(221, 233, 248, .94), rgba(185, 204, 229, .9));
+  box-shadow:
+    0 26px 76px rgba(0, 0, 0, .58),
+    0 0 22px rgba(112, 205, 255, .2),
+    inset 0 0 0 1px rgba(226, 246, 255, .34);
+  transform: translate(-50%, -50%);
+  -webkit-backdrop-filter: blur(12px) saturate(1.08);
+  backdrop-filter: blur(12px) saturate(1.08);
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-panel::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(132, 198, 238, .52);
+  border-radius: 18px;
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-panel.show {
+  display: block;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-panel > span {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-bottom: 7px;
+  color: rgba(16, 59, 88, .68);
+  font-size: 12px;
+  letter-spacing: .12em;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-panel h2 {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 15px;
+  font-size: clamp(27px, 2.4vw, 36px);
+  font-weight: 500;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-guide {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 20px;
+  color: #24445f;
+  font-size: 16px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-empty-slot {
+  position: relative;
+  z-index: 1;
+  min-height: 150px;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  border: 2px dashed rgba(68, 113, 143, .58);
+  border-radius: 14px;
+  color: rgba(29, 68, 96, .58);
+  background: rgba(226, 238, 248, .2);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-empty-slot[hidden],
+html[data-samunmong-theme="spaceStation"] .space-power-access-card[hidden] {
+  display: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-empty-slot span {
+  padding: 10px 18px;
+  border: 1px solid rgba(68, 113, 143, .22);
+  border-radius: 6px;
+  font-size: 12px;
+  letter-spacing: .14em;
+}
+
+html[data-samunmong-theme="spaceStation"].space-power-access-active .scene-dock {
+  display: contents;
+}
+
+html[data-samunmong-theme="spaceStation"].space-power-access-active .scene-dock .scene-chip,
+html[data-samunmong-theme="spaceStation"].space-power-access-active .scene-dock .tool-prop {
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"].space-power-access-active .scene-dock .bag-chip {
+  z-index: 78;
+  pointer-events: auto;
+}
+
+html[data-samunmong-theme="spaceStation"].space-power-access-active .evidence-bag-pop {
+  z-index: 80;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-cursor {
+  position: fixed;
+  z-index: 82;
+  left: 0;
+  top: 0;
+  width: 150px;
+  height: 100px;
+  display: none;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, .48));
+  transform: translate(-50%, -44%);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-cursor.show {
+  display: block;
+}
+
+html[data-samunmong-theme="spaceStation"].space-power-access-active .evidence-card[data-evidence="전력 제어실 출입 카드"] {
+  cursor: grab;
+}
+
+html[data-samunmong-theme="spaceStation"].space-power-access-active .evidence-card[data-evidence="전력 제어실 출입 카드"]:hover,
+html[data-samunmong-theme="spaceStation"].space-power-access-active .evidence-card[data-evidence="전력 제어실 출입 카드"]:focus-visible {
+  border-color: rgba(75, 163, 211, .9);
+  box-shadow: 0 0 0 2px rgba(74, 176, 230, .14), inset 0 0 20px rgba(91, 187, 236, .1);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 18px 26px;
+  border: 1px solid rgba(74, 129, 166, .42);
+  border-radius: 14px;
+  color: #102b44;
+  background: rgba(234, 244, 252, .46);
+  cursor: pointer;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-card:hover,
+html[data-samunmong-theme="spaceStation"] .space-power-access-card:focus-visible {
+  border-color: rgba(54, 145, 196, .82);
+  background: rgba(229, 245, 255, .72);
+  box-shadow: 0 0 0 2px rgba(85, 184, 235, .15);
+  outline: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-card img {
+  width: 105px;
+  height: 105px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .24));
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-card span {
+  display: grid;
+  gap: 8px;
+  text-align: left;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-card small {
+  color: rgba(16, 59, 88, .62);
+  font-size: 11px;
+  letter-spacing: .08em;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-card strong {
+  font-size: 20px;
+  font-weight: 500;
+}
+
 html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-choice {
   position: relative;
   z-index: 1;

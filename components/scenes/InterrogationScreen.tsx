@@ -157,6 +157,10 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
 
   const moveFromMap = (screenId?: string) => {
     if (!screenId) return;
+    if (isSpaceTheme && screenId === "spaceOxygenGenerator") {
+      window.dispatchEvent(new CustomEvent("samunmong:space-power-access-request"));
+      return;
+    }
     document.querySelector<HTMLElement>("#mapPanel")?.classList.remove("show", "closing");
     document.querySelector<HTMLElement>("#mapPanel")?.setAttribute("aria-hidden", "true");
     document.querySelector<HTMLElement>("#globalOverlay")?.classList.remove("show");
@@ -905,6 +909,41 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               <p>▪ 실행 명령: MEDICAL RECORD / DELETE</p>
             </div>
           </aside>
+          <div className="space-power-access-overlay" id="spacePowerAccessOverlay" aria-hidden="true" />
+          <aside
+            className="space-power-access-panel"
+            id="spacePowerAccessPanel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="spacePowerAccessTitle"
+            aria-hidden="true"
+          >
+            <button className="space-evidence-detail-close" id="closeSpacePowerAccess" type="button" aria-label="전력 제어실 출입 인증 닫기">
+              ×
+            </button>
+            <span>ORBIT-13 · RESTRICTED ACCESS</span>
+            <h2 id="spacePowerAccessTitle">전력 제어실 출입 인증</h2>
+            <p className="space-power-access-guide" id="spacePowerAccessGuide">
+              보안 조사실에서 획득한 출입 카드를 사용하십시오.
+            </p>
+            <div className="space-power-access-empty-slot" id="spacePowerAccessEmptySlot" hidden>
+              <span>ACCESS CARD REQUIRED</span>
+            </div>
+            <button className="space-power-access-card" id="useSpacePowerAccessCard" type="button">
+              <img src="/assets/space-station/evidence/power-control-access-card.png" alt="" />
+              <span>
+                <small>AUTHORIZED PERSONNEL ACCESS</small>
+                <strong>전력 제어실 출입 카드</strong>
+              </span>
+            </button>
+          </aside>
+          <img
+            className="space-power-access-cursor"
+            id="spacePowerAccessCursor"
+            src="/assets/space-station/evidence/power-control-access-card.png"
+            alt=""
+            aria-hidden="true"
+          />
         </>
       ) : null}
 

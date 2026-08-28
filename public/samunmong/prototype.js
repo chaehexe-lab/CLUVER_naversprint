@@ -189,6 +189,9 @@
     const spaceMedicalRecordRecoveryKey = "samunmong-space-medical-record-recovered";
     const spaceAnalysisResultsKey = "samunmong-space-analysis-results";
     const spaceKeycardRecoveryKey = "samunmong-space-keycard-recovered";
+    const spacePowerAccessCardName = "전력 제어실 출입 카드";
+    let spacePowerAccessCardHeld = false;
+    let spacePowerAccessCardInserted = false;
     const retiredJoseonEvidenceNames = new Set(["헐거워진 노리개"]);
     const conversationNotesKey = `samunmong-conversation-notes-${themeStorageSuffix}`;
     const interrogationQuestionCountKey = `samunmong-interrogation-question-count-${themeStorageSuffix}`;
@@ -1681,6 +1684,100 @@
       }
     };
 
+    function hasSpacePowerAccessCard() {
+      return isSpaceTheme && readStoredNames(collectedEvidenceKey).includes(spacePowerAccessCardName);
+    }
+
+    function setSpacePowerAccessPanel(open) {
+      if (!isSpaceTheme) return;
+      const panel = document.querySelector("#spacePowerAccessPanel");
+      const overlay = document.querySelector("#spacePowerAccessOverlay");
+      if (!panel || !overlay) return;
+      const guide = panel.querySelector("#spacePowerAccessGuide");
+      const emptySlot = panel.querySelector("#spacePowerAccessEmptySlot");
+      const card = panel.querySelector("#useSpacePowerAccessCard");
+      if (open) {
+        spacePowerAccessCardHeld = false;
+        spacePowerAccessCardInserted = false;
+      }
+      if (guide) guide.textContent = "전력 제어실은 잠겨 있습니다. 출입 권한이 있는 대원의 카드를 확보하십시오.";
+      if (emptySlot) emptySlot.hidden = false;
+      if (card) card.hidden = true;
+      panel.classList.toggle("show", open);
+      overlay.classList.remove("show");
+      panel.setAttribute("aria-hidden", String(!open));
+      overlay.setAttribute("aria-hidden", "true");
+      document.documentElement.classList.toggle("space-power-access-active", open);
+      if (!open) {
+        spacePowerAccessCardHeld = false;
+        document.querySelector("#spacePowerAccessCursor")?.classList.remove("show");
+        setEvidenceBag(false);
+        if (document.querySelector("#mapPanel")?.classList.contains("show")) {
+          globalOverlay.classList.add("show");
+        }
+      }
+      if (open) {
+        window.setTimeout(() => document.querySelector("#closeSpacePowerAccess")?.focus(), 40);
+      }
+    }
+
+    function holdSpacePowerAccessCard() {
+      if (!hasSpacePowerAccessCard() || !document.querySelector("#spacePowerAccessPanel")?.classList.contains("show")) return;
+      spacePowerAccessCardHeld = true;
+      document.querySelector("#spacePowerAccessCursor")?.classList.add("show");
+      setEvidenceBag(false);
+      const guide = document.querySelector("#spacePowerAccessGuide");
+      if (guide) guide.textContent = "카드를 점선 슬롯에 놓고 클릭하십시오.";
+      playSfx("buttonAlt", 0.48);
+    }
+
+    function insertSpacePowerAccessCard() {
+      if (!spacePowerAccessCardHeld || spacePowerAccessCardInserted) return;
+      spacePowerAccessCardHeld = false;
+      spacePowerAccessCardInserted = true;
+      document.querySelector("#spacePowerAccessCursor")?.classList.remove("show");
+      const emptySlot = document.querySelector("#spacePowerAccessEmptySlot");
+      const card = document.querySelector("#useSpacePowerAccessCard");
+      const guide = document.querySelector("#spacePowerAccessGuide");
+      if (emptySlot) emptySlot.hidden = true;
+      if (card) card.hidden = false;
+      if (guide) guide.textContent = "출입 카드가 인식되었습니다. 카드를 다시 눌러 입장하십시오.";
+      playSfx("evidence", 0.68);
+      card?.focus();
+    }
+
+    function requestSpacePowerAccess() {
+      if (!isSpaceTheme) return;
+      setSpacePowerAccessPanel(true);
+      playSfx("buttonAlt", 0.48);
+    }
+
+    function shouldGrantSpacePowerAccessCard(suspect, question) {
+      if (!isSpaceTheme || suspect?.id !== "aladdindin" || hasSpacePowerAccessCard()) return false;
+      const asksAboutPowerRoom = /(전력\s*제어실|전력실|제어실)/.test(question);
+      const asksHowToEnter = /(어떻게|어디|들어가|들어갈|출입|입장|접근|가는\s*법|카드|권한|열어)/.test(question);
+      return asksAboutPowerRoom && asksHowToEnter;
+    }
+
+    function grantSpacePowerAccessCard() {
+      if (hasSpacePowerAccessCard()) return;
+      addEvidenceToBag(spacePowerAccessCardName);
+      showToast("증거 보관함에 저장되었습니다.", {
+        image: getEvidenceImage(spacePowerAccessCardName),
+        title: spacePowerAccessCardName,
+        dismissible: true
+      });
+    }
+
+    window.addEventListener("samunmong:space-power-access-request", requestSpacePowerAccess);
+    document.addEventListener("pointermove", (event) => {
+      if (!spacePowerAccessCardHeld) return;
+      const cursor = document.querySelector("#spacePowerAccessCursor");
+      if (!cursor) return;
+      cursor.style.left = `${event.clientX}px`;
+      cursor.style.top = `${event.clientY}px`;
+    });
+
     function setSpaceEvidenceDetail(open, evidenceName) {
       if (!isSpaceTheme) return;
       const panel = document.querySelector("#spaceEvidenceDetail");
@@ -2191,6 +2288,7 @@
       "/assets/space-station/evidence/voltage-sensor-no-scalpel.png",
       "/assets/space-station/evidence/tampered-delay-timer.webp",
       "/assets/space-station/evidence/access-keycard-chip.webp",
+      "/assets/space-station/evidence/power-control-access-card.png",
       "/assets/space-station/evidence/encrypted-research-contract.webp",
       "/assets/space-station/evidence/engineer-tool-clamp.webp",
       "/assets/space-station/evidence/coffee-tumbler-front.png",
@@ -4054,6 +4152,10 @@
       button.dataset.storyRole = meaningRevealed ? getEvidenceStoryCue(name, data)[0] : "???";
       button.innerHTML = evidenceCardHtml(name);
       button.addEventListener("click", () => {
+        if (isSpaceTheme && document.querySelector("#spacePowerAccessPanel")?.classList.contains("show")) {
+          if (name === spacePowerAccessCardName) holdSpacePowerAccessCard();
+          return;
+        }
         if (isSpaceTheme && detailedSpaceEvidence[name]) {
           setSpaceEvidenceDetail(true, name);
           playSfx("buttonAlt", 0.48);
@@ -6472,6 +6574,24 @@
         return;
       }
 
+      if (target.closest("#closeSpacePowerAccess, #spacePowerAccessOverlay")) {
+        setSpacePowerAccessPanel(false);
+        return;
+      }
+
+      if (target.closest("#useSpacePowerAccessCard")) {
+        if (!hasSpacePowerAccessCard() || !spacePowerAccessCardInserted) return;
+        setSpacePowerAccessPanel(false);
+        closeGlobalPanel();
+        go("spaceOxygenGenerator", "출입 카드 인증 중...");
+        return;
+      }
+
+      if (target.closest("#spacePowerAccessEmptySlot")) {
+        insertSpacePowerAccessCard();
+        return;
+      }
+
       const keycardTerminal = target.closest("#spaceKeycardTerminal.space-keycard-terminal-unlocked");
       if (keycardTerminal) {
         setSpaceKeycardTerminalPanel(true);
@@ -6798,7 +6918,11 @@
       document.querySelectorAll("#toggleEvidenceBag, .bag-chip, .open-bag-panel").forEach((button) => {
         button.setAttribute("aria-expanded", String(open));
       });
-      globalOverlay.classList.toggle("show", open);
+      const keepMapOverlay = !open
+        && isSpaceTheme
+        && document.documentElement.classList.contains("space-power-access-active")
+        && document.querySelector("#mapPanel")?.classList.contains("show");
+      globalOverlay.classList.toggle("show", open || keepMapOverlay);
       if (open) playSfx("bag", 0.7);
     }
     toggleEvidenceBag.addEventListener("click", () => setEvidenceBag(!evidenceBagPop.classList.contains("open")));
@@ -6942,6 +7066,10 @@
       button.addEventListener("blur", () => button.classList.remove("pressing"));
       button.addEventListener("click", () => {
         const target = button.dataset.mapGo;
+        if (isSpaceTheme && target === "spaceOxygenGenerator") {
+          requestSpacePowerAccess();
+          return;
+        }
         if (!canAccessMagicScreen(target)) {
           showToast(getMagicLockMessage(target));
           return;
@@ -7195,6 +7323,9 @@
           setAiMode(suspect.name);
         }
         showToast(data.source === "rag" || data.source === "openai" ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
+        if (shouldGrantSpacePowerAccessCard(suspect, question)) {
+          window.setTimeout(grantSpacePowerAccessCard, 260);
+        }
       } catch (error) {
         setInterrogationReaction("calm");
         if (suspects[suspectIndex]?.id === suspect.id) {
