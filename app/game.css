@@ -14926,8 +14926,7 @@ html[data-samunmong-theme="magicSchool"] .memory-trace-dialog button:disabled {
 html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb,
 html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring {
   background:
-    linear-gradient(180deg, rgba(3, 3, 6, .12), rgba(3, 3, 6, .3)),
-    url("/samunmong/assets/magic-school/briefing/memory-orb-background-v2.webp") center / cover no-repeat,
+    url("/samunmong/assets/magic-school/briefing/memory-orb-background-v5-flames-removed.webp") center / cover no-repeat,
     #060403 !important;
 }
 
@@ -17920,4 +17919,250 @@ html[data-samunmong-theme="spaceStation"] .space-evidence-detail-close:focus-vis
   width: 100%;
   height: 100%;
   pointer-events: none;
+}
+
+/* High-resolution floating library layers for the magic-school entrance. */
+html[data-samunmong-theme="magicSchool"] .magic-intro-atmosphere {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+  perspective: 1200px;
+  opacity: 0;
+  transition: opacity 900ms ease;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb .magic-intro-atmosphere,
+html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .magic-intro-atmosphere {
+  opacity: 1;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .magic-intro-atmosphere {
+  opacity: .32;
+  transition-duration: 420ms;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-floating-book-layer {
+  --magic-book-shift-x: 0px;
+  --magic-book-shift-y: 0px;
+  position: absolute;
+  display: block;
+  transform: translate3d(var(--magic-book-shift-x), var(--magic-book-shift-y), 0);
+  will-change: transform;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-floating-book-layer img {
+  display: block;
+  width: 100%;
+  height: auto;
+  user-select: none;
+  transform-origin: 50% 52%;
+  filter:
+    brightness(.8)
+    saturate(.82)
+    contrast(.98)
+    drop-shadow(0 15px 17px rgba(0, 0, 0, .52));
+  will-change: transform;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-floating-folio {
+  left: 19.5%;
+  top: 17.5%;
+  z-index: 1;
+  width: clamp(126px, 13vw, 208px);
+  opacity: 1;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-floating-folio img {
+  animation: magicFolioDrift 9.4s cubic-bezier(.42, 0, .58, 1) infinite -2.6s;
+  filter:
+    brightness(.7)
+    saturate(.68)
+    contrast(.94)
+    blur(.22px)
+    drop-shadow(0 12px 14px rgba(0, 0, 0, .46));
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-floating-grimoire-closed {
+  right: 25.5%;
+  top: 20.5%;
+  z-index: 2;
+  width: clamp(106px, 10.2vw, 164px);
+  opacity: 1;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-floating-grimoire-closed img {
+  animation: magicClosedBookDrift 8.1s cubic-bezier(.42, 0, .58, 1) infinite -4.1s;
+  filter:
+    brightness(.73)
+    saturate(.72)
+    contrast(.96)
+    blur(.12px)
+    drop-shadow(0 14px 15px rgba(0, 0, 0, .5));
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-floating-grimoire-open {
+  right: 7.5%;
+  top: 35%;
+  z-index: 3;
+  width: clamp(190px, 17.2vw, 284px);
+  opacity: 1;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-floating-grimoire-open img {
+  animation: magicOpenBookDrift 7.6s cubic-bezier(.42, 0, .58, 1) infinite -1.3s;
+  filter:
+    brightness(.77)
+    saturate(.8)
+    contrast(.98)
+    drop-shadow(0 20px 20px rgba(0, 0, 0, .58))
+    drop-shadow(0 0 5px rgba(91, 168, 205, .1));
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb .memory-orb-trigger,
+html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .memory-orb-trigger {
+  top: 51.2% !important;
+  width: 235px !important;
+  height: 235px !important;
+  z-index: 4 !important;
+  cursor: pointer !important;
+  touch-action: manipulation;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb .memory-orb-trigger {
+  animation: none !important;
+  translate: 0 0;
+  scale: 1;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb .memory-orb {
+  animation: none !important;
+  rotate: 0deg;
+  scale: 1;
+  background: url("/samunmong/assets/magic-school/intro/memory-orb-cutout-v2.webp") center / contain no-repeat !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .memory-orb {
+  background: url("/samunmong/assets/magic-school/intro/memory-orb-cutout-v2.webp") center / contain no-repeat !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .memory-orb-frame {
+  display: none;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb .memory-orb-glass,
+html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb .memory-orb-smoke,
+html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb .memory-orb-rune,
+html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .memory-orb-glass,
+html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .memory-orb-smoke,
+html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .memory-orb-rune {
+  display: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] .memory-orb-3d {
+  position: absolute;
+  left: 18%;
+  top: 7%;
+  z-index: 2;
+  display: block;
+  width: 64%;
+  height: 64%;
+  border-radius: 50%;
+  overflow: hidden;
+  opacity: .76;
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .memory-orb-3d {
+  opacity: .72;
+  transition: opacity 420ms ease;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-intro-fire-rig {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-intro-fire-3d {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-intro-fire-3d {
+  z-index: 2;
+}
+
+@keyframes magicFolioDrift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-10deg) rotateX(3deg); }
+  36% { transform: translate3d(7px, -9px, 5px) rotate(-7deg) rotateX(7deg); }
+  72% { transform: translate3d(-4px, -4px, 2px) rotate(-12deg) rotateX(4deg); }
+}
+
+@keyframes magicClosedBookDrift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(13deg) rotateY(-5deg); }
+  45% { transform: translate3d(-5px, -12px, 7px) rotate(9deg) rotateY(1deg); }
+  76% { transform: translate3d(4px, -5px, 3px) rotate(15deg) rotateY(-2deg); }
+}
+
+@keyframes magicOpenBookDrift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(-7deg) rotateX(2deg); }
+  34% { transform: translate3d(-6px, -11px, 8px) rotate(-4deg) rotateX(6deg); }
+  67% { transform: translate3d(5px, -6px, 3px) rotate(-9deg) rotateX(3deg); }
+}
+
+@media (max-width: 820px) {
+  html[data-samunmong-theme="magicSchool"] .magic-floating-folio {
+    left: 12%;
+    top: 18%;
+    width: clamp(104px, 24vw, 148px);
+  }
+
+  html[data-samunmong-theme="magicSchool"] .magic-floating-grimoire-closed {
+    right: 8%;
+    top: 20%;
+    width: clamp(92px, 19vw, 124px);
+  }
+
+  html[data-samunmong-theme="magicSchool"] .magic-floating-grimoire-open {
+    right: -4%;
+    top: 51%;
+    width: clamp(168px, 38vw, 226px);
+    opacity: 1;
+  }
+
+  html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb .memory-orb-trigger,
+  html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .memory-orb-trigger {
+    top: 51.5% !important;
+    width: 205px !important;
+    height: 205px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-samunmong-theme="magicSchool"] .magic-floating-book-layer img {
+    animation: none !important;
+  }
+
+  html[data-samunmong-theme="magicSchool"] .magic-intro-fire-3d,
+  html[data-samunmong-theme="magicSchool"] .memory-orb-3d { opacity: .72; }
+}
+
+/* The memory orb is the portal into the briefing, so it gets a distinct game cursor. */
+html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb .memory-orb-trigger,
+html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .memory-orb-trigger,
+html[data-samunmong-theme="magicSchool"] #briefingScreen.awaiting-memory-orb .memory-orb-trigger *,
+html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .memory-orb-trigger * {
+  cursor: url("/samunmong/assets/magic-school/ui/fantasy-hand-cursor-v1.png") 5 4, pointer !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen.memory-restoring .memory-orb-prompt {
+  opacity: 0 !important;
 }
