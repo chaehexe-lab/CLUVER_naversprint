@@ -15294,6 +15294,16 @@ html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing
   -webkit-text-fill-color: #7a241c;
 }
 
+html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] .briefing-death-copy .briefing-critical-evidence {
+  color: #7a241c;
+  -webkit-text-fill-color: #7a241c;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  letter-spacing: inherit;
+  opacity: 1;
+}
+
 @media (max-height: 820px) {
   html[data-samunmong-theme="joseon"] #briefingScreen .briefing-card[data-briefing-step="1"] {
     max-height: 94vh;
