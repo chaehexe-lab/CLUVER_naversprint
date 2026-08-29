@@ -6956,6 +6956,26 @@
       background: rgba(64, 32, 18, .12);
     }
 
+    html[data-samunmong-theme="magicSchool"] .note-suspect-tabs {
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+    }
+
+    html[data-samunmong-theme="magicSchool"] .gandalf-report {
+      width: 100%;
+      max-width: none;
+      border: 1px solid rgba(111, 80, 35, .2);
+      background: linear-gradient(145deg, rgba(255, 247, 216, .82), rgba(225, 239, 255, .62));
+    }
+
+    html[data-samunmong-theme="magicSchool"] .gandalf-development {
+      display: block;
+      margin-top: 9px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(87, 61, 33, .18);
+      color: #553919;
+      opacity: .9;
+    }
+
     .note-suspect-tab {
       min-height: 38px;
       border: 1px solid rgba(78, 40, 24, .26);
@@ -8737,7 +8757,7 @@ html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-requir
 .holy-particle.star { border-radius: 1px; background: #fff1a0; box-shadow: 0 0 12px rgba(255,216,77,.82); }
 .magic-school-screen.light-magic-active .holy-particle { animation: magicHolyParticleFall var(--particle-duration) linear calc(.2s + var(--particle-delay)) both; }
 
-/* 두 번째 마법학교 조사 구역으로 이어지는 자물쇠 해제 주문 화면 */
+/* 청소도구함에서 도서관으로 이어지는 자물쇠 해제 주문 화면 */
 .magic-unlock-screen { isolation:isolate; overflow:hidden; color:#f3ead5; background:#090810; font-family:"Nanum BareunJeongsin",serif; }
 .magic-unlock-backdrop { position:absolute; inset:0; background:linear-gradient(180deg,rgba(7,5,12,.24),rgba(4,4,8,.75)),url("/samunmong/assets/magic-school/scenes/dorm-hallway.webp") center 42%/cover no-repeat; filter:saturate(.76) brightness(.62); transform:scale(1.025); }
 .magic-unlock-backdrop::before,.magic-unlock-backdrop::after { content:""; position:absolute; inset:0; pointer-events:none; }
@@ -14070,18 +14090,18 @@ html[data-samunmong-theme="magicSchool"] .magic-record-field-copy p {
 }
 
 html[data-samunmong-theme="magicSchool"] .magic-record-filled-student .magic-record-portrait-slot {
-  left: 22.4%;
-  top: 24.2%;
-  width: 20.7%;
-  height: 43.5%;
+  left: 22.8%;
+  top: 20.9%;
+  width: 20.1%;
+  height: 44.3%;
 }
 
 html[data-samunmong-theme="magicSchool"] .magic-record-filled-student .magic-record-identity {
-  left: 21.4%;
-  top: 68.7%;
-  width: 23.1%;
-  min-height: 8.2%;
-  padding: 9px 8px 6px;
+  left: 22.3%;
+  top: 68%;
+  width: 20.6%;
+  min-height: 8.5%;
+  padding: 6px 8px 5px;
   justify-content: center;
   align-content: center;
   border: 1px solid rgba(157, 106, 58, .66);
@@ -14091,17 +14111,24 @@ html[data-samunmong-theme="magicSchool"] .magic-record-filled-student .magic-rec
 }
 
 html[data-samunmong-theme="magicSchool"] .magic-record-filled-student .magic-record-field-copy {
-  left: 55.8%;
-  top: 19.7%;
-  width: 28.2%;
-  height: 59.5%;
-  grid-template-rows: repeat(3, 1fr);
-  gap: 4.8%;
+  inset: 0;
+  display: block;
 }
 
 html[data-samunmong-theme="magicSchool"] .magic-record-filled-student .magic-record-field-copy p {
-  padding: 11% 6% 3%;
+  position: absolute;
+  left: 53.8%;
+  width: 29.8%;
+  height: 15.2%;
+  box-sizing: border-box;
+  padding: 1.1% 1.7%;
+  font-size: clamp(11px, .82vw, 15px);
+  line-height: 1.3;
 }
+
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-student .magic-record-field-copy p:nth-child(1) { top: 16.3%; }
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-student .magic-record-field-copy p:nth-child(2) { top: 38.7%; }
+html[data-samunmong-theme="magicSchool"] .magic-record-filled-student .magic-record-field-copy p:nth-child(3) { top: 61.1%; }
 
 html[data-samunmong-theme="magicSchool"] .magic-record-filled-guard .magic-record-portrait-slot,
 html[data-samunmong-theme="magicSchool"] .magic-record-filled-faculty .magic-record-portrait-slot {
@@ -17827,4 +17854,165 @@ html[data-samunmong-theme="spaceStation"] .space-evidence-detail-close:focus-vis
   width: 100%;
   height: 100%;
   pointer-events: none;
+}
+
+/* 마법학교 취조실 전용 NPC 대화바 */
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .inquiry-bar,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .inquiry-bar {
+  z-index: 9;
+  width: min(860px, 74%);
+  gap: 9px;
+  padding: 13px 16px 15px;
+  border: 1px solid rgba(134, 225, 255, .48);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 12% 0%, rgba(115, 223, 255, .14), transparent 32%),
+    linear-gradient(145deg, rgba(8, 18, 43, .94), rgba(34, 18, 63, .93));
+  box-shadow:
+    inset 0 0 30px rgba(107, 220, 255, .08),
+    0 0 0 1px rgba(164, 111, 255, .13),
+    0 18px 50px rgba(1, 3, 18, .66),
+    0 0 26px rgba(80, 196, 255, .14);
+  backdrop-filter: blur(12px);
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .dialogue-bar-heading,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .dialogue-bar-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 0 2px 8px;
+  border-bottom: 1px solid rgba(124, 221, 255, .2);
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .dialogue-target,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .dialogue-target {
+  min-width: 0;
+  display: flex;
+  align-items: baseline;
+  gap: 9px;
+  cursor: text;
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .dialogue-target span,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .dialogue-target span {
+  color: rgba(176, 224, 246, .72);
+  font-size: 10px;
+  letter-spacing: .08em;
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .dialogue-target strong,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .dialogue-target strong {
+  overflow: hidden;
+  color: #fff3ae;
+  font-size: 17px;
+  font-weight: 800;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 0 10px rgba(255, 230, 115, .38);
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .dialogue-bar-heading .question-limit-mini,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .dialogue-bar-heading .question-limit-mini {
+  color: #bfeeff;
+  font-size: 11px;
+  text-shadow: 0 0 8px rgba(86, 210, 255, .35);
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .dialogue-bar-heading .question-meta,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .dialogue-bar-heading .question-meta {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 14px;
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .prompt-lines,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .prompt-lines {
+  justify-content: flex-start;
+  gap: 7px;
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .prompt-line,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .prompt-line {
+  padding: 5px 9px;
+  border: 1px solid rgba(139, 216, 255, .24);
+  border-radius: 999px;
+  color: rgba(211, 241, 255, .88);
+  background: rgba(61, 45, 105, .38);
+  font-size: 10px;
+  text-decoration: none;
+  text-shadow: 0 0 8px rgba(102, 215, 255, .22);
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .prompt-line:hover,
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .prompt-line:focus-visible,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .prompt-line:hover,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .prompt-line:focus-visible {
+  border-color: rgba(165, 235, 255, .72);
+  color: #fff;
+  background: rgba(77, 68, 137, .66);
+  outline: none;
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .question-box,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .question-box {
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .inquiry-bar input,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .inquiry-bar input {
+  min-height: 48px;
+  padding: 0 16px;
+  border: 1px solid rgba(127, 220, 255, .48);
+  border-radius: 11px;
+  color: #f5fbff;
+  background: rgba(2, 9, 27, .72);
+  box-shadow: inset 0 0 18px rgba(93, 207, 255, .06);
+  font-size: 14px;
+  backdrop-filter: blur(5px);
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .inquiry-bar input:focus,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .inquiry-bar input:focus {
+  border-color: rgba(180, 239, 255, .94);
+  box-shadow: 0 0 0 3px rgba(101, 214, 255, .14), inset 0 0 20px rgba(104, 218, 255, .1);
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .inquiry-bar input::placeholder,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .inquiry-bar input::placeholder {
+  color: rgba(195, 219, 237, .58);
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .inquiry-bar .ask,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .inquiry-bar .ask {
+  min-width: 104px;
+  min-height: 48px;
+  border: 1px solid rgba(255, 239, 151, .7);
+  border-radius: 11px;
+  color: #13203b;
+  background: linear-gradient(135deg, #8eeaff, #fff0a5);
+  box-shadow: 0 0 18px rgba(104, 224, 255, .24), inset 0 1px 0 rgba(255, 255, 255, .55);
+  font-weight: 900;
+  text-shadow: none;
+  cursor: pointer;
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .inquiry-bar .ask:hover,
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .inquiry-bar .ask:focus-visible,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .inquiry-bar .ask:hover,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .inquiry-bar .ask:focus-visible {
+  filter: brightness(1.1);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+html[data-samunmong-theme="magicSchool"] #interrogationScreen .inquiry-bar .ask:disabled,
+.game-shell[data-initial-theme="magicSchool"] #interrogationScreen .inquiry-bar .ask:disabled {
+  cursor: wait;
+  filter: grayscale(.45) brightness(.72);
+  transform: none;
 }

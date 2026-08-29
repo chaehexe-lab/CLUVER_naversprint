@@ -53,27 +53,36 @@ const magicSchoolSuspects = [
     id: "malpoi",
     name: "말포이",
     image: "/samunmong/assets/magic-school/interrogation/malpoi-sprite.webp",
-    slot: { left: "24%", top: "36.56%", width: "13.94%", height: "31.24%" },
-    nameLeft: "30.97%",
-    stampLeft: "35.07%",
+    slot: { left: "13.22%", top: "36.56%", width: "13.94%", height: "31.24%" },
+    nameLeft: "20.16%",
+    stampLeft: "24.25%",
     offsetX: "0%"
   },
   {
     id: "malposam",
     name: "말포삼",
     image: "/samunmong/assets/magic-school/interrogation/malposam-sprite.webp",
-    slot: { left: "43%", top: "36.56%", width: "13.94%", height: "31.24%" },
-    nameLeft: "49.97%",
-    stampLeft: "54.07%",
+    slot: { left: "32.78%", top: "36.56%", width: "13.82%", height: "31.24%" },
+    nameLeft: "39.65%",
+    stampLeft: "43.7%",
     offsetX: "0%"
   },
   {
     id: "malpoil",
     name: "말포일",
     image: "/samunmong/assets/magic-school/interrogation/malpoil-sprite.webp",
-    slot: { left: "62%", top: "36.56%", width: "13.94%", height: "31.24%" },
-    nameLeft: "68.97%",
-    stampLeft: "73.07%",
+    slot: { left: "52.57%", top: "36.56%", width: "13.88%", height: "31.24%" },
+    nameLeft: "59.51%",
+    stampLeft: "63.15%",
+    offsetX: "0%"
+  },
+  {
+    id: "dunguldoor",
+    name: "덩쿨도어",
+    image: "/samunmong/assets/magic-school/interrogation/dunguldoor-sprite.webp",
+    slot: { left: "72.01%", top: "36.56%", width: "13.64%", height: "31.24%" },
+    nameLeft: "78.83%",
+    stampLeft: "82.6%",
     offsetX: "0%"
   }
 ] as const;
