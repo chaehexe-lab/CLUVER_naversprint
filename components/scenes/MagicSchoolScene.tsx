@@ -1,11 +1,14 @@
 "use client";
 
-import { useCallback, useState, type CSSProperties } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from "react";
 import MagicSpellSystem, { type MagicSpellId, type MagicSpellResult } from "@/components/MagicSpellSystem";
 import { magicSchoolScenes } from "@/lib/gameData";
 import { hotspotStyle } from "./hotspotStyle";
 
 type MagicScene = (typeof magicSchoolScenes)[number];
+
+const FROZEN_BOOK_NAME = "빙결 흔적이 남은 반납 도서";
+const FROZEN_BOOK_THAWED_KEY = "samunmong-magic-library-frozen-book-thawed";
 
 type HolyParticleStyle = CSSProperties & {
   "--particle-start-x": string;
@@ -26,6 +29,20 @@ type HeavenlyBeamStyle = CSSProperties & {
   "--beam-width": string;
   "--beam-delay": string;
   "--beam-brightness": string;
+};
+
+type IceBurstParticleStyle = CSSProperties & {
+  "--ice-dx": string;
+  "--ice-dy": string;
+  "--ice-delay": string;
+  "--ice-duration": string;
+  "--ice-size": string;
+  "--ice-spin": string;
+};
+
+type IceSpreadOriginStyle = CSSProperties & {
+  "--ice-origin-x": string;
+  "--ice-origin-y": string;
 };
 
 const holyParticles: HolyParticleStyle[] = Array.from({ length: 180 }, (_, index) => {
@@ -73,18 +90,67 @@ const heavenlyBeams: HeavenlyBeamStyle[] = [
   "--beam-brightness": `${brightness}`
 }));
 
+const iceBurstParticles: IceBurstParticleStyle[] = Array.from({ length: 64 }, (_, index) => {
+  const angle = (Math.PI * 2 * index) / 64 + ((index % 5) - 2) * 0.035;
+  const distance = 105 + (index % 8) * 34;
+  return {
+    "--ice-dx": `${Math.cos(angle) * distance}px`,
+    "--ice-dy": `${Math.sin(angle) * distance * 0.72}px`,
+    "--ice-delay": `${(index % 9) * 0.025}s`,
+    "--ice-duration": `${0.95 + (index % 7) * 0.11}s`,
+    "--ice-size": `${3 + (index % 6) * 1.35}px`,
+    "--ice-spin": `${150 + (index % 10) * 41}deg`
+  } satisfies IceBurstParticleStyle;
+});
+
 export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
   const requiresLightSpell = scene.id === "magicAlchemyLab";
   const [lightEnabled, setLightEnabled] = useState(false);
   const [lightCastCount, setLightCastCount] = useState(0);
+  const [frozenBookThawed, setFrozenBookThawed] = useState(false);
+  const [frozenBookNotice, setFrozenBookNotice] = useState<string | null>(null);
+  const [iceBurstCount, setIceBurstCount] = useState(0);
+  const noticeTimer = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (scene.id !== "magicLibrary") return;
+    setFrozenBookThawed(window.localStorage.getItem(FROZEN_BOOK_THAWED_KEY) === "1");
+  }, [scene.id]);
+
+  useEffect(() => () => {
+    if (noticeTimer.current !== null) window.clearTimeout(noticeTimer.current);
+  }, []);
+
+  const showFrozenBookNotice = useCallback((message: string) => {
+    if (noticeTimer.current !== null) window.clearTimeout(noticeTimer.current);
+    setFrozenBookNotice(message);
+    noticeTimer.current = window.setTimeout(() => setFrozenBookNotice(null), 2600);
+  }, []);
   const handleLightChange = useCallback((enabled: boolean) => {
     setLightEnabled(enabled);
     if (enabled) setLightCastCount((count) => count + 1);
   }, []);
   const handleSpellCast = useCallback((spellId: MagicSpellId): MagicSpellResult => {
-    return spellId === "light" ? "success" : "no-effect";
-  }, []);
-  const lightClassName = `${requiresLightSpell ? " magic-light-required" : ""}${lightEnabled ? " light-magic-active" : ""}`;
+    if (spellId === "light") return "success";
+    if (spellId === "ice-control" && scene.id === "magicLibrary") {
+      setFrozenBookThawed(true);
+      setIceBurstCount((count) => count + 1);
+      window.localStorage.setItem(FROZEN_BOOK_THAWED_KEY, "1");
+      showFrozenBookNotice("냉기가 걷혔습니다. 이제 책을 획득할 수 있습니다.");
+      return "success";
+    }
+    return "no-effect";
+  }, [scene.id, showFrozenBookNotice]);
+  const lightClassName = `${requiresLightSpell ? " magic-light-required" : ""}${lightEnabled ? " light-magic-active" : ""}${frozenBookThawed ? " frozen-book-thawed" : ""}`;
+  const frozenBookHotspot = scene.hotspots.find((hotspot) => hotspot.evidenceName === FROZEN_BOOK_NAME);
+  const iceSpreadOrigin: IceSpreadOriginStyle = {
+    "--ice-origin-x": frozenBookHotspot
+      ? `${parseFloat(frozenBookHotspot.x) - 2}%`
+      : "50%",
+    "--ice-origin-y": frozenBookHotspot
+      ? `${parseFloat(frozenBookHotspot.y) - 3}%`
+      : "50%"
+  };
 
   return (
     <section className={`screen active magic-school-screen${lightClassName}`} id={scene.id}>
@@ -102,17 +168,38 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
         ))}
       </div>
 
+      {iceBurstCount > 0 ? (
+        <div className="ice-spread-effect" style={iceSpreadOrigin} aria-hidden="true" key={`ice-burst-${iceBurstCount}`}>
+          <span className="ice-burst-flash" />
+          <span className="ice-burst-ring" />
+          {iceBurstParticles.map((style, index) => (
+            <i className={index % 4 === 0 ? "ice-particle snowflake" : "ice-particle shard"} style={style} key={index} />
+          ))}
+        </div>
+      ) : null}
+
       {scene.hotspots.map((hotspot) => {
         const hotspotKey = "id" in hotspot && typeof hotspot.id === "string" ? hotspot.id : hotspot.evidenceName;
         const className = "className" in hotspot && typeof hotspot.className === "string" ? ` ${hotspot.className}` : "";
+        const isFrozenBook = scene.id === "magicLibrary" && hotspot.evidenceName === FROZEN_BOOK_NAME;
+
+        const handleHotspotClick = (event: ReactMouseEvent<HTMLButtonElement>) => {
+          if (!isFrozenBook || frozenBookThawed || event.currentTarget.classList.contains("collected")) return;
+          event.preventDefault();
+          event.stopPropagation();
+          showFrozenBookNotice("책이 꽁꽁 얼어 있어 획득할 수 없습니다.");
+        };
 
         return (
           <button
             key={hotspotKey}
-            className={`hotspot${className}`}
+            className={`hotspot${className}${isFrozenBook ? frozenBookThawed ? " frozen-book-hotspot thawed" : " frozen-book-hotspot frozen" : ""}`}
             type="button"
             data-evidence-name={hotspot.evidenceName}
             aria-label={hotspot.ariaLabel}
+            aria-description={isFrozenBook && !frozenBookThawed ? "얼음 조절 마법을 사용해야 획득할 수 있습니다" : undefined}
+            aria-disabled={isFrozenBook && !frozenBookThawed ? "true" : undefined}
+            onClick={handleHotspotClick}
             style={{
               ...hotspotStyle(hotspot),
               clipPath: hotspot.clipPath,
@@ -121,6 +208,13 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
           />
         );
       })}
+
+      {frozenBookNotice ? (
+        <div className="frozen-book-notice" role="status" aria-live="polite">
+          <span aria-hidden="true">❄</span>
+          <strong>{frozenBookNotice}</strong>
+        </div>
+      ) : null}
 
       <nav className="hud scene-dock magic-school-dock" aria-label="마법학교 조사 도구">
         {scene.dock.map((action) => {

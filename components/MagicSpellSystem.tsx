@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointer
 type Point = { x: number; y: number };
 type SpellPhase = "select" | "draw" | "casting" | "complete";
 
-export type MagicSpellId = "light" | "unlock";
+export type MagicSpellId = "light" | "unlock" | "ice-control";
 export type MagicSpellResult = "success" | "no-effect";
 
 type MagicSpellDefinition = {
@@ -15,7 +15,7 @@ type MagicSpellDefinition = {
   description: string;
   symbol: string;
   drawingTitle: string;
-  trace: "star" | "key";
+  trace: "star" | "key" | "snowflake";
   traceName: string;
 };
 
@@ -41,7 +41,18 @@ const unlockSpell: MagicSpellDefinition = {
   traceName: "열쇠",
 };
 
-const availableSpells = [lightSpell, unlockSpell];
+const iceControlSpell: MagicSpellDefinition = {
+  id: "ice-control",
+  name: "얼음 조절 마법",
+  incantation: "GLACIES TEMPERA",
+  description: "얼어붙은 물체의 냉기를 거두어 안전하게 녹인다",
+  symbol: "❄",
+  drawingTitle: "눈송이 모양을 따라 얼음 조절 마법진을 그리세요",
+  trace: "snowflake",
+  traceName: "눈송이",
+};
+
+const availableSpells = [lightSpell, unlockSpell, iceControlSpell];
 
 function SpellIcon({ spell }: { spell: MagicSpellDefinition }) {
   if (spell.id === "unlock") {
@@ -50,6 +61,17 @@ function SpellIcon({ spell }: { spell: MagicSpellDefinition }) {
         <circle cx="29" cy="50" r="17" />
         <path d="M46 50 H86 V64 H75 V57 H64 V50" />
         <circle cx="29" cy="50" r="6" />
+      </svg>
+    );
+  }
+
+  if (spell.id === "ice-control") {
+    return (
+      <svg className="ice-control-spell-icon" viewBox="0 0 100 100" focusable="false" aria-hidden="true">
+        <path d="M50 8 V92 M14 29 L86 71 M14 71 L86 29" />
+        <path d="M50 8 L42 20 M50 8 L58 20 M50 92 L42 80 M50 92 L58 80" />
+        <path d="M14 29 L29 30 M14 29 L21 43 M86 71 L71 70 M86 71 L79 57" />
+        <path d="M14 71 L21 57 M14 71 L29 70 M86 29 L71 30 M86 29 L79 43" />
       </svg>
     );
   }
@@ -118,6 +140,12 @@ const keyShaftTrace: Point[] = [
   ...linePoints({ x: 398, y: 264 }, { x: 398, y: 235 }, 7),
 ];
 
+const snowflakeTrace: Point[][] = [
+  linePoints({ x: 300, y: 55 }, { x: 300, y: 415 }, 64),
+  linePoints({ x: 145, y: 145 }, { x: 455, y: 325 }, 64),
+  linePoints({ x: 145, y: 325 }, { x: 455, y: 145 }, 64),
+];
+
 const traceSets = {
   star: {
     paths: ["M300 55 C310 135 385 220 500 235 C385 250 310 335 300 415 C290 335 215 250 100 235 C215 220 290 135 300 55 Z"],
@@ -129,6 +157,14 @@ const traceSets = {
       "M287 235 H485 V292 H440 V264 H398 V235",
     ],
     strokes: [keyBowTrace, keyShaftTrace],
+  },
+  snowflake: {
+    paths: [
+      "M300 55 V415",
+      "M145 145 L455 325",
+      "M145 325 L455 145",
+    ],
+    strokes: snowflakeTrace,
   },
 };
 

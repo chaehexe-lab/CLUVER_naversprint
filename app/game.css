@@ -8880,6 +8880,7 @@ button.magic-spell-card:hover { border-color: #a5edff; background: rgba(31,74,11
 .spell-card-icon { width: 60px; height: 60px; display: grid; place-items: center; border: 1px solid #8bdfffa8; border-radius: 50%; color: #fff6b1; font-family: serif; font-size: 43px; text-align: center; text-shadow: 0 0 15px #e8fdff; }
 .unlock-key-spell-icon { width:72%; height:72%; overflow:visible; fill:none; stroke:currentColor; stroke-width:7; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 11px #63d9ff); }
 .unlock-key-spell-icon circle:last-child { stroke-width:5; opacity:.72; }
+.ice-control-spell-icon { width:74%; height:74%; overflow:visible; fill:none; stroke:currentColor; stroke-width:5.5; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 12px #76dcff); }
 .magic-spell-card.locked { filter: grayscale(.9); opacity: .46; }
 .magic-spell-backdrop { pointer-events: auto; position: absolute; inset: 0; border: 0; background: rgba(1,3,12,.82); backdrop-filter: blur(6px); }
 .magic-circle-modal { pointer-events: auto; position: absolute; left: 50%; top: 50%; width: min(1040px,88%); height: min(790px,88%); overflow: hidden; transform: translate(-50%,-50%); border: 1px solid rgba(137,226,255,.62); border-radius: 24px; background: radial-gradient(circle at 50% 62%,rgba(28,70,110,.72),transparent 45%),linear-gradient(155deg,#101b3cf7,#050817fc); box-shadow: inset 0 0 60px #5ddcff18,0 28px 100px #000f,0 0 35px #53d7ff40; }
@@ -8887,6 +8888,7 @@ button.magic-spell-card:hover { border-color: #a5edff; background: rgba(31,74,11
 .magic-circle-modal > header { height: 130px; display: flex; align-items: center; gap: 18px; padding: 19px 78px 13px 28px; border-bottom: 1px solid rgba(131,221,255,.24); background: linear-gradient(90deg,rgba(20,54,88,.75),rgba(6,13,35,.3)); }
 .magic-spell-emblem { width: 88px; height: 88px; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid #a7edff99; border-radius: 50%; color: #fff5a8; font-family: serif; font-size: 64px; text-shadow: 0 0 18px #fff,0 0 34px #62dfff; box-shadow: inset 0 0 22px #5ddcff2e,0 0 24px #5edcff24; }
 .magic-spell-emblem .unlock-key-spell-icon { width:68%; height:68%; }
+.magic-spell-emblem .ice-control-spell-icon { width:70%; height:70%; }
 .magic-circle-modal h2 { margin: 4px 0 5px; font-size: 28px; }
 .magic-circle-modal header p { margin: 0; color: #b9d6df; }
 .magic-circle-stage { position: relative; height: 570px; display: grid; place-items: center; background: radial-gradient(circle,rgba(43,114,155,.2),rgba(2,5,16,.75) 65%); }
@@ -8904,6 +8906,24 @@ button.magic-spell-card:hover { border-color: #a5edff; background: rgba(31,74,11
 .magic-circle-modal > footer .magic-cast-button { min-width: 150px; color: #071426; border-color: #fff5ad; background: linear-gradient(135deg,#8de9ff,#fff3a5); box-shadow: 0 0 20px #7fe5ff70; font-weight: 700; }
 .magic-circle-modal > footer button:disabled { opacity: .38; filter: grayscale(.65); box-shadow: none; cursor: not-allowed; }
 .magic-spell-feedback { pointer-events:none; position:absolute; z-index:102; left:50%; bottom:14%; min-width:280px; padding:16px 28px; color:#e8e0d0; border:1px solid rgba(150,195,215,.52); border-radius:7px; background:linear-gradient(145deg,rgba(13,25,48,.96),rgba(8,10,24,.97)); box-shadow:inset 0 0 20px rgba(102,197,235,.08),0 16px 42px #000d; font-size:20px; letter-spacing:.08em; text-align:center; transform:translateX(-50%); animation:magicNoEffectMessage 1.5s ease both; }
+.frozen-book-hotspot::before { content:""; position:absolute; inset:-10%; border-radius:16px; background:radial-gradient(circle at 48% 45%,rgba(220,250,255,.18),rgba(89,205,255,.12) 45%,rgba(100,229,255,.42)); box-shadow:inset 0 0 20px rgba(215,251,255,.52),0 0 15px rgba(103,218,255,.48); opacity:.88; pointer-events:none; animation:frozenBookPulse 1.8s ease-in-out infinite alternate; }
+.frozen-book-hotspot.thawed::before { animation:frozenBookThaw .9s ease-out both; }
+.ice-spread-effect { position:absolute; z-index:42; inset:0; overflow:hidden; pointer-events:none; }
+.ice-burst-flash,.ice-burst-ring,.ice-particle { position:absolute; left:var(--ice-origin-x); top:var(--ice-origin-y); pointer-events:none; }
+.ice-burst-flash { width:170px; height:120px; border-radius:50%; background:radial-gradient(circle,rgba(244,254,255,.98) 0,rgba(159,235,255,.72) 20%,rgba(78,188,255,.25) 48%,transparent 72%); filter:blur(3px); transform:translate(-50%,-50%); animation:iceBurstFlash .85s ease-out both; }
+.ice-burst-ring { width:70px; height:44px; border:3px solid rgba(200,250,255,.88); border-radius:50%; box-shadow:0 0 18px #8cecff,inset 0 0 15px #bff8ff; transform:translate(-50%,-50%); animation:iceBurstRing 1.15s cubic-bezier(.12,.72,.15,1) both; }
+.ice-particle { width:var(--ice-size); height:var(--ice-size); opacity:0; filter:drop-shadow(0 0 5px rgba(163,239,255,.95)); animation:iceParticleSpread var(--ice-duration) cubic-bezier(.12,.58,.2,1) var(--ice-delay) both; }
+.ice-particle.shard { border-radius:1px 70% 1px 70%; background:linear-gradient(135deg,#f4feff 0,#9cecff 42%,#3a9fe8 100%); box-shadow:inset 0 0 2px #fff; }
+.ice-particle.snowflake::before,.ice-particle.snowflake::after { content:""; position:absolute; left:50%; top:50%; width:155%; height:2px; border-radius:999px; background:#dffcff; box-shadow:0 0 5px #71dfff; transform:translate(-50%,-50%) rotate(45deg); }
+.ice-particle.snowflake::after { transform:translate(-50%,-50%) rotate(-45deg); }
+.frozen-book-notice { pointer-events:none; position:absolute; z-index:103; left:50%; bottom:17%; display:flex; align-items:center; gap:12px; min-width:440px; max-width:70%; padding:17px 24px; color:#ecfbff; border:1px solid rgba(154,232,255,.72); border-radius:10px; background:linear-gradient(145deg,rgba(17,47,78,.97),rgba(7,14,35,.98)); box-shadow:inset 0 0 24px rgba(115,218,255,.13),0 16px 46px #000d,0 0 22px rgba(89,206,255,.3); font-size:19px; letter-spacing:.035em; transform:translateX(-50%); animation:frozenBookNotice 2.6s ease both; }
+.frozen-book-notice span { color:#b9f3ff; font-size:28px; filter:drop-shadow(0 0 8px #7adfff); }
+@keyframes frozenBookPulse { to { opacity:1; box-shadow:inset 0 0 26px rgba(227,253,255,.68),0 0 23px rgba(103,218,255,.7); } }
+@keyframes frozenBookThaw { 0% { opacity:1; filter:brightness(1.5); transform:scale(1); } 55% { opacity:.42; filter:blur(2px) brightness(1.8); transform:scale(1.08); } 100% { opacity:0; filter:blur(7px); transform:scale(1.16); } }
+@keyframes frozenBookNotice { 0% { opacity:0; transform:translate(-50%,12px); } 10%,82% { opacity:1; transform:translate(-50%,0); } 100% { opacity:0; transform:translate(-50%,-8px); } }
+@keyframes iceBurstFlash { 0% { opacity:0; transform:translate(-50%,-50%) scale(.18); } 18% { opacity:1; transform:translate(-50%,-50%) scale(1); } 100% { opacity:0; transform:translate(-50%,-50%) scale(1.75); } }
+@keyframes iceBurstRing { 0% { opacity:0; transform:translate(-50%,-50%) scale(.25); } 15% { opacity:1; } 100% { opacity:0; transform:translate(-50%,-50%) scale(5.8); border-width:1px; } }
+@keyframes iceParticleSpread { 0% { opacity:0; transform:translate(-50%,-50%) scale(.15) rotate(0deg); } 12% { opacity:1; } 72% { opacity:.88; } 100% { opacity:0; transform:translate(calc(-50% + var(--ice-dx)),calc(-50% + var(--ice-dy))) scale(.38) rotate(var(--ice-spin)); } }
 @keyframes magicSceneIlluminate { 0% { opacity: 0; } 24% { opacity: .92; } 62% { opacity: .5; } 100% { opacity: 0; } }
 @keyframes magicHolyParticleFall {
   0% { opacity: 0; transform: translate3d(0,-10vh,0) scale(.35) rotate(0deg); }
@@ -8929,7 +8949,7 @@ button.magic-spell-card:hover { border-color: #a5edff; background: rgba(31,74,11
 @keyframes magicRuneBreathe { to { transform: scale(1.06) rotate(8deg); box-shadow: inset 0 0 22px #bff9ff55,0 0 17px #83dfff8c; } }
 @keyframes magicNoEffectMessage { 0% { opacity:0; transform:translate(-50%,12px); } 18%,78% { opacity:1; transform:translate(-50%,0); } 100% { opacity:0; transform:translate(-50%,-6px); } }
 @media (prefers-reduced-motion: reduce) {
-  .magic-spell-toggle-rune,.holy-particle,.heavenly-light-beam { animation: none; }
+  .magic-spell-toggle-rune,.holy-particle,.heavenly-light-beam,.frozen-book-hotspot::before,.frozen-book-notice,.ice-burst-flash,.ice-burst-ring,.ice-particle { animation: none; }
   .magic-holy-particles,.magic-heavenly-light { display: none; }
   .magic-school-screen.magic-light-required .plate,.magic-school-screen.magic-light-required .magic-shade { transition-duration: .15s; }
 }
