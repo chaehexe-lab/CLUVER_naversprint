@@ -3415,7 +3415,7 @@
       },
       "찢어진 약속 편지": {
         note: "점순의 손에서 발견된 찢어진 약속 편지. 정중한 말투가 돌쇠의 평소 말투와 맞지 않는다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg"
+        img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v6.png"
       }
     };
 
@@ -3453,7 +3453,7 @@
       "긁힌 팔 흔적": "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp",
       "작은 발자국": "/samunmong/assets/evidence-transparent/evidence-small-footprints.webp",
       "끊어진 호패끈": "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord-v2.png",
-      "찢어진 약속 편지": "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg"
+      "찢어진 약속 편지": "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v6.png"
     };
 
     // Keep canonical evidence keys for saves/interrogation, but do not reveal
