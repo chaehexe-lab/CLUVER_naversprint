@@ -3352,6 +3352,10 @@
         tool: "돋보기",
         toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있고, 그림 가장자리에는 지운 글씨의 눌린 획이 남아 있다."
       },
+      "고름이 뜯긴 저고리": {
+        note: "춘월의 방 병풍에 걸린 자주빛 저고리. 한쪽 고름이 뜯겨 실밥만 남아 있다.",
+        img: "/samunmong/assets/evidence-transparent/evidence-chunwol-jeogori-torn-goreum-v1.png"
+      },
       "헐거워진 노리개": {
         note: "끊어진 장식과 급히 잡아챈 듯한 흔적이 남은 노리개. 누가 지녔는지 확인해야 한다.",
         img: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.webp"
@@ -3440,6 +3444,7 @@
     const joseonEvidenceImageByName = {
       "호패 조각": "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp",
       "돌쇠의 그림": "/samunmong/assets/evidence-transparent/evidence-portrait-concealed-v1.png",
+      "고름이 뜯긴 저고리": "/samunmong/assets/evidence-transparent/evidence-chunwol-jeogori-torn-goreum-v1.png",
       "헐거워진 노리개": "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.webp",
       "무덕의 번진 일기": "/samunmong/assets/evidence-transparent/evidence-smeared-diary-clean-v2.png",
       "진흙 묻은 짚신": "/samunmong/assets/evidence-transparent/evidence-muddy-straw-shoes-clean-v2.png",
@@ -3461,6 +3466,7 @@
     const joseonUnexaminedEvidenceNames = {
       "호패 조각": "글자 지워진 나무패",
       "돌쇠의 그림": "의문의 그림",
+      "고름이 뜯긴 저고리": "고름이 뜯긴 저고리",
       "무덕의 번진 일기": "먹 번진 책자",
       "진흙 묻은 짚신": "흙 묻은 짚신",
       "찢어진 옷고름": "찢긴 비단끈",
@@ -3477,6 +3483,7 @@
     const joseonUnexaminedEvidenceSummaries = {
       "호패 조각": "낡은 나무패의 글자 부분이 긁혀 있다.",
       "돌쇠의 그림": "붉은 끈이 단단히 감겨 안쪽이 보이지 않는다.",
+      "고름이 뜯긴 저고리": "한쪽 고름이 뜯겨 실밥만 남아 있다. 떨어진 끈은 어디에 있을까?",
       "무덕의 번진 일기": "표지와 종이에 번진 먹 때문에 내용을 읽기 어렵다.",
       "진흙 묻은 짚신": "밑창에 마르지 않은 흙이 붙어 있다.",
       "찢어진 옷고름": "찢긴 결이 고운 천 조각이다.",
@@ -3630,6 +3637,7 @@
       "점순의 손톱 밑 흔적": "마지막에 붙잡은 누군가의 흔적인 것 같다.",
       "호패 조각": "이름을 감추려 뒤늦게 긁어 낸 것인가?",
       "돌쇠의 그림": "여러 번 고쳐 그릴 만큼 마음에 둔 사람이 있었던 것 같다.",
+      "고름이 뜯긴 저고리": "뜯겨 나간 고름은 어디에 남아 있는 것일까?",
       "헐거워진 노리개": "벌어진 고리에 다른 옷감이 걸린 것인가? 언제 스친 흔적인지는 더 따져봐야 한다.",
       "무덕의 번진 일기": "밤의 기척을 들은 사람이 있었던 것 같다.",
       "진흙 묻은 짚신": "작은 발자국과 맞지 않는다면 다른 동선의 흔적인가?",

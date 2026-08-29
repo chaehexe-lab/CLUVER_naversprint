@@ -128,9 +128,10 @@ export const fieldOneScene = {
 export const chunwolRoomScene = {
   id: "chunwolRoom",
   image: "/samunmong/assets/scenes-integrated/scene-chunwol-room-clean-v3.png",
-  alt: "춘월의 방과 초상화 그림 증거",
+  alt: "춘월의 방, 병풍에 걸린 저고리와 숨겨진 그림 증거",
   props: [] as SceneProp[],
   hotspots: [
+    { id: "jeogoriHotspot", className: "scene-evidence-object hanging-norigae hanging-jeogori", evidenceName: "고름이 뜯긴 저고리", ariaLabel: "병풍에 걸린 고름이 뜯긴 저고리 조사", x: "65.2%", y: "21.5%", w: "8.8%", h: "31%", clipPath: "polygon(20% 0%, 86% 5%, 100% 90%, 58% 100%, 2% 78%, 12% 16%)", radius: "10px", rot: "1deg" },
     { id: "portraitHotspot", className: "scene-evidence-object portrait-glow", evidenceName: "돌쇠의 그림", ariaLabel: "붉은 끈으로 묶인 의문의 두루마리 조사", x: "74%", y: "55.5%", w: "8%", h: "18%", clipPath: "polygon(18% 4%, 92% 16%, 81% 98%, 8% 84%)", radius: "8px", rot: "4deg" }
   ] satisfies SceneHotspot[],
   lights: [{ x: "27.6%", y: "58.2%", size: "7.5%", strength: 0.38 }],
