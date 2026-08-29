@@ -520,7 +520,7 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
                   </div>
                   <div className="briefing-death-copy">
                     <p>사또님, 검안 결과를 살펴보니 <br />목에 <strong>희미한 끈 자국</strong>이 보입니다.</p>
-                    <p>또한 점순이의 손톱 밑에는 <strong>살점으로 보이는 흔적</strong>이 남아 있었습니다.</p>
+                    <p>또한 점순이의 손톱 밑에는 <strong className="briefing-critical-evidence">살점으로 보이는 흔적</strong>이 남아 있었습니다.</p>
                     <p>이는 누군가 점순이의 목을 조른 정황으로 보입니다.</p>
                   </div>
                 </div>
@@ -612,12 +612,12 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
               다음
             </button>
             <button
-              className="magic-start-case-button"
+              className={isMagicTheme ? "magic-start-case-button" : "briefing-nav"}
               id="startCase"
               type="button"
               aria-label={briefing.startLabel}
               onClick={!isMagicTheme ? startJoseonInvestigation : undefined}
-              style={{
+              style={isMagicTheme ? {
                 width: "240px",
                 height: "72px",
                 minWidth: "240px",
@@ -630,9 +630,11 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
                 boxShadow: "none",
                 textShadow: "none",
                 overflow: "visible"
-              }}
+              } : undefined}
             >
-              <MagicStartCaseButtonArt label={briefing.startLabel} />
+              {isMagicTheme
+                ? <MagicStartCaseButtonArt label={briefing.startLabel} />
+                : briefing.startLabel}
             </button>
           </div>
         </div>
