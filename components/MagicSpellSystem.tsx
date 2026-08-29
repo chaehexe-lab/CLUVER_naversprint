@@ -43,6 +43,20 @@ const unlockSpell: MagicSpellDefinition = {
 
 const availableSpells = [lightSpell, unlockSpell];
 
+function SpellIcon({ spell }: { spell: MagicSpellDefinition }) {
+  if (spell.id === "unlock") {
+    return (
+      <svg className="unlock-key-spell-icon" viewBox="0 0 100 100" focusable="false" aria-hidden="true">
+        <circle cx="29" cy="50" r="17" />
+        <path d="M46 50 H86 V64 H75 V57 H64 V50" />
+        <circle cx="29" cy="50" r="6" />
+      </svg>
+    );
+  }
+
+  return <>{spell.symbol}</>;
+}
+
 const VIEWBOX_WIDTH = 600;
 const VIEWBOX_HEIGHT = 470;
 const REQUIRED_COVERAGE = 72;
@@ -309,7 +323,7 @@ export default function MagicSpellSystem({
           <header><small>보유 주문</small><strong>사용할 마법을 선택하세요</strong></header>
           {spells.map((spell) => (
             <button className="magic-spell-card available" type="button" onClick={() => openSpellDrawing(spell.id)} key={spell.id}>
-              <span className="spell-card-icon" aria-hidden="true">{spell.symbol}</span>
+              <span className="spell-card-icon" aria-hidden="true"><SpellIcon spell={spell} /></span>
               <span><strong>{spell.name}</strong><small>{spell.description}</small></span>
             </button>
           ))}
@@ -328,7 +342,7 @@ export default function MagicSpellSystem({
           <section className="magic-circle-modal phase-draw" role="dialog" aria-modal="true" aria-labelledby={`${sceneId}SpellTitle`}>
             <button className="magic-spell-close" type="button" onClick={closeSpellUi} aria-label="닫기">×</button>
             <header>
-              <div className="magic-spell-emblem" aria-hidden="true">{selectedSpell.symbol}</div>
+              <div className="magic-spell-emblem" aria-hidden="true"><SpellIcon spell={selectedSpell} /></div>
               <div>
                 <small>{`${selectedSpell.name} · ${selectedSpell.incantation}`}</small>
                 <h2 id={`${sceneId}SpellTitle`}>{selectedSpell.drawingTitle}</h2>

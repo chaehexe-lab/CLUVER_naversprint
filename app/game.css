@@ -8878,12 +8878,15 @@ button.magic-spell-card:hover { border-color: #a5edff; background: rgba(31,74,11
 .magic-spell-card > span:last-child { display: grid; gap: 4px; }
 .magic-spell-card small { color: #a9c9d4; }
 .spell-card-icon { width: 60px; height: 60px; display: grid; place-items: center; border: 1px solid #8bdfffa8; border-radius: 50%; color: #fff6b1; font-family: serif; font-size: 43px; text-align: center; text-shadow: 0 0 15px #e8fdff; }
+.unlock-key-spell-icon { width:72%; height:72%; overflow:visible; fill:none; stroke:currentColor; stroke-width:7; stroke-linecap:round; stroke-linejoin:round; filter:drop-shadow(0 0 5px #fff) drop-shadow(0 0 11px #63d9ff); }
+.unlock-key-spell-icon circle:last-child { stroke-width:5; opacity:.72; }
 .magic-spell-card.locked { filter: grayscale(.9); opacity: .46; }
 .magic-spell-backdrop { pointer-events: auto; position: absolute; inset: 0; border: 0; background: rgba(1,3,12,.82); backdrop-filter: blur(6px); }
 .magic-circle-modal { pointer-events: auto; position: absolute; left: 50%; top: 50%; width: min(1040px,88%); height: min(790px,88%); overflow: hidden; transform: translate(-50%,-50%); border: 1px solid rgba(137,226,255,.62); border-radius: 24px; background: radial-gradient(circle at 50% 62%,rgba(28,70,110,.72),transparent 45%),linear-gradient(155deg,#101b3cf7,#050817fc); box-shadow: inset 0 0 60px #5ddcff18,0 28px 100px #000f,0 0 35px #53d7ff40; }
 .magic-spell-close { position: absolute; z-index: 5; right: 19px; top: 17px; width: 44px; height: 44px; color: #dffaff; border: 1px solid #82dfffa3; border-radius: 50%; background: #0d1939e8; font-size: 28px; cursor: pointer; }
 .magic-circle-modal > header { height: 130px; display: flex; align-items: center; gap: 18px; padding: 19px 78px 13px 28px; border-bottom: 1px solid rgba(131,221,255,.24); background: linear-gradient(90deg,rgba(20,54,88,.75),rgba(6,13,35,.3)); }
 .magic-spell-emblem { width: 88px; height: 88px; flex: 0 0 auto; display: grid; place-items: center; border: 1px solid #a7edff99; border-radius: 50%; color: #fff5a8; font-family: serif; font-size: 64px; text-shadow: 0 0 18px #fff,0 0 34px #62dfff; box-shadow: inset 0 0 22px #5ddcff2e,0 0 24px #5edcff24; }
+.magic-spell-emblem .unlock-key-spell-icon { width:68%; height:68%; }
 .magic-circle-modal h2 { margin: 4px 0 5px; font-size: 28px; }
 .magic-circle-modal header p { margin: 0; color: #b9d6df; }
 .magic-circle-stage { position: relative; height: 570px; display: grid; place-items: center; background: radial-gradient(circle,rgba(43,114,155,.2),rgba(2,5,16,.75) 65%); }
