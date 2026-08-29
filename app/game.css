@@ -17225,9 +17225,92 @@ html[data-samunmong-theme="spaceStation"] .space-power-access-panel h2 {
 html[data-samunmong-theme="spaceStation"] .space-power-access-guide {
   position: relative;
   z-index: 1;
-  margin: 0 0 20px;
+  margin: 0;
   color: #24445f;
   font-size: 16px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-guide-row {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 20px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-help {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-trigger {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  color: #ffc83d;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-trigger:hover,
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-trigger:focus-visible,
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-trigger[aria-expanded="true"] {
+  color: #ffe382;
+  background: radial-gradient(circle, rgba(255, 211, 79, .3) 0%, rgba(255, 194, 24, .14) 44%, transparent 72%);
+  filter: drop-shadow(0 0 5px rgba(255, 205, 62, .72));
+  outline: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-trigger svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-bulb-body,
+html[data-samunmong-theme="spaceStation"] .space-power-access-bulb-base {
+  fill: currentColor;
+  stroke: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-bulb-hole {
+  fill: rgba(76, 59, 8, .88);
+  stroke: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-tooltip {
+  position: absolute;
+  z-index: 4;
+  right: -100px;
+  bottom: calc(100% + 7px);
+  width: max-content;
+  max-width: none;
+  padding: 7px 9px;
+  border: 1px solid rgba(210, 225, 236, .78);
+  border-radius: 7px;
+  color: #eaf7ff;
+  background: rgba(8, 22, 34, .94);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .34);
+  font-size: 12px;
+  line-height: 1.25;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-tooltip:hover,
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-tooltip:focus-visible {
+  border-color: rgba(255, 207, 75, .85);
+  color: #fff4c9;
+  outline: none;
 }
 
 html[data-samunmong-theme="spaceStation"] .space-power-access-empty-slot {

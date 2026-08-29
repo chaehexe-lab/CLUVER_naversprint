@@ -1862,6 +1862,14 @@
       return isSpaceTheme && readStoredNames(collectedEvidenceKey).includes(spacePowerAccessCardName);
     }
 
+    function setSpacePowerAccessHelp(open) {
+      const trigger = document.querySelector("#spacePowerAccessHelpTrigger");
+      const tooltip = document.querySelector("#spacePowerAccessHelpTooltip");
+      if (!trigger || !tooltip) return;
+      trigger.setAttribute("aria-expanded", String(open));
+      tooltip.hidden = !open;
+    }
+
     function setSpacePowerAccessPanel(open) {
       if (!isSpaceTheme) return;
       const panel = document.querySelector("#spacePowerAccessPanel");
@@ -1873,6 +1881,7 @@
       if (open) {
         spacePowerAccessCardHeld = false;
         spacePowerAccessCardInserted = false;
+        setSpacePowerAccessHelp(false);
       }
       if (guide) guide.textContent = "전력 제어실은 잠겨 있습니다. 출입 권한이 있는 대원의 카드를 확보하십시오.";
       if (emptySlot) emptySlot.hidden = false;
@@ -1884,6 +1893,7 @@
       document.documentElement.classList.toggle("space-power-access-active", open);
       if (!open) {
         spacePowerAccessCardHeld = false;
+        setSpacePowerAccessHelp(false);
         document.querySelector("#spacePowerAccessCursor")?.classList.remove("show");
         setEvidenceBag(false);
         if (document.querySelector("#mapPanel")?.classList.contains("show")) {
@@ -1902,6 +1912,8 @@
       setEvidenceBag(false);
       const guide = document.querySelector("#spacePowerAccessGuide");
       if (guide) guide.textContent = "카드를 점선 슬롯에 놓고 클릭하십시오.";
+      document.querySelector("#spacePowerAccessHelpTrigger")?.setAttribute("hidden", "");
+      setSpacePowerAccessHelp(false);
       playSfx("buttonAlt", 0.48);
     }
 
@@ -1916,12 +1928,15 @@
       if (emptySlot) emptySlot.hidden = true;
       if (card) card.hidden = false;
       if (guide) guide.textContent = "출입 카드가 인식되었습니다. 카드를 다시 눌러 입장하십시오.";
+      document.querySelector("#spacePowerAccessHelpTrigger")?.setAttribute("hidden", "");
+      setSpacePowerAccessHelp(false);
       playSfx("evidence", 0.68);
       card?.focus();
     }
 
     function requestSpacePowerAccess() {
       if (!isSpaceTheme) return;
+      document.querySelector("#spacePowerAccessHelpTrigger")?.removeAttribute("hidden");
       setSpacePowerAccessPanel(true);
       playSfx("buttonAlt", 0.48);
     }
@@ -6971,6 +6986,10 @@
       const target = event.target instanceof Element ? event.target : null;
       if (!target) return;
 
+      if (!target.closest(".space-power-access-help")) {
+        setSpacePowerAccessHelp(false);
+      }
+
       if (target.closest("#closeSpaceAnalysis, #spaceAnalysisOverlay")) {
         setSpaceAnalysisPanel(false);
         return;
@@ -6983,6 +7002,20 @@
 
       if (target.closest("#closeSpacePowerAccess, #spacePowerAccessOverlay")) {
         setSpacePowerAccessPanel(false);
+        return;
+      }
+
+      if (target.closest("#spacePowerAccessHelpTrigger")) {
+        const trigger = document.querySelector("#spacePowerAccessHelpTrigger");
+        setSpacePowerAccessHelp(trigger?.getAttribute("aria-expanded") !== "true");
+        playSfx("buttonAlt", 0.42);
+        return;
+      }
+
+      if (target.closest("#spacePowerAccessHelpTooltip")) {
+        setSpacePowerAccessPanel(false);
+        closeGlobalPanel();
+        go("interrogationScreen", "보안 조사실로 이동 중...");
         return;
       }
 

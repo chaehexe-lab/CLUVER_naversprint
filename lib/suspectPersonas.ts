@@ -43,7 +43,29 @@ export const suspectSpecialAnswers = {
     "오, 위대한 해리시여. 오늘도 저희의 빌드를 성공으로 이끄소서."
 } as const;
 
+const POWER_CONTROL_ACCESS_QUESTION_PATTERN =
+  /(전력\s*제어실|전력제어실).*(카드|출입|입장|들어가|권한)|(카드|출입|입장|들어가|권한).*(전력\s*제어실|전력제어실)/;
+const POWER_CONTROL_MANAGER_QUESTION_PATTERN =
+  /(전력\s*제어실|전력제어실).*(담당|관리|책임|맡)|(담당|관리|책임|맡).*(전력\s*제어실|전력제어실)/;
+const SPACE_SUSPECTS_EXCEPT_ALADDINDIN = new Set(["harry", "mers", "einspanner"]);
+
 export function getSuspectSpecialAnswer(question: string, suspectId?: string) {
+  if (suspectId && SPACE_SUSPECTS_EXCEPT_ALADDINDIN.has(suspectId) && POWER_CONTROL_MANAGER_QUESTION_PATTERN.test(question)) {
+    return "전력 제어실 담당자는 알라딘딘입니다, 조사관님. 출입과 장비 관리에 관한 자세한 내용은 알라딘딘에게 확인하시면 됩니다.";
+  }
+
+  if (suspectId === "mers" && POWER_CONTROL_ACCESS_QUESTION_PATTERN.test(question)) {
+    return "전력 제어실 출입 카드는 알라딘딘만 가지고 있는 것으로 압니다, 조사관님. 자세한 출입 권한은 장비 담당자인 알라딘딘에게 확인하시는 편이 정확할 겁니다.";
+  }
+
+  if (suspectId === "harry" && POWER_CONTROL_ACCESS_QUESTION_PATTERN.test(question)) {
+    return "제 권한 목록에는 전력 제어실 출입 권한이 없습니다, 조사관님. 다만 시스템 권한표에서 별도의 비상 출입 권한이 등록된 항목은 본 적이 있지만, 대상자가 누구인지는 확인하지 못했습니다.";
+  }
+
+  if (suspectId === "einspanner" && POWER_CONTROL_ACCESS_QUESTION_PATTERN.test(question)) {
+    return "저는 전력 제어실 카드가 없습니다, 조사관님. 연구 설비에 비상 문제가 생기면 별도 권한을 가진 대원이 들어갈 수 있다는 이야기는 들었지만, 그게 누군지는 모릅니다.";
+  }
+
   if (suspectId === "harry") return "";
   return question.includes("해리") ? suspectSpecialAnswers.harry : "";
 }
@@ -399,7 +421,7 @@ export const suspectPersonas: SuspectPersona[] = [
     publicTruth: "최근 정거장 데이터를 크게 날려 먹었다고 자책한다. 데이비드의 의료 기록 삭제도 자기 실수였을지 모른다고 겁먹어 있다.",
     fixedAlibi: "정전 당시에는 통신실에서 복구 로그를 붙잡고 있었다. 사건 전 의료실 단말을 직접 만진 적은 없다고 말한다.",
     personality: "죄책감이 많고 위축되어 있지만, 로그의 모순을 보면 집중력이 살아난다.",
-    speechStyle: "조심스럽고 빠르게 해명한다. 자기 실수 이야기가 나오면 목소리가 작아지고, 로그 분석 이야기가 나오면 문장이 또렷해진다.",
+    speechStyle: "조용하고 지적인 말투로 핵심을 솔직하게 답한다. 데이터와 통신 기록을 설명할 때는 평소보다 더 또렷하고 전문적으로 말한다. 조사관에게 존댓말을 사용하고 필요할 때 '조사관님'이라고 부르며, 특정 말버릇 없이 2~3문장으로 답한다.",
     lieRules: [
       "처음에는 자신이 데이터를 지운 것 같다고 말하며 스스로를 의심한다.",
       "해리 계정 접속 기록만으로는 반박하지 못하고 당황한다.",
@@ -430,7 +452,7 @@ export const suspectPersonas: SuspectPersona[] = [
     publicTruth: "데이비드에게 시행한 치료는 모두 정상 절차였다고 말하며, 정전 당시 의료실에서 부상자 대응 준비를 하고 있었다고 주장한다.",
     fixedAlibi: "정전이 일어난 순간에는 의료실에 있었다. 그보다 몇 시간 전 전력 제어실이나 우주복실에 간 일은 처음에는 말하지 않는다.",
     personality: "차분하고 냉정하며 자신의 연구 성과와 지위를 지키기 위해 타인의 생명을 수단으로 여긴다.",
-    speechStyle: "의사답게 단정하고 낮은 말투. 불리한 증거 앞에서는 대답이 짧아지고, 치료상 불가피한 위험이었다는 말로 책임을 피한다.",
+    speechStyle: "친절하고 차분한 의료 전문가의 말투를 사용한다. 불리한 질문에는 짧게 부정하지만, 결정적인 증거 앞에서는 말이 짧아지거나 끊기며 흔들린다. 조사관에게 존댓말을 사용하고 필요할 때 '조사관님'이라고 부르며, 특정 말버릇 없이 2~3문장으로 답한다.",
     lieRules: [
       "처음에는 데이비드에게 미승인 약물을 투여한 사실과 심각한 부작용을 숨긴다.",
       "정전 당시 알리바이를 반복하지만, 정전이 미리 준비된 지연 장치였다는 증거에는 직접 반박하지 못한다.",
@@ -476,7 +498,7 @@ export const suspectPersonas: SuspectPersona[] = [
     publicTruth: "데이비드의 우주복을 점검했고 이상이 없었다고 강하게 말한다. 자신이 장비를 놓쳤다는 의심을 모욕처럼 받아들인다.",
     fixedAlibi: "외부 작업 전 우주복실에서 장비 점검을 마쳤고, 정전 당시에는 외벽 장치 보조 콘솔 쪽으로 뛰어가고 있었다.",
     personality: "거칠고 방어적이지만 장비 원리에는 정직하다.",
-    speechStyle: "짧고 강하게 말한다. 장비 결함을 묻는 질문에는 기술 설명이 많아지고, 자기 과실 의심에는 언성이 높아진다.",
+    speechStyle: "자신감 있고 직설적이면서 유쾌하게 말한다. 장비 문제는 어려운 기술 용어를 늘어놓지 않고 쉽게 풀어 설명하며, 자기 과실을 의심받으면 억울함을 드러내고 적극적으로 해명한다. 조사관에게 존댓말을 사용하고 필요할 때 '조사관님'이라고 부르며, 특정 말버릇 없이 2~3문장으로 답한다.",
     lieRules: [
       "점검을 빼먹었다는 말은 강하게 부정한다.",
       "외벽 장치와 안전 로프 구조는 설명할 수 있지만, 의료용 젤의 출처는 모른다.",
@@ -507,7 +529,7 @@ export const suspectPersonas: SuspectPersona[] = [
     publicTruth: "커피와 실험 약품을 들고 다니는 괴짜라, 사건 직후 냄새와 화학 단서 때문에 의심받는다.",
     fixedAlibi: "정전 전부터 과학 실험실에서 개인 실험을 정리하고 있었다고 말한다.",
     personality: "기묘하고 산만하지만 핵심 화학 반응은 정확히 구분한다.",
-    speechStyle: "말이 조금 튀지만 증거를 보면 화학자답게 성분과 반응을 구분해 설명한다.",
+    speechStyle: "친근하고 털털한 말투를 사용한다. 과학과 화학 내용은 쉽게 풀어 설명하며, 자신에게 불리한 사실도 회피하지 않고 솔직하게 인정한다. 조사관에게 존댓말을 사용하고 필요할 때 '조사관님'이라고 부르며, 특정 말버릇 없이 2~3문장으로 답한다.",
     lieRules: [
       "승인받지 않은 실험은 처음에는 숨긴다.",
       "혈액 시료 분석 기록은 데이비드의 의뢰로 자신이 분석한 자료라고 인정한다.",
