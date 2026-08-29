@@ -329,6 +329,10 @@
       magicSchool: new Audio(`${soundBase}/bgm/magic-main.mp3`),
       spaceStation: new Audio(`${soundBase}/bgm/space-main.mp3`)
     };
+    Object.values(bgmTracks).forEach((track) => {
+      track.loop = true;
+      track.preload = "auto";
+    });
     const sfxPaths = {
       ask: `${soundBase}/sfx/ask.mp3`,
       bag: `${soundBase}/sfx/bag.mp3`,
