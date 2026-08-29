@@ -17312,6 +17312,77 @@ html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-choice > p {
   font-size: 16px;
 }
 
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-empty-slot {
+  min-height: 170px;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  border: 2px dashed rgba(68, 113, 143, .58);
+  border-radius: 14px;
+  color: rgba(29, 68, 96, .58);
+  background: rgba(226, 238, 248, .2);
+  cursor: pointer;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-empty-slot span {
+  padding: 10px 18px;
+  border: 1px solid rgba(68, 113, 143, .22);
+  border-radius: 6px;
+  font-size: 12px;
+  letter-spacing: .14em;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-empty-slot[hidden],
+html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip[hidden] {
+  display: none;
+}
+
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .scene-dock {
+  display: contents;
+}
+
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .scene-dock .scene-chip,
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .scene-dock .tool-prop {
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .scene-dock .bag-chip {
+  z-index: 78;
+  pointer-events: auto;
+}
+
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .evidence-bag-pop {
+  z-index: 80;
+}
+
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .evidence-card[data-evidence="접속 키카드 칩"] {
+  cursor: grab;
+}
+
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .evidence-card[data-evidence="접속 키카드 칩"]:hover,
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .evidence-card[data-evidence="접속 키카드 칩"]:focus-visible {
+  border-color: rgba(75, 163, 211, .9);
+  box-shadow: 0 0 0 2px rgba(74, 176, 230, .14), inset 0 0 20px rgba(91, 187, 236, .1);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-cursor {
+  position: fixed;
+  z-index: 82;
+  left: 0;
+  top: 0;
+  width: 108px;
+  height: 108px;
+  display: none;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, .48));
+  transform: translate(-50%, -44%);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-cursor.show {
+  display: block;
+}
+
 html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip {
   width: 100%;
   min-height: 170px;
@@ -17346,6 +17417,18 @@ html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip img {
 html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip strong {
   font-size: 20px;
   font-weight: 500;
+}
+
+html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip > span {
+  display: grid;
+  gap: 8px;
+  text-align: left;
+}
+
+html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip small {
+  color: rgba(16, 59, 88, .62);
+  font-size: 11px;
+  letter-spacing: .08em;
 }
 
 html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-loading {
@@ -17437,10 +17520,10 @@ html[data-samunmong-theme="spaceStation"] .space-analysis-panel {
   left: 50%;
   top: 50%;
   box-sizing: border-box;
-  width: min(900px, 88vw);
-  min-height: 470px;
+  width: min(740px, 84vw);
+  min-height: 380px;
   display: none;
-  padding: 42px 52px 46px;
+  padding: 38px 48px 32px;
   border: 1px solid rgba(188, 229, 255, .9);
   border-radius: 24px;
   color: #102b44;
@@ -17498,24 +17581,95 @@ html[data-samunmong-theme="spaceStation"] .space-analysis-guide {
   font-size: 16px;
 }
 
+html[data-samunmong-theme="spaceStation"] .space-analysis-insertion {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-empty-slot {
+  min-height: 170px;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  border: 2px dashed rgba(68, 113, 143, .58);
+  border-radius: 14px;
+  color: rgba(29, 68, 96, .58);
+  background: rgba(226, 238, 248, .2);
+  cursor: pointer;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-empty-slot span {
+  padding: 10px 18px;
+  border: 1px solid rgba(68, 113, 143, .22);
+  border-radius: 6px;
+  font-size: 12px;
+  letter-spacing: .14em;
+}
+
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .scene-dock {
+  display: contents;
+}
+
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .scene-dock .scene-chip,
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .scene-dock .tool-prop {
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .scene-dock .bag-chip {
+  z-index: 78;
+  pointer-events: auto;
+}
+
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .evidence-bag-pop {
+  z-index: 80;
+}
+
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .evidence-card[data-evidence="소독천과 장갑"] {
+  cursor: grab;
+}
+
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .evidence-card[data-evidence="소독천과 장갑"]:hover,
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .evidence-card[data-evidence="소독천과 장갑"]:focus-visible {
+  border-color: rgba(75, 163, 211, .9);
+  box-shadow: 0 0 0 2px rgba(74, 176, 230, .14), inset 0 0 20px rgba(91, 187, 236, .1);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-sample-cursor {
+  position: fixed;
+  z-index: 82;
+  left: 0;
+  top: 0;
+  width: 112px;
+  height: 112px;
+  display: none;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, .48));
+  transform: translate(-50%, -44%);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-sample-cursor.show {
+  display: block;
+}
+
 html[data-samunmong-theme="spaceStation"] .space-analysis-evidence-list {
   position: relative;
   z-index: 1;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: stretch;
-  gap: 18px;
+  gap: 16px;
   width: 100%;
 }
 
 html[data-samunmong-theme="spaceStation"] .space-analysis-evidence-option {
   min-width: 0;
-  min-height: 170px;
+  min-height: 175px;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 24px;
-  padding: 18px 24px;
+  gap: 20px;
+  padding: 15px 20px;
   border: 1px solid rgba(74, 129, 166, .42);
   border-radius: 12px;
   color: #102b44;
@@ -17534,8 +17688,8 @@ html[data-samunmong-theme="spaceStation"] .space-analysis-evidence-option:focus-
 }
 
 html[data-samunmong-theme="spaceStation"] .space-analysis-evidence-option img {
-  width: 118px;
-  height: 118px;
+  width: 100px;
+  height: 100px;
   object-fit: contain;
   filter: drop-shadow(0 7px 8px rgba(0, 0, 0, .22));
 }

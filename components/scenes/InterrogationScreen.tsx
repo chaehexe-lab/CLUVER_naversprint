@@ -884,8 +884,13 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             </button>
             <span className="space-analysis-kicker">ORBIT-13 · MATERIAL ANALYZER</span>
             <h2 id="spaceAnalysisTitle">성분 분석</h2>
-            <p className="space-analysis-guide" id="spaceAnalysisGuide">어떤 증거를 분석하시겠습니까?</p>
-            <div className="space-analysis-evidence-list" id="spaceAnalysisEvidenceList" />
+            <p className="space-analysis-guide" id="spaceAnalysisGuide">증거 보관함에서 분석할 증거를 선택하십시오.</p>
+            <div className="space-analysis-insertion" id="spaceAnalysisInsertion">
+              <div className="space-analysis-empty-slot" id="spaceAnalysisEmptySlot">
+                <span>ANALYSIS SAMPLE REQUIRED</span>
+              </div>
+            </div>
+            <div className="space-analysis-evidence-list" id="spaceAnalysisEvidenceList" hidden />
             <div className="space-analysis-progress" id="spaceAnalysisProgress" hidden>
               <strong id="spaceAnalysisProgressLabel">시료 분석 중</strong>
               <div className="space-analysis-progress-track" aria-hidden="true">
@@ -913,10 +918,16 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             <span>ORBIT-13 · ACCESS RECOVERY TERMINAL</span>
             <h2 id="spaceKeycardTerminalTitle">접속 기록 복구</h2>
             <div className="space-keycard-terminal-choice" id="spaceKeycardTerminalChoice">
-              <p>연결할 칩을 선택하십시오.</p>
-              <button id="spaceKeycardTerminalChip" type="button">
+              <p id="spaceKeycardTerminalGuide">증거 보관함에서 연결할 칩을 선택하십시오.</p>
+              <div className="space-keycard-terminal-empty-slot" id="spaceKeycardTerminalEmptySlot">
+                <span>ACCESS CHIP REQUIRED</span>
+              </div>
+              <button id="spaceKeycardTerminalChip" type="button" hidden>
                 <img src="/assets/space-station/evidence/access-keycard-chip.webp" alt="" />
-                <strong>접속 키카드 칩</strong>
+                <span>
+                  <small>PORTABLE ACCESS RECORD</small>
+                  <strong>접속 키카드 칩</strong>
+                </span>
               </button>
             </div>
             <div className="space-keycard-terminal-loading" id="spaceKeycardTerminalLoading" hidden>
@@ -964,6 +975,20 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             className="space-power-access-cursor"
             id="spacePowerAccessCursor"
             src="/assets/space-station/evidence/power-control-access-card.png"
+            alt=""
+            aria-hidden="true"
+          />
+          <img
+            className="space-keycard-terminal-cursor"
+            id="spaceKeycardTerminalCursor"
+            src="/assets/space-station/evidence/access-keycard-chip.webp"
+            alt=""
+            aria-hidden="true"
+          />
+          <img
+            className="space-analysis-sample-cursor"
+            id="spaceAnalysisSampleCursor"
+            src="/assets/space-station/evidence/disinfectant-cloth-glove.webp"
             alt=""
             aria-hidden="true"
           />

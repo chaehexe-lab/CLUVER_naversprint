@@ -193,6 +193,10 @@
     const spacePowerAccessCardName = "전력 제어실 출입 카드";
     let spacePowerAccessCardHeld = false;
     let spacePowerAccessCardInserted = false;
+    let spaceKeycardChipHeld = false;
+    let spaceKeycardChipInserted = false;
+    let spaceAnalysisSampleHeld = false;
+    let spaceAnalysisSampleInserted = false;
     const retiredJoseonEvidenceNames = new Set(["헐거워진 노리개"]);
     const conversationNotesKey = `samunmong-conversation-notes-${themeStorageSuffix}`;
     const interrogationQuestionCountKey = `samunmong-interrogation-question-count-${themeStorageSuffix}`;
@@ -1569,7 +1573,9 @@
       "접속 키카드 칩": { x: 20, y: 34 },
       "암호화된 파일": { x: -55, y: 20 },
       "혈액 시료 분석 기록": { x: -55, y: 15 },
-      "미승인 약물 앰풀": { x: 31, y: 60 }
+      "미승인 약물 앰풀": { x: 31, y: 60 },
+      "성분 분석 장치": { x: -35, y: 20 },
+      "접속 기록 복구 단말기": { x: -58, y: 9 }
     };
 
     function getCollectedEvidenceTooltip() {
@@ -1590,7 +1596,14 @@
       if (!isSpaceTheme || !hotspot.classList.contains("collected")) return;
       const tooltip = getCollectedEvidenceTooltip();
       const title = tooltip.querySelector(".collected-evidence-tooltip-title");
-      const name = hotspot.dataset.evidenceName || hotspot.getAttribute("aria-label") || "수집한 증거";
+      const deviceTooltipNames = {
+        spaceMedicalAnalyzer: "성분 분석 장치",
+        spaceKeycardTerminal: "접속 기록 복구 단말기"
+      };
+      const name = deviceTooltipNames[hotspot.id]
+        || hotspot.dataset.evidenceName
+        || hotspot.getAttribute("aria-label")
+        || "수집한 증거";
       if (title) title.textContent = getEvidenceDisplayName(name);
 
       tooltip.classList.add("show");
@@ -1833,8 +1846,13 @@
 
     window.addEventListener("samunmong:space-power-access-request", requestSpacePowerAccess);
     document.addEventListener("pointermove", (event) => {
-      if (!spacePowerAccessCardHeld) return;
-      const cursor = document.querySelector("#spacePowerAccessCursor");
+      const cursor = spacePowerAccessCardHeld
+        ? document.querySelector("#spacePowerAccessCursor")
+        : spaceKeycardChipHeld
+          ? document.querySelector("#spaceKeycardTerminalCursor")
+          : spaceAnalysisSampleHeld
+            ? document.querySelector("#spaceAnalysisSampleCursor")
+            : null;
       if (!cursor) return;
       cursor.style.left = `${event.clientX}px`;
       cursor.style.top = `${event.clientY}px`;
@@ -2056,8 +2074,11 @@
       const device = document.querySelector("#spaceMedicalAnalyzer");
       if (!device) return;
       const unlocked = readStoredNames(collectedEvidenceKey).includes("소독천과 장갑");
+      const used = readStoredNames(spaceAnalysisResultsKey).length > 0;
       device.classList.toggle("analysis-device-unlocked", unlocked);
+      device.classList.toggle("analysis-device-used", used);
       device.classList.toggle("evidence-hotspot", unlocked);
+      device.classList.toggle("collected", used);
       device.toggleAttribute("disabled", !unlocked);
       device.setAttribute("aria-disabled", String(!unlocked));
     }
@@ -2088,11 +2109,16 @@
     function showSpaceAnalysisChooser() {
       clearTimeout(spaceAnalysisTimer);
       const guide = document.querySelector("#spaceAnalysisGuide");
+      const insertion = document.querySelector("#spaceAnalysisInsertion");
       const list = document.querySelector("#spaceAnalysisEvidenceList");
       const progress = document.querySelector("#spaceAnalysisProgress");
       const result = document.querySelector("#spaceAnalysisResult");
       const bar = document.querySelector("#spaceAnalysisProgressBar");
-      if (guide) guide.textContent = "어떤 증거를 분석하시겠습니까?";
+      if (guide) {
+        guide.hidden = false;
+        guide.textContent = "어떤 증거를 분석하시겠습니까?";
+      }
+      if (insertion) insertion.hidden = true;
       if (list) list.hidden = false;
       if (progress) progress.hidden = true;
       if (result) result.hidden = true;
@@ -2109,7 +2135,7 @@
       const result = document.querySelector("#spaceAnalysisResult");
       const title = document.querySelector("#spaceAnalysisResultTitle");
       const lines = document.querySelector("#spaceAnalysisResultLines");
-      if (guide) guide.textContent = "분석 결과";
+      if (guide) guide.hidden = true;
       if (list) list.hidden = true;
       if (progress) progress.hidden = true;
       if (result) result.hidden = false;
@@ -2134,7 +2160,10 @@
       const result = document.querySelector("#spaceAnalysisResult");
       const label = document.querySelector("#spaceAnalysisProgressLabel");
       const bar = document.querySelector("#spaceAnalysisProgressBar");
-      if (guide) guide.textContent = "시료의 성분을 확인하고 있습니다.";
+      if (guide) {
+        guide.hidden = false;
+        guide.textContent = "시료의 성분을 확인하고 있습니다.";
+      }
       if (list) list.hidden = true;
       if (progress) progress.hidden = false;
       if (result) result.hidden = true;
@@ -2146,6 +2175,7 @@
       spaceAnalysisTimer = setTimeout(() => {
         analyzed.add(sampleId);
         localStorage.setItem(spaceAnalysisResultsKey, JSON.stringify([...analyzed]));
+        syncSpaceAnalysisDevice();
         showSpaceAnalysisResult(sampleId);
         playSfx("evidence", 0.55);
       }, 1800);
@@ -2155,18 +2185,57 @@
       if (!isSpaceTheme) return;
       const panel = document.querySelector("#spaceAnalysisPanel");
       const overlay = document.querySelector("#spaceAnalysisOverlay");
+      const insertion = document.querySelector("#spaceAnalysisInsertion");
+      const list = document.querySelector("#spaceAnalysisEvidenceList");
+      const progress = document.querySelector("#spaceAnalysisProgress");
+      const result = document.querySelector("#spaceAnalysisResult");
+      const guide = document.querySelector("#spaceAnalysisGuide");
       if (!panel || !overlay) return;
+      spaceAnalysisSampleHeld = false;
+      spaceAnalysisSampleInserted = false;
+      document.querySelector("#spaceAnalysisSampleCursor")?.classList.remove("show");
       panel.classList.toggle("show", open);
       overlay.classList.toggle("show", open);
       panel.setAttribute("aria-hidden", String(!open));
       overlay.setAttribute("aria-hidden", String(!open));
+      document.documentElement.classList.toggle("space-analysis-insertion-active", open);
+      clearTimeout(spaceAnalysisTimer);
+      if (insertion) insertion.hidden = false;
+      if (list) list.hidden = true;
+      if (progress) progress.hidden = true;
+      if (result) result.hidden = true;
+      if (guide) {
+        guide.hidden = false;
+        guide.textContent = "증거 보관함에서 분석할 증거를 선택하십시오.";
+      }
       if (open) {
         hideCollectedEvidenceTooltip();
-        showSpaceAnalysisChooser();
+        renderSpaceAnalysisChoices();
         document.querySelector("#closeSpaceAnalysis")?.focus();
       } else {
-        clearTimeout(spaceAnalysisTimer);
+        setEvidenceBag(false);
       }
+    }
+
+    function holdSpaceAnalysisSample() {
+      if (!document.querySelector("#spaceAnalysisPanel")?.classList.contains("show")) return;
+      if (!readStoredNames(collectedEvidenceKey).includes("소독천과 장갑")) return;
+      spaceAnalysisSampleHeld = true;
+      document.querySelector("#spaceAnalysisSampleCursor")?.classList.add("show");
+      setEvidenceBag(false);
+      const guide = document.querySelector("#spaceAnalysisGuide");
+      if (guide) guide.textContent = "소독천과 장갑을 점선 슬롯에 놓고 클릭하십시오.";
+      playSfx("buttonAlt", 0.48);
+    }
+
+    function insertSpaceAnalysisSample() {
+      if (!spaceAnalysisSampleHeld || spaceAnalysisSampleInserted) return;
+      spaceAnalysisSampleHeld = false;
+      spaceAnalysisSampleInserted = true;
+      document.querySelector("#spaceAnalysisSampleCursor")?.classList.remove("show");
+      playSfx("evidence", 0.68);
+      showSpaceAnalysisChooser();
+      document.querySelector(".space-analysis-evidence-option")?.focus();
     }
 
     document.querySelector("#spaceAnalysisEvidenceList")?.addEventListener("click", (event) => {
@@ -2174,6 +2243,7 @@
       if (!button) return;
       startSpaceAnalysis(button.dataset.analysisSample || "");
     });
+    document.querySelector("#spaceAnalysisEmptySlot")?.addEventListener("click", insertSpaceAnalysisSample);
     document.querySelector("#spaceAnalysisBack")?.addEventListener("click", showSpaceAnalysisChooser);
 
     function syncSpaceKeycardTerminal() {
@@ -2184,7 +2254,8 @@
       const recovered = localStorage.getItem(spaceKeycardRecoveryKey) === "1";
       terminal.classList.toggle("space-keycard-terminal-unlocked", unlocked);
       terminal.classList.toggle("keycard-recovered", recovered);
-      terminal.classList.toggle("evidence-hotspot", unlocked && !recovered);
+      terminal.classList.toggle("evidence-hotspot", unlocked);
+      terminal.classList.toggle("collected", recovered);
       terminal.toggleAttribute("disabled", !unlocked);
       terminal.setAttribute("aria-disabled", String(!unlocked));
     }
@@ -2199,6 +2270,7 @@
     }
 
     function startSpaceKeycardRecovery() {
+      if (!spaceKeycardChipInserted) return;
       const choice = document.querySelector("#spaceKeycardTerminalChoice");
       const loading = document.querySelector("#spaceKeycardTerminalLoading");
       const result = document.querySelector("#spaceKeycardTerminalResult");
@@ -2222,22 +2294,61 @@
       const choice = document.querySelector("#spaceKeycardTerminalChoice");
       const loading = document.querySelector("#spaceKeycardTerminalLoading");
       const result = document.querySelector("#spaceKeycardTerminalResult");
+      const emptySlot = document.querySelector("#spaceKeycardTerminalEmptySlot");
+      const chip = document.querySelector("#spaceKeycardTerminalChip");
+      const guide = document.querySelector("#spaceKeycardTerminalGuide");
       if (!panel || !overlay) return;
+      spaceKeycardChipHeld = false;
+      spaceKeycardChipInserted = false;
+      document.querySelector("#spaceKeycardTerminalCursor")?.classList.remove("show");
       panel.classList.toggle("show", open);
       overlay.classList.toggle("show", open);
       panel.setAttribute("aria-hidden", String(!open));
       overlay.setAttribute("aria-hidden", String(!open));
+      document.documentElement.classList.toggle("space-keycard-terminal-active", open);
       clearTimeout(spaceKeycardRecoveryTimer);
-      if (!open) return;
-      hideCollectedEvidenceTooltip();
-      const recovered = localStorage.getItem(spaceKeycardRecoveryKey) === "1";
-      if (choice) choice.hidden = recovered;
+      if (choice) choice.hidden = false;
       if (loading) loading.hidden = true;
-      if (result) result.hidden = !recovered;
+      if (result) result.hidden = true;
+      if (emptySlot) emptySlot.hidden = false;
+      if (chip) chip.hidden = true;
+      if (guide) guide.textContent = "증거 보관함에서 연결할 칩을 선택하십시오.";
+      if (!open) {
+        setEvidenceBag(false);
+        return;
+      }
+      hideCollectedEvidenceTooltip();
       document.querySelector("#closeSpaceKeycardTerminal")?.focus();
     }
 
+    function holdSpaceKeycardChip() {
+      if (!document.querySelector("#spaceKeycardTerminalPanel")?.classList.contains("show")) return;
+      if (!readStoredNames(collectedEvidenceKey).includes("접속 키카드 칩")) return;
+      spaceKeycardChipHeld = true;
+      document.querySelector("#spaceKeycardTerminalCursor")?.classList.add("show");
+      setEvidenceBag(false);
+      const guide = document.querySelector("#spaceKeycardTerminalGuide");
+      if (guide) guide.textContent = "칩을 점선 슬롯에 놓고 클릭하십시오.";
+      playSfx("buttonAlt", 0.48);
+    }
+
+    function insertSpaceKeycardChip() {
+      if (!spaceKeycardChipHeld || spaceKeycardChipInserted) return;
+      spaceKeycardChipHeld = false;
+      spaceKeycardChipInserted = true;
+      document.querySelector("#spaceKeycardTerminalCursor")?.classList.remove("show");
+      const emptySlot = document.querySelector("#spaceKeycardTerminalEmptySlot");
+      const chip = document.querySelector("#spaceKeycardTerminalChip");
+      const guide = document.querySelector("#spaceKeycardTerminalGuide");
+      if (emptySlot) emptySlot.hidden = true;
+      if (chip) chip.hidden = false;
+      if (guide) guide.textContent = "접속 키카드 칩이 연결되었습니다. 칩을 다시 눌러 기록을 확인하십시오.";
+      playSfx("evidence", 0.68);
+      chip?.focus();
+    }
+
     document.querySelector("#spaceKeycardTerminalChip")?.addEventListener("click", startSpaceKeycardRecovery);
+    document.querySelector("#spaceKeycardTerminalEmptySlot")?.addEventListener("click", insertSpaceKeycardChip);
 
     function setupEvidenceScreen(screenId) {
       const screen = document.getElementById(screenId);
@@ -2246,9 +2357,11 @@
       syncSpaceAnalysisDevice();
       syncSpaceKeycardTerminal();
 
-      const evidenceHotspots = [...screen.querySelectorAll(".hotspot[data-evidence-name], #hopaeHotspot, #portraitHotspot")];
+      const evidenceHotspots = [...screen.querySelectorAll(".hotspot[data-evidence-name], #spaceMedicalAnalyzer, #spaceKeycardTerminal, #hopaeHotspot, #portraitHotspot")];
       evidenceHotspots.forEach((hotspot) => {
-        hotspot.classList.add("evidence-hotspot");
+        if (hotspot.id !== "spaceMedicalAnalyzer" && hotspot.id !== "spaceKeycardTerminal") {
+          hotspot.classList.add("evidence-hotspot");
+        }
         if (!isSpaceTheme || hotspot.dataset.collectedTooltipBound === "true") return;
         hotspot.dataset.collectedTooltipBound = "true";
         hotspot.addEventListener("mouseenter", () => showCollectedEvidenceTooltip(hotspot));
@@ -2298,7 +2411,7 @@
       hint.addEventListener("click", () => {
         const collectedNames = isSpaceTheme ? new Set(readStoredNames(collectedEvidenceKey)) : null;
         const activeAnalysisDevice = isSpaceTheme
-          ? screen.querySelector("#spaceMedicalAnalyzer.analysis-device-unlocked, #spaceKeycardTerminal.space-keycard-terminal-unlocked:not(.keycard-recovered)")
+          ? screen.querySelector("#spaceMedicalAnalyzer.analysis-device-unlocked:not(.analysis-device-used), #spaceKeycardTerminal.space-keycard-terminal-unlocked:not(.keycard-recovered)")
           : null;
         const remainingEvidence = isSpaceTheme
           ? [...screen.querySelectorAll(".hotspot[data-evidence-name]")]
@@ -4341,6 +4454,14 @@
       button.addEventListener("click", () => {
         if (isSpaceTheme && document.querySelector("#spacePowerAccessPanel")?.classList.contains("show")) {
           if (name === spacePowerAccessCardName) holdSpacePowerAccessCard();
+          return;
+        }
+        if (isSpaceTheme && document.querySelector("#spaceKeycardTerminalPanel")?.classList.contains("show")) {
+          if (name === "접속 키카드 칩") holdSpaceKeycardChip();
+          return;
+        }
+        if (isSpaceTheme && document.querySelector("#spaceAnalysisPanel")?.classList.contains("show")) {
+          if (name === "소독천과 장갑") holdSpaceAnalysisSample();
           return;
         }
         if (isSpaceTheme && detailedSpaceEvidence[name]) {
