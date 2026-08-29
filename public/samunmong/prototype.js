@@ -1114,11 +1114,13 @@
       briefingScreen.classList.remove("awaiting-memory-orb");
       briefingScreen.classList.remove("memory-restored");
       briefingScreen.classList.add("memory-restoring");
+      showLoading("이동 중...", "briefingScreen", { plain: true });
       playSfx("briefingNext", 0.75);
       briefingRestoreTimer = window.setTimeout(() => {
         briefingScreen.classList.remove("memory-restoring");
         briefingScreen.classList.remove("awaiting-memory-orb");
         briefingScreen.classList.add("memory-restored");
+        hideLoading();
         if (isMagicTheme) {
           finishBriefingTyping();
         } else {
@@ -2630,8 +2632,17 @@
       }
     }
 
-    function showLoading(message = "이동 중...", targetScreenId) {
-      setLoadingArtwork(targetScreenId);
+    function showLoading(message = "이동 중...", targetScreenId, options = {}) {
+      if (options.plain) {
+        fade?.classList.remove("magic-rune-transition");
+        if (fade) {
+          fade.style.background = "black";
+          fade.style.opacity = "1";
+        }
+      } else {
+        fade?.style.removeProperty("opacity");
+        setLoadingArtwork(targetScreenId);
+      }
       fade?.classList.add("show");
       if (fade) fade.textContent = message;
     }
@@ -2639,6 +2650,7 @@
     function hideLoading() {
       fade?.classList.remove("show");
       fade?.classList.remove("magic-rune-transition");
+      fade?.style.removeProperty("opacity");
       fade?.style.removeProperty("background");
     }
 

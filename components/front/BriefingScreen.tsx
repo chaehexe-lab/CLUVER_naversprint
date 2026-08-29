@@ -3,6 +3,9 @@
 import { briefing } from "@/lib/gameData";
 import type { GameTheme } from "@/lib/gameTheme";
 import { useEffect, useState } from "react";
+import MagicSchoolIntroFire3D from "@/components/effects/MagicSchoolIntroFire3D";
+import MemoryOrb3D from "@/components/effects/MemoryOrb3D";
+import MagicSchoolIntroAtmosphere from "@/components/front/MagicSchoolIntroAtmosphere";
 
 const magicRecordCards = [
   {
@@ -387,10 +390,14 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
   return (
     <section className="screen briefing-screen" id="briefingScreen">
       {isMagicTheme ? <div className="magic-memory-stage">
+        <MagicSchoolIntroFire3D />
+        <MagicSchoolIntroAtmosphere />
         <div className="magic-summon-circle magic-summon-circle-outer" />
         <div className="magic-summon-circle magic-summon-circle-inner" />
         <button className="memory-orb-trigger" id="memoryOrbTrigger" type="button" aria-label="기억 수정구를 눌러 봉인된 기억 복원하기">
           <span className="memory-orb">
+            <MemoryOrb3D />
+            <span className="memory-orb-frame" />
             <span className="memory-orb-glass" />
             <span className="memory-orb-smoke" />
             <span className="memory-orb-rune rune-one">ᚱ</span>
