@@ -957,9 +957,33 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             </button>
             <span>ORBIT-13 · RESTRICTED ACCESS</span>
             <h2 id="spacePowerAccessTitle">전력 제어실 출입 인증</h2>
-            <p className="space-power-access-guide" id="spacePowerAccessGuide">
-              보안 조사실에서 획득한 출입 카드를 사용하십시오.
-            </p>
+            <div className="space-power-access-guide-row">
+              <p className="space-power-access-guide" id="spacePowerAccessGuide">
+                보안 조사실에서 획득한 출입 카드를 사용하십시오.
+              </p>
+              <div className="space-power-access-help">
+                <button
+                  className="space-power-access-help-trigger"
+                  id="spacePowerAccessHelpTrigger"
+                  type="button"
+                  aria-label="출입 권한 단서 보기"
+                  aria-controls="spacePowerAccessHelpTooltip"
+                  aria-expanded="false"
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true">
+                    <path
+                      className="space-power-access-bulb-body"
+                      d="M12 2.5a6.2 6.2 0 0 0-3.92 11c.78.65 1.17 1.3 1.17 2.16v.64h5.5v-.64c0-.86.39-1.51 1.17-2.16A6.2 6.2 0 0 0 12 2.5Z"
+                    />
+                    <rect className="space-power-access-bulb-base" x="8.75" y="15.2" width="6.5" height="6.3" rx="1.35" />
+                    <rect className="space-power-access-bulb-hole" x="10.65" y="17.35" width="2.7" height="2.25" rx=".45" />
+                  </svg>
+                </button>
+                <button className="space-power-access-help-tooltip" id="spacePowerAccessHelpTooltip" type="button" hidden>
+                  출입 권한이 누구에게 있는지 확인하러 가기
+                </button>
+              </div>
+            </div>
             <div className="space-power-access-empty-slot" id="spacePowerAccessEmptySlot" hidden>
               <span>ACCESS CARD REQUIRED</span>
             </div>

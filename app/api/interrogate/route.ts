@@ -21,6 +21,8 @@ type OpenAIAnswerResult =
   | { ok: true; answer: string; inputTokens?: number; outputTokens?: number }
   | { ok: false; error: string };
 
+type AIProvider = "openai" | "mistral";
+
 type InterrogateRequest = {
   suspectId?: string;
   userMessage?: string;
@@ -35,6 +37,7 @@ type InterrogateRequest = {
 };
 
 const OPENAI_RESPONSES_ENDPOINT = "https://api.openai.com/v1/responses";
+const MISTRAL_CHAT_ENDPOINT = "https://api.mistral.ai/v1/chat/completions";
 const FOREIGN_TEXT_PATTERN = /[A-Za-z\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u3040-\u30FF\u0400-\u04FF\u0600-\u06FF\u0900-\u097F]/;
 const ALIBI_QUESTION_PATTERN = /(알리바이|어제|사건\s*당일|그날|그\s*밤|그때|행적|어디 있었|뭐 했|무엇을 했)/;
 const CASE_SUBJECT_PATTERN = /(피해자|사망자|점순|죽|살해|사건|시신|목\s*졸|목을\s*졸|편지|호패|옷고름|도망|돌쇠|춘월|유문석|무덕|방화|화재|불|실습실|마법|마력|지팡이|룬스톤|경보|빙결|환각|수정구|도서관|대출|담배|건달프|덩쿨도어|말포일|말포이|말포삼|우주|정거장|오르빗|데이비드|메르스|해리|알라딘딘|안성줴줴이|아인슈페너|에어록|우주복|관제|단말기|레버|무전|로그|의료|산소|압력|센서|정전|로봇\s*팔|근위축증|젤)/;
@@ -356,6 +359,76 @@ async function requestOpenAIAnswer(apiKey: string, messages: OpenAIMessage[]): P
   };
 }
 
+function extractMistralText(data: unknown) {
+  const content = (data as { choices?: Array<{ message?: { content?: unknown } }> })?.choices?.[0]?.message?.content;
+  if (typeof content === "string") return content.trim();
+  if (!Array.isArray(content)) return "";
+
+  return content
+    .map((part) => {
+      if (typeof part === "string") return part;
+      const text = (part as { text?: unknown })?.text;
+      return typeof text === "string" ? text : "";
+    })
+    .join("")
+    .trim();
+}
+
+async function requestMistralAnswer(apiKey: string, messages: OpenAIMessage[]): Promise<OpenAIAnswerResult> {
+  const response = await fetch(MISTRAL_CHAT_ENDPOINT, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      model: process.env.MISTRAL_MODEL || "mistral-small-latest",
+      messages: messages.map((message) => ({
+        role: message.role === "developer" ? "system" : message.role,
+        content: message.content
+      })),
+      temperature: 0.35,
+      max_tokens: 350
+    })
+  });
+
+  if (!response.ok) {
+    const detail = await response.text();
+    return { ok: false, error: `Mistral API 호출 실패: ${response.status} ${detail.slice(0, 160)}` };
+  }
+
+  const data = await response.json();
+  const usage = (data as { usage?: { prompt_tokens?: number; completion_tokens?: number } }).usage;
+  return {
+    ok: true,
+    answer: extractMistralText(data),
+    inputTokens: usage?.prompt_tokens,
+    outputTokens: usage?.completion_tokens
+  };
+}
+
+function getAIProvider(): AIProvider {
+  return process.env.AI_PROVIDER?.trim().toLowerCase() === "mistral" ? "mistral" : "openai";
+}
+
+function getAIProviderConfig(provider: AIProvider) {
+  if (provider === "mistral") {
+    return {
+      apiKey: process.env.MISTRAL_API_KEY,
+      missingKeyWarning: "MISTRAL_API_KEY가 설정되지 않아 임시 답변을 반환했습니다."
+    };
+  }
+
+  return {
+    apiKey: process.env.OPENAI_API_KEY,
+    missingKeyWarning: "OPENAI_API_KEY가 설정되지 않아 임시 답변을 반환했습니다."
+  };
+}
+
+function requestAIAnswer(provider: AIProvider, apiKey: string, messages: OpenAIMessage[]) {
+  return provider === "mistral" ? requestMistralAnswer(apiKey, messages) : requestOpenAIAnswer(apiKey, messages);
+}
+
 function fallbackAnswer(
   persona: SuspectPersona,
   evidenceNames: string[],
@@ -431,7 +504,8 @@ export async function POST(req: Request) {
   });
   const reaction = getInterrogationReaction(persona, usableEvidence, retrievedFacts, question);
   const responseMeta = buildResponseMeta(retrievedFacts, reaction, knownFactIds);
-  const apiKey = process.env.OPENAI_API_KEY;
+  const provider = getAIProvider();
+  const { apiKey, missingKeyWarning } = getAIProviderConfig(provider);
 
   if (!apiKey) {
     return Response.json(
@@ -439,7 +513,7 @@ export async function POST(req: Request) {
         persona,
         usableEvidence,
         reactions,
-        "OPENAI_API_KEY가 설정되지 않아 임시 답변을 반환했습니다.",
+        missingKeyWarning,
         question,
         questionState.wasTruncated,
         responseMeta
@@ -458,7 +532,7 @@ export async function POST(req: Request) {
   ];
 
   try {
-    const firstAnswer = await requestOpenAIAnswer(apiKey, messages);
+    const firstAnswer = await requestAIAnswer(provider, apiKey, messages);
     if (!firstAnswer.ok) {
       return Response.json(
         fallbackAnswer(persona, usableEvidence, reactions, firstAnswer.error, question, questionState.wasTruncated, responseMeta),
@@ -481,7 +555,7 @@ export async function POST(req: Request) {
         },
         { role: "user", content: `질문: ${question}\n\n${persona.name}의 입장에서 한국어만 사용해 새로 답하라.` }
       ];
-      const repairedAnswer = await requestOpenAIAnswer(apiKey, repairMessages);
+      const repairedAnswer = await requestAIAnswer(provider, apiKey, repairMessages);
       answer = repairedAnswer.ok ? repairedAnswer.answer : "";
     }
 
@@ -509,6 +583,7 @@ export async function POST(req: Request) {
 
     if (process.env.NODE_ENV !== "production") {
       console.info("[interrogate-rag]", {
+        provider,
         suspectId: persona.id,
         usedFactIds: responseMeta.usedFactIds,
         inputTokens: firstAnswer.inputTokens,
@@ -526,8 +601,9 @@ export async function POST(req: Request) {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "알 수 없는 오류";
+    const providerLabel = provider === "mistral" ? "Mistral" : "OpenAI";
     return Response.json(
-      fallbackAnswer(persona, usableEvidence, reactions, `OpenAI API 오류: ${message}`, question, questionState.wasTruncated, responseMeta),
+      fallbackAnswer(persona, usableEvidence, reactions, `${providerLabel} API 오류: ${message}`, question, questionState.wasTruncated, responseMeta),
       { status: 200 }
     );
   }
