@@ -16311,6 +16311,10 @@ html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card .evid
   filter: drop-shadow(0 7px 8px rgba(0, 0, 0, .45));
 }
 
+html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card .evidence-thumb[src$="encrypted-research-contract-decrypted.png"] {
+  clip-path: polygon(8% 5%, 92% 3%, 94% 96%, 7% 93%);
+}
+
 html[data-samunmong-theme="spaceStation"] .evidence-bag-pop .evidence-card[data-evidence="추진 레버 결빙 기록"] .evidence-thumb {
   width: 104px;
   height: 96px;
@@ -16783,6 +16787,22 @@ html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="
   align-items: center;
 }
 
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="암호화된 파일"].contract-encrypted {
+  width: min(520px, 88vw);
+  grid-template-columns: minmax(0, 1fr);
+  padding-inline: 44px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="암호화된 파일"].contract-encrypted .space-evidence-detail-visual {
+  display: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="암호화된 파일"].contract-encrypted .space-evidence-detail-copy {
+  width: 100%;
+  max-width: 410px;
+  margin-inline: auto;
+}
+
 html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="암호화된 파일"].contract-decrypted .space-evidence-detail-copy {
   max-height: calc(min(640px, 88vh) - 92px);
   padding-right: 12px;
@@ -16800,6 +16820,12 @@ html[data-samunmong-theme="spaceStation"] .space-medical-recovery-form:not([hidd
   gap: 18px;
 }
 
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="암호화된 파일"].contract-decrypted .space-evidence-detail-visual img {
+  width: 100%;
+  height: 440px;
+  clip-path: polygon(8% 5%, 92% 3%, 94% 96%, 7% 93%);
+}
+
 html[data-samunmong-theme="spaceStation"] .space-contract-decryption-form:not([hidden]) {
   display: grid;
   gap: 16px;
@@ -16814,21 +16840,21 @@ html[data-samunmong-theme="spaceStation"] .space-contract-decryption-form label 
 }
 
 html[data-samunmong-theme="spaceStation"] .space-contract-key-fields {
-  display: grid;
-  grid-template-columns: minmax(0, 1.15fr) auto minmax(0, .72fr) auto minmax(0, .88fr);
+  display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 18px;
 }
 
-html[data-samunmong-theme="spaceStation"] .space-contract-key-fields span {
-  color: rgba(16, 59, 88, .65);
-  font: 600 18px/1 "Consolas", monospace;
+html[data-samunmong-theme="spaceStation"] .space-contract-key-group {
+  display: flex;
+  gap: 7px;
 }
 
 html[data-samunmong-theme="spaceStation"] .space-contract-key-fields input {
-  min-width: 0;
+  width: 42px;
+  min-width: 42px;
   box-sizing: border-box;
-  padding: 12px 8px;
+  padding: 12px 4px;
   border: 1px solid rgba(50, 106, 145, .7);
   border-radius: 9px;
   outline: 0;

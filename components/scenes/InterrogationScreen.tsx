@@ -833,11 +833,14 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               <form className="space-contract-decryption-form" id="spaceContractDecryptionForm" hidden>
                 <label>파일을 열려면 보안 키를 입력하시오.</label>
                 <div className="space-contract-key-fields" aria-label="암호화된 파일 보안 키">
-                  <input type="text" maxLength={5} autoComplete="off" placeholder="PROJECT" aria-label="PROJECT 보안 키" />
-                  <span aria-hidden="true">-</span>
-                  <input type="text" maxLength={2} autoComplete="off" placeholder="TERMINAL" aria-label="TERMINAL 보안 키" />
-                  <span aria-hidden="true">-</span>
-                  <input type="text" maxLength={4} autoComplete="off" placeholder="CYCLE" aria-label="CYCLE 보안 키" />
+                  <div className="space-contract-key-group" aria-label="6자리 영문 보안 키">
+                    {Array.from({ length: 6 }, (_, index) => (
+                      <input key={`contract-letter-${index}`} type="text" maxLength={1} autoComplete="off" aria-label={`영문 보안 키 ${index + 1}번째 칸`} />
+                    ))}
+                  </div>
+                  <div className="space-contract-key-group" aria-label="1자리 영문 보안 키">
+                    <input type="text" maxLength={1} autoComplete="off" aria-label="마지막 영문 보안 키" />
+                  </div>
                 </div>
                 <button type="submit">파일 잠금 해제</button>
                 <p className="space-medical-recovery-error" id="spaceContractDecryptionError" role="alert" />
