@@ -131,6 +131,9 @@ export default function GameSettingsOverlay() {
       window.localStorage.removeItem("samunmong-field-guide-seen");
       window.localStorage.removeItem("samunmong-sato-skill-state");
     }
+    if (theme === "magicSchool") {
+      window.localStorage.removeItem("samunmong-magic-library-frozen-book-thawed");
+    }
 
     try {
       const slots = JSON.parse(window.localStorage.getItem("samunmong-save-slots") || "{}");
