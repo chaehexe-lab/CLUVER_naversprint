@@ -417,10 +417,17 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-orb-copy {
   position: absolute;
   z-index: 3;
   top: 12%;
-  width: min(980px, 84vw);
+  width: min(1320px, 92vw);
   display: grid;
   gap: 12px;
   text-align: center;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-orb-copy h2 {
+  width: 100%;
+  max-width: none;
+  white-space: nowrap;
+  font-size: clamp(25px, 2.15vw, 38px) !important;
 }
 
 html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-orb-button {
