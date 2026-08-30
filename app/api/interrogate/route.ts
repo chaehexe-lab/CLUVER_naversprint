@@ -22,8 +22,10 @@ type OpenAIAnswerResult =
   | { ok: false; error: string };
 
 type AIProvider = "openai" | "mistral";
+type InvestigationTheme = "joseon" | "magicSchool" | "spaceStation";
 
 type InterrogateRequest = {
+  themeId?: InvestigationTheme;
   suspectId?: string;
   userMessage?: string;
   question?: string;
@@ -42,6 +44,12 @@ const FOREIGN_TEXT_PATTERN = /[A-Za-z\u3400-\u4DBF\u4E00-\u9FFF\uF900-\uFAFF\u30
 const ALIBI_QUESTION_PATTERN = /(알리바이|어제|사건\s*당일|그날|그\s*밤|그때|행적|어디 있었|뭐 했|무엇을 했)/;
 const CASE_SUBJECT_PATTERN = /(피해자|사망자|점순|죽|살해|사건|시신|목\s*졸|목을\s*졸|편지|호패|옷고름|도망|돌쇠|춘월|유문석|무덕|방화|화재|불|실습실|마법|마력|지팡이|룬스톤|경보|빙결|환각|수정구|도서관|대출|담배|건달프|덩쿨도어|말포일|말포이|말포삼|우주|정거장|오르빗|데이비드|메르스|해리|알라딘딘|안성줴줴이|아인슈페너|에어록|우주복|관제|단말기|레버|무전|로그|의료|산소|압력|센서|정전|로봇\s*팔|근위축증|젤)/;
 const SPACE_SUSPECT_IDS = new Set(["harry", "mers", "aladdindin", "einspanner"]);
+const JOSEON_SUSPECT_IDS = new Set(["dolsoe", "chunwol", "yoomunseok", "mudeok"]);
+const THEME_SUSPECT_IDS: Record<InvestigationTheme, ReadonlySet<string>> = {
+  joseon: JOSEON_SUSPECT_IDS,
+  magicSchool: magicSchoolSuspectIds,
+  spaceStation: SPACE_SUSPECT_IDS
+};
 const CHUNWOL_DIRECT_PRESSURE_PATTERNS = [
   { evidenceName: "찢어진 옷고름", pattern: /(범인|죽였|살해|목\s*졸|목을\s*졸|목\s*조른|옷고름|비단\s*끈|목끈)/ },
   { evidenceName: "찢어진 약속 편지", pattern: /(창고|약속\s*편지|편지|쪽지|기다리시오|함께\s*떠납시다|돌쇠가\s*쓴)/ },
@@ -60,6 +68,10 @@ const NEVER_CLAIM_PATTERNS = [
 
 function unique(values: string[]) {
   return [...new Set(values.filter(Boolean))];
+}
+
+function isInvestigationTheme(value: unknown): value is InvestigationTheme {
+  return value === "joseon" || value === "magicSchool" || value === "spaceStation";
 }
 
 function hasForeignText(text: string) {
@@ -332,6 +344,11 @@ function extractOpenAIText(data: unknown) {
 }
 
 async function requestOpenAIAnswer(apiKey: string, messages: OpenAIMessage[]): Promise<OpenAIAnswerResult> {
+  const instructions = messages
+    .filter((message) => message.role === "developer")
+    .map((message) => message.content)
+    .join("\n\n");
+  const input = messages.filter((message) => message.role !== "developer");
   const response = await fetch(OPENAI_RESPONSES_ENDPOINT, {
     method: "POST",
     headers: {
@@ -340,7 +357,9 @@ async function requestOpenAIAnswer(apiKey: string, messages: OpenAIMessage[]): P
     },
     body: JSON.stringify({
       model: process.env.OPENAI_MODEL || "gpt-5.4-mini",
-      input: messages
+      instructions,
+      input,
+      max_output_tokens: 800
     })
   });
 
@@ -470,10 +489,22 @@ export async function POST(req: Request) {
   const body = (await req.json()) as InterrogateRequest;
   const questionState = normalizeQuestion(body.userMessage || body.question || "");
   const question = questionState.effectiveQuestion;
-  const persona = suspectPersonas.find((item) => item.id === body.suspectId) || suspectPersonas[0];
 
   if (!questionState.originalQuestion) {
     return Response.json({ error: "질문이 비어 있습니다." }, { status: 400 });
+  }
+
+  const persona = suspectPersonas.find((item) => item.id === body.suspectId);
+  if (!persona) {
+    return Response.json({ error: "대화할 용의자를 찾지 못했습니다." }, { status: 400 });
+  }
+
+  if (body.themeId && !isInvestigationTheme(body.themeId)) {
+    return Response.json({ error: "알 수 없는 사건 테마입니다." }, { status: 400 });
+  }
+
+  if (body.themeId && !THEME_SUSPECT_IDS[body.themeId].has(persona.id)) {
+    return Response.json({ error: "현재 사건에 속한 용의자가 아닙니다." }, { status: 400 });
   }
 
   const specialAnswer = getSuspectSpecialAnswer(question, persona.id);

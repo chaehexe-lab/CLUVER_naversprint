@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import MagicSpellSystem, { type MagicSpellId, type MagicSpellResult } from "@/components/MagicSpellSystem";
 
 type UnlockPhase = "locked" | "casting" | "unlocked";
-const UNLOCK_STORAGE_KEY = "samunmong-magic-cleaning-closet-unlocked";
+const UNLOCK_STORAGE_KEY = "samunmong-magic-library-door-unlocked";
 
 export default function MagicUnlockDoorScene() {
   const [phase, setPhase] = useState<UnlockPhase>("locked");
@@ -47,18 +47,18 @@ export default function MagicUnlockDoorScene() {
         <img
           className="magic-door-scene-image door-scene-unlocked"
           src="/samunmong/assets/magic-school/scenes/unlocked-cleaning-closet-door-v1.png"
-          alt="자물쇠 고리가 열리고 쇠사슬이 바닥으로 늘어진 채 살짝 열린 청소도구함 문"
+          alt="자물쇠 고리가 열리고 쇠사슬이 바닥으로 늘어진 채 살짝 열린 도서관 문"
           draggable="false"
         />
         <span className="magic-door-vignette" aria-hidden="true" />
       </div>
       <header className="magic-unlock-copy">
-        <p>현재 위치 · 청소도구함 앞</p>
+        <p>현재 위치 · 도서관 앞</p>
         <h1>{phase === "unlocked" ? "봉인이 풀렸습니다" : phase === "casting" ? "봉인 해제 중" : "문이 잠겨 있습니다"}</h1>
         <span aria-live="polite">
           {phase === "locked" && "자물쇠 해제 마법으로 문에 걸린 봉인을 푸세요."}
           {phase === "casting" && "해제 주문이 자물쇠의 룬을 분해하고 있습니다…"}
-          {phase === "unlocked" && "문 너머의 청소도구함을 조사할 수 있습니다."}
+          {phase === "unlocked" && "문 너머의 도서관을 조사할 수 있습니다."}
         </span>
       </header>
 
@@ -73,7 +73,7 @@ export default function MagicUnlockDoorScene() {
       </div>
 
       <div className="magic-unlock-actions">
-        {phase === "unlocked" && <button className="unlock-enter-button" type="button" onClick={() => moveTo("magicCleaningCloset")}>문을 열고 들어가기</button>}
+        {phase === "unlocked" && <button className="unlock-enter-button" type="button" onClick={() => moveTo("magicLibrary")}>문을 열고 들어가기</button>}
       </div>
       {phase !== "unlocked" ? (
         <MagicSpellSystem
@@ -82,7 +82,7 @@ export default function MagicUnlockDoorScene() {
           onSpellCast={castSpell}
         />
       ) : null}
-      <button className="magic-unlock-return" type="button" onClick={() => moveTo("magicAlchemyLab")}>이전 장소로 돌아가기</button>
+      <button className="magic-unlock-return" type="button" onClick={() => moveTo("magicCleaningCloset")}>이전 장소로 돌아가기</button>
     </section>
   );
 }

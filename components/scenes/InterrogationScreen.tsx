@@ -24,10 +24,18 @@ const promptLines = [
   "숨긴 말이 더 있나?"
 ] as const;
 
+const magicPromptLines = [
+  "화재 당시 어디에 있었나요?",
+  "이 마력 흔적을 본 적 있나요?",
+  "수정구 기록과 진술이 다른 이유는?",
+  "아직 숨기고 있는 게 있나요?"
+] as const;
+
 type MapLocation = {
   screen: string;
   goTo?: string;
   gateway?: string;
+  gatewayFrom?: string;
   text: string;
   label: string;
   x: string;
@@ -55,8 +63,8 @@ const THEME_MAPS: Record<GameTheme, { image: string; alt: string; locations: Map
     alt: "마법학교 조사 장소가 표시된 학교 지도",
     locations: [
       { screen: "magicAlchemyLab", goTo: "magicAlchemyLab", text: "제1 연금술 실습실", label: "제1 연금술 실습실로 이동", x: "23.4%", y: "27.6%", labelY: "15.6%" },
-      { screen: "magicCleaningCloset", goTo: "magicCleaningCloset", gateway: "magicUnlockDoor", text: "청소도구함", label: "청소도구함으로 이동", x: "44%", y: "27.2%", labelY: "15.2%" },
-      { screen: "magicLibrary", goTo: "magicLibrary", text: "도서관", label: "도서관으로 이동", x: "65.7%", y: "23.8%", labelY: "11.8%" },
+      { screen: "magicCleaningCloset", goTo: "magicCleaningCloset", text: "청소도구함", label: "청소도구함으로 이동", x: "44%", y: "27.2%", labelY: "15.2%" },
+      { screen: "magicLibrary", goTo: "magicLibrary", gateway: "magicUnlockDoor", gatewayFrom: "magicCleaningCloset", text: "도서관", label: "도서관으로 이동", x: "65.7%", y: "23.8%", labelY: "11.8%" },
       { screen: "magicRecordCrystalRoom", goTo: "magicRecordCrystalRoom", text: "기록 수정구실", label: "기록 수정구실로 이동", x: "78.4%", y: "47.4%", labelY: "35.4%" },
       { screen: "magicDormHallway", goTo: "magicDormHallway", text: "학생들 기숙사", label: "학생들 기숙사로 이동", x: "27.3%", y: "61%", labelY: "49%" },
       { screen: "interrogationScreen", goTo: "interrogationScreen", text: "교무 조사실", label: "교무 조사실로 이동", x: "70.3%", y: "73.6%", labelY: "61.6%" }
@@ -107,7 +115,8 @@ const THEME_INTERROGATION_COPY: Record<GameTheme, {
     suspects: [
       { id: "malpoi", name: "말포이" },
       { id: "malposam", name: "말포삼" },
-      { id: "malpoil", name: "말포일" }
+      { id: "malpoil", name: "말포일" },
+      { id: "dunguldoor", name: "덩쿨도어" }
     ]
   },
   spaceStation: spaceStationInterrogationCopy
@@ -155,12 +164,15 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
     ? ({ backgroundImage: "url('/assets/space-station/panels/evidence-vault-panel-v2.webp')" } satisfies CSSProperties)
     : undefined;
   const toolPanelStyle = undefined;
+  const suggestedQuestions = isMagicTheme ? magicPromptLines : promptLines;
 
   const moveFromMap = (location: MapLocation) => {
     if (!location.goTo) return;
+    const currentScreenId = document.querySelector<HTMLElement>(".screen.active")?.id;
     const needsGateway = Boolean(
       location.gateway
-      && window.localStorage.getItem("samunmong-magic-cleaning-closet-unlocked") !== "1"
+      && (!location.gatewayFrom || location.gatewayFrom === currentScreenId)
+      && window.localStorage.getItem("samunmong-magic-library-door-unlocked") !== "1"
     );
     const screenId = needsGateway ? location.gateway : location.goTo;
     if (!screenId) return;
@@ -295,26 +307,51 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
         </nav>
 
         <section className="hud inquiry-bar">
+          {isMagicTheme ? (
+            <div className="dialogue-bar-heading">
+              <label className="dialogue-target" htmlFor="questionInput">
+                <span>현재 대화 상대</span>
+                <strong id="dialogueTargetName">{initialName}</strong>
+              </label>
+              <div className="question-meta">
+                <span className="presented-mini">
+                  <img id="presentedEvidenceImage" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" hidden />
+                  <span>제시할 증거</span>
+                  <strong id="presentedEvidence">없음</strong>
+                  <b id="presentedEvidenceRole" hidden>단서</b>
+                </span>
+                <span className="question-limit-mini" id="questionLimitStatus" aria-live="polite">
+                  남은 질문: 50회
+                </span>
+              </div>
+            </div>
+          ) : null}
           <div className="prompt-lines" aria-label="추천 질문">
-            {promptLines.map((line) => (
+            {suggestedQuestions.map((line) => (
               <button className="prompt-line" type="button" key={line}>
                 {line}
               </button>
             ))}
           </div>
           <div className="question-box">
-            <div className="question-meta">
-              <span className="presented-mini">
-                <img id="presentedEvidenceImage" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" hidden />
-                <span>제시할 증거</span>
-                <strong id="presentedEvidence">없음</strong>
-                <b id="presentedEvidenceRole" hidden>단서</b>
-              </span>
-              <span className="question-limit-mini" id="questionLimitStatus" aria-live="polite">
-                남은 질문: 50회
-              </span>
-            </div>
-            <input id="questionInput" type="text" placeholder="용의자에게 질문을 입력하세요. 필요하면 증거를 함께 제시할 수 있습니다." />
+            {!isMagicTheme ? (
+              <div className="question-meta">
+                <span className="presented-mini">
+                  <img id="presentedEvidenceImage" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" hidden />
+                  <span>제시할 증거</span>
+                  <strong id="presentedEvidence">없음</strong>
+                  <b id="presentedEvidenceRole" hidden>단서</b>
+                </span>
+                <span className="question-limit-mini" id="questionLimitStatus" aria-live="polite">
+                  남은 질문: 50회
+                </span>
+              </div>
+            ) : null}
+            <input
+              id="questionInput"
+              type="text"
+              placeholder={isMagicTheme ? "용의자에게 질문을 입력하세요. Enter를 눌러 바로 보낼 수 있습니다." : "용의자에게 질문을 입력하세요. 필요하면 증거를 함께 제시할 수 있습니다."}
+            />
             <button className="ask" id="askButton" type="button">
               질문
             </button>
@@ -760,6 +797,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               type="button"
               data-map-go={location.goTo}
               data-map-gateway={location.gateway}
+              data-map-gateway-from={location.gatewayFrom}
               data-location-screen={location.screen}
               style={mapPinStyle(location)}
               aria-label={location.label}

@@ -110,7 +110,8 @@
     const magicSuspects = [
       { name: "말포이", id: "malpoi", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malpoi-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
       { name: "말포삼", id: "malposam", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malposam-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
-      { name: "말포일", id: "malpoil", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malpoil-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" }
+      { name: "말포일", id: "malpoil", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/malpoil-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" },
+      { name: "덩쿨도어", id: "dunguldoor", scene: "/samunmong/assets/magic-school/interrogation/office-empty.webp", sprite: "/samunmong/assets/magic-school/interrogation/dunguldoor-sprite.webp", sleeveScene: "/samunmong/assets/magic-school/interrogation/office-empty.webp" }
     ];
     const spaceConfig = window.SAMUNMONG_SPACE_STATION || (() => {
       try {
@@ -201,9 +202,10 @@
     const conversationNotesKey = `samunmong-conversation-notes-${themeStorageSuffix}`;
     const interrogationQuestionCountKey = `samunmong-interrogation-question-count-${themeStorageSuffix}`;
     const interrogationKnownFactsKey = `samunmong-interrogation-known-facts-${themeStorageSuffix}`;
+    const magicGandalfReportsKey = "samunmong-magic-gandalf-reports";
     const fieldGuidePendingKey = "samunmong-field-guide-pending";
     const fieldGuideSeenKey = "samunmong-field-guide-seen";
-    const magicCleaningClosetDoorKey = "samunmong-magic-cleaning-closet-unlocked";
+    const magicLibraryDoorKey = "samunmong-magic-library-door-unlocked";
     const settingsKey = "samunmong-demo-settings";
     const bgmStateKey = "samunmong-bgm-state";
     const interrogationQuestionLimit = 50;
@@ -224,6 +226,49 @@
       { screenId: "magicDormHallway", name: "학생들 기숙사", evidence: ["버려진 지팡이 조각"] },
       { screenId: "interrogationScreen", name: "교무 조사실", evidence: [] }
     ];
+    const magicGandalfReports = [
+      {
+        id: "alchemy-lab",
+        screenId: "magicAlchemyLab",
+        location: "제1 연금술 실습실",
+        evidence: ["부러진 지팡이", "화염 감지 룬스톤", "기록의 수정구"],
+        meaning: "붉은 화염 마력만 보면 말포이가 가장 수상하지만, 얼어붙은 경보 룬과 환각으로 덮인 기록은 한 사람의 단순 방화가 아니라는 뜻일세.",
+        development: "범인은 말포이의 지팡이를 이용해 시선을 돌리고, 불이 나기 전에 경보와 출입 기록부터 무력화한 것으로 보이네."
+      },
+      {
+        id: "cleaning-closet",
+        screenId: "magicCleaningCloset",
+        location: "청소도구함",
+        evidence: ["금지된 마법 담배 재"],
+        meaning: "이 재에는 방화의 붉은 마력이 아니라 초록 마력만 남아 있네. 덩쿨도어의 탄 냄새는 불을 지른 흔적보다 금지된 담배의 흔적에 가깝군.",
+        development: "덩쿨도어는 교칙 위반을 감추느라 거짓말했을 가능성이 크지만, 그것만으로 방화범이라 단정할 수는 없겠네. 이제 도서관에서 경보를 끌 지식을 찾은 사람을 확인하게."
+      },
+      {
+        id: "library",
+        screenId: "magicLibrary",
+        location: "도서관",
+        evidence: ["도서관 대출 기록부", "빙결 흔적이 남은 반납 도서"],
+        meaning: "말포일이 빌린 보안 마법책과 반납 도서에 룬스톤과 같은 빙결 흔적이 남아 있네. 지식을 읽은 것에서 그치지 않고 실제로 연습했을 가능성이 높아졌어.",
+        development: "말포일의 도서관 알리바이는 오히려 사전 준비의 흔적이 되었네. 다음에는 기록 수정구실에서 누가 출입 기록을 가렸는지 좁혀 보세."
+      },
+      {
+        id: "record-crystal-room",
+        screenId: "magicRecordCrystalRoom",
+        location: "기록 수정구실",
+        evidence: ["조작된 기록 수정구"],
+        meaning: "보라색 환각층은 말포삼의 마력과 닮았지만 주문이 서툴고 목적만 분명하네. 방화범 본인보다 부탁받아 기록을 가린 사람의 흔적처럼 보이는군.",
+        development: "말포삼에게 수정구를 조작해 달라고 부탁한 사람이 따로 있을 걸세. 기숙사에서 버린 지팡이의 이동 경로까지 확인한 뒤 심문으로 이어가게."
+      },
+      {
+        id: "dorm-hallway",
+        screenId: "magicDormHallway",
+        location: "학생들 기숙사",
+        evidence: ["버려진 지팡이 조각"],
+        meaning: "기숙사의 조각과 실습실의 지팡이는 한 물건이었네. 말포이가 먼저 버린 지팡이를 누군가 주워 방화에 다시 쓴 셈이지.",
+        development: "말포이의 누명, 말포삼의 기록 조작, 말포일의 보안책 대출이 하나의 흐름으로 이어졌네. 이제 교무 조사실에서 덩쿨도어를 포함한 용의자들의 진술을 맞춰 보세."
+      }
+    ];
+    let magicGandalfReportUnread = false;
     let magicUnlockedIndex = -1;
 
     function getMagicUnlockedIndex() {
@@ -295,6 +340,49 @@
         const unlockedLocation = magicLinearProgression[unlockedIndex];
         window.setTimeout(() => showToast(`${unlockedLocation.name}의 봉인이 풀렸습니다.`), 2100);
       }
+      syncMagicGandalfReports({ announce });
+    }
+
+    function showMagicGandalfReportNotice(report) {
+      const toast = document.querySelector("#newFactToast");
+      const title = document.querySelector("#newFactTitle");
+      if (toast && title) {
+        const kicker = toast.querySelector("span");
+        if (kicker) kicker.textContent = "건달프의 수사일지";
+        title.textContent = `${report.location}의 증거 해설이 기록되었습니다`;
+        toast.classList.add("show");
+        toast.setAttribute("aria-hidden", "false");
+        window.clearTimeout(newFactToastTimer);
+        newFactToastTimer = window.setTimeout(() => {
+          toast.classList.remove("show");
+          toast.setAttribute("aria-hidden", "true");
+        }, 4200);
+      }
+      showToast(`건달프가 ${report.location} 수사 전개를 기록했습니다.`);
+      playSfx("note", 0.72);
+    }
+
+    function syncMagicGandalfReports({ announce = false } = {}) {
+      if (!isMagicTheme) return;
+      const collected = new Set(readStoredNames(collectedEvidenceKey));
+      const recorded = new Set(readStoredNames(magicGandalfReportsKey));
+      const newlyRecorded = [];
+
+      magicGandalfReports.forEach((report) => {
+        if (recorded.has(report.id)) return;
+        if (!report.evidence.every((name) => collected.has(name))) return;
+        recorded.add(report.id);
+        newlyRecorded.push(report);
+      });
+
+      if (!newlyRecorded.length) return;
+      localStorage.setItem(magicGandalfReportsKey, JSON.stringify([...recorded]));
+      magicGandalfReportUnread = announce;
+      if (announce) {
+        activeNoteSuspectId = "gandalf";
+        showMagicGandalfReportNotice(newlyRecorded[newlyRecorded.length - 1]);
+      }
+      renderConversationNotes();
     }
 
     const joseonLocationMeta = {
@@ -499,11 +587,17 @@
       localStorage.removeItem(`samunmong-conversation-notes-${suffix}`);
       localStorage.removeItem(`samunmong-interrogation-question-count-${suffix}`);
       localStorage.removeItem(`samunmong-interrogation-known-facts-${suffix}`);
+      if (normalizedTheme === "magicSchool") {
+        localStorage.removeItem(magicGandalfReportsKey);
+      }
       if (normalizedTheme === "spaceStation") {
         localStorage.removeItem(spaceMedicalRecordRecoveryKey);
         localStorage.removeItem(spaceEncryptedFileDecryptionKey);
         localStorage.removeItem(spaceAnalysisResultsKey);
         localStorage.removeItem(spaceKeycardRecoveryKey);
+      }
+      if (normalizedTheme === "magicSchool") {
+        localStorage.removeItem("samunmong-magic-library-frozen-book-thawed");
       }
       if (normalizedTheme === "joseon") localStorage.removeItem(fieldGuideSeenKey);
 
@@ -669,7 +763,11 @@
       }
       if (input) {
         input.disabled = exhausted;
-        input.placeholder = exhausted ? "취조 가능한 질문 횟수를 모두 사용했습니다." : "용의자에게 질문을 입력하세요. 필요하면 증거를 함께 제시할 수 있습니다.";
+        input.placeholder = exhausted
+          ? "취조 가능한 질문 횟수를 모두 사용했습니다."
+          : isMagicTheme
+            ? "용의자에게 질문을 입력하세요. Enter를 눌러 바로 보낼 수 있습니다."
+            : "용의자에게 질문을 입력하세요. 필요하면 증거를 함께 제시할 수 있습니다.";
       }
       if (askButton && !isAskingAi) {
         askButton.disabled = exhausted;
@@ -1461,7 +1559,8 @@
         const roles = {
           malpoi: "화염 마법 학생",
           malposam: "환각 마법 학생",
-          malpoil: "모범생"
+          malpoil: "모범생",
+          dunguldoor: "화염 마법 담당 교사"
         };
         suspectGrid.innerHTML = magicSuspects.map((suspect) => `
           <section class="briefing-suspect-tag magic-suspect-tag" data-suspect="${suspect.name}">
@@ -7213,6 +7312,8 @@
       } else if (suspectNamePanel) {
         suspectNamePanel.textContent = suspect.name;
       }
+      const dialogueTargetName = document.querySelector("#dialogueTargetName");
+      if (dialogueTargetName) dialogueTargetName.textContent = suspect.name;
       document.querySelector("#suspectStage").dataset.suspect = suspect.id;
       const interrogationScreen = document.querySelector("#interrogationScreen");
       setLieExpressionOverlay(false);
@@ -7264,8 +7365,62 @@
     }
 
     function renderConversationNotes() {
+      if (isMagicTheme && activeNoteSuspectId === "gandalf") {
+        const recorded = new Set(readStoredNames(magicGandalfReportsKey));
+        const reports = magicGandalfReports.filter((report) => recorded.has(report.id));
+
+        document.querySelectorAll(".note-current-suspect").forEach((item) => {
+          item.textContent = "건달프 · 수사 조력자";
+        });
+        document.querySelectorAll(".note-lead").forEach((lead) => {
+          lead.textContent = "한 장소의 증거를 모두 모을 때마다 건달프가 증거의 의미와 다음 수사 방향을 정리합니다.";
+        });
+        document.querySelectorAll(".note-suspect-tab").forEach((button) => {
+          const isActive = button.dataset.suspectId === "gandalf";
+          button.classList.toggle("active", isActive);
+          button.setAttribute("aria-pressed", String(isActive));
+        });
+        document.querySelectorAll("[data-note-log]").forEach((log) => {
+          log.replaceChildren();
+          if (!reports.length) {
+            const empty = document.createElement("p");
+            empty.className = "conversation-empty";
+            empty.textContent = "한 장소의 증거를 모두 모으면 건달프가 이곳에 증거의 의미와 다음 수사 방향을 남깁니다.";
+            log.appendChild(empty);
+            return;
+          }
+
+          reports.forEach((report) => {
+            const entry = document.createElement("article");
+            entry.className = "conversation-message suspect gandalf-report";
+            const heading = document.createElement("strong");
+            heading.className = "conversation-speaker";
+            heading.textContent = `건달프 · ${report.location} 조사 정리`;
+            const meaning = document.createElement("p");
+            meaning.className = "conversation-text";
+            meaning.textContent = report.meaning;
+            const development = document.createElement("span");
+            development.className = "conversation-meta gandalf-development";
+            development.textContent = `사건 전개 · ${report.development}`;
+            entry.append(heading, meaning, development);
+            log.appendChild(entry);
+          });
+          log.scrollTop = log.scrollHeight;
+        });
+        if (document.querySelector("#noteDrawer")?.classList.contains("open")) {
+          magicGandalfReportUnread = false;
+        }
+        return;
+      }
+
       const activeSuspect = getSuspectById(activeNoteSuspectId);
       const messages = getConversationNoteList(activeSuspect.id);
+
+      if (isMagicTheme) {
+        document.querySelectorAll(".note-lead").forEach((lead) => {
+          lead.textContent = "관계자별 질문과 답변을 대화처럼 확인합니다.";
+        });
+      }
 
       document.querySelectorAll(".note-current-suspect").forEach((item) => {
         item.textContent = activeSuspect.name;
@@ -7319,7 +7474,10 @@
     function hydrateSuspectTabs() {
       document.querySelectorAll("[data-note-tabs]").forEach((tabs) => {
         tabs.replaceChildren();
-        suspects.forEach((suspect, index) => {
+        const notePeople = isMagicTheme
+          ? [...suspects, { id: "gandalf", name: "건달프 ✦" }]
+          : suspects;
+        notePeople.forEach((suspect, index) => {
           const button = document.createElement("button");
           button.className = `note-suspect-tab${index === 0 ? " active" : ""}`;
           button.type = "button";
@@ -7346,12 +7504,17 @@
 
     function setNote(open) {
       if (open) {
-        activeNoteSuspectId = suspects[suspectIndex].id;
+        activeNoteSuspectId = isMagicTheme && magicGandalfReportUnread
+          ? "gandalf"
+          : suspects[suspectIndex].id;
         renderConversationNotes();
       }
       noteDrawer.classList.toggle("open", open);
       overlay.classList.toggle("show", open);
       noteDrawer.setAttribute("aria-hidden", String(!open));
+      if (open && activeNoteSuspectId === "gandalf") {
+        magicGandalfReportUnread = false;
+      }
     }
     document.querySelector("#openNoteProp").addEventListener("click", () => setNote(true));
     document.querySelector("#closeNote").addEventListener("click", () => setNote(false));
@@ -7535,7 +7698,8 @@
         }
         const needsGateway = Boolean(
           button.dataset.mapGateway
-          && localStorage.getItem(magicCleaningClosetDoorKey) !== "1"
+          && (!button.dataset.mapGatewayFrom || button.dataset.mapGatewayFrom === getActiveScreenId())
+          && localStorage.getItem(magicLibraryDoorKey) !== "1"
         );
         const resolvedTarget = needsGateway ? button.dataset.mapGateway : target;
         button.classList.add("pressing");
@@ -7757,6 +7921,7 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            themeId,
             suspectId: suspect.id,
             userMessage: question,
             presentedEvidenceNames: selectedEvidence ? [selectedEvidence] : [],
