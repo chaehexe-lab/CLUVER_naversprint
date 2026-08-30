@@ -559,7 +559,10 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
             <img src="/samunmong/assets/magic-school/briefing/scene-investigation/new-teacher-briefing-frame-v1.png" alt="" draggable={false} />
             <div className="magic-entry-ink-copy">
               <p>ARCANA FACULTY NOTICE</p>
-              <h2 id="magicWelcomeTitle">선생님, 아르카나 마법학교에 오신 것을 환영합니다.</h2>
+              <h2 id="magicWelcomeTitle">
+                선생님, 아르카나 마법학교에 오신 것을<br />
+                환영합니다.
+              </h2>
               <span>첫 부임을 앞둔 밤, 제1 연금술 실습실에서 원인을 알 수 없는 화재가 발생했습니다.</span>
               <strong>기억 수정구에 남은 현장을 보시겠습니까?</strong>
               <button type="button" onClick={() => {
