@@ -1,0 +1,437 @@
+/* Loaded after the legacy game stylesheet so the first magic scene uses full-image coordinates. */
+@font-face {
+  font-family: "NalSun";
+  src: url("/samunmong/assets/fonts/NalSun-Regular.ttf") format("truetype");
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Paperlogy";
+  src: url("/samunmong/assets/fonts/Paperlogy-4Regular.ttf") format("truetype");
+  font-display: swap;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen {
+  font-family: "Paperlogy", sans-serif;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-trace-photo-zone,
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-trace-evidence {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-trace-evidence {
+  z-index: 20 !important;
+  display: block !important;
+  pointer-events: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence,
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence.fire,
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence.ice,
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence.illusion {
+  position: absolute !important;
+  inset: auto !important;
+  width: clamp(130px, 11vw, 180px) !important;
+  min-width: 0 !important;
+  min-height: clamp(130px, 11vw, 180px) !important;
+  display: block !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  opacity: .01 !important;
+  pointer-events: auto !important;
+  transform: translate(-50%, -50%) !important;
+  animation: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence.fire {
+  left: 31.5% !important;
+  top: 35% !important;
+  background: transparent !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence.ice {
+  left: 27.2% !important;
+  top: 67.8% !important;
+  background: transparent !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence.illusion {
+  left: 77.2% !important;
+  top: 73.8% !important;
+  background: transparent !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence .memory-evidence-observation {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence:hover,
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence:focus-visible {
+  opacity: .01 !important;
+  filter: none !important;
+  transform: translate(-50%, -50%) !important;
+  outline: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence.revealed {
+  width: clamp(220px, 20vw, 310px) !important;
+  min-height: 250px !important;
+  display: flex !important;
+  padding: 12px 14px 18px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  opacity: 1 !important;
+  filter: none !important;
+  background: radial-gradient(circle, rgba(20, 14, 24, .82), rgba(7, 5, 9, .4) 68%, transparent 76%) !important;
+  transform: translate(-50%, -50%) !important;
+  animation: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen [data-memory-trace-copy] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  white-space: normal !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-ink-line {
+  --ink-delay: 0ms;
+  display: block;
+  max-width: 100%;
+  opacity: 0;
+  filter: blur(8px);
+  letter-spacing: .055em;
+  text-shadow: 0 0 18px rgba(184, 137, 214, .8), 0 0 5px rgba(238, 214, 173, .62);
+  mask-image: linear-gradient(90deg, #000 0 56%, transparent 76% 100%);
+  mask-size: 240% 100%;
+  mask-position: 100% 0;
+  animation: magicInkSpread 1.05s cubic-bezier(.16, .8, .22, 1) var(--ink-delay) forwards;
+}
+
+@keyframes magicInkSpread {
+  0% {
+    opacity: 0;
+    filter: blur(9px);
+    letter-spacing: .09em;
+    mask-position: 100% 0;
+  }
+  42% {
+    opacity: .78;
+    filter: blur(3px);
+    text-shadow: 0 0 22px rgba(187, 137, 224, .92), 0 0 9px rgba(244, 222, 184, .72);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    letter-spacing: 0;
+    mask-position: 0 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, .84);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-ink-line {
+    opacity: 1;
+    filter: none;
+    letter-spacing: 0;
+    mask-image: none;
+    animation: none;
+  }
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-trace-dialog {
+  width: min(820px, 76vw) !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-trace-dialog-content {
+  width: min(620px, 60vw) !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-trace-dialog p {
+  min-height: 82px !important;
+  margin: 8px 0 12px !important;
+  font-size: clamp(16px, 1.12vw, 19px) !important;
+  line-height: 1.5 !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-trace-dialog button {
+  min-height: 38px !important;
+  font-size: 16px !important;
+}
+
+/* Magic-school utility panels always close from the upper-right corner. */
+html[data-samunmong-theme="magicSchool"] #mapPanel .map-floating-close,
+html[data-samunmong-theme="magicSchool"] #fieldNotePanel .note-close,
+html[data-samunmong-theme="magicSchool"] #evidenceBagPop .mini-close {
+  position: absolute !important;
+  left: auto !important;
+  right: 24px !important;
+  top: 22px !important;
+  margin: 0 !important;
+  z-index: 30 !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #toolPanel {
+  display: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen:not(.magic-entry-scene) .briefing-card,
+html[data-samunmong-theme="magicSchool"] #briefingScreen:not(.magic-entry-scene) .memory-restore-ritual {
+  display: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-welcome-panel,
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-orb-stage {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #050408;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(.3) saturate(.72) blur(1px);
+  transform: scale(1.025);
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-welcome-panel::after,
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-orb-stage::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at center, transparent 18%, rgba(4, 2, 8, .38) 70%, rgba(2, 1, 4, .84));
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-document {
+  position: relative;
+  z-index: 2;
+  width: min(1040px, 82vw);
+  min-height: 690px;
+  display: grid;
+  place-items: center;
+  filter: drop-shadow(0 34px 70px rgba(0, 0, 0, .72));
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-document > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: fill;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-document > div {
+  position: relative;
+  z-index: 1;
+  width: min(720px, 70%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  color: #f4e5c4;
+  text-align: center;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-document p,
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-orb-copy p {
+  margin: 0;
+  color: #c9a767;
+  font-size: 15px;
+  letter-spacing: .22em;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-document h2,
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-orb-copy h2 {
+  display: block !important;
+  margin: 0;
+  color: #f9ebce;
+  opacity: 1 !important;
+  visibility: visible !important;
+  font-family: "NalSun", serif !important;
+  font-size: clamp(34px, 3vw, 48px) !important;
+  line-height: 1.18 !important;
+  text-shadow: 0 4px 18px rgba(0, 0, 0, .9);
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-document span,
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-document strong {
+  max-width: 650px;
+  font-size: 20px;
+  line-height: 1.65;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-document button {
+  min-width: 250px;
+  margin-top: 8px;
+  padding: 16px 34px;
+  border: 1px solid rgba(222, 181, 105, .76);
+  color: #fff0cf;
+  background: linear-gradient(180deg, rgba(78, 48, 73, .95), rgba(33, 21, 37, .98));
+  box-shadow: 0 0 24px rgba(153, 99, 184, .28), inset 0 0 0 2px rgba(250, 218, 157, .08);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-ink-copy > :not(button) {
+  opacity: 0;
+  filter: blur(2px);
+  mask-image: linear-gradient(90deg, #000 0 54%, transparent 76% 100%);
+  mask-size: 240% 100%;
+  mask-position: 100% 0;
+  animation: magicWelcomeInkSpread .52s cubic-bezier(.16, .8, .22, 1) forwards;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-ink-copy > p {
+  margin-top: 42px;
+  animation-delay: 0s;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-ink-copy > h2 {
+  animation-delay: .08s;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-ink-copy > span {
+  animation-delay: .16s;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-ink-copy > strong {
+  animation-delay: .24s;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-ink-copy > button {
+  opacity: 0;
+  animation: magicWelcomeButtonReveal .35s ease-out .42s forwards;
+}
+
+@keyframes magicWelcomeInkSpread {
+  0% {
+    opacity: 0;
+    filter: blur(2px);
+    letter-spacing: .025em;
+    mask-position: 100% 0;
+    text-shadow: 0 0 24px rgba(153, 99, 184, .9);
+  }
+  52% {
+    opacity: .92;
+    filter: blur(1px);
+    text-shadow: 0 0 20px rgba(191, 143, 218, .8);
+  }
+  100% {
+    opacity: 1;
+    filter: blur(0);
+    letter-spacing: normal;
+    mask-position: 0 0;
+    text-shadow: 0 3px 12px rgba(0, 0, 0, .86);
+  }
+}
+
+@keyframes magicWelcomeButtonReveal {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-ink-copy > * {
+    opacity: 1;
+    filter: none;
+    mask-image: none;
+    animation: none;
+  }
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-orb-stage {
+  grid-template-rows: 1fr;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-orb-copy {
+  position: absolute;
+  z-index: 3;
+  top: 12%;
+  width: min(980px, 84vw);
+  display: grid;
+  gap: 12px;
+  text-align: center;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-orb-button {
+  position: relative;
+  z-index: 3;
+  width: min(390px, 36vw);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  border: 0;
+  color: #f8e9c9;
+  background: transparent;
+  cursor: pointer;
+  filter: drop-shadow(0 0 30px rgba(167, 101, 210, .52));
+  animation: none;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-orb-button::before {
+  content: "";
+  position: absolute;
+  inset: 12%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(227, 179, 255, .34), rgba(122, 63, 164, .12) 48%, transparent 72%);
+  display: none;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-orb-button img {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-orb-button span {
+  position: absolute;
+  z-index: 2;
+  bottom: -14px;
+  padding: 11px 24px;
+  border: 1px solid rgba(224, 190, 126, .48);
+  background: rgba(12, 7, 18, .86);
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+@keyframes magicEntryOrbFloat {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-13px) scale(1.025); }
+}
+
+@keyframes magicEntryOrbGlow {
+  0%, 100% { opacity: .52; transform: scale(.94); }
+  50% { opacity: 1; transform: scale(1.08); }
+}

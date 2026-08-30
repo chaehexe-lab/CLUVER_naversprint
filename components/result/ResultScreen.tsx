@@ -634,6 +634,9 @@ export default function ResultScreen() {
         <h1 id="resultTitle" className="accusation-title">
           {accusationTitle}
         </h1>
+        {theme === "spaceStation" ? (
+          <p className="accusation-instruction">사건의 범인이라고 판단되는 인물을 선택하세요.</p>
+        ) : null}
 
         {activeSuspects.map((suspect) => (
           <button
@@ -653,30 +656,40 @@ export default function ResultScreen() {
             }}
           >
             <img src={suspect.image} alt="" />
+            {theme === "spaceStation" && "role" in suspect ? (
+              <span className="space-accusation-card-copy">
+                <strong>{suspect.name}</strong>
+                <small>{suspect.role}</small>
+              </span>
+            ) : null}
           </button>
         ))}
 
-        {activeSuspects.map((suspect) => (
-          <span className="accusation-name" key={`${suspect.id}-name`} style={{ left: suspect.nameLeft }}>
-            {suspect.name}
-          </span>
-        ))}
+        {theme !== "spaceStation" ? activeSuspects.map((suspect) => (
+            <span className="accusation-name" key={`${suspect.id}-name`} style={{ left: suspect.nameLeft }}>
+              {suspect.name}
+            </span>
+          )) : null}
 
-        <div
-          className="accusation-stamp"
-          aria-hidden="true"
-          style={{ left: selectedSuspect.stampLeft }}
-        >
-          {theme === "magicSchool" ? "선택" : "지목"}
-        </div>
+        {theme !== "spaceStation" ? (
+          <div
+            className="accusation-stamp"
+            aria-hidden="true"
+            style={{ left: selectedSuspect.stampLeft }}
+          >
+            {theme === "magicSchool" ? "선택" : "지목"}
+          </div>
+        ) : null}
 
         <div className="accusation-actions">
           <button className="wood-result-button primary" type="button" onClick={() => confirmAccusation()}>
             {theme === "magicSchool" ? "이 학생을 지목한다" : "이 자를 지목한다"}
           </button>
-          <Link className="wood-result-button" href={backToInterrogationHref}>
-            {theme === "spaceStation" ? "보안 조사실로 돌아간다" : theme === "magicSchool" ? "교무 조사실로 돌아간다" : "취조실로 돌아간다"}
-          </Link>
+          {theme !== "spaceStation" ? (
+            <Link className="wood-result-button" href={backToInterrogationHref}>
+              {theme === "magicSchool" ? "교무 조사실로 돌아간다" : "취조실로 돌아간다"}
+            </Link>
+          ) : null}
         </div>
       </section>
 

@@ -105,6 +105,195 @@ body {
   transition: filter 0.16s ease, transform 0.16s ease;
 }
 
+.theme-spaceStation .accusation-stage {
+  background: #050d14;
+}
+
+.theme-spaceStation .accusation-stage::before,
+.theme-spaceStation .accusation-stage::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.theme-spaceStation .accusation-stage::before {
+  inset: 1.7% 1.15%;
+  border: 1px solid rgba(128, 177, 204, .38);
+  clip-path: polygon(3.2% 0, 96.8% 0, 100% 5.2%, 100% 94.8%, 96.8% 100%, 3.2% 100%, 0 94.8%, 0 5.2%);
+  box-shadow: inset 0 0 44px rgba(65, 132, 169, .08);
+}
+
+.theme-spaceStation .accusation-stage::after {
+  inset: 0;
+  background:
+    linear-gradient(90deg, transparent 3.1%, rgba(117, 171, 201, .28) 3.1% 3.25%, transparent 3.25% 96.75%, rgba(117, 171, 201, .28) 96.75% 96.9%, transparent 96.9%) center 5.2% / 100% 1px no-repeat,
+    radial-gradient(ellipse at 50% 43%, rgba(38, 88, 116, .18), transparent 57%),
+    linear-gradient(180deg, rgba(2, 10, 16, .2), rgba(2, 10, 16, .68));
+}
+
+.theme-spaceStation .accusation-bg {
+  filter: brightness(.34) saturate(.72) contrast(1.06);
+}
+
+.theme-spaceStation .accusation-title {
+  top: 5.8%;
+  color: #edf4f8;
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+  font-size: clamp(31px, 3.35vw, 56px);
+  font-weight: 500;
+  letter-spacing: .08em;
+  text-shadow: 0 0 20px rgba(128, 205, 240, .18), 0 3px 8px rgba(0, 0, 0, .8);
+}
+
+.theme-spaceStation .accusation-title::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: calc(100% + 14px);
+  width: 135%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(143, 192, 216, .7) 18%, rgba(143, 192, 216, .28) 82%, transparent);
+  transform: translateX(-50%);
+}
+
+.theme-spaceStation .accusation-instruction {
+  position: absolute;
+  left: 50%;
+  top: 14.6%;
+  z-index: 3;
+  margin: 0;
+  color: rgba(226, 235, 241, .9);
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+  font-size: clamp(14px, 1.5vw, 25px);
+  letter-spacing: .02em;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.theme-spaceStation .accusation-suspect {
+  top: 23% !important;
+  width: 20% !important;
+  height: 55% !important;
+  overflow: hidden;
+  border: 1px solid rgba(122, 157, 178, .38);
+  clip-path: polygon(5.5% 0, 94.5% 0, 100% 3.4%, 100% 96.6%, 94.5% 100%, 5.5% 100%, 0 96.6%, 0 3.4%);
+  background: linear-gradient(180deg, rgba(24, 36, 46, .9), rgba(8, 20, 29, .96));
+  box-shadow: inset 0 0 30px rgba(108, 165, 196, .06), 0 12px 30px rgba(0, 0, 0, .3);
+}
+
+.theme-spaceStation .accusation-suspect[data-suspect-id="harry"] { left: 5.5% !important; }
+.theme-spaceStation .accusation-suspect[data-suspect-id="mers"] { left: 28.5% !important; }
+.theme-spaceStation .accusation-suspect[data-suspect-id="aladdindin"] { left: 51.5% !important; }
+.theme-spaceStation .accusation-suspect[data-suspect-id="einspanner"] { left: 74.5% !important; }
+
+.theme-spaceStation .accusation-suspect::before {
+  inset: 7px;
+  border: 1px solid rgba(150, 183, 201, .14);
+  box-shadow: none;
+}
+
+.theme-spaceStation .accusation-suspect img {
+  top: 2%;
+  width: 100%;
+  height: 76%;
+  max-width: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  filter: brightness(.88) saturate(.82) drop-shadow(0 12px 16px rgba(0, 0, 0, .5));
+  transform: translateX(-50%);
+}
+
+.theme-spaceStation .accusation-suspect:hover,
+.theme-spaceStation .accusation-suspect:focus-visible {
+  border-color: rgba(111, 198, 237, .7);
+  outline: 0;
+}
+
+.theme-spaceStation .accusation-suspect.selected {
+  border-color: #6bd5ff;
+  box-shadow: 0 0 18px rgba(68, 203, 255, .72), inset 0 0 26px rgba(60, 189, 238, .16);
+}
+
+.theme-spaceStation .accusation-suspect.selected::before {
+  border-color: rgba(123, 222, 255, .62);
+  box-shadow: inset 0 0 18px rgba(66, 204, 255, .14);
+}
+
+.theme-spaceStation .accusation-suspect:hover img,
+.theme-spaceStation .accusation-suspect:focus-visible img,
+.theme-spaceStation .accusation-suspect.selected img {
+  filter: brightness(1) saturate(.94) drop-shadow(0 13px 18px rgba(0, 0, 0, .5));
+}
+
+.space-accusation-card-copy {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  z-index: 3;
+  width: 100%;
+  height: 24%;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-top: 1px solid rgba(121, 164, 188, .2);
+  background: linear-gradient(180deg, rgba(7, 20, 29, .83), rgba(4, 14, 22, .98));
+  color: #edf4f8;
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+}
+
+.space-accusation-card-copy strong {
+  font-size: clamp(19px, 2vw, 33px);
+  font-weight: 500;
+  line-height: 1;
+}
+
+.space-accusation-card-copy small {
+  color: rgba(190, 208, 219, .82);
+  font-size: clamp(10px, 1vw, 17px);
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+.theme-spaceStation .accusation-actions {
+  top: 85.3%;
+  width: 51%;
+}
+
+.theme-spaceStation .accusation-actions .wood-result-button {
+  width: 100%;
+  min-width: 0;
+  min-height: min(6.4vw, 64px);
+  border: 1px solid rgba(104, 151, 177, .45);
+  border-radius: 3px;
+  color: rgba(222, 232, 238, .92);
+  background: linear-gradient(180deg, rgba(30, 43, 53, .9), rgba(14, 25, 33, .96));
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .38), inset 0 0 0 1px rgba(194, 226, 241, .05);
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+  font-size: clamp(18px, 1.9vw, 31px);
+  font-weight: 400;
+}
+
+.theme-spaceStation .accusation-actions .wood-result-button::before {
+  inset: 7px;
+  border-color: rgba(133, 178, 201, .18);
+}
+
+.theme-spaceStation .accusation-actions .wood-result-button::after {
+  background: linear-gradient(90deg, transparent, rgba(157, 203, 225, .2), transparent);
+}
+
+.theme-spaceStation .accusation-actions .wood-result-button:hover,
+.theme-spaceStation .accusation-actions .wood-result-button:focus-visible {
+  border-color: rgba(105, 210, 251, .8);
+  color: #eefaff;
+  box-shadow: 0 0 16px rgba(62, 190, 239, .3), inset 0 0 18px rgba(54, 173, 219, .08);
+}
+
 .accusation-suspect:hover img,
 .accusation-suspect:focus-visible img,
 .accusation-suspect.selected img {

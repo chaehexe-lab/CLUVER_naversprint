@@ -65,6 +65,14 @@
       tool: "돋보기",
       toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있고, 그림 가장자리에는 지운 글씨의 눌린 획이 남아 있다."
     },
+    "고름이 뜯긴 저고리": {
+      note: "춘월의 방 병풍에 걸린 자주빛 저고리. 한쪽 고름이 거칠게 뜯겨 나가고 실밥만 남아 있다.",
+      location: "춘월의 방",
+      logic: "무덕의 방에서 발견한 찢긴 비단끈이 이 저고리에서 떨어진 것인지 직접 대조해야 한다.",
+      relatedSuspects: ["춘월", "무덕"],
+      contradiction: "춘월이 저고리를 입고 밖에 나가지 않았다고 주장하면, 뜯긴 고름과 무덕의 방에 남은 비단끈을 함께 제시할 수 있다.",
+      img: "/samunmong/assets/evidence-transparent/evidence-chunwol-jeogori-torn-goreum-v1.png"
+    },
     "헐거워진 노리개": {
       note: "장식 고리가 느슨해진 노리개. 누가 급히 잡아챘거나 떨어뜨렸는지 확인해야 한다.",
       location: "춘월의 방",
@@ -214,7 +222,7 @@
       logic: "점순은 돌쇠가 보낸 쪽지라고 믿고 창고로 향했다. 정중한 말투가 돌쇠의 평소 말과 정말 맞는지 진술과 대조해야 한다.",
       relatedSuspects: ["돌쇠", "춘월", "무덕"],
       contradiction: "도망 보따리와 맞물리면 돌쇠의 계획을 누군가 이용했을 가능성이 생긴다.",
-      img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v5.svg",
+      img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v6.png",
       reverseImg: "/samunmong/assets/interactions/evidence-reverse/torn-promise-letter-back-v2.png",
       tool: "문서 맞춤판",
       toolResult: "찢긴 가장자리를 맞추자 ‘오늘 밤 창고에서 기다리시오, 함께 떠납시다’라는 문장이 온전히 이어진다.",
