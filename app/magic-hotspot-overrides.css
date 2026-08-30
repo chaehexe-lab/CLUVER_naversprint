@@ -89,10 +89,10 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence:focus-
 }
 
 html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence.revealed {
-  width: clamp(220px, 20vw, 310px) !important;
-  height: 250px !important;
-  max-height: 250px !important;
-  min-height: 250px !important;
+  width: clamp(190px, 17vw, 250px) !important;
+  height: 220px !important;
+  max-height: 220px !important;
+  min-height: 220px !important;
   display: flex !important;
   padding: 12px 14px 18px !important;
   align-items: center !important;
@@ -103,6 +103,25 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence.reveal
   transform: translate(-50%, -50%) !important;
   animation: none !important;
   pointer-events: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence.revealed .magic-evidence-result-emblem {
+  position: relative !important;
+  inset: auto !important;
+  width: 104px !important;
+  height: 104px !important;
+  max-width: 104px !important;
+  max-height: 104px !important;
+  flex: 0 0 104px !important;
+  object-fit: contain !important;
+  transform: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence.revealed .memory-evidence-result {
+  max-width: 210px !important;
+  margin-inline: auto !important;
+  line-height: 1.35 !important;
+  text-align: center !important;
 }
 
 html[data-samunmong-theme="magicSchool"] #briefingScreen [data-memory-trace-copy] {
@@ -160,8 +179,19 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-ink-line {
 
 html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-trace-dialog {
   width: min(820px, 76vw) !important;
+  height: auto !important;
+  max-height: min(480px, 72vh) !important;
+  aspect-ratio: 1400 / 820 !important;
   min-height: 0 !important;
   padding: 0 !important;
+  overflow: visible !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-trace-dialog > img {
+  width: 100% !important;
+  height: 100% !important;
+  max-height: none !important;
+  object-fit: fill !important;
 }
 
 html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-trace-dialog-content {
