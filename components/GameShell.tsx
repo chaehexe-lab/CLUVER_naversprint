@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useLayoutEffect, useState, type ComponentType } from "react";
+import { useEffect, useLayoutEffect, useState, type ComponentType, type MouseEvent } from "react";
 import { useRouter } from "next/navigation";
 import BriefingScreen from "@/components/front/BriefingScreen";
 import ButtonGuideLayer from "@/components/ButtonGuideLayer";
@@ -32,7 +32,7 @@ import {
 } from "@/lib/gameTheme";
 
 const CONTENT_SCRIPT = "/samunmong/content.js?v=20260824-evidence-scene-v3";
-const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260829-ice-control-v131";
+const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260830-magic-intro-audio-v131";
 const MAIN_SCREEN = "mainScreen";
 
 const INVESTIGATION_SCENE_COMPONENTS: Record<string, ComponentType> = {
@@ -76,11 +76,33 @@ function requestScreen(screenId: string) {
   );
 }
 
+function startMagicBriefingAudio(event: MouseEvent<HTMLDivElement>) {
+  const target = event.target;
+  if (!(target instanceof Element) || !target.closest("#chooseMagicSchool")) return;
+
+  const alarmAudio = new Audio("/samunmong/sound/sfx/magic-school-alarm.mp3");
+  const fireAudio = new Audio("/samunmong/sound/sfx/magic-school-fire.mp3");
+  alarmAudio.volume = 0.62;
+  fireAudio.volume = 0.42;
+  fireAudio.loop = true;
+  const audioWindow = window as Window & {
+    __samunmongMagicIntroAudio?: { alarmAudio: HTMLAudioElement; fireAudio: HTMLAudioElement };
+  };
+  audioWindow.__samunmongMagicIntroAudio?.alarmAudio.pause();
+  audioWindow.__samunmongMagicIntroAudio?.fireAudio.pause();
+  audioWindow.__samunmongMagicIntroAudio = { alarmAudio, fireAudio };
+  void alarmAudio.play().catch(() => undefined);
+  void fireAudio.play().catch(() => undefined);
+}
+
 function ensureRequestedStartScreen(initialScreen?: string) {
   const startScreen = new URLSearchParams(window.location.search).get("start") || initialScreen;
   if (!startScreen || !STARTABLE_SCREENS.has(startScreen)) return;
 
   requestScreen(startScreen);
+  document.querySelectorAll(".screen").forEach((screen) => {
+    screen.classList.toggle("active", screen.id === startScreen);
+  });
   window.setTimeout(() => {
     document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
   }, 0);
@@ -96,7 +118,7 @@ function ActiveInvestigationScene({ screenId }: { screenId: string }) {
   if (magicScene) return <MagicSchoolScene key={magicScene.id} scene={magicScene} />;
 
   const spaceScene = SPACE_SCENES_BY_ID.get(screenId);
-  return spaceScene ? <SpaceStationScene scene={spaceScene} /> : null;
+  return spaceScene ? <SpaceStationScene key={spaceScene.id} scene={spaceScene} /> : null;
 }
 
 export default function GameShell({ initialScreen, initialTheme }: GameShellProps) {
@@ -106,6 +128,11 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
   const [currentScreen, setCurrentScreen] = useState(
     initialScreen && STARTABLE_SCREENS.has(initialScreen) ? initialScreen : MAIN_SCREEN
   );
+
+  useLayoutEffect(() => {
+    document.documentElement.dataset.samunmongTheme = renderedTheme;
+    window.localStorage.setItem("samunmong-current-theme", renderedTheme);
+  }, [renderedTheme]);
 
   useLayoutEffect(() => {
     const requestedStart = new URLSearchParams(window.location.search).get("start") || initialScreen;
@@ -243,12 +270,25 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
   return (
     <>
     <script
+      dangerouslySetInnerHTML={{
+        __html: `(() => {
+          const params = new URLSearchParams(window.location.search);
+          const requestedTheme = params.get("theme");
+          const theme = ["joseon", "magicSchool", "spaceStation"].includes(requestedTheme)
+            ? requestedTheme
+            : ${JSON.stringify(renderedTheme)};
+          document.documentElement.dataset.samunmongTheme = theme;
+        })();`
+      }}
+    />
+    <script
       id="spaceStationRuntimeData"
       type="application/json"
       dangerouslySetInnerHTML={{ __html: JSON.stringify(spaceStationRuntimeConfig).replace(/</g, "\\u003c") }}
     />
     <div
       className="game-viewport"
+      onClickCapture={startMagicBriefingAudio}
       onDragStartCapture={(event) => {
         const target = event.target;
         if (!(target instanceof HTMLElement) || !target.closest('[draggable="true"]')) {
@@ -266,7 +306,7 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
         <MainScreen active={currentScreen === MAIN_SCREEN} />
         <TutorialScreen />
         <DreamSelectScreen />
-        <BriefingScreen initialTheme={renderedTheme} />
+        <BriefingScreen initialTheme={renderedTheme} active={currentScreen === "briefingScreen"} />
         <ActiveInvestigationScene screenId={currentScreen} />
         <InterrogationScreen initialTheme={renderedTheme} />
         <LocationIndicator initialScreen={initialScreen} initialTheme={renderedTheme} />

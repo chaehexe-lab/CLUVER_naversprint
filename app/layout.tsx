@@ -1,6 +1,7 @@
 ﻿import type { Metadata } from "next";
 import "./game.css";
 import "./globals.css";
+import "./magic-hotspot-overrides.css";
 
 export const metadata: Metadata = {
   title: "삼운몽: 세 개의 꿈",
@@ -13,7 +14,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ko">
+    <html lang="ko" suppressHydrationWarning>
       <body>{children}</body>
     </html>
   );

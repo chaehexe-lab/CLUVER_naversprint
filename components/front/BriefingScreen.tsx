@@ -3,85 +3,117 @@
 import { briefing } from "@/lib/gameData";
 import type { GameTheme } from "@/lib/gameTheme";
 import { useEffect, useState } from "react";
-import MagicSchoolIntroFire3D from "@/components/effects/MagicSchoolIntroFire3D";
-import MemoryOrb3D from "@/components/effects/MemoryOrb3D";
-import MagicSchoolIntroAtmosphere from "@/components/front/MagicSchoolIntroAtmosphere";
+
+type MagicIntroAudioWindow = Window & {
+  __samunmongMagicIntroAudio?: {
+    alarmAudio: HTMLAudioElement;
+    fireAudio: HTMLAudioElement;
+  };
+};
 
 const magicRecordCards = [
   {
-    name: "말포이",
-    kind: "학생기록부",
-    variant: "student",
-    background: "/samunmong/assets/magic-school/intro/final-ui/student-record-open.webp",
-    portrait: "/samunmong/assets/magic-school/interrogation/malpoi-sprite.webp",
-    role: "세쌍둥이 둘째 · 천재형 문제아",
-    fields: [
-      "마력이 강하지만 충동적이다. 지팡이를 자주 부수며 화염 마법 사용 흔적이 많다.",
-      "화염 마법 강의 수강을 마쳤다. 섬세한 빙결 마법은 다루기 어렵다는 기록이 있다.",
-      "부러진 지팡이 때문에 의심받지만, 경보 룬스톤을 얼릴 능력은 부족해 보인다."
-    ]
+    name: "기록 책",
+    kind: "세 권의 기록",
+    image: "/samunmong/assets/magic-school/intro/final-ui/archive-books-closed.webp"
   },
   {
     name: "말포일",
     kind: "학생기록부",
-    variant: "student",
-    background: "/samunmong/assets/magic-school/intro/final-ui/student-record-open.webp",
-    portrait: "/samunmong/assets/magic-school/interrogation/malpoil-sprite.webp",
-    role: "세쌍둥이 첫째 · 모범생",
-    fields: [
-      "예의 바르고 성적이 우수하다. 매일 도서관에 머물며 교칙을 잘 지키는 학생이다.",
-      "5대 원소 기초 강의를 모두 수강했다. 보안 기기 관련 도서 대출 기록이 확인된다.",
-      "말포이를 향한 열등감을 감추고 있다. 지나치게 매끄러운 태도를 주의할 필요가 있다."
-    ]
-  },
-  {
-    name: "말포삼",
-    kind: "학생기록부",
-    variant: "student",
-    background: "/samunmong/assets/magic-school/intro/final-ui/student-record-open.webp",
-    portrait: "/samunmong/assets/magic-school/interrogation/malposam-sprite.webp",
-    role: "세쌍둥이 셋째 · 환각 마법 관심",
-    fields: [
-      "소심하고 눈을 잘 마주치지 못한다. 도서관에서 환각 마법 기록을 즐겨 본다.",
-      "환각 마법에 집착한다. 다른 사람의 부탁을 쉽게 거절하지 못하는 성향이다.",
-      "기록 수정구의 보라색 환각층과 연결될 가능성이 있다. 누가 부탁했는지 확인해야 한다."
-    ]
+    image: "/samunmong/assets/magic-school/intro/final-ui/student-record-open.webp"
   },
   {
     name: "건달프",
     kind: "경비근무일지",
-    variant: "guard",
-    background: "/samunmong/assets/magic-school/intro/final-ui/guard-log-open.webp",
-    portrait: "/samunmong/assets/magic-school/interrogation/gandalf-sprite.webp",
-    role: "교내 경비원",
-    fields: [
-      "성실하고 규정에 엄격하다. 학생 안전 문제에는 즉각 반응한다.",
-      "사건 당일 밤 제1 연금술 실습실 인근 순찰을 강화했다.",
-      "덩쿨도어를 의심하지만, 말포일이 매일 도서관에 간다는 사실도 언급했다."
-    ]
+    image: "/samunmong/assets/magic-school/intro/final-ui/guard-log-open.webp"
   },
   {
     name: "덩쿨도어",
     kind: "교직원 기록",
-    variant: "faculty",
-    background: "/samunmong/assets/magic-school/intro/final-ui/faculty-record-open.webp",
-    portrait: "/samunmong/assets/magic-school/interrogation/dunguldoor-sprite.webp",
-    role: "학년부장 · 화염 마법 담당",
-    fields: [
-      "화염 마법 담당 교사로 제1 연금술 실습실 수업 관리 권한을 가지고 있다.",
-      "냉담하고 무관심한 태도가 잦다. 학생 문제에 깊게 관여하지 않는다.",
-      "사건 직후 몸에서 탄 냄새가 났고 현장 근처에서 목격되어 의심받고 있다."
-    ]
+    image: "/samunmong/assets/magic-school/intro/final-ui/faculty-record-open.webp"
   }
 ] as const;
 
-const memoryTraceEvidence = [
-  { name: "피", className: "blood", label: "붉은 잔흔" },
-  { name: "깨진 안경", className: "glasses", label: "깨진 안경" },
-  { name: "발자국", className: "footprint", label: "그을린 발자국" },
-  { name: "찢어진 종이", className: "paper", label: "찢어진 종이" },
-  { name: "열쇠", className: "key", label: "녹슨 열쇠" }
+const magicStudentRecords = [
+  {
+    name: "말포일",
+    subtitle: "세쌍둥이 첫째 · 원소마법 종합반",
+    portrait: "/samunmong/assets/magic-school/interrogation/malpoil-sprite.webp",
+    conduct: "예의가 바르고 수업 태도가 성실함. 방과 후에는 대부분 도서관에서 시간을 보냄.",
+    notes: "둘째 말포이의 재능과 성적을 자주 의식하는 모습이 관찰됨.",
+    courses: "5대 원소 기초 마법 강의 전 과정 수강 완료.",
+    memo: "최근 마법 보안 기기의 구조와 약점을 다룬 도서를 대출함."
+  },
+  {
+    name: "말포이",
+    subtitle: "세쌍둥이 둘째 · 화염마법 심화반",
+    portrait: "/samunmong/assets/magic-school/interrogation/malpoi-sprite.webp",
+    conduct: "천재적인 마력으로 주목받으나 규칙을 가볍게 여기고 잦은 소동을 일으킴.",
+    notes: "마력이 지나치게 강해 지팡이를 자주 부숨. 섬세한 빙결 마법 제어에는 서툼.",
+    courses: "화염 마법 관련 기초·심화 강의 전 과정 수강 완료.",
+    memo: "최근 파손된 개인 지팡이를 기숙사 폐기함에 버렸다고 진술함."
+  },
+  {
+    name: "말포삼",
+    subtitle: "세쌍둥이 셋째 · 환각마법 연구반",
+    portrait: "/samunmong/assets/magic-school/interrogation/malposam-sprite.webp",
+    conduct: "매우 소심하며 타인과 눈을 잘 맞추지 못함. 혼자 도서관에 머무는 시간이 김.",
+    notes: "환각 마법과 기록 수정술에 강한 흥미를 보이며 첫째 말포일을 깊이 따름.",
+    courses: "환각 마법 기초 및 기록 매체 응용 과목을 집중 수강함.",
+    memo: "사건 전후 수정구 기록에 관해 질문하자 눈에 띄게 긴장함."
+  }
 ] as const;
+
+const magicGuardRecord = {
+  name: "건달프",
+  subtitle: "야간 경비 책임자 · 제1연금술관 담당",
+  portrait: "/samunmong/assets/magic-school/interrogation/gandalf-sprite.webp",
+  duty: "사건 당일 저녁, 제1 연금술 실습실과 중앙 복도를 정기 순찰함.",
+  conduct: "근무 규칙을 철저히 지키며 학생들의 야간 출입을 엄격하게 단속함.",
+  notes: "금지 구역 흡연 문제로 학년부장 덩쿨도어와 자주 충돌해 왔음.",
+  testimony: "말포일은 평소 매일 도서관에 머무는 모범생이라며 강하게 신뢰하고 있음."
+} as const;
+
+const memoryTraceEvidence = [
+  {
+    name: "부러진 지팡이",
+    className: "fire",
+    label: "부러진 지팡이",
+    description: "발화 지점 가까이에서 심하게 그을린 채 발견됨",
+    result: "화염 마력 검출",
+    resultDescription: "지팡이 내부에 폭발적으로 방출된 화염 마력이 남아 있음",
+    resultImage: "/samunmong/assets/magic-school/briefing/scene-investigation/fire-magic-analysis-emblem-v1.png",
+    image: "/samunmong/assets/magic-school/evidence-cutouts/broken-wand.webp"
+  },
+  {
+    name: "화염 감지 룬스톤",
+    className: "ice",
+    label: "화염 감지 룬스톤",
+    description: "큰 화재가 났지만 경보가 한 번도 울리지 않음",
+    result: "빙결 마력 검출",
+    resultDescription: "차가운 마력이 룬의 공명을 얼려 작동을 막은 흔적이 있음",
+    resultImage: "/samunmong/assets/magic-school/briefing/scene-investigation/ice-magic-analysis-emblem-v1.png",
+    image: "/samunmong/assets/magic-school/evidence-cutouts/fire-rune-stone.webp"
+  },
+  {
+    name: "기록의 수정구",
+    className: "illusion",
+    label: "기록의 수정구",
+    description: "사건 시간대의 영상만 흐릿하게 깨져 있음",
+    result: "환각 마력 검출",
+    resultDescription: "누군가 사건 당시 기록 위에 거짓 잔상을 덮어쓴 흔적이 있음",
+    resultImage: "/samunmong/assets/magic-school/briefing/scene-investigation/illusion-magic-analysis-emblem-v1.png",
+    image: "/samunmong/assets/magic-school/evidence-cutouts/record-crystal.webp"
+  }
+] as const;
+
+const magicIncidentScene = "/samunmong/assets/magic-school/briefing/incident-hero/magic-alchemy-lab-fire-map-match-v2.png";
+
+function playMagicButtonClick() {
+  const buttonAudio = new Audio("/samunmong/sound/sfx/button.mp3");
+  buttonAudio.volume = 0.64;
+  void buttonAudio.play().catch(() => undefined);
+}
 
 function MagicBriefingPopupFrame() {
   return (
@@ -216,7 +248,6 @@ function SpaceStationBriefingScreen() {
 
   useEffect(() => {
     const openJournal = () => {
-      window.dispatchEvent(new CustomEvent("samunmong:briefing-step-change", { detail: { step: 1 } }));
       setBriefingStep(1);
       setIsJournalOpen(true);
     };
@@ -296,9 +327,9 @@ function SpaceStationBriefingScreen() {
               <h3>최종 원격 판정 기록</h3>
               <div className="space-report-summary-body">
                 <div className="space-report-summary-copy">
-                  <p>외부 작업 중 갑작스러운 심장 이상과 근력 저하가 확인되었습니다.<br />곧이어 추진 레버가 작동하지 않았고 산소 수치도 빠르게 떨어졌습니다.</p>
-                  <p>안전줄 연결이 끊어진 뒤 정거장으로 돌아오지 못했으며,<br />생체 신호와 통신도 모두 끊겼습니다.</p>
-                  <p>시신을 찾지 못해 정확한 사망 원인은 알 수 없지만,<br />사고 전부터 나타난 신체 이상과 장비 고장은 단순 사고로 보기 어렵습니다.</p>
+                  <p>외부 작업 중 갑작스러운 심박 이상과 근력 저하가 감지되었습니다.<br />직후 추진 레버가 응답하지 않았고 산소 수치가 비정상적으로 감소했습니다.</p>
+                  <p>안전줄 체결 신호가 해제된 뒤 구조 가능 궤도를 벗어났으며,<br />생체 신호와 통신이 모두 끊겼습니다.</p>
+                  <p className="space-report-verdict">시신을 회수하지 못해 정확한 사인은 확정할 수 없으나,<br />이탈 전부터 이어진 신체 이상과 장비 오류는 단순 외부 작업 사고로 보기 어렵습니다.</p>
                 </div>
                 <img
                   className="space-body-scan-image"
@@ -337,7 +368,6 @@ function SpaceStationBriefingScreen() {
             onClick={briefingStep === 0 ? ((event) => {
               event.preventDefault();
               event.stopPropagation();
-              window.dispatchEvent(new CustomEvent("samunmong:briefing-step-change", { detail: { step: 1 } }));
               setBriefingStep(1);
             }) : undefined}
             aria-label={briefingStep === 0 ? "생체 기록 보기" : "에어록으로 이동"}
@@ -367,14 +397,111 @@ function SpaceStationBriefingScreen() {
   );
 }
 
-export default function BriefingScreen({ initialTheme }: { initialTheme: GameTheme }) {
+export default function BriefingScreen({ initialTheme, active = false }: { initialTheme: GameTheme; active?: boolean }) {
   const [joseonStep, setJoseonStep] = useState(0);
+  const [magicEntryStage, setMagicEntryStage] = useState<"alarm" | "welcome" | "orb" | "opening" | "scene">("alarm");
+  const [orbTransitionFrame, setOrbTransitionFrame] = useState(0);
+  const [orbSmokeFrame, setOrbSmokeFrame] = useState(1);
+  const [incidentMagicFrame, setIncidentMagicFrame] = useState(1);
+  const isMagicTheme = initialTheme === "magicSchool";
+
+  useEffect(() => {
+    if (!isMagicTheme) return;
+    const playSceneVideos = () => {
+      document.querySelectorAll<HTMLVideoElement>("#briefingScreen video").forEach((video) => {
+        video.muted = true;
+        void video.play().catch(() => undefined);
+      });
+    };
+    const timer = window.setTimeout(playSceneVideos, 0);
+    document.addEventListener("visibilitychange", playSceneVideos);
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("visibilitychange", playSceneVideos);
+    };
+  }, [isMagicTheme, magicEntryStage]);
+
+  useEffect(() => {
+    if (!isMagicTheme || !active || magicEntryStage !== "alarm") return;
+    const audioWindow = window as MagicIntroAudioWindow;
+    const pendingAudio = audioWindow.__samunmongMagicIntroAudio;
+    const alarmAudio = pendingAudio?.alarmAudio ?? new Audio("/samunmong/sound/sfx/magic-school-alarm.mp3");
+    const fireAudio = pendingAudio?.fireAudio ?? new Audio("/samunmong/sound/sfx/magic-school-fire.mp3");
+    delete audioWindow.__samunmongMagicIntroAudio;
+    alarmAudio.volume = 0.62;
+    fireAudio.volume = 0.42;
+    fireAudio.loop = true;
+    void alarmAudio.play().catch(() => undefined);
+    void fireAudio.play().catch(() => undefined);
+    const revealTimer = window.setTimeout(() => setMagicEntryStage("welcome"), 4000);
+    return () => {
+      window.clearTimeout(revealTimer);
+      alarmAudio.pause();
+      fireAudio.pause();
+      alarmAudio.currentTime = 0;
+      fireAudio.currentTime = 0;
+    };
+  }, [active, isMagicTheme, magicEntryStage]);
+
+  useEffect(() => {
+    if (!isMagicTheme || !active || magicEntryStage !== "welcome") return;
+    const inkAudio = new Audio("/samunmong/sound/sfx/magic-school-ink-type.mp3");
+    inkAudio.volume = 0.48;
+    inkAudio.loop = false;
+    void inkAudio.play().catch(() => undefined);
+    return () => {
+      inkAudio.pause();
+      inkAudio.currentTime = 0;
+    };
+  }, [active, isMagicTheme, magicEntryStage]);
+
+  useEffect(() => {
+    if (!isMagicTheme || magicEntryStage !== "orb") return;
+    const smokeFrames = [1, 2, 3, 2];
+    let smokeIndex = 0;
+    setOrbSmokeFrame(smokeFrames[smokeIndex]);
+    const smokeTimer = window.setInterval(() => {
+      smokeIndex = (smokeIndex + 1) % smokeFrames.length;
+      setOrbSmokeFrame(smokeFrames[smokeIndex]);
+    }, 520);
+    return () => window.clearInterval(smokeTimer);
+  }, [isMagicTheme, magicEntryStage]);
+
+  useEffect(() => {
+    if (!isMagicTheme || magicEntryStage !== "scene") return;
+    const sceneFrames = [1, 2, 3, 2];
+    let sceneIndex = 0;
+    setIncidentMagicFrame(sceneFrames[sceneIndex]);
+    const sceneTimer = window.setInterval(() => {
+      sceneIndex = (sceneIndex + 1) % sceneFrames.length;
+      setIncidentMagicFrame(sceneFrames[sceneIndex]);
+    }, 460);
+    return () => window.clearInterval(sceneTimer);
+  }, [isMagicTheme, magicEntryStage]);
+
+  useEffect(() => {
+    if (!isMagicTheme || !active || magicEntryStage !== "scene") return;
+    const fireAudio = new Audio("/samunmong/sound/sfx/magic-school-fire.mp3");
+    fireAudio.volume = 0.42;
+    fireAudio.loop = true;
+    void fireAudio.play().catch(() => undefined);
+    return () => {
+      fireAudio.pause();
+      fireAudio.currentTime = 0;
+    };
+  }, [active, isMagicTheme, magicEntryStage]);
+
+  useEffect(() => {
+    if (!isMagicTheme || magicEntryStage !== "scene") return;
+    const screen = document.querySelector("#briefingScreen");
+    screen?.classList.remove("awaiting-memory-orb", "memory-restoring");
+    screen?.classList.add("memory-restored");
+  }, [isMagicTheme, magicEntryStage]);
 
   if (initialTheme === "spaceStation") {
     return <SpaceStationBriefingScreen />;
   }
 
-  const isMagicTheme = initialTheme === "magicSchool";
   const briefingTitle = isMagicTheme ? "마법학교 방화사건" : briefing.title;
   const briefingKicker = isMagicTheme ? "기억 수정구" : "사건기록";
   const activeStep = isMagicTheme ? 0 : joseonStep;
@@ -387,34 +514,92 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
     }));
   };
 
+  const openMagicMemory = () => {
+    if (magicEntryStage !== "orb") return;
+    playMagicButtonClick();
+    const orbAudio = new Audio("/samunmong/sound/sfx/magic-school-orb-open.mp3");
+    orbAudio.volume = 0.7;
+    void orbAudio.play().catch(() => undefined);
+    setMagicEntryStage("opening");
+    setOrbTransitionFrame(1);
+    window.setTimeout(() => setOrbTransitionFrame(2), 360);
+    window.setTimeout(() => setOrbTransitionFrame(3), 780);
+    window.setTimeout(() => {
+      setMagicEntryStage("scene");
+      setOrbTransitionFrame(0);
+    }, 1250);
+  };
+
   return (
-    <section className="screen briefing-screen" id="briefingScreen">
-      {isMagicTheme ? <div className="magic-memory-stage">
-        <MagicSchoolIntroFire3D />
-        <MagicSchoolIntroAtmosphere />
-        <div className="magic-summon-circle magic-summon-circle-outer" />
-        <div className="magic-summon-circle magic-summon-circle-inner" />
-        <button className="memory-orb-trigger" id="memoryOrbTrigger" type="button" aria-label="기억 수정구를 눌러 봉인된 기억 복원하기">
-          <span className="memory-orb">
-            <MemoryOrb3D />
-            <span className="memory-orb-frame" />
-            <span className="memory-orb-glass" />
-            <span className="memory-orb-smoke" />
-            <span className="memory-orb-rune rune-one">ᚱ</span>
-            <span className="memory-orb-rune rune-two">ᛟ</span>
-            <span className="memory-orb-rune rune-three">ᛗ</span>
-          </span>
-        </button>
-        <p className="memory-orb-prompt">기억 수정구를 눌러 봉인된 사건을 복원하세요</p>
-        <div className="memory-particles">
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-          <span />
-        </div>
-      </div> : null}
+    <section className={`screen briefing-screen${active ? " active" : ""}${isMagicTheme ? ` magic-entry-${magicEntryStage}` : ""}`} id="briefingScreen">
+      {isMagicTheme && magicEntryStage === "alarm" ? (
+        <div aria-label="화재 경보가 울리는 어두운 화면" style={{ position: "absolute", inset: 0, zIndex: 80, background: "#000" }} />
+      ) : null}
+      {isMagicTheme && magicEntryStage === "welcome" ? (
+        <section className="magic-entry-welcome-panel" role="dialog" aria-modal="true" aria-labelledby="magicWelcomeTitle">
+          <img className="magic-entry-backdrop" src="/samunmong/assets/magic-school/scenes/alchemy-lab.webp" alt="아르카나 마법학교 제1 연금술 실습실" draggable={false} />
+          <div className="magic-entry-document">
+            <img src="/samunmong/assets/magic-school/briefing/scene-investigation/new-teacher-briefing-frame-v1.png" alt="" draggable={false} />
+            <div className="magic-entry-ink-copy">
+              <p>ARCANA FACULTY NOTICE</p>
+              <h2 id="magicWelcomeTitle">선생님, 아르카나 마법학교에 오신 것을 환영합니다.</h2>
+              <span>첫 부임을 앞둔 밤, 제1 연금술 실습실에서 원인을 알 수 없는 화재가 발생했습니다.</span>
+              <strong>기억 수정구에 남은 현장을 보시겠습니까?</strong>
+              <button type="button" onClick={() => {
+                playMagicButtonClick();
+                setMagicEntryStage("orb");
+              }}>현장 확인하기</button>
+            </div>
+          </div>
+        </section>
+      ) : null}
+      {isMagicTheme && (magicEntryStage === "orb" || magicEntryStage === "opening") ? (
+        <section className={`magic-entry-orb-stage${magicEntryStage === "opening" ? " is-opening" : ""}`} aria-label="기억 수정구로 현장 확인하기">
+          <img className="magic-entry-backdrop" src="/samunmong/assets/magic-school/scenes/alchemy-lab.webp" alt="" draggable={false} />
+          <div className="magic-entry-orb-copy">
+            <p>봉인된 현장 기억</p>
+            <h2>수정구를 눌러 화재 당시의 현장을 확인하십시오.</h2>
+          </div>
+          <img
+            src={`/samunmong/assets/magic-school/intro/orb-lavender-white-smoke-v${orbSmokeFrame}.png`}
+            alt=""
+            aria-hidden="true"
+            draggable={false}
+            style={{
+              position: "absolute",
+              zIndex: 2,
+              left: "50%",
+              top: "52%",
+              width: "min(570px, 52vw)",
+              transform: "translate(-50%, -50%)",
+              pointerEvents: "none"
+            }}
+          />
+          <button className="magic-entry-orb-button" type="button" onClick={openMagicMemory} aria-label="기억 수정구 열기" disabled={magicEntryStage === "opening"}>
+            <img src="/samunmong/assets/magic-school/intro/rebuilt/memory-orb-v3.png" alt="기억 수정구" draggable={false} />
+            <span>현장 기억 열기</span>
+          </button>
+          {orbTransitionFrame > 0 ? (
+            <img
+              src={`/samunmong/assets/magic-school/intro/orb-transition/orb-transition-0${orbTransitionFrame}.png`}
+              alt=""
+              aria-hidden="true"
+              draggable={false}
+              style={{
+                position: "absolute",
+                zIndex: 12,
+                left: "50%",
+                top: "50%",
+                width: orbTransitionFrame === 1 ? "48vmin" : orbTransitionFrame === 2 ? "82vmin" : "145vmax",
+                height: orbTransitionFrame === 3 ? "145vmax" : "auto",
+                objectFit: "contain",
+                pointerEvents: "none",
+                transform: "translate(-50%, -50%)"
+              }}
+            />
+          ) : null}
+        </section>
+      ) : null}
       {isMagicTheme ? <div className="memory-restore-ritual" aria-hidden="true">
         <span className="memory-beam" />
         <span className="memory-beam-core" />
@@ -442,8 +627,10 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
             <span data-memory-shard="1">숨은 단서</span>
             <span data-memory-shard="2">관계자</span>
           </div> : null}
-          <p className="briefing-kicker">{briefingKicker}</p>
-          <h2>{briefingTitle}</h2>
+          {!isMagicTheme ? <>
+            <p className="briefing-kicker">{briefingKicker}</p>
+            <h2>{briefingTitle}</h2>
+          </> : null}
 
           <div
             className={`briefing-step${activeStep === 0 ? " active" : ""}`}
@@ -452,28 +639,59 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
           >
             {isMagicTheme ? <section className="memory-trace-sequence" data-memory-trace-state="intro" aria-label="사건 잔상 복원">
               <div className="memory-trace-frame">
-                <img src="/samunmong/assets/magic-school/intro/memory-trace/memory-trace-frame.webp" alt="마법학교 방화사건 기억 프레임과 사건 현장" draggable={false} />
-                <div className="memory-trace-photo-zone" data-memory-draw-zone>
-                  <svg className="memory-trace-drawing" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
-                    <path data-memory-draw-path d="" />
-                    <circle data-memory-draw-guide cx="50" cy="50" r="31" />
-                  </svg>
-                  <div className="memory-trace-evidence" aria-hidden="true">
+                <img className="magic-investigation-scene-video" src={magicIncidentScene} alt="실제 게임맵과 같은 제1 연금술 실습실의 화재 당시 현장" draggable={false} />
+                <img
+                  src={`/samunmong/assets/magic-school/briefing/incident-vfx/incident-magic-vfx-0${incidentMagicFrame}.png`}
+                  alt=""
+                  aria-hidden="true"
+                  draggable={false}
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    zIndex: 2,
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "fill",
+                    opacity: 0.08,
+                    pointerEvents: "none"
+                  }}
+                />
+                <header className="memory-trace-heading">
+                  <p>FIRST SCENE INVESTIGATION</p>
+                  <h2>화재 현장을 직접 살펴보십시오</h2>
+                  <span>불길과 얼어붙은 경보 룬, 깨진 수정구를 눌러 남은 마법을 확인하세요.</span>
+                </header>
+                <div className="memory-trace-photo-zone">
+                  <div className="memory-trace-evidence">
                     {memoryTraceEvidence.map((item) => (
-                      <span className={`memory-evidence ${item.className}`} data-memory-evidence key={item.name}>
-                        <span>{item.label}</span>
-                      </span>
+                      <button
+                        className={`memory-evidence ${item.className}`}
+                        type="button"
+                        data-memory-evidence
+                        aria-label={`${item.label} 조사하기`}
+                        key={item.name}
+                      >
+                        <strong className="memory-evidence-observation">{item.label} 조사</strong>
+                        <span className="memory-evidence-observation">눌러서 흔적 확인</span>
+                        <img className="magic-evidence-result-emblem memory-evidence-result" src={item.resultImage} alt="" draggable={false} />
+                        <strong className="memory-evidence-result">{item.result}</strong>
+                        <span className="memory-evidence-result">{item.resultDescription}</span>
+                      </button>
                     ))}
                   </div>
                 </div>
                 <p className="memory-trace-instruction" data-memory-trace-instruction>
-                  지팡이를 이용해 원을 그려 사건의 잔상을 확인하세요.
+                  현장에서 아직 조사하지 않은 물건이 3개 남아 있습니다.
                 </p>
                 <div className="memory-trace-dialog" aria-live="polite">
-                  <p data-memory-trace-copy />
-                  <button type="button" data-memory-trace-continue disabled>
-                    계속하기
-                  </button>
+                  <img src="/samunmong/assets/magic-school/briefing/scene-investigation/new-teacher-briefing-frame-v1.png" alt="" draggable={false} />
+                  <div className="memory-trace-dialog-content">
+                    <span className="memory-trace-dialog-kicker">현장 조사 결과</span>
+                    <p data-memory-trace-copy />
+                    <button type="button" data-memory-trace-continue disabled>
+                      실제 현장으로 이동하기
+                    </button>
+                  </div>
                 </div>
               </div>
             </section> : null}
@@ -537,7 +755,7 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
 
           {isMagicTheme ? (
             <div className="briefing-step" data-briefing-panel="2" aria-hidden="true">
-              <p className="briefing-caption strong">다섯 명의 관계자 기록을 차례로 확인하십시오, 선생님.</p>
+              <p className="briefing-caption strong">세 권의 기록 책을 차례로 펼쳐 보십시오, 선생님.</p>
               <div className="magic-record-intro" data-record-kind="card">
                 <nav className="magic-record-tabs" aria-label="관계자 기록 바로가기">
                   {magicRecordCards.map((record, index) => (
@@ -561,33 +779,69 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
                       data-record-card={index}
                       key={record.name}
                     >
-                      <img
-                        className="magic-record-original-form"
-                        src={record.background}
-                        alt={`${record.kind} 원본 양식`}
-                        draggable={false}
-                      />
-                      <div className={`magic-record-filled-content magic-record-filled-${record.variant}`}>
-                        {record.variant === "student" ? (
-                          <div className="magic-student-index-covers" aria-hidden="true">
-                            <span />
-                            <span />
-                            <span />
-                          </div>
-                        ) : null}
-                        <div className="magic-record-portrait-slot">
-                          <img src={record.portrait} alt={`${record.name} 인물 사진`} draggable={false} />
-                        </div>
-                        <div className="magic-record-identity">
-                          <strong>{record.name}</strong>
-                          <span>{record.role}</span>
-                        </div>
-                        <div className="magic-record-field-copy">
-                          {record.fields.map((field, fieldIndex) => (
-                            <p key={`${record.name}-${fieldIndex}`}>{field}</p>
+                      {index === 1 ? (
+                        <div className="magic-student-ledger" data-magic-student-ledger>
+                          <img className="magic-student-ledger-book" src="/samunmong/assets/magic-school/intro/records/student-record-book-blank-v1.png" alt="펼쳐진 마법학교 학생기록부" draggable={false} />
+                          {magicStudentRecords.map((student, studentIndex) => (
+                            <section
+                              className={`magic-student-record${studentIndex === 0 ? " active" : ""}`}
+                              data-magic-student-record={studentIndex}
+                              aria-hidden={studentIndex !== 0}
+                              key={student.name}
+                            >
+                              <div className="magic-student-portrait-frame">
+                                <img src={student.portrait} alt={`${student.name} 학생 초상`} draggable={false} />
+                              </div>
+                              <header className="magic-student-record-heading">
+                                <p>아르카나 마법학교 학생기록부</p>
+                                <h3>{student.name}</h3>
+                                <span>{student.subtitle}</span>
+                              </header>
+                              <dl className="magic-student-record-fields">
+                                <div><dt>평소 행실</dt><dd>{student.conduct}</dd></div>
+                                <div><dt>특이 사항</dt><dd>{student.notes}</dd></div>
+                                <div><dt>수강 기록</dt><dd>{student.courses}</dd></div>
+                                <div><dt>담임 관찰 기록</dt><dd>{student.memo}</dd></div>
+                              </dl>
+                            </section>
                           ))}
+                          <div className="magic-student-ledger-tabs" aria-label="학생 선택">
+                            {magicStudentRecords.map((student, studentIndex) => (
+                              <button className={studentIndex === 0 ? "active" : ""} type="button" data-magic-student-tab={studentIndex} key={student.name}>{student.name}</button>
+                            ))}
+                          </div>
                         </div>
-                      </div>
+                      ) : index === 2 ? (
+                        <div className="magic-guard-ledger">
+                          <img className="magic-guard-ledger-book" src="/samunmong/assets/magic-school/intro/records/guard-duty-log-blank-v1.png" alt="펼쳐진 마법학교 경비근무일지" draggable={false} />
+                          <div className="magic-guard-portrait-frame">
+                            <img src={magicGuardRecord.portrait} alt={`${magicGuardRecord.name} 경비원 초상`} draggable={false} />
+                          </div>
+                          <div className="magic-guard-id">
+                            <strong>{magicGuardRecord.name}</strong>
+                            <span>{magicGuardRecord.subtitle}</span>
+                          </div>
+                          <header className="magic-guard-heading">
+                            <p>아르카나 마법학교 보안부</p>
+                            <h3>경비근무일지</h3>
+                          </header>
+                          <dl className="magic-guard-fields">
+                            <div><dt>사건 당일 순찰 기록</dt><dd>{magicGuardRecord.duty}</dd></div>
+                            <div><dt>평소 근무 태도</dt><dd>{magicGuardRecord.conduct}</dd></div>
+                            <div><dt>특이 사항</dt><dd>{magicGuardRecord.notes}</dd></div>
+                            <div><dt>참고 진술</dt><dd>{magicGuardRecord.testimony}</dd></div>
+                          </dl>
+                        </div>
+                      ) : (
+                        <img src={record.image} alt={`${record.name} ${record.kind}`} draggable={false} />
+                      )}
+                      {index === 0 ? (
+                        <div className="magic-book-click-zones" aria-label="기록 책 선택">
+                          <button type="button" data-record-card-tab="1" aria-label="학생기록부 펼치기" />
+                          <button type="button" data-record-card-tab="2" aria-label="경비근무일지 펼치기" />
+                          <button type="button" data-record-card-tab="3" aria-label="교직원 기록 펼치기" />
+                        </div>
+                      ) : null}
                     </article>
                   ))}
                   <div className="magic-record-page-controls" aria-label="관계자 기록 넘기기">
@@ -601,23 +855,25 @@ export default function BriefingScreen({ initialTheme }: { initialTheme: GameThe
           ) : null}
 
           <div className="briefing-actions">
-            <button
-              className="briefing-nav"
-              id="briefingPrev"
-              type="button"
-              disabled={!isMagicTheme && activeStep === 0}
-              onClick={!isMagicTheme ? () => setJoseonStep(0) : undefined}
-            >
-              이전
-            </button>
-            <button
-              className="briefing-nav primary"
-              id="briefingNext"
-              type="button"
-              onClick={!isMagicTheme ? () => setJoseonStep(1) : undefined}
-            >
-              다음
-            </button>
+            {!isMagicTheme ? <>
+              <button
+                className="briefing-nav"
+                id="briefingPrev"
+                type="button"
+                disabled={activeStep === 0}
+                onClick={() => setJoseonStep(0)}
+              >
+                이전
+              </button>
+              <button
+                className="briefing-nav primary"
+                id="briefingNext"
+                type="button"
+                onClick={() => setJoseonStep(1)}
+              >
+                다음
+              </button>
+            </> : null}
             <button
               className={isMagicTheme ? "magic-start-case-button" : "briefing-nav"}
               id="startCase"
