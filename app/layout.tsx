@@ -1,7 +1,7 @@
 ﻿import type { Metadata } from "next";
 import "./game.css";
 import "./globals.css";
-import "./magic-hotspot-overrides.css";
+import "./magic-briefing-v2.css";
 
 export const metadata: Metadata = {
   title: "삼운몽: 세 개의 꿈",
