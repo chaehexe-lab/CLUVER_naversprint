@@ -272,8 +272,13 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-orb-copy h
   opacity: 1 !important;
   visibility: visible !important;
   font-family: "NalSun", serif !important;
-  font-size: clamp(34px, 3vw, 48px) !important;
-  line-height: 1.18 !important;
+  max-width: 760px;
+  font-size: clamp(30px, 2.45vw, 42px) !important;
+  line-height: 1.24 !important;
+  word-break: keep-all;
+  font-synthesis: none;
+  text-rendering: geometricPrecision;
+  -webkit-font-smoothing: antialiased;
   text-shadow: 0 4px 18px rgba(0, 0, 0, .9);
 }
 

@@ -403,7 +403,9 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
   const [orbTransitionFrame, setOrbTransitionFrame] = useState(0);
   const [orbSmokeFrame, setOrbSmokeFrame] = useState(1);
   const [incidentMagicFrame, setIncidentMagicFrame] = useState(1);
+  const [investigatedMagicEvidence, setInvestigatedMagicEvidence] = useState<string[]>([]);
   const isMagicTheme = initialTheme === "magicSchool";
+  const isMagicSceneComplete = investigatedMagicEvidence.length === memoryTraceEvidence.length;
 
   useEffect(() => {
     if (!isMagicTheme) return;
@@ -530,6 +532,21 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
     }, 1250);
   };
 
+  const inspectMagicEvidence = (evidenceName: string) => {
+    if (investigatedMagicEvidence.includes(evidenceName)) return;
+    playMagicButtonClick();
+    setInvestigatedMagicEvidence((current) => [...current, evidenceName]);
+  };
+
+  const enterMagicInvestigation = () => {
+    if (!isMagicSceneComplete) return;
+    playMagicButtonClick();
+    window.dispatchEvent(new CustomEvent("samunmong:screen-request", {
+      cancelable: true,
+      detail: { screenId: "magicAlchemyLab" }
+    }));
+  };
+
   return (
     <section className={`screen briefing-screen${active ? " active" : ""}${isMagicTheme ? ` magic-entry-${magicEntryStage}` : ""}`} id="briefingScreen">
       {isMagicTheme && magicEntryStage === "alarm" ? (
@@ -637,7 +654,7 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
             data-briefing-panel="0"
             aria-hidden={activeStep !== 0}
           >
-            {isMagicTheme ? <section className="memory-trace-sequence" data-memory-trace-state="intro" aria-label="사건 잔상 복원">
+            {isMagicTheme ? <section className="memory-trace-sequence" data-memory-trace-state={isMagicSceneComplete ? "complete" : "intro"} aria-label="화재 현장 조사">
               <div className="memory-trace-frame">
                 <img className="magic-investigation-scene-video" src={magicIncidentScene} alt="실제 게임맵과 같은 제1 연금술 실습실의 화재 당시 현장" draggable={false} />
                 <img
@@ -663,13 +680,15 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
                 </header>
                 <div className="memory-trace-photo-zone">
                   <div className="memory-trace-evidence">
-                    {memoryTraceEvidence.map((item) => (
+                    {memoryTraceEvidence.map((item) => {
+                      const isRevealed = investigatedMagicEvidence.includes(item.name);
+                      return (
                       <button
-                        className={`memory-evidence ${item.className}`}
+                        className={`memory-evidence ${item.className}${isRevealed ? " revealed" : ""}`}
                         type="button"
-                        data-memory-evidence
                         aria-label={`${item.label} 조사하기`}
                         key={item.name}
+                        onClick={() => inspectMagicEvidence(item.name)}
                       >
                         <strong className="memory-evidence-observation">{item.label} 조사</strong>
                         <span className="memory-evidence-observation">눌러서 흔적 확인</span>
@@ -677,18 +696,26 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
                         <strong className="memory-evidence-result">{item.result}</strong>
                         <span className="memory-evidence-result">{item.resultDescription}</span>
                       </button>
-                    ))}
+                    )})}
                   </div>
                 </div>
-                <p className="memory-trace-instruction" data-memory-trace-instruction>
-                  현장에서 아직 조사하지 않은 물건이 3개 남아 있습니다.
+                <p className="memory-trace-instruction">
+                  {isMagicSceneComplete
+                    ? "세 물건에서 서로 다른 마법 사용 흔적이 확인되었습니다."
+                    : `현장에서 아직 조사하지 않은 물건이 ${memoryTraceEvidence.length - investigatedMagicEvidence.length}개 남아 있습니다.`}
                 </p>
                 <div className="memory-trace-dialog" aria-live="polite">
                   <img src="/samunmong/assets/magic-school/briefing/scene-investigation/new-teacher-briefing-frame-v1.png" alt="" draggable={false} />
                   <div className="memory-trace-dialog-content">
                     <span className="memory-trace-dialog-kicker">현장 조사 결과</span>
-                    <p data-memory-trace-copy />
-                    <button type="button" data-memory-trace-continue disabled>
+                    <p>
+                      {isMagicSceneComplete ? <>
+                        불길에서는 강한 화염 마력이 검출되었습니다.<br />
+                        작동하지 않은 경보 룬에는 빙결 마력이, 깨진 수정구에는 환각 마력이 남아 있습니다.<br />
+                        서로 다른 세 마법이 한 현장에 남은 이유를 조사해야 합니다.
+                      </> : null}
+                    </p>
+                    <button type="button" disabled={!isMagicSceneComplete} onClick={enterMagicInvestigation}>
                       실제 현장으로 이동하기
                     </button>
                   </div>
