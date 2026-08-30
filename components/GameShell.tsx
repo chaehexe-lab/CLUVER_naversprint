@@ -32,7 +32,7 @@ import {
 } from "@/lib/gameTheme";
 
 const CONTENT_SCRIPT = "/samunmong/content.js?v=20260824-evidence-scene-v3";
-const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260830-magic-intro-audio-v131";
+const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260830-backgate-order-v1";
 const MAIN_SCREEN = "mainScreen";
 
 const INVESTIGATION_SCENE_COMPONENTS: Record<string, ComponentType> = {
