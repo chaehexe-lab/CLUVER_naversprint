@@ -1566,7 +1566,7 @@
     // Collected evidence tooltip offsets: +x right, -x left, +y down, -y up.
     const collectedEvidenceTooltipOffsets = {
       "엔지니어 공구 클램프": { x: -10, y: 30 },
-      "추진 레버 결빙 기록": { x: 60, y: 60 },
+      "EVA 지원 단말기": { x: 60, y: 60 },
       "마지막 무전 기록": { x: -130, y: 95 },
       "소독천과 장갑": { x: 40, y: 35 },
       "삭제된 의료 기록": { x: -32, y: 30 },
@@ -1632,12 +1632,13 @@
     }
 
     const detailedSpaceEvidence = {
-      "추진 레버 결빙 기록": {
-        kicker: "ORBIT-13 · EQUIPMENT DIAGNOSTIC",
-        title: "추진 레버 결빙 기록",
-        image: "/assets/space-station/evidence/thruster-freeze-record-detail.webp",
-        imageAlt: "정면에서 본 추진 레버 결빙 진단 화면",
-        description: "데이비드의 우주복에서 전송된 마지막 장비 진단 화면이다. 비상 추진 레버 연결부가 정체불명의 투명한 결빙 물질로 뒤덮여 있다. 레버 작동 신호는 입력됐지만 추진 가스 밸브는 열리지 않았다. 기록만으로는 결빙 물질의 정확한 성분을 확인할 수 없다."
+      "EVA 지원 단말기": {
+        kicker: "ORBIT-13 · EVA SUPPORT TERMINAL",
+        title: "EVA 지원 단말기",
+        image: "/assets/space-station/evidence/eva-support-terminal.png",
+        imageAlt: "검은 화면의 EVA 지원 단말기",
+        description: "외부 작업용 우주복의 점검 및 상태 기록을 확인할 수 있습니다.",
+        evaRecordMenu: true
       },
       "엔지니어 공구 클램프": {
         kicker: "ORBIT-13 · TOOL RETURN LOG",
@@ -1648,7 +1649,7 @@
         items: [
           "사용 목적: 우주복 점검",
           "공구함 반납 시각: OST 21:37",
-          "마지막 사용자 ID: ORBIT-13-MNT-0821",
+          "마지막 사용자 ID: ORBIT-13-ENG-0821",
           "점검 결과: 실내 작동 점검 정상"
         ]
       },
@@ -1761,6 +1762,66 @@
       }
     };
 
+    const spaceEvaRecords = {
+      preflight: {
+        title: "출발 전 점검 기록",
+        lead: "외부 작업을 시작하기 전 실시한 데이비드의 우주복 점검 내역이다.",
+        items: [
+          "점검 완료: OST 21:37",
+          "담당자 ID: ORBIT-13-ENG-0821",
+          "산소 공급 장치: 정상",
+          "비상 추진 장치: 실내 작동 정상"
+        ]
+      },
+      remote: {
+        title: "마지막 원격 진단 기록",
+        lead: "데이비드의 우주복에서 전송된 마지막 장비 진단 기록이다.",
+        items: [
+          "기록 시각: OST 22:22",
+          "산소 공급 장치: 공급량 급감",
+          "비상 추진 장치: 작동 불가",
+          "추진 레버 연결부: 정체를 알 수 없는 투명 물질이 굳어 있음"
+        ]
+      }
+    };
+
+    function setSpaceEvaRecordDialog(open, recordId) {
+      const dialog = document.querySelector("#spaceEvaRecordDialog");
+      if (!dialog) return;
+      if (open) {
+        const record = spaceEvaRecords[recordId];
+        if (!record) return;
+        const title = dialog.querySelector("#spaceEvaRecordTitle");
+        const lead = dialog.querySelector("#spaceEvaRecordLead");
+        const items = dialog.querySelector("#spaceEvaRecordItems");
+        if (title) title.textContent = record.title;
+        if (lead) lead.textContent = record.lead;
+        if (items) {
+          items.replaceChildren();
+          record.items.forEach((item) => {
+            const row = document.createElement("p");
+            const separatorIndex = item.indexOf(":");
+            row.append(document.createTextNode(`▪ ${item.slice(0, separatorIndex + 1)} `));
+            const value = document.createElement("strong");
+            value.textContent = item.slice(separatorIndex + 1).trim();
+            row.appendChild(value);
+            items.appendChild(row);
+          });
+        }
+      }
+      dialog.classList.toggle("show", open);
+      dialog.setAttribute("aria-hidden", String(!open));
+      if (open) dialog.querySelector("#closeSpaceEvaRecord")?.focus();
+    }
+
+    function setSpaceEvaSupportHelp(open) {
+      const trigger = document.querySelector("#spaceEvaSupportHelpTrigger");
+      const tooltip = document.querySelector("#spaceEvaSupportHelpTooltip");
+      if (!trigger || !tooltip) return;
+      trigger.setAttribute("aria-expanded", String(open));
+      tooltip.hidden = !open;
+    }
+
     function hasSpacePowerAccessCard() {
       return isSpaceTheme && readStoredNames(collectedEvidenceKey).includes(spacePowerAccessCardName);
     }
@@ -1862,6 +1923,20 @@
     }
 
     window.addEventListener("samunmong:space-power-access-request", requestSpacePowerAccess);
+    const spacePowerAccessHelp = document.querySelector(".space-power-access-help");
+    spacePowerAccessHelp?.addEventListener("pointerenter", () => setSpacePowerAccessHelp(true));
+    spacePowerAccessHelp?.addEventListener("pointerleave", () => setSpacePowerAccessHelp(false));
+    spacePowerAccessHelp?.addEventListener("focusin", () => setSpacePowerAccessHelp(true));
+    spacePowerAccessHelp?.addEventListener("focusout", (event) => {
+      if (!spacePowerAccessHelp.contains(event.relatedTarget)) setSpacePowerAccessHelp(false);
+    });
+    const spaceEvaSupportHelp = document.querySelector("#spaceEvaSupportHelp");
+    spaceEvaSupportHelp?.addEventListener("pointerenter", () => setSpaceEvaSupportHelp(true));
+    spaceEvaSupportHelp?.addEventListener("pointerleave", () => setSpaceEvaSupportHelp(false));
+    spaceEvaSupportHelp?.addEventListener("focusin", () => setSpaceEvaSupportHelp(true));
+    spaceEvaSupportHelp?.addEventListener("focusout", (event) => {
+      if (!spaceEvaSupportHelp.contains(event.relatedTarget)) setSpaceEvaSupportHelp(false);
+    });
     document.addEventListener("pointermove", (event) => {
       const cursor = spacePowerAccessCardHeld
         ? document.querySelector("#spacePowerAccessCursor")
@@ -1919,6 +1994,8 @@
         const contractForm = panel.querySelector("#spaceContractDecryptionForm");
         const recoveredRecord = panel.querySelector("#spaceMedicalRecoveredRecord");
         const structuredRecord = panel.querySelector("#spaceEvidenceStructuredRecord");
+        const evaRecordMenu = panel.querySelector("#spaceEvaRecordMenu");
+        const evaSupportHelp = panel.querySelector("#spaceEvaSupportHelp");
         const recoveryError = panel.querySelector("#spaceMedicalRecoveryError");
         const contractError = panel.querySelector("#spaceContractDecryptionError");
         if (image) {
@@ -1986,7 +2063,10 @@
             structuredRecord.appendChild(footer);
           }
         }
+        if (evaRecordMenu) evaRecordMenu.hidden = !detail.evaRecordMenu;
+        if (evaSupportHelp) evaSupportHelp.hidden = !detail.evaRecordMenu;
         const recovered = detail.requiresRecovery && localStorage.getItem(spaceMedicalRecordRecoveryKey) === "1";
+        panel.classList.toggle("medical-record-recovered", Boolean(recovered));
         if (recoveryForm) {
           recoveryForm.hidden = !detail.requiresRecovery || recovered;
           if (detail.requiresRecovery && !recovered) recoveryForm.reset();
@@ -2004,6 +2084,10 @@
       overlay.classList.toggle("show", open);
       panel.setAttribute("aria-hidden", String(!open));
       overlay.setAttribute("aria-hidden", String(!open));
+      if (!open) {
+        setSpaceEvaRecordDialog(false);
+        setSpaceEvaSupportHelp(false);
+      }
       if (open) {
         hideCollectedEvidenceTooltip();
         const focusTarget = panel.querySelector("#spaceContractDecryptionForm:not([hidden]) input")
@@ -2062,6 +2146,7 @@
       localStorage.setItem(spaceMedicalRecordRecoveryKey, "1");
       form.hidden = true;
       if (recoveredRecord) recoveredRecord.hidden = false;
+      document.querySelector("#spaceEvidenceDetail")?.classList.add("medical-record-recovered");
       if (error) error.textContent = "";
       playSfx("evidence", 0.5);
     });
@@ -2550,7 +2635,7 @@
       "/samunmong/assets/magic-school/interrogation/malpoil.webp"
     ];
     const spaceThemeStartAssets = [
-      "/assets/space-station/backgrounds/orbit-13-airlock-evidence-v4.webp",
+      "/assets/space-station/backgrounds/orbit-13-airlock-eva-terminal.png",
       "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp",
       "/assets/space-station/backgrounds/medical-bay-evidence-v2.webp",
       "/assets/space-station/backgrounds/oxygen-generator-evidence-v2.webp",
@@ -6909,6 +6994,7 @@
 
       if (!target.closest(".space-power-access-help")) {
         setSpacePowerAccessHelp(false);
+        setSpaceEvaSupportHelp(false);
       }
 
       if (target.closest("#closeSpaceAnalysis, #spaceAnalysisOverlay")) {
@@ -6923,13 +7009,6 @@
 
       if (target.closest("#closeSpacePowerAccess, #spacePowerAccessOverlay")) {
         setSpacePowerAccessPanel(false);
-        return;
-      }
-
-      if (target.closest("#spacePowerAccessHelpTrigger")) {
-        const trigger = document.querySelector("#spacePowerAccessHelpTrigger");
-        setSpacePowerAccessHelp(trigger?.getAttribute("aria-expanded") !== "true");
-        playSfx("buttonAlt", 0.42);
         return;
       }
 
@@ -6964,6 +7043,25 @@
       if (analysisDevice) {
         setSpaceAnalysisPanel(true);
         playSfx("buttonAlt", 0.48);
+        return;
+      }
+
+      if (target.closest("#spaceEvaSupportHelpTooltip")) {
+        setSpaceEvidenceDetail(false);
+        closeGlobalPanel();
+        go("interrogationScreen", "점검 담당자를 심문하러 이동 중...");
+        return;
+      }
+
+      const evaRecordButton = target.closest("[data-eva-record]");
+      if (evaRecordButton) {
+        setSpaceEvaRecordDialog(true, evaRecordButton.dataset.evaRecord);
+        playSfx("buttonAlt", 0.48);
+        return;
+      }
+
+      if (target.closest("#closeSpaceEvaRecord")) {
+        setSpaceEvaRecordDialog(false);
         return;
       }
 

@@ -818,12 +818,38 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             </div>
             <div className="space-evidence-detail-copy">
               <span id="spaceEvidenceDetailKicker">ORBIT-13 · EQUIPMENT DIAGNOSTIC</span>
-              <h2 id="spaceEvidenceDetailTitle">추진 레버 결빙 기록</h2>
-              <p id="spaceEvidenceDetailDescription">
-                데이비드의 우주복에서 전송된 마지막 장비 진단 화면이다. 비상 추진 레버 연결부가
-                정체불명의 투명한 결빙 물질로 뒤덮여 있다. 레버 작동 신호는 입력됐지만 추진 가스
-                밸브는 열리지 않았다. 기록만으로는 결빙 물질의 정확한 성분을 확인할 수 없다.
-              </p>
+              <h2 id="spaceEvidenceDetailTitle">EVA 지원 단말기</h2>
+              <div className="space-evidence-description-row">
+                <p id="spaceEvidenceDetailDescription">
+                  외부 작업용 우주복의 점검 및 상태 기록을 확인할 수 있습니다.
+                </p>
+                <div className="space-power-access-help space-eva-support-help" id="spaceEvaSupportHelp" hidden>
+                  <button
+                    className="space-power-access-help-trigger"
+                    id="spaceEvaSupportHelpTrigger"
+                    type="button"
+                    aria-label="점검 담당자에게 질문하기"
+                    aria-controls="spaceEvaSupportHelpTooltip"
+                    aria-expanded="false"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        className="space-power-access-bulb-body"
+                        d="M12 2.5a6.2 6.2 0 0 0-3.92 11c.78.65 1.17 1.3 1.17 2.16v.64h5.5v-.64c0-.86.39-1.51 1.17-2.16A6.2 6.2 0 0 0 12 2.5Z"
+                      />
+                      <rect className="space-power-access-bulb-base" x="8.75" y="15.2" width="6.5" height="6.3" rx="1.35" />
+                      <rect className="space-power-access-bulb-hole" x="10.65" y="17.35" width="2.7" height="2.25" rx=".45" />
+                    </svg>
+                  </button>
+                  <button className="space-power-access-help-tooltip" id="spaceEvaSupportHelpTooltip" type="button" hidden>
+                    점검 담당자에게 질문하기
+                  </button>
+                </div>
+              </div>
+              <div className="space-eva-record-menu" id="spaceEvaRecordMenu" hidden>
+                <button type="button" data-eva-record="preflight">출발 전 점검 기록</button>
+                <button type="button" data-eva-record="remote">마지막 원격 진단 기록</button>
+              </div>
               <div
                 className="space-medical-recovered-record"
                 id="spaceEvidenceStructuredRecord"
@@ -863,12 +889,74 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
                 <p className="space-medical-recovery-error" id="spaceMedicalRecoveryError" role="alert" />
               </form>
               <div className="space-medical-recovered-record" id="spaceMedicalRecoveredRecord" aria-live="polite" hidden>
-                <p>▪ 투약 시각: OST 21:52</p>
-                <p>▪ 환자: 데이비드</p>
-                <p>▪ 담당 의사: 메르스</p>
-                <p>▪ 삭제 시각: OST 22:31</p>
+                <div className="space-medical-record-table-wrap">
+                  <table className="space-medical-record-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">시점</th>
+                        <th scope="col">대원</th>
+                        <th scope="col">진료 내용</th>
+                        <th scope="col">처리 결과</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>사건 12일 전</td>
+                        <td>데이비드</td>
+                        <td>근육 피로 및 손 떨림</td>
+                        <td>근육 재생제 처방</td>
+                      </tr>
+                      <tr>
+                        <td>사건 8일 전</td>
+                        <td>데이비드</td>
+                        <td>근력 저하 및 심박 증가</td>
+                        <td>근육 재생제 처방</td>
+                      </tr>
+                      <tr>
+                        <td>사건 6일 전</td>
+                        <td>아인슈페너</td>
+                        <td>방사선 노출 정기검사</td>
+                        <td>이상 없음</td>
+                      </tr>
+                      <tr>
+                        <td>사건 4일 전</td>
+                        <td>데이비드</td>
+                        <td>가슴 두근거림 및 근육 경련</td>
+                        <td>근육 재생제 처방</td>
+                      </tr>
+                      <tr>
+                        <td>사건 2일 전</td>
+                        <td>알라딘딘</td>
+                        <td>손목 염좌</td>
+                        <td>진통제 처방</td>
+                      </tr>
+                      <tr>
+                        <td>사건 당일 21:52</td>
+                        <td>데이비드</td>
+                        <td>외부 작업 전 의료 처치</td>
+                        <td>근육 재생제 처방</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
+          </aside>
+          <aside
+            className="space-eva-record-dialog"
+            id="spaceEvaRecordDialog"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="spaceEvaRecordTitle"
+            aria-hidden="true"
+          >
+            <button className="space-evidence-detail-close" id="closeSpaceEvaRecord" type="button" aria-label="EVA 기록 닫기">
+              ×
+            </button>
+            <span>ORBIT-13 · EVA SUPPORT TERMINAL</span>
+            <h2 id="spaceEvaRecordTitle">출발 전 점검 기록</h2>
+            <p id="spaceEvaRecordLead" />
+            <div className="space-eva-record-items" id="spaceEvaRecordItems" />
           </aside>
           <div className="space-analysis-overlay" id="spaceAnalysisOverlay" aria-hidden="true" />
           <aside

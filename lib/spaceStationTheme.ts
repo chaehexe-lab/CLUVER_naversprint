@@ -25,11 +25,11 @@ export const spaceStationTheme = {
   suspects: [
     { id: "harry", name: "해리", role: "데이터/통신 담당", authId: "ORBIT-13-DAT-0319", scene: room, sprite: "/assets/space-station/characters/harry-upper-transparent.webp", sleeveScene: "/assets/space-station/characters/harry-upper-transparent.webp", resultImage: "/assets/space-station/characters/harry-upper.webp", resultLayout: { slot: { left: "13.22%", top: "38.5%", width: "13.5%", height: "30%" }, nameLeft: "19.9%", stampLeft: "23.8%", offsetX: "0%" }, hiddenTruth: "21시 43분경 메르스에게 키카드를 빌려줬다." },
     { id: "mers", name: "메르스", role: "주치의", authId: "ORBIT-13-MED-0427", scene: room, sprite: "/assets/space-station/characters/mers-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/mers-upper-aligned.webp", resultImage: "/assets/space-station/characters/mers-upper.webp", resultLayout: { slot: { left: "32.78%", top: "37%", width: "13.5%", height: "31%" }, nameLeft: "39.5%", stampLeft: "43.4%", offsetX: "0%" }, hiddenTruth: "불법 임상시험과 약물 부작용을 숨기고 연구 보상과 우선 귀환 특혜를 지키려 데이비드를 살해했다." },
-    { id: "aladdindin", name: "알라딘딘", role: "외부 작업 장비 담당 엔지니어", authId: "ORBIT-13-MNT-0821", scene: room, sprite: "/assets/space-station/characters/aladdindin-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/aladdindin-upper-aligned.webp", resultImage: "/assets/space-station/characters/aladdindin-upper.webp", resultLayout: { slot: { left: "52.57%", top: "37.8%", width: "13.5%", height: "30.4%" }, nameLeft: "59.3%", stampLeft: "63.2%", offsetX: "0%" }, hiddenTruth: "22시 11분경 에어록 근처에서 메르스의 수상한 무전을 들었다." },
+    { id: "aladdindin", name: "알라딘딘", role: "외부 작업 장비 담당 엔지니어", authId: "ORBIT-13-ENG-0821", scene: room, sprite: "/assets/space-station/characters/aladdindin-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/aladdindin-upper-aligned.webp", resultImage: "/assets/space-station/characters/aladdindin-upper.webp", resultLayout: { slot: { left: "52.57%", top: "37.8%", width: "13.5%", height: "30.4%" }, nameLeft: "59.3%", stampLeft: "63.2%", offsetX: "0%" }, hiddenTruth: "22시 11분경 에어록 근처에서 메르스의 수상한 무전을 들었다." },
     { id: "einspanner", name: "아인슈페너", role: "화학 실험 담당 과학자", authId: "ORBIT-13-SCI-0516", scene: room, sprite: "/assets/space-station/characters/einspanner-upper-aligned.webp", sleeveScene: "/assets/space-station/characters/einspanner-upper-aligned.webp", resultImage: "/assets/space-station/characters/einspanner-upper.webp", resultLayout: { slot: { left: "72.01%", top: "38.2%", width: "13.5%", height: "30%" }, nameLeft: "78.7%", stampLeft: "82.6%", offsetX: "0%" }, hiddenTruth: "21시 47분경 메르스가 약물 냉각 보관함을 의료실로 운반하는 모습을 목격했다." }
   ],
   locations: [
-    { id: "spaceAirlock", name: "에어록", map: { x: "50.1%", y: "17%", labelY: "26.4%" }, indicator: { x: "50%", y: "14%" }, image: "/assets/space-station/backgrounds/orbit-13-airlock-evidence-v4.webp", alt: "오르빗-13 에어록과 외부 작업 사고 현장" },
+    { id: "spaceAirlock", name: "에어록", map: { x: "50.1%", y: "17%", labelY: "26.4%" }, indicator: { x: "50%", y: "14%" }, image: "/assets/space-station/backgrounds/orbit-13-airlock-eva-terminal.png", alt: "검은 화면의 EVA 지원 단말기가 설치된 오르빗-13 에어록" },
     { id: "spaceMedicalBay", name: "의료실", map: { x: "28.5%", y: "33%", labelY: "43.4%" }, indicator: { x: "29%", y: "31%" }, image: "/assets/space-station/backgrounds/medical-bay-evidence-v2.webp", alt: "오르빗-13 의료실" },
     { id: "spaceOxygenGenerator", name: "전력 제어실", map: { x: "71.9%", y: "33%", labelY: "43.4%" }, indicator: { x: "72%", y: "31%" }, image: "/assets/space-station/backgrounds/oxygen-generator-motion-base-v1.webp", alt: "오르빗-13 전력 제어실" },
     { id: "spaceDataCore", name: "데이터실", map: { x: "28.5%", y: "63.5%", labelY: "73.5%" }, indicator: { x: "29%", y: "61%" }, image: "/assets/space-station/backgrounds/data-core-evidence-v2.webp", alt: "오르빗-13 데이터실" },
@@ -38,7 +38,7 @@ export const spaceStationTheme = {
   ],
   evidence: {
     "엔지니어 공구 클램프": { role: "무혐의 증거", location: "에어록", note: "공구함 반납 기록을 확인할 수 있다.", logic: "알라딘딘이 장비를 조작했다는 의혹을 약화한다.", relatedSuspects: ["알라딘딘"], img: "/assets/space-station/evidence/engineer-tool-clamp.webp" },
-    "추진 레버 결빙 기록": { role: "수법 증거", location: "에어록", note: "데이비드의 우주복 원격 진단 기록을 확인할 수 있다.", logic: "추진 레버는 데이비드와 함께 표류했지만 관제 기록을 통해 결빙 시점과 작동 불능 상태를 확인할 수 있다.", relatedSuspects: ["메르스", "알라딘딘"], img: "/assets/space-station/evidence/control-terminal.webp" },
+    "EVA 지원 단말기": { role: "수법 증거", location: "에어록", note: "외부 작업용 우주복의 점검 및 상태 기록을 확인할 수 있다.", logic: "출발 전에는 정상이었던 산소 공급 장치와 비상 추진 장치가 외부 작업 중 비정상 상태로 바뀐 사실을 보여준다.", relatedSuspects: ["메르스", "알라딘딘"], img: "/assets/space-station/evidence/eva-support-terminal.png" },
     "마지막 무전 기록": { role: "결정타 증거", location: "에어록", note: "사건 당시 데이비드가 송신한 무전 기록을 시간순으로 확인할 수 있다.", logic: "메르스가 구조 요청을 받고도 채널을 차단했다.", relatedSuspects: ["데이비드", "메르스"], img: "/assets/space-station/evidence/final-radio-log.webp" },
     "소독천과 장갑": { role: "연결 증거", location: "의료실", note: "흰 소독천과 수술용 장갑에 투명 젤 성분이 남아 있다.", cardNote: "흰 소독천과 수술용 장갑에 정체를 알 수 없는 물질이 묻어 있다.", logic: "추진 레버를 막은 젤과 의료실을 연결한다.", relatedSuspects: ["메르스"], img: "/assets/space-station/evidence/disinfectant-cloth-glove.webp" },
     "삭제된 의료 기록": { role: "동기 증거", location: "의료실", note: "데이비드의 의료 기록 일부가 삭제되었다.", logic: "불법 임상시험과 약물 부작용 은폐를 보여준다.", relatedSuspects: ["해리", "메르스", "데이비드"], img: "/assets/space-station/evidence/deleted-medical-record.webp" },
@@ -50,7 +50,7 @@ export const spaceStationTheme = {
     "혈액 시료 분석 기록": { role: "불법 투약 추적 증거", location: "과학 실험실", note: "데이비드가 사건 전날 과학 실험실에 맡긴 혈액 시료의 분석 기록이다.", logic: "데이비드가 미승인 약물 투여 사실을 알아내고 관련 자료를 직접 조사하기 시작했음을 보여준다.", relatedSuspects: ["데이비드", "아인슈페너", "메르스"], img: "/assets/space-station/evidence/blood-sample-analysis-report.png" },
     "미승인 약물 앰풀": { role: "위장 및 동기 증거", location: "과학 실험실", note: "삭제된 투약 기록과 같은 제조 코드가 남은 파란 근육 재생 약물 앰풀.", cardNote: "정식 의료 목록에 등록되지 않은 청색 약물 앰풀. 일부가 사용된 상태다.", logic: "메르스가 불법 약물을 숨기고 아인슈페너에게 책임을 씌우려 했다.", relatedSuspects: ["메르스", "아인슈페너"], img: "/assets/space-station/evidence/unauthorized-drug-ampoule.webp" }
   },
-  requiredEvidence: ["추진 레버 결빙 기록", "조작된 전압 센서", "비인가 지연 타이머", "삭제된 의료 기록", "접속 키카드 칩", "암호화된 파일", "마지막 무전 기록"],
+  requiredEvidence: ["EVA 지원 단말기", "조작된 전압 센서", "비인가 지연 타이머", "삭제된 의료 기록", "접속 키카드 칩", "암호화된 파일", "마지막 무전 기록"],
   deductionRoute: ["외벽 장비 담당 알라딘딘이 먼저 의심받는다.", "약물 앰풀 때문에 아인슈페너가 의심받는다.", "삭제 로그 때문에 해리가 의심받는다.", "산소 복구 과정에서 사고가 예약 실행됐음이 드러난다.", "심문과 의료실 증거가 메르스의 행동을 완성한다.", "최종 지목은 메르스다."]
 } as const;
 
@@ -65,7 +65,7 @@ const dock = [
 const hotspots: Record<string, SceneHotspot[]> = {
   spaceAirlock: [
     { evidenceName: "엔지니어 공구 클램프", ariaLabel: "엔지니어 공구 클램프 조사", x: "30.9%", y: "87.8%", w: "11%", h: "10%", clipPath: "polygon(2% 36%, 85% 12%, 98% 68%, 18% 96%)", radius: "999px", rot: "5deg" },
-    { evidenceName: "추진 레버 결빙 기록", ariaLabel: "추진 레버 결빙 기록 조사", x: "61.5%", y: "40.5%", w: "7%", h: "17%", clipPath: "polygon(8% 4%, 92% 4%, 96% 94%, 4% 96%)", radius: "12px", rot: "0deg" },
+    { evidenceName: "EVA 지원 단말기", ariaLabel: "EVA 지원 단말기 조사", x: "61.5%", y: "40.5%", w: "7%", h: "17%", clipPath: "polygon(8% 4%, 92% 4%, 96% 94%, 4% 96%)", radius: "12px", rot: "0deg" },
     { evidenceName: "마지막 무전 기록", ariaLabel: "마지막 무전 기록 조사", x: "96.5%", y: "35.4%", w: "7%", h: "17%", clipPath: "polygon(12% 4%, 88% 8%, 98% 92%, 4% 96%)", radius: "14px", rot: "0deg" }
   ],
   spaceMedicalBay: [
@@ -101,7 +101,7 @@ export const spaceStationMap = { image: spaceStationTheme.assets.map, alt: "중�
 
 export const spaceStationInterrogationCopy = { map: spaceStationTheme.ui.map, note: spaceStationTheme.ui.conversationLog, noteKicker: "심문 기록", noteLead: "대원별 질문과 답변을 심문 기록에서 확인합니다.", journal: spaceStationTheme.ui.briefing, bag: spaceStationTheme.ui.inventory, tools: "추가 분석", toolKicker: "분석 기록", toolTitle: "추가 분석", suspects: spaceStationTheme.suspects.map(({ id, name }) => ({ id, name })) };
 
-export const spaceStationResultSuspects = spaceStationTheme.suspects.map((suspect) => ({ id: suspect.id, name: suspect.name, image: suspect.resultImage, ...suspect.resultLayout }));
+export const spaceStationResultSuspects = spaceStationTheme.suspects.map((suspect) => ({ id: suspect.id, name: suspect.name, role: suspect.role, image: suspect.resultImage, ...suspect.resultLayout }));
 
 export const spaceStationRuntimeConfig = {
   title: spaceStationTheme.title,
