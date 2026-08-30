@@ -176,6 +176,7 @@ export function getMagicSchoolFallbackDialogue(
     if (hasEvidence("부러진 지팡이")) {
       return "제 지팡이가 맞습니다. 하지만 사건 전에 이미 부러져서 기숙사 폐기함에 버렸습니다. 누가 다시 가져갔는지는 모릅니다.";
     }
+    return "사건 당시에는 기숙사에서 다음 날 수업을 준비하고 있었습니다. 제 지팡이가 현장에서 나왔다고 해서 제가 불을 지른 것은 아닙니다.";
   }
 
   if (suspectId === "malposam") {
@@ -188,6 +189,7 @@ export function getMagicSchoolFallbackDialogue(
       }
       return "죄송합니다. 수정구에 환각 마법을 건 것은 저입니다. 하지만 방화를 숨기려던 일인 줄은 몰랐습니다.";
     }
+    return "사건 당시에는 기록 수정구실 근처에 있었습니다. 저는 방화에 관해서는 아는 것이 없습니다, 선생님.";
   }
 
   if (suspectId === "malpoil") {
@@ -200,6 +202,7 @@ export function getMagicSchoolFallbackDialogue(
     if (hasEvidence("도서관 대출 기록부")) {
       return "제가 빌린 책이 맞습니다. 시험을 준비하려고 읽었을 뿐입니다.";
     }
+    return "사건 당시에는 도서관에서 공부한 뒤 곧바로 기숙사로 돌아갔습니다. 제 행동은 모두 수업과 시험을 준비하기 위한 것이었습니다.";
   }
 
   if (suspectId === "dunguldoor") {
@@ -209,6 +212,7 @@ export function getMagicSchoolFallbackDialogue(
     if (hasEvidence("도서관 대출 기록부") || hasEvidence("빙결 흔적이 남은 반납 도서")) {
       return "보안 마법책에는 경보 룬스톤을 멈추는 방법이 적혀 있습니다. 다만 그 책을 빌린 이름은 제가 아니니 대출 기록을 직접 확인해 보십시오.";
     }
+    return "사건 당시에는 실습실 옆 청소도구함에 있었습니다. 그곳에 간 까닭은 지금 말씀드리기 어렵지만, 학생에게 책임을 떠넘길 생각은 없습니다.";
   }
 
   return null;

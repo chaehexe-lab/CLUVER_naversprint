@@ -350,7 +350,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             <input
               id="questionInput"
               type="text"
-              placeholder={isMagicTheme ? "NPC에게 질문을 입력하세요. Enter를 눌러 바로 보낼 수 있습니다." : "용의자에게 질문을 입력하세요. 필요하면 증거를 함께 제시할 수 있습니다."}
+              placeholder={isMagicTheme ? "용의자에게 질문을 입력하세요. Enter를 눌러 바로 보낼 수 있습니다." : "용의자에게 질문을 입력하세요. 필요하면 증거를 함께 제시할 수 있습니다."}
             />
             <button className="ask" id="askButton" type="button">
               질문

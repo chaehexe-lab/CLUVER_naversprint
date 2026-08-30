@@ -766,7 +766,7 @@
         input.placeholder = exhausted
           ? "취조 가능한 질문 횟수를 모두 사용했습니다."
           : isMagicTheme
-            ? "NPC에게 질문을 입력하세요. Enter를 눌러 바로 보낼 수 있습니다."
+            ? "용의자에게 질문을 입력하세요. Enter를 눌러 바로 보낼 수 있습니다."
             : "용의자에게 질문을 입력하세요. 필요하면 증거를 함께 제시할 수 있습니다.";
       }
       if (askButton && !isAskingAi) {
@@ -7803,6 +7803,7 @@
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            themeId,
             suspectId: suspect.id,
             userMessage: question,
             presentedEvidenceNames: selectedEvidence ? [selectedEvidence] : [],
