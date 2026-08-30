@@ -36,6 +36,8 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence.illusi
   position: absolute !important;
   inset: auto !important;
   width: clamp(130px, 11vw, 180px) !important;
+  height: clamp(130px, 11vw, 180px) !important;
+  max-height: clamp(130px, 11vw, 180px) !important;
   min-width: 0 !important;
   min-height: clamp(130px, 11vw, 180px) !important;
   display: block !important;
@@ -88,6 +90,8 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence:focus-
 
 html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence.revealed {
   width: clamp(220px, 20vw, 310px) !important;
+  height: 250px !important;
+  max-height: 250px !important;
   min-height: 250px !important;
   display: flex !important;
   padding: 12px 14px 18px !important;
@@ -98,6 +102,7 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen .memory-evidence.reveal
   background: radial-gradient(circle, rgba(20, 14, 24, .82), rgba(7, 5, 9, .4) 68%, transparent 76%) !important;
   transform: translate(-50%, -50%) !important;
   animation: none !important;
+  pointer-events: none !important;
 }
 
 html[data-samunmong-theme="magicSchool"] #briefingScreen [data-memory-trace-copy] {
