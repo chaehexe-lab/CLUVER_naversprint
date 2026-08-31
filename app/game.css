@@ -22367,6 +22367,22 @@ html[data-samunmong-theme="joseon"] .scene-object-comment-hitbox {
   cursor: help !important;
 }
 
+html[data-samunmong-theme="spaceStation"] .scene-object-comment-hitbox {
+  cursor: help !important;
+}
+
+html[data-samunmong-theme="spaceStation"] .scene-object-comment {
+  border-color: rgba(143, 206, 235, .54);
+  color: #eaf8ff;
+  background:
+    linear-gradient(180deg, rgba(23, 45, 60, .95), rgba(8, 19, 29, .97));
+  box-shadow:
+    0 12px 34px rgba(0, 0, 0, .6),
+    0 0 22px rgba(78, 170, 211, .16),
+    inset 0 0 0 1px rgba(210, 241, 255, .07);
+  font-family: "Pretendard", "Noto Sans KR", sans-serif;
+}
+
 html[data-samunmong-theme="joseon"] .hotspot.concealed-space-hotspot:not(:disabled),
 html[data-samunmong-theme="joseon"] .hotspot.concealed-space-hotspot.collected {
   cursor: zoom-in !important;
