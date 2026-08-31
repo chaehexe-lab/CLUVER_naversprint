@@ -1,6 +1,7 @@
 import { spaceStationScenes } from "@/lib/gameData";
 import SpaceSceneRig3D from "@/components/effects/SpaceSceneRig3D";
 import { hotspotStyle, propStyle } from "./hotspotStyle";
+import SceneObjectComments from "./SceneObjectComments";
 
 type SpaceScene = (typeof spaceStationScenes)[number];
 
@@ -33,6 +34,8 @@ export default function SpaceStationScene({ scene }: { scene: SpaceScene }) {
           style={hotspotStyle(hotspot)}
         />
       ))}
+
+      <SceneObjectComments sceneId={scene.id} />
 
       <nav className="hud scene-dock" aria-label="우주정거장 조사 도구">
         {scene.dock.map((action) => (
