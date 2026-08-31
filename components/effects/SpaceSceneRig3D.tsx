@@ -37,6 +37,15 @@ type HologramSpec = {
   phase: number;
 };
 
+type TexturedHologramSpec = {
+  center: readonly [number, number];
+  size: readonly [number, number];
+  texture: string;
+  phase: number;
+  glitchInterval?: number;
+  glitchVariance?: number;
+};
+
 type ScenePoint = readonly [number, number];
 type SceneQuad = readonly [ScenePoint, ScenePoint, ScenePoint, ScenePoint];
 
@@ -83,6 +92,27 @@ const HOLOGRAMS: Partial<Record<string, readonly HologramSpec[]>> = {
     { center: [0.472, 0.255], size: [0.105, 0.135], color: 0x79cfff, phase: 0.4 },
     { center: [0.686, 0.255], size: [0.185, 0.145], color: 0x6ec8ff, phase: 2.1 },
     { center: [0.438, 0.372], size: [0.082, 0.098], color: 0x82dcff, phase: 4.7 }
+  ]
+};
+
+const DATA_HOLOGRAM_ROOT = "/assets/space-station/effects/data-core-holograms";
+const MEDICAL_HOLOGRAM_ROOT = "/assets/space-station/effects/medical-bay-holograms";
+
+const TEXTURED_HOLOGRAMS: Partial<Record<string, readonly TexturedHologramSpec[]>> = {
+  spaceMedicalBay: [
+    { center: [0.435108, 0.453241], size: [0.047249, 0.071201], texture: `${MEDICAL_HOLOGRAM_ROOT}/medical-hologram-m1-v1.png`, phase: 0.9, glitchInterval: 2.2, glitchVariance: 0.55 },
+    { center: [0.479964, 0.452179], size: [0.035287, 0.071201], texture: `${MEDICAL_HOLOGRAM_ROOT}/medical-hologram-m2-v1.png`, phase: 2.8, glitchInterval: 2.2, glitchVariance: 0.55 },
+    { center: [0.512859, 0.451647], size: [0.034091, 0.072264], texture: `${MEDICAL_HOLOGRAM_ROOT}/medical-hologram-m3-v1.png`, phase: 5.1, glitchInterval: 2.2, glitchVariance: 0.55 }
+  ],
+  spaceDataCore: [
+    { center: [0.440789, 0.227949], size: [0.068182, 0.079702], texture: `${DATA_HOLOGRAM_ROOT}/data-hologram-d1-v1.png`, phase: 0.3, glitchInterval: 2.2, glitchVariance: 0.55 },
+    { center: [0.517644, 0.252391], size: [0.04366, 0.06695], texture: `${DATA_HOLOGRAM_ROOT}/data-hologram-d2-v1.png`, phase: 1.4, glitchInterval: 2.2, glitchVariance: 0.55 },
+    { center: [0.615431, 0.225824], size: [0.078947, 0.075452], texture: `${DATA_HOLOGRAM_ROOT}/data-hologram-d3-v1.png`, phase: 2.7, glitchInterval: 2.2, glitchVariance: 0.55 },
+    { center: [0.427333, 0.350159], size: [0.086722, 0.105207], texture: `${DATA_HOLOGRAM_ROOT}/data-hologram-d4-v1.png`, phase: 3.8, glitchInterval: 2.2, glitchVariance: 0.55 },
+    { center: [0.538876, 0.321467], size: [0.07177, 0.109458], texture: `${DATA_HOLOGRAM_ROOT}/data-hologram-d5-v1.png`, phase: 5.1, glitchInterval: 2.2, glitchVariance: 0.55 },
+    { center: [0.658493, 0.316684], size: [0.087321, 0.121148], texture: `${DATA_HOLOGRAM_ROOT}/data-hologram-d6-v1.png`, phase: 6.3, glitchInterval: 2.2, glitchVariance: 0.55 },
+    { center: [0.419856, 0.465994], size: [0.045455, 0.079702], texture: `${DATA_HOLOGRAM_ROOT}/data-hologram-d7-v1.png`, phase: 7.4, glitchInterval: 2.2, glitchVariance: 0.55 },
+    { center: [0.680024, 0.420829], size: [0.063397, 0.085016], texture: `${DATA_HOLOGRAM_ROOT}/data-hologram-d10-v1.png`, phase: 11.3, glitchInterval: 2.2, glitchVariance: 0.55 }
   ]
 };
 
@@ -301,6 +331,92 @@ function makeHolograms(specs: readonly HologramSpec[]) {
   return group;
 }
 
+function makeTexturedHolograms(specs: readonly TexturedHologramSpec[], renderer: THREE.WebGLRenderer) {
+  const group = new THREE.Group();
+  const textureLoader = new THREE.TextureLoader();
+  const maxAnisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+
+  specs.forEach((spec) => {
+    const texture = textureLoader.load(spec.texture);
+    texture.colorSpace = THREE.NoColorSpace;
+    texture.anisotropy = maxAnisotropy;
+    texture.minFilter = THREE.LinearMipmapLinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.wrapS = THREE.ClampToEdgeWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+
+    const material = new THREE.ShaderMaterial({
+      transparent: true,
+      depthWrite: false,
+      depthTest: false,
+      blending: THREE.AdditiveBlending,
+      toneMapped: false,
+      uniforms: {
+        map: { value: texture },
+        time: { value: 0 },
+        phase: { value: spec.phase },
+        glitchInterval: { value: spec.glitchInterval ?? 4.4 },
+        glitchVariance: { value: spec.glitchVariance ?? 1.2 }
+      },
+      vertexShader: `
+        varying vec2 vUv;
+        void main() {
+          vUv = uv;
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform sampler2D map;
+        uniform float time;
+        uniform float phase;
+        uniform float glitchInterval;
+        uniform float glitchVariance;
+        varying vec2 vUv;
+
+        float hash(float n) {
+          return fract(sin(n) * 43758.5453123);
+        }
+
+        void main() {
+          float cycle = mod(time + phase * 1.73, glitchInterval + hash(phase) * glitchVariance);
+          float burst = 1.0 - smoothstep(0.12, 0.22, cycle);
+          float row = floor(vUv.y * 78.0);
+          float rowNoise = hash(row * 4.17 + floor(time * 23.0) + phase * 31.0);
+          float tearMask = burst * step(0.78, rowNoise);
+          float tear = (rowNoise - 0.5) * 0.028 * tearMask;
+          vec2 sampleUv = vec2(vUv.x + tear, vUv.y);
+          float inside = step(0.0, sampleUv.x) * step(sampleUv.x, 1.0);
+          vec4 baseTexel = texture2D(map, vUv);
+          vec4 shiftedTexel = texture2D(map, clamp(sampleUv, 0.0, 1.0));
+          vec4 texel = mix(baseTexel, shiftedTexel, tearMask);
+
+          float scan = 0.94 + 0.06 * sin((vUv.y * 620.0) - time * 9.0 + phase);
+          float refreshPosition = fract(time * 0.085 + phase * 0.137);
+          float refresh = 1.0 - smoothstep(0.0, 0.024, abs(vUv.y - refreshPosition));
+          float dropout = 1.0 - tearMask * step(0.54, hash(row + phase * 13.0)) * 0.52;
+          float signalBreath = 0.98 + 0.02 * sin(time * 0.83 + phase * 2.7);
+          float idleSignal = 0.025 + 0.012 * sin(time * 0.83 + phase * 2.7);
+          float burstSignal = tearMask * dropout * 0.42;
+          float refreshSignal = refresh * 0.12;
+          float alpha = texel.a * inside * scan * (idleSignal + burstSignal + refreshSignal) * signalBreath;
+          vec3 color = texel.rgb * 1.12 + vec3(0.0, 0.035, 0.075) * refresh;
+
+          gl_FragColor = vec4(color, alpha);
+        }
+      `
+    });
+
+    const geometry = new THREE.PlaneGeometry(spec.size[0] * 16, spec.size[1] * 9);
+    const mesh = new THREE.Mesh(geometry, material);
+    mesh.position.copy(uvToWorld(spec.center, 0.44));
+    mesh.userData.material = material;
+    mesh.userData.texture = texture;
+    group.add(mesh);
+  });
+
+  return group;
+}
+
 function makeServerLeds(specs: readonly ServerRackSpec[], pixelRatio: number) {
   const group = new THREE.Group();
 
@@ -470,7 +586,11 @@ function addSceneLight(scene: THREE.Scene, light: LightSpec) {
 
 export default function SpaceSceneRig3D({ sceneId }: { sceneId: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const hasSceneEffects = Boolean(LIGHTS[sceneId]?.length || SERVER_LED_RACKS[sceneId]?.length);
+  const hasSceneEffects = Boolean(
+    LIGHTS[sceneId]?.length ||
+    TEXTURED_HOLOGRAMS[sceneId]?.length ||
+    SERVER_LED_RACKS[sceneId]?.length
+  );
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -490,6 +610,7 @@ export default function SpaceSceneRig3D({ sceneId }: { sceneId: string }) {
     scene.add(makeSteam(STEAM[sceneId] || []));
     scene.add(makeSparks(SPARKS[sceneId] || []));
     scene.add(makeHolograms(HOLOGRAMS[sceneId] || []));
+    scene.add(makeTexturedHolograms(TEXTURED_HOLOGRAMS[sceneId] || [], renderer));
     scene.add(makeServerLeds(SERVER_LED_RACKS[sceneId] || [], renderer.getPixelRatio()));
 
     const specimen = sceneId === "spaceScienceLab" ? makeCapsuleSpecimen(renderer) : null;
