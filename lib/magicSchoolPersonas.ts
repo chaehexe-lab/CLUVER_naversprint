@@ -168,8 +168,12 @@ export function getMagicSchoolFallbackDialogue(
   evidenceNames: string[]
 ) {
   const hasEvidence = (name: string) => evidenceNames.includes(name);
+  const asksAlibi = /(알리바이|사건\s*당일|그날|그때|어디\s*있|뭐\s*했|무엇을\s*했)/.test(question);
 
   if (suspectId === "malpoi") {
+    if (asksAlibi) {
+      return "사건 당시 저는 기숙사에서 다음 날 수업을 준비하고 있었습니다. 부러진 지팡이는 그보다 앞서 폐기함에 버렸고, 누가 가져갔는지는 보지 못했습니다.";
+    }
     if (hasEvidence("화염 감지 룬스톤")) {
       return "저는 화염 마법은 잘하지만 저렇게 정교한 빙결 마법은 쓰지 못합니다. 경보를 얼린 사람은 제가 아닙니다.";
     }
@@ -180,6 +184,9 @@ export function getMagicSchoolFallbackDialogue(
   }
 
   if (suspectId === "malposam") {
+    if (asksAlibi) {
+      return "사건 당시 기록 수정구실 근처에 있었습니다. 처음에는 방화와 관계없는 부탁이라고 생각했습니다, 선생님.";
+    }
     if (hasEvidence("말포삼의 자백")) {
       return "말포일 형이 기록을 가려 달라고 부탁했습니다. 저는 깜짝 실험인 줄 알았고, 방화 계획은 정말 몰랐습니다.";
     }
@@ -189,10 +196,16 @@ export function getMagicSchoolFallbackDialogue(
       }
       return "죄송합니다. 수정구에 환각 마법을 건 것은 저입니다. 하지만 방화를 숨기려던 일인 줄은 몰랐습니다.";
     }
+    if (/(방화|화재|불|실습실|수정구)/.test(question)) {
+      return "저는 사건 당시 기록 수정구실 근처에 있었습니다. 정확히 무엇을 확인하셨는지 말씀해 주시면 아는 만큼 답하겠습니다.";
+    }
     return "사건 당시에는 기록 수정구실 근처에 있었습니다. 저는 방화에 관해서는 아는 것이 없습니다, 선생님.";
   }
 
   if (suspectId === "malpoil") {
+    if (asksAlibi) {
+      return "사건 당시 도서관에서 보안 마법책을 공부한 뒤 곧바로 기숙사로 돌아갔습니다. 그 사이 다른 곳에는 가지 않았습니다.";
+    }
     if (hasEvidence("말포삼의 자백")) {
       return "말포삼에게 기록을 가려 달라고 부탁한 것은 맞습니다. 하지만 깜짝 실험을 준비했을 뿐이며, 방화와는 관계없습니다.";
     }
@@ -201,6 +214,9 @@ export function getMagicSchoolFallbackDialogue(
     }
     if (hasEvidence("도서관 대출 기록부")) {
       return "제가 빌린 책이 맞습니다. 시험을 준비하려고 읽었을 뿐입니다.";
+    }
+    if (/(방화|화재|불|실습실)/.test(question)) {
+      return "저는 실습실에 불을 지르지 않았습니다. 그 시간에는 도서관에서 공부한 뒤 곧바로 기숙사로 돌아갔습니다.";
     }
     return "사건 당시에는 도서관에서 공부한 뒤 곧바로 기숙사로 돌아갔습니다. 제 행동은 모두 수업과 시험을 준비하기 위한 것이었습니다.";
   }

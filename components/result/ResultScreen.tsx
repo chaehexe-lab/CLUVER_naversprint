@@ -2,12 +2,20 @@
 
 import Link from "next/link";
 import { type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { finalCulpritId } from "@/lib/persona";
 import { joseonAjeonAssets, joseonSatoSkillAssets } from "@/lib/joseonSatoSkillAssets";
 import { spaceStationResultSuspects, spaceStationTheme } from "@/lib/spaceStationTheme";
+import type { VerifiedAccusation } from "@/lib/gameProgressTypes";
 
 type ResultTheme = "joseon" | "magicSchool" | "spaceStation";
+
+type ResultScreenProps = {
+  initialTheme: ResultTheme;
+  collectedEvidenceNames: string[];
+  analyzedEvidenceNames: string[];
+  verifiedVerdict?: VerifiedAccusation;
+};
 
 const suspects = [
   {
@@ -110,11 +118,6 @@ const magicSchoolRequiredEvidence = [
   "말포삼의 자백"
 ] as const;
 
-const correctSuspectByTheme = {
-  joseon: process.env.NEXT_PUBLIC_SAMUNMONG_CULPRIT_ID || finalCulpritId,
-  magicSchool: "malpoil",
-  spaceStation: spaceStationTheme.culpritId
-} as const;
 const soundBase = "/samunmong/sound";
 const buttonSfxPath = `${soundBase}/sfx/button.mp3`;
 const bgmStateKey = "samunmong-bgm-state";
@@ -175,33 +178,49 @@ const magicSchoolOutcomeCopy = {
   }
 } as const;
 
-function getEvidenceStorageKey(theme: ResultTheme) {
-  if (theme === "spaceStation") return "samunmong-collected-evidence-space-station";
-  if (theme === "magicSchool") return "samunmong-collected-evidence-magic-school";
-  return "samunmong-collected-evidence-joseon";
-}
-
-function readCollectedEvidence(theme: ResultTheme) {
-  if (typeof window === "undefined") return [] as string[];
-
-  try {
-    const parsed = JSON.parse(window.localStorage.getItem(getEvidenceStorageKey(theme)) || "[]");
-    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
-  } catch {
-    return [];
+const spaceStationOutcomeCopy = {
+  success: {
+    kicker: "보안 판정",
+    title: "오르빗-13의 진범이 확인됐다",
+    stamp: "확정",
+    lines: [
+      "정거장 기록과 생체 분석 결과가 하나의 범행 경로로 이어졌다.",
+      "조작된 전력 계통과 삭제된 의료 기록이 마지막 진술을 무너뜨렸다.",
+      "오르빗-13 의문사 사건의 최종 보고가 승인된다."
+    ]
+  },
+  failure: {
+    kicker: "판정 불일치",
+    title: "지목과 수사 기록이 일치하지 않는다",
+    stamp: "보류",
+    lines: [
+      "현재 기록만으로는 이 대원을 범인으로 확정할 수 없다.",
+      "접속 기록과 의료 자료, 전력 계통의 연결을 다시 확인해야 한다.",
+      "보안 조사실로 돌아가 남은 모순을 추적하라."
+    ]
   }
-}
+} as const;
 
-function readAnalyzedEvidence() {
-  if (typeof window === "undefined") return [] as string[];
-
-  try {
-    const parsed = JSON.parse(window.localStorage.getItem("samunmong-analyzed-evidence-joseon") || "[]");
-    return Array.isArray(parsed) ? parsed.filter((item) => typeof item === "string") : [];
-  } catch {
-    return [];
+const insufficientEvidenceCopy = {
+  joseon: {
+    kicker: "증거 불충분",
+    title: "판결을 뒷받침할 흔적이 모자라다",
+    stamp: "보류",
+    lines: ["지목은 남았으나, 판결을 확정할 증거가 아직 이어지지 않았다.", "현장과 취조실로 돌아가 빠진 흔적을 맞춰야 한다."]
+  },
+  magicSchool: {
+    kicker: "마력 증거 불충분",
+    title: "지목을 확정할 마력 흔적이 모자라다",
+    stamp: "보류",
+    lines: ["학생을 향한 의심만으로는 방화 주문의 경로를 증명할 수 없다.", "남은 장소의 마력 잔류와 진술을 다시 연결해야 한다."]
+  },
+  spaceStation: {
+    kicker: "보고 보류",
+    title: "최종 판정을 위한 기록이 부족하다",
+    stamp: "보류",
+    lines: ["지목 대상은 기록됐지만 사건 경로를 확정할 자료가 부족하다.", "누락된 장치 기록과 분석 자료를 확보한 뒤 다시 보고해야 한다."]
   }
-}
+} as const;
 
 function objectParticle(name: string) {
   const last = name.charCodeAt(name.length - 1) - 0xac00;
@@ -394,15 +413,17 @@ function TypewriterLines({ lines, onType }: { lines: readonly string[]; onType?:
   );
 }
 
-export default function ResultScreen() {
+export default function ResultScreen({
+  initialTheme,
+  collectedEvidenceNames,
+  analyzedEvidenceNames,
+  verifiedVerdict
+}: ResultScreenProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const resultRouteState = searchParams.toString();
-  const theme = (searchParams.get("theme") === "spaceStation" ? "spaceStation" : searchParams.get("theme") === "magicSchool" ? "magicSchool" : "joseon") satisfies ResultTheme;
+  const theme = initialTheme;
   const { playButtonSfx, playTypingSfx } = useResultAudio(theme);
   const activeSuspects = theme === "spaceStation" ? spaceStationResultSuspects : theme === "magicSchool" ? magicSchoolSuspects : suspects;
   const requiredEvidence = theme === "spaceStation" ? spaceRequiredEvidence : theme === "magicSchool" ? magicSchoolRequiredEvidence : joseonRequiredEvidence;
-  const correctSuspectId = correctSuspectByTheme[theme];
   const resultBg = theme === "spaceStation"
     ? "/assets/space-station/backgrounds/emergency-investigation-room-v2.webp"
     : theme === "magicSchool"
@@ -414,43 +435,27 @@ export default function ResultScreen() {
     : theme === "magicSchool"
       ? "/?start=interrogationScreen&theme=magicSchool"
       : "/interrogation";
-  const initialSuspectId = searchParams.get("suspectId");
-  const [selectedSuspectId, setSelectedSuspectId] = useState(
-    activeSuspects.some((suspect) => suspect.id === initialSuspectId) ? initialSuspectId : activeSuspects[0].id
-  );
+  const [selectedSuspectId, setSelectedSuspectId] = useState<string>(activeSuspects[0].id);
   const [showWarning, setShowWarning] = useState(false);
   const [showExitPrompt, setShowExitPrompt] = useState(false);
   const [showLoading, setShowLoading] = useState(false);
   const [showSealRitual, setShowSealRitual] = useState(false);
   const [sealStep, setSealStep] = useState<"ready" | "inked" | "pressed">("ready");
+  const [submissionError, setSubmissionError] = useState("");
   const loadingTimerRef = useRef<number | null>(null);
 
   const selectedSuspect = activeSuspects.find((suspect) => suspect.id === selectedSuspectId) ?? activeSuspects[0];
   const missingEvidence = useMemo(() => {
-    const collected = new Set(readCollectedEvidence(theme));
+    const collected = new Set(collectedEvidenceNames);
     const missingCollected = requiredEvidence.filter((name) => !collected.has(name));
     if (theme !== "joseon") return missingCollected;
 
-    const analyzed = new Set(readAnalyzedEvidence());
+    const analyzed = new Set(analyzedEvidenceNames);
     const missingAnalyzed = joseonRequiredAnalysisSteps
       .filter(([storageName]) => !analyzed.has(storageName))
       .map(([, label]) => label);
     return [...missingCollected, ...missingAnalyzed];
-  }, [requiredEvidence, showWarning, theme]);
-
-  useEffect(() => {
-    if (searchParams.get("previewWarning") === "1" && missingEvidence.length > 0) {
-      setShowWarning(true);
-    }
-  }, [missingEvidence.length, searchParams]);
-
-  useEffect(() => {
-    if (loadingTimerRef.current !== null) {
-      window.clearTimeout(loadingTimerRef.current);
-      loadingTimerRef.current = null;
-    }
-    setShowLoading(false);
-  }, [resultRouteState]);
+  }, [analyzedEvidenceNames, collectedEvidenceNames, requiredEvidence, theme]);
 
   useEffect(() => {
     return () => {
@@ -485,15 +490,25 @@ export default function ResultScreen() {
     });
   }
 
-  function finalizeAccusation() {
-    const outcome = correctSuspectId && selectedSuspect.id === correctSuspectId ? "success" : "failure";
-    const params = new URLSearchParams({
-      suspect: selectedSuspect.name,
-      suspectId: selectedSuspect.id,
-      outcome,
-      theme
-    });
-    navigateWithLoading(`/result?${params.toString()}&accused=1`);
+  async function finalizeAccusation() {
+    setSubmissionError("");
+    setShowLoading(true);
+    try {
+      const flushProgress = (window as Window & { samunmongFlushProgress?: () => Promise<unknown> }).samunmongFlushProgress;
+      await flushProgress?.();
+      const response = await fetch("/api/game/accuse", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ theme, suspectId: selectedSuspect.id })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "최종 지목을 검증하지 못했습니다.");
+      router.push(`/result?theme=${theme}&verdict=1`);
+    } catch (error) {
+      setShowLoading(false);
+      setShowSealRitual(false);
+      setSubmissionError(error instanceof Error ? error.message : "최종 지목을 검증하지 못했습니다.");
+    }
   }
 
   function confirmAccusation(force = false) {
@@ -520,22 +535,24 @@ export default function ResultScreen() {
     });
   }
 
-  if (searchParams.get("accused") === "1") {
-    const outcome = searchParams.get("outcome") === "success" ? "success" : "failure";
-    const accusedSuspect =
-      activeSuspects.find((suspect) => suspect.id === searchParams.get("suspectId")) ??
-      activeSuspects.find((suspect) => suspect.name === searchParams.get("suspect")) ??
-      selectedSuspect;
+  if (verifiedVerdict) {
+    const outcome = verifiedVerdict.outcome;
+    const accusedSuspect = activeSuspects.find((suspect) => suspect.id === verifiedVerdict.suspectId) ?? selectedSuspect;
     const baseCopy = outcomeCopy[outcome];
     const magicCopy = magicSchoolOutcomeCopy[outcome];
-    const copy = theme === "magicSchool"
+    const spaceCopy = spaceStationOutcomeCopy[outcome];
+    const copy = verifiedVerdict.reason === "insufficient-evidence"
+      ? insufficientEvidenceCopy[theme]
+      : theme === "magicSchool"
       ? {
           ...magicCopy,
           title: outcome === "success"
             ? `${accusedSuspect.name}이 진범이다`
             : `${accusedSuspect.name}${objectParticle(accusedSuspect.name)} 잘못 지목했다`
         }
-      : baseCopy;
+      : theme === "spaceStation"
+        ? spaceCopy
+        : baseCopy;
 
     return (
       <main className={`result-screen result-verdict result-${outcome} theme-${theme}`} onClickCapture={handleResultClick}>
@@ -547,7 +564,7 @@ export default function ResultScreen() {
             style={{ ["--portrait-x" as string]: accusedSuspect.offsetX }}
           >
             <span className="verdict-seal" aria-hidden="true" />
-            <span className="verdict-corner-stamp" aria-hidden="true">失證</span>
+            <span className="verdict-corner-stamp" aria-hidden="true">{theme === "spaceStation" ? "SEC" : "失證"}</span>
             <div className="verdict-portrait-frame">
               <img src={accusedSuspect.image} alt="" />
             </div>
@@ -562,7 +579,7 @@ export default function ResultScreen() {
             <h1 id="resultTitle">{copy.title}</h1>
             <TypewriterLines lines={copy.lines} onType={playTypingSfx} />
             <div className="verdict-actions">
-              {theme === "joseon" && outcome === "success" && accusedSuspect.id === correctSuspectId ? (
+              {theme === "joseon" && outcome === "success" ? (
                 <button
                   className="wood-result-button"
                   type="button"
@@ -577,6 +594,14 @@ export default function ResultScreen() {
                   onClick={() => navigateWithLoading("/?start=briefingScreen&theme=magicSchool")}
                 >
                   사건 다시 보기
+                </button>
+              ) : theme === "spaceStation" && outcome === "success" ? (
+                <button
+                  className="wood-result-button"
+                  type="button"
+                  onClick={() => navigateWithLoading("/?start=briefingScreen&theme=spaceStation")}
+                >
+                  사건 기록 다시 보기
                 </button>
               ) : (
                 <button
@@ -683,7 +708,7 @@ export default function ResultScreen() {
 
         <div className="accusation-actions">
           <button className="wood-result-button primary" type="button" onClick={() => confirmAccusation()}>
-            {theme === "magicSchool" ? "이 학생을 지목한다" : "이 자를 지목한다"}
+            {theme === "spaceStation" ? "이 대원을 지목한다" : theme === "magicSchool" ? "이 학생을 지목한다" : "이 자를 지목한다"}
           </button>
           {theme !== "spaceStation" ? (
             <Link className="wood-result-button" href={backToInterrogationHref}>
@@ -691,16 +716,17 @@ export default function ResultScreen() {
             </Link>
           ) : null}
         </div>
+        {submissionError ? <p className="accusation-submit-error" role="alert">{submissionError}</p> : null}
       </section>
 
       {showWarning ? (
         <div className="accusation-dialog-backdrop" role="presentation">
           <section className="accusation-dialog" role="alertdialog" aria-modal="true" aria-labelledby="warningTitle">
-            <h2 id="warningTitle">{theme === "magicSchool" ? "선생님..." : "사또님..."}</h2>
-            <p>{theme === "magicSchool" ? "아직 해석하지 못한 마력 흔적이 있습니다. 그래도 이 학생을 지목하시겠습니까?" : "아직 맞춰 보지 못한 흔적이 있습니다. 그래도 이 자를 지목하시겠습니까?"}</p>
+            <h2 id="warningTitle">{theme === "spaceStation" ? "조사관님..." : theme === "magicSchool" ? "선생님..." : "사또님..."}</h2>
+            <p>{theme === "spaceStation" ? "아직 연결하지 못한 장치 기록과 분석 자료가 있습니다. 그래도 이 대원을 최종 보고하시겠습니까?" : theme === "magicSchool" ? "아직 해석하지 못한 마력 흔적이 있습니다. 그래도 이 학생을 지목하시겠습니까?" : "아직 맞춰 보지 못한 흔적이 있습니다. 그래도 이 자를 지목하시겠습니까?"}</p>
             <div className="accusation-dialog-actions">
               <button className="wood-result-button primary" type="button" onClick={() => confirmAccusation(true)}>
-                {theme === "magicSchool" ? "판정을 내린다" : "그래도 지목한다"}
+                {theme === "spaceStation" ? "그래도 보고한다" : theme === "magicSchool" ? "판정을 내린다" : "그래도 지목한다"}
               </button>
               <button className="wood-result-button" type="button" onClick={() => setShowWarning(false)}>
                 더 조사한다

@@ -41,6 +41,13 @@
 - GitHub Projects
 - GitHub Actions
 
+## 배포 환경 변수
+
+- `GAME_STATE_SECRET`: 진행 기록과 최종 판정을 서명하는 서버 전용 비밀값입니다. Vercel Production, Preview, Development 환경에 같은 값을 등록합니다.
+- `OPENAI_API_KEY` 또는 `MISTRAL_API_KEY`: 취조 답변을 생성할 AI 제공자의 서버 전용 키입니다.
+
+`GAME_STATE_SECRET`은 최소 32바이트의 무작위 문자열을 사용하고 클라이언트 환경 변수(`NEXT_PUBLIC_*`)로 노출하지 않습니다. 이 값을 바꾸면 기존 플레이어의 서명된 진행 기록은 초기화됩니다.
+
 ## 프로젝트 구조
 
 - app/          : 페이지
