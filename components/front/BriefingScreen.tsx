@@ -368,6 +368,7 @@ function SpaceStationBriefingScreen() {
             onClick={briefingStep === 0 ? ((event) => {
               event.preventDefault();
               event.stopPropagation();
+              window.dispatchEvent(new CustomEvent("samunmong:briefing-step-change", { detail: { step: 1 } }));
               setBriefingStep(1);
             }) : undefined}
             aria-label={briefingStep === 0 ? "생체 기록 보기" : "에어록으로 이동"}
