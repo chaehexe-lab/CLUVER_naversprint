@@ -217,6 +217,30 @@
     let newFactToastTimer = 0;
     let spaceAnalysisTimer = 0;
     let spaceKeycardRecoveryTimer = 0;
+    let progressSyncQueue = Promise.resolve();
+
+    function syncServerProgress(action, payload = {}, targetTheme = themeId) {
+      progressSyncQueue = progressSyncQueue
+        .catch(() => undefined)
+        .then(async () => {
+          const response = await fetch("/api/game/progress", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ action, theme: targetTheme, ...payload })
+          });
+          if (!response.ok) {
+            const data = await response.json().catch(() => ({}));
+            throw new Error(data.error || "서버 진행 기록을 갱신하지 못했습니다.");
+          }
+          return response.json();
+        })
+        .catch((error) => {
+          console.warn("[samunmong-progress]", error);
+        });
+      return progressSyncQueue;
+    }
+
+    window.samunmongFlushProgress = () => progressSyncQueue.catch(() => undefined);
 
     const magicLinearProgression = [
       { screenId: "magicAlchemyLab", name: "제1 연금술 실습실", evidence: ["부러진 지팡이", "화염 감지 룬스톤", "기록의 수정구"] },
@@ -609,6 +633,7 @@
       if (legacy?.theme === normalizedTheme || (!legacy?.theme && normalizedTheme === themeId)) {
         localStorage.removeItem(saveKey);
       }
+      syncServerProgress("reset", {}, normalizedTheme);
     }
 
     function consumeNewDreamMode(theme) {
@@ -652,6 +677,9 @@
       syncSpaceKeycardTerminal();
       if (isNewEvidence) markEvidenceBagUnread();
       if (isNewEvidence) syncMagicMapProgress({ announce: true });
+      if (isNewEvidence) {
+        syncServerProgress("collect", { screenId: getActiveScreenId(), evidenceName: name });
+      }
     }
 
     function syncEvidenceBagUnreadIndicator() {
@@ -723,6 +751,7 @@
       const analyzed = new Set(readStoredNames(analyzedEvidenceKey));
       analyzed.add(name);
       localStorage.setItem(analyzedEvidenceKey, JSON.stringify([...analyzed]));
+      syncServerProgress("analyze", { evidenceName: name });
     }
 
     function hasAnalyzedEvidence(name) {
@@ -2874,6 +2903,8 @@
         window.dispatchEvent(new CustomEvent("samunmong:screen-change", { detail: { screenId: id } }));
       }
 
+      syncServerProgress("enter", { screenId: id });
+
       if (rush) {
         requestAnimationFrame(() => {
           const screen = document.getElementById(id);
@@ -3051,7 +3082,9 @@
       writeBgmState(currentBgm || bgmForScreen(getActiveScreenId()), bgmTracks[currentBgm || bgmForScreen(getActiveScreenId())]);
       showLoading("이동 중...");
       setTimeout(() => {
-        navigateWithinApp(`/result?${params.toString()}`);
+        window.samunmongFlushProgress?.().finally(() => {
+          navigateWithinApp(`/result?${params.toString()}`);
+        });
       }, loadingDuration);
     }
 
@@ -3789,9 +3822,7 @@
         saveAnalyzedEvidence(name);
         return;
       }
-      const analyzed = new Set(readStoredNames(analyzedEvidenceKey));
-      analyzed.add(`${name}::${toolName}`);
-      localStorage.setItem(analyzedEvidenceKey, JSON.stringify([...analyzed]));
+      saveAnalyzedEvidence(`${name}::${toolName}`);
     }
 
     function getEvidenceDetailText(name, analyzed = false) {
@@ -7917,6 +7948,7 @@
       setInterrogationReaction("thinking");
 
       try {
+        await window.samunmongFlushProgress?.();
         const response = await fetch("/api/interrogate/", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -7925,9 +7957,7 @@
             suspectId: suspect.id,
             userMessage: question,
             presentedEvidenceNames: selectedEvidence ? [selectedEvidence] : [],
-            collectedEvidenceNames: getCollectedEvidenceNames(),
-            conversationHistory: history.slice(-8),
-            knownFactIds: readStoredNames(interrogationKnownFactsKey)
+            conversationHistory: history.slice(-8)
           })
         });
 
@@ -7951,8 +7981,9 @@
         if (suspects[suspectIndex]?.id === suspect.id) {
           setAiMode(suspect.name);
         }
-        showToast(data.source === "rag" || data.source === "openai" ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
-        if (shouldGrantSpacePowerAccessCard(suspect, question)) {
+        const acceptedAnswerSources = new Set(["rag", "openai", "special", "guarded"]);
+        showToast(acceptedAnswerSources.has(data.source) ? "용의자가 답했습니다." : "임시 답변을 표시했습니다.");
+        if (data.grantSpacePowerAccessCard === true) {
           window.setTimeout(grantSpacePowerAccessCard, 260);
         }
       } catch (error) {

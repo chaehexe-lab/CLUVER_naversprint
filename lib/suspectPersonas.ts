@@ -49,7 +49,28 @@ const POWER_CONTROL_MANAGER_QUESTION_PATTERN =
   /(전력\s*제어실|전력제어실).*(담당|관리|책임|맡)|(담당|관리|책임|맡).*(전력\s*제어실|전력제어실)/;
 const SPACE_SUSPECTS_EXCEPT_ALADDINDIN = new Set(["harry", "mers", "einspanner"]);
 
-export function getSuspectSpecialAnswer(question: string, suspectId?: string) {
+const POWER_CONTROL_ROOM_PATTERN = /(전력\s*제어실|전력실|제어실)/;
+const POWER_CONTROL_CARD_PATTERN = /(출입\s*카드|출입증|카드|그\s*카드)/;
+const POWER_CONTROL_CARD_REQUEST_PATTERN =
+  /(?:출입\s*카드|출입증|카드|그\s*카드|그거|그것).{0,14}(?:줘|주세요|주십시오|주시오|달라|빌려|건네|필요)|(?:줘|주세요|주십시오|주시오|달라|빌려|건네).{0,14}(?:출입\s*카드|출입증|카드|그\s*카드|그거|그것)/;
+const POWER_CONTROL_ENTRY_REQUEST_PATTERN = /(어떻게|들어가|들어갈|출입|입장|접근|가는\s*법|열어|열\s*수)/;
+
+export function shouldGrantPowerControlAccessCard(
+  question: string,
+  suspectId?: string,
+  previousUserQuestions: string[] = []
+) {
+  if (suspectId !== "aladdindin") return false;
+
+  const recentContext = previousUserQuestions.slice(-2).join(" ");
+  const hasRoomContext = POWER_CONTROL_ROOM_PATTERN.test(question) || POWER_CONTROL_ROOM_PATTERN.test(recentContext);
+  const explicitCardRequest = POWER_CONTROL_CARD_REQUEST_PATTERN.test(question);
+  const asksHowToEnter = POWER_CONTROL_ROOM_PATTERN.test(question) && POWER_CONTROL_ENTRY_REQUEST_PATTERN.test(question);
+
+  return asksHowToEnter || explicitCardRequest && (hasRoomContext || POWER_CONTROL_CARD_PATTERN.test(question));
+}
+
+export function getSuspectSpecialAnswer(question: string, suspectId?: string, previousUserQuestions: string[] = []) {
   if (suspectId && SPACE_SUSPECTS_EXCEPT_ALADDINDIN.has(suspectId) && POWER_CONTROL_MANAGER_QUESTION_PATTERN.test(question)) {
     return "전력 제어실 담당자는 알라딘딘입니다, 조사관님. 출입과 장비 관리에 관한 자세한 내용은 알라딘딘에게 확인하시면 됩니다.";
   }
@@ -66,8 +87,24 @@ export function getSuspectSpecialAnswer(question: string, suspectId?: string) {
     return "저는 전력 제어실 카드가 없습니다, 조사관님. 연구 설비에 비상 문제가 생기면 별도 권한을 가진 대원이 들어갈 수 있다는 이야기는 들었지만, 그게 누군지는 모릅니다.";
   }
 
-  if (suspectId === "harry") return "";
-  return question.includes("해리") ? suspectSpecialAnswers.harry : "";
+  if (suspectId === "aladdindin") {
+    const asksAboutPastCardTransfer =
+      POWER_CONTROL_ROOM_PATTERN.test(question) &&
+      POWER_CONTROL_CARD_PATTERN.test(question) &&
+      /(해리|메르스|아인슈페너|다른\s*대원|누구).{0,16}(줬|주었|빌려줬|건넸|받았)/.test(question);
+    if (asksAboutPastCardTransfer) {
+      return "아닙니다. 전력 제어실 출입 카드는 제가 직접 관리해 왔고, 다른 대원에게 넘긴 적은 없습니다.";
+    }
+
+    if (shouldGrantPowerControlAccessCard(question, suspectId, previousUserQuestions)) {
+      return "전력 제어실은 제 출입 권한으로만 열립니다. 조사에 필요하다면 이 출입 카드를 가져가십시오. 분실하지 마십시오.";
+    }
+
+    if (POWER_CONTROL_ROOM_PATTERN.test(question) && /(카드|출입|입장|접근|권한|담당|관리)/.test(question)) {
+      return "전력 제어실 출입 카드는 제가 관리합니다. 조사에 필요하시면 사용 목적을 말씀해 주십시오.";
+    }
+  }
+  return question.trim() === "해리가 누구야~!!" ? suspectSpecialAnswers.harry : "";
 }
 
 export const evidenceCatalog = [
@@ -553,3 +590,118 @@ export const suspectPersonas: SuspectPersona[] = [
     finalBehavior: "불법 실험은 인정하지만, 수법은 자기 실험실이 아니라 의료실 물품과 더 맞는다고 설명한다."
   }
 ];
+
+/** 설정 설명문이 화면 대사로 노출되지 않도록 조선 사건의 기본 질문을 직접 대사로 처리한다. */
+export function getJoseonFallbackDialogue(
+  suspectId: SuspectPersona["id"],
+  question: string,
+  evidenceNames: string[]
+) {
+  const asksAlibi = /(알리바이|사건\s*당일|그날|그\s*밤|그때|어디\s*있|뭐\s*했|무엇을\s*했)/.test(question);
+  if (evidenceNames.length && !asksAlibi) return null;
+
+  if (suspectId === "chunwol") {
+    if (asksAlibi) return "사건이 있던 밤에는 제 방에 있었습니다. 점순이와 돌쇠가 떠나려 한다는 이야기는 무덕에게 얼핏 들었을 뿐입니다.";
+    if (/(점순|돌쇠|혼인|유문석)/.test(question)) {
+      return "점순이를 안타깝게 여긴 것은 사실입니다. 저도 원치 않는 혼인을 앞두고 있었지만, 그것이 그 아이의 일에 관여했다는 뜻은 아닙니다.";
+    }
+    return "무엇을 확인하려는지 분명히 말씀해 주십시오. 제가 아는 일이라면 답하겠습니다.";
+  }
+
+  if (suspectId === "dolsoe") {
+    if (asksAlibi) return "그날 밤 점순이와 뒷문 근처에서 잠시 만난 뒤 헤어졌습니다. 저는 창고에는 가지 않았습니다, 사또님.";
+    if (/(점순|사이|사랑|도망|떠나)/.test(question)) {
+      return "점순이는 제게 소중한 사람이었습니다. 함께 떠나려 했던 일은 숨겼지만, 그 아이를 해칠 까닭은 없습니다, 사또님.";
+    }
+    return "무엇을 물으시는지 말씀해 주십시오, 사또님. 아는 일은 숨기지 않겠습니다.";
+  }
+
+  if (suspectId === "yoomunseok") {
+    if (asksAlibi) return "사건 전날부터 호패를 찾지 못했고, 그날 밤에는 사랑방 근처를 떠나지 않았습니다.";
+    if (/(점순|호패|춘월|혼인)/.test(question)) {
+      return "점순에게 언성을 높인 적은 있으나 죽일 이유는 없습니다. 제 호패가 현장에 있었다는 사실만으로 저를 범인으로 단정할 수는 없습니다.";
+    }
+    return "무엇을 근거로 묻는지 먼저 밝히십시오. 사실이라면 피하지 않겠습니다.";
+  }
+
+  if (suspectId === "mudeok") {
+    if (asksAlibi) return "그날 밤에는 하인방 근처에 있었습니다. 뒷문이 열리는 소리는 들었지만, 무서워서 밖으로 나가 보지는 못했습니다, 사또님.";
+    if (/(점순|춘월|뒷문|일기|들었|봤)/.test(question)) {
+      return "제가 본 것과 들은 것은 일기에 적었습니다. 확실하지 않은 일을 함부로 말씀드리기는 두렵습니다, 사또님.";
+    }
+    return "어느 일을 말씀하시는지 조금만 더 알려 주십시오, 사또님. 기억나는 대로 답하겠습니다.";
+  }
+
+  return null;
+}
+
+/** OpenAI 연결이 없어도 우주정거장 사건의 핵심 심문 흐름을 유지하는 인물별 대사. */
+export function getSpaceStationFallbackDialogue(
+  suspectId: SuspectPersona["id"],
+  question: string,
+  evidenceNames: string[]
+) {
+  const hasAnyEvidence = (...names: string[]) => names.some((name) => evidenceNames.includes(name));
+  const asksAlibi = /(알리바이|정전\s*당시|그때|그날|어디\s*있|뭐\s*했|무엇을\s*했)/.test(question);
+
+  if (suspectId === "harry") {
+    if (asksAlibi) return "정전 당시 저는 통신실에서 손상된 로그를 복구하고 있었습니다. 사건 전에 의료실 보조 단말을 직접 만진 적은 없습니다.";
+    if (hasAnyEvidence("삭제된 의료 기록", "접속 키카드 칩", "암호화된 연구 보상 계약")) {
+      return "제 계정이 사용된 것은 맞습니다. 하지만 접속 위치가 의료실 보조 단말이라는 건 저도 처음 확인했습니다. 21시 43분쯤 메르스가 단말 오류를 보겠다며 제 키카드를 빌려 갔고, 돌려받았을 때는 이미 손상돼 있었습니다.";
+    }
+    if (hasAnyEvidence("마지막 무전 기록")) {
+      return "마지막 무전 끝에 개인 채널 흔적이 남아 있습니다. 복구하면 구조 요청 뒤에 오간 신호까지 확인할 수 있을 겁니다.";
+    }
+    return "확인하려는 로그나 접속 기록을 말씀해 주세요. 기록에 남은 범위라면 숨기지 않고 답하겠습니다.";
+  }
+
+  if (suspectId === "mers") {
+    if (asksAlibi) return "정전이 일어난 순간 저는 의료실에서 부상자 대응을 준비하고 있었습니다. 그 전의 동선도 필요하다면 시간순으로 말씀드리겠습니다.";
+    if (hasAnyEvidence("삭제된 의료 기록", "접속 키카드 칩")) {
+      return "미승인 약물을 투여한 사실은 인정합니다. 치료 가능성을 확인하기 위한 판단이었고, 기록을 지운 것은 성급한 오해가 퍼지는 것을 막기 위해서였습니다.";
+    }
+    if (hasAnyEvidence("마지막 무전 기록")) {
+      return "그때는 통신 장애가 있었습니다. 수동 차단 기록이 왜 남았는지는 지금 확인 없이 단정할 수 없습니다.";
+    }
+    if (hasAnyEvidence("암호화된 연구 보상 계약", "미승인 약물 앰풀")) {
+      return "그 계약과 앰풀이 제 의료 권한에 연결된 것은 맞습니다. 하지만 연구 보상만을 위해 환자를 위험에 빠뜨렸다는 결론은 받아들일 수 없습니다.";
+    }
+    if (hasAnyEvidence("조작된 전압 센서", "비인가 지연 타이머")) {
+      return "정전 순간 저는 의료실에 있었습니다. 센서의 절단 흔적이 의료용 메스와 닮았다는 이유만으로 제 행동까지 단정할 수는 없습니다.";
+    }
+    if (hasAnyEvidence("추진 레버 결빙 기록", "소독천과 장갑")) {
+      return "의료용 밀봉 젤이 극저온에서 굳을 가능성은 있습니다. 다만 그것이 데이비드의 추진 레버에 어떻게 들어갔는지는 제가 답할 수 없습니다.";
+    }
+    return "의료 기록인지 데이비드의 치료인지, 확인하려는 내용을 분명히 말씀해 주십시오. 아는 범위에서 답하겠습니다.";
+  }
+
+  if (suspectId === "aladdindin") {
+    if (asksAlibi) return "정전 당시 저는 외벽 장치 보조 콘솔로 뛰어가고 있었습니다. 그 전에 우주복실에서 장비 점검을 마쳤고, 당시에는 이상이 없었습니다.";
+    if (hasAnyEvidence("추진 레버 결빙 기록", "엔지니어 공구 클램프")) {
+      return "출발 전 점검에서는 추진 레버가 정상이었습니다. 결빙은 외부 작업 중 급격히 생겼고, 제 공구 클램프에서도 젤 흔적은 나오지 않았습니다. 엔지니어 장비로 만든 고장은 아닙니다.";
+    }
+    if (hasAnyEvidence("조작된 전압 센서", "비인가 지연 타이머")) {
+      return "고정 전력이 끊기면서 외벽 패널이 이탈한 겁니다. 그리고 22시 11분쯤 에어록 근처에서 메르스가 이제 시간만 맞으면 된다고 무전하는 것을 들었습니다.";
+    }
+    if (/(22시\s*11분|메르스.{0,18}무전|무전.{0,18}메르스|이제\s*시간만\s*맞으면)/.test(question)) {
+      return "그 시각에는 정전 대응으로 외벽 장치 보조 콘솔을 향하고 있었습니다. 확인할 기록도 없이 특정 대원의 무전을 제가 들었다고 단정할 수는 없습니다.";
+    }
+    return "장비 결함인지 출입 권한인지 정확히 말씀하십시오. 제가 맡은 설비라면 기록과 구조를 기준으로 답하겠습니다.";
+  }
+
+  if (suspectId === "einspanner") {
+    if (asksAlibi) return "정전 전부터 과학 실험실에서 개인 실험을 정리하고 있었습니다. 다른 구역에는 가지 않았습니다.";
+    if (hasAnyEvidence("혈액 시료 분석 기록", "미승인 약물 앰풀")) {
+      return "혈액 시료는 데이비드의 의뢰로 제가 분석했고, 미승인 약물 성분이 검출됐습니다. 그 앰풀은 제 것이 아닙니다. 21시 47분쯤 메르스가 냉각 보관함을 의료실 방향으로 옮기는 모습도 봤습니다.";
+    }
+    if (hasAnyEvidence("추진 레버 결빙 기록", "소독천과 장갑")) {
+      return "두 시료의 젤 성분을 비교하면 실험실 시약보다 의료용 밀봉재에 가깝습니다. 극저온에서 단단해지는 성질이 추진 레버 결빙과도 맞습니다.";
+    }
+    if (/(21시\s*47분|메르스.{0,18}냉각\s*보관함|냉각\s*보관함.{0,18}메르스)/.test(question)) {
+      return "그 시각에는 과학 실험실에서 제 실험을 정리하고 있었습니다. 확인할 증거 없이 누가 보관함을 옮겼다고 말씀드릴 수는 없습니다.";
+    }
+    return "성분 분석인지 제 실험 동선인지 말씀해 주세요. 화학 반응에 관한 내용이라면 정확히 구분해 드리겠습니다.";
+  }
+
+  return null;
+}

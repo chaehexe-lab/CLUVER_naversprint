@@ -720,6 +720,134 @@ body {
   font-size: 20px;
 }
 
+.accusation-submit-error {
+  position: absolute;
+  left: 50%;
+  bottom: 4.5%;
+  z-index: 8;
+  width: min(680px, 86%);
+  margin: 0;
+  color: #ffd6c5;
+  font-size: 16px;
+  text-align: center;
+  text-shadow: 0 2px 5px #000;
+  transform: translateX(-50%);
+}
+
+/* 우주정거장 판정 화면은 한지와 관인 대신 보안 보고서 패널을 사용한다. */
+.result-screen.theme-spaceStation {
+  background: #030a11;
+  color: #d9f3ff;
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+.theme-spaceStation .verdict-stage::before {
+  background:
+    radial-gradient(circle at 24% 48%, rgba(47, 160, 202, 0.14), transparent 33%),
+    linear-gradient(90deg, rgba(1, 7, 12, 0.9), rgba(3, 15, 24, 0.42) 52%, rgba(1, 6, 11, 0.9));
+}
+
+.theme-spaceStation .verdict-tag {
+  overflow: hidden;
+  border: 1px solid rgba(120, 211, 239, 0.5);
+  border-radius: 3px;
+  background:
+    linear-gradient(135deg, transparent 0 14px, rgba(24, 54, 69, 0.96) 15px) top left,
+    linear-gradient(315deg, transparent 0 14px, rgba(13, 32, 43, 0.98) 15px) bottom right;
+  background-size: 55% 55%;
+  background-repeat: no-repeat;
+  box-shadow: inset 0 0 0 1px rgba(157, 228, 248, 0.1), inset 0 -80px 100px rgba(0, 5, 9, 0.38);
+  filter: drop-shadow(0 28px 56px rgba(0, 0, 0, 0.72));
+  color: #dff7ff;
+  transform: none;
+}
+
+.theme-spaceStation .verdict-tag::before {
+  display: block;
+  inset: 9px;
+  border: 1px solid rgba(116, 205, 233, 0.18);
+  background: repeating-linear-gradient(0deg, transparent 0 21px, rgba(135, 220, 244, 0.025) 21px 22px);
+}
+
+.theme-spaceStation .verdict-corner-stamp {
+  position: absolute;
+  right: 8%;
+  top: 5.5%;
+  z-index: 4;
+  display: block;
+  color: rgba(127, 222, 249, 0.72);
+  font: 700 13px/1 monospace;
+  letter-spacing: 0;
+}
+
+.theme-spaceStation .verdict-portrait-frame {
+  left: 10%;
+  top: 12%;
+  width: 80%;
+  height: 64%;
+  border: 1px solid rgba(116, 210, 239, 0.32);
+  background: radial-gradient(circle at 50% 40%, rgba(66, 164, 194, 0.14), transparent 62%), #07131c;
+}
+
+.theme-spaceStation .verdict-portrait-frame img {
+  top: 55%;
+  width: auto;
+  height: 116%;
+  filter: saturate(0.82) contrast(1.04) drop-shadow(0 14px 18px rgba(0, 0, 0, 0.62));
+}
+
+.theme-spaceStation .verdict-tag strong {
+  left: 10%;
+  bottom: 7%;
+  color: #dcf7ff;
+  font-family: "Noto Sans KR", sans-serif;
+  font-weight: 500;
+  text-shadow: 0 0 12px rgba(81, 196, 229, 0.45);
+}
+
+.theme-spaceStation .verdict-stamp {
+  right: 7%;
+  bottom: 6.5%;
+  border: 2px solid rgba(82, 210, 233, 0.72);
+  color: #9cecff;
+  font-family: "Noto Sans KR", sans-serif;
+  font-size: clamp(16px, 1.7vw, 25px);
+  letter-spacing: 0;
+  box-shadow: inset 0 0 14px rgba(53, 190, 225, 0.08), 0 0 16px rgba(53, 190, 225, 0.12);
+  transform: rotate(-3deg);
+}
+
+.theme-spaceStation .verdict-message {
+  border-left-color: rgba(88, 199, 229, 0.34);
+  background: linear-gradient(90deg, rgba(2, 13, 21, 0.86), rgba(3, 17, 27, 0.36));
+}
+
+.theme-spaceStation .verdict-kicker {
+  color: #69cce8;
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+.theme-spaceStation .verdict-message h1,
+.theme-spaceStation .typewriter-lines p {
+  color: #dff6ff;
+  font-family: "Noto Sans KR", sans-serif;
+}
+
+.theme-spaceStation .wood-result-button,
+.theme-spaceStation .accusation-dialog .wood-result-button {
+  border-color: rgba(100, 205, 235, 0.48);
+  background: linear-gradient(180deg, rgba(19, 61, 78, 0.95), rgba(6, 27, 39, 0.98));
+  color: #ddf7ff;
+  font-family: "Noto Sans KR", sans-serif;
+  box-shadow: inset 0 0 0 1px rgba(164, 229, 248, 0.08), 0 9px 24px rgba(0, 0, 0, 0.42);
+}
+
+.theme-spaceStation .accusation-dialog {
+  border: 1px solid rgba(95, 202, 231, 0.42);
+  background: linear-gradient(145deg, rgba(10, 35, 48, 0.98), rgba(3, 16, 25, 0.99));
+  color: #dff7ff;
+}
+
 @keyframes verdictCaret {
   50% { opacity: 0; }
 }
