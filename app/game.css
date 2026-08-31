@@ -8820,55 +8820,10 @@
     }
 
     html[data-samunmong-theme="magicSchool"] .magic-school-screen .plate {
-      z-index: 0;
-      filter: brightness(1.2) contrast(1.03) saturate(1.04);
-    }
-
-    .magic-library-lightning-layer,
-    .magic-library-window-foreground {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-    }
-
-    .magic-library-lightning-layer {
-      z-index: 1;
-      overflow: hidden;
-    }
-
-    .magic-library-lightning-strike {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      mix-blend-mode: screen;
-      pointer-events: none;
-      filter: saturate(1.08) contrast(1.05);
-    }
-
-    .magic-library-lightning-strike.is-low {
-      opacity: .18;
-    }
-
-    .magic-library-lightning-strike.is-peak {
-      opacity: .9;
-    }
-
-    .magic-library-lightning-strike.is-after {
-      opacity: .32;
-    }
-
-    .magic-library-window-foreground {
-      z-index: 2;
-      object-fit: cover;
       filter: brightness(1.2) contrast(1.03) saturate(1.04);
     }
 
     html[data-samunmong-theme="magicSchool"] .magic-school-screen .magic-shade {
-      z-index: 3;
       background: radial-gradient(circle at 52% 50%, rgba(255, 238, 198, .06), rgba(10, 7, 5, .18) 72%);
       pointer-events: none;
     }

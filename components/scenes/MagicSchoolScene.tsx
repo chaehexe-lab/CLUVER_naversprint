@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from "react";
 import MagicSpellSystem, { type MagicSpellId, type MagicSpellResult } from "@/components/MagicSpellSystem";
-import MagicLibraryStormLayer from "@/components/effects/MagicLibraryStormLayer";
 import { magicSchoolScenes } from "@/lib/gameData";
 import { hotspotStyle } from "./hotspotStyle";
 
@@ -106,10 +105,6 @@ const iceBurstParticles: IceBurstParticleStyle[] = Array.from({ length: 64 }, (_
 
 export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
   const requiresLightSpell = scene.id === "magicAlchemyLab";
-  const isLibrary = scene.id === "magicLibrary";
-  const sceneImage = isLibrary
-    ? "/samunmong/assets/magic-school/scenes/motion/library-windows/library-window-motion-base-v1.png"
-    : scene.image;
   const [lightEnabled, setLightEnabled] = useState(false);
   const [lightCastCount, setLightCastCount] = useState(0);
   const [frozenBookThawed, setFrozenBookThawed] = useState(false);
@@ -159,19 +154,7 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
 
   return (
     <section className={`screen active magic-school-screen${lightClassName}`} id={scene.id}>
-      <img className="plate" src={sceneImage} alt={scene.alt} />
-      {isLibrary ? (
-        <>
-          <MagicLibraryStormLayer />
-          <img
-            className="magic-library-window-foreground"
-            src="/samunmong/assets/magic-school/scenes/motion/library-windows/library-window-frame-foreground-v1.png"
-            alt=""
-            draggable={false}
-            aria-hidden="true"
-          />
-        </>
-      ) : null}
+      <img className="plate" src={scene.image} alt={scene.alt} />
       <div className="shade magic-shade" />
       <div className="magic-light-bloom" aria-hidden="true" />
       <div className="magic-heavenly-light" aria-hidden="true" key={`heavenly-light-${lightCastCount}`}>
@@ -215,6 +198,7 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
             data-evidence-name={hotspot.evidenceName}
             aria-label={hotspot.ariaLabel}
             aria-description={isFrozenBook && !frozenBookThawed ? "얼음 조절 마법을 사용해야 획득할 수 있습니다" : undefined}
+            aria-disabled={isFrozenBook && !frozenBookThawed ? "true" : undefined}
             onClick={handleHotspotClick}
             style={{
               ...hotspotStyle(hotspot),
