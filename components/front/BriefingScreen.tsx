@@ -400,7 +400,7 @@ function SpaceStationBriefingScreen() {
 
 export default function BriefingScreen({ initialTheme, active = false }: { initialTheme: GameTheme; active?: boolean }) {
   const [joseonStep, setJoseonStep] = useState(0);
-  const [magicEntryStage, setMagicEntryStage] = useState<"alarm" | "welcome" | "orb" | "opening" | "scene">("alarm");
+  const [magicEntryStage, setMagicEntryStage] = useState<"alarm" | "welcome" | "orb" | "opening" | "scene" | "records">("alarm");
   const [orbTransitionFrame, setOrbTransitionFrame] = useState(0);
   const [orbSmokeFrame, setOrbSmokeFrame] = useState(1);
   const [incidentMagicFrame, setIncidentMagicFrame] = useState(1);
@@ -507,7 +507,7 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
 
   const briefingTitle = isMagicTheme ? "마법학교 방화사건" : briefing.title;
   const briefingKicker = isMagicTheme ? "기억 수정구" : "사건기록";
-  const activeStep = isMagicTheme ? 0 : joseonStep;
+  const activeStep = isMagicTheme ? (magicEntryStage === "records" ? 2 : 0) : joseonStep;
 
   const startJoseonInvestigation = () => {
     if (isMagicTheme) return;
@@ -541,6 +541,12 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
 
   const enterMagicInvestigation = () => {
     if (!isMagicSceneComplete) return;
+    playMagicButtonClick();
+    setMagicEntryStage("records");
+  };
+
+  const startMagicInvestigation = () => {
+    if (magicEntryStage !== "records") return;
     playMagicButtonClick();
     window.dispatchEvent(new CustomEvent("samunmong:screen-request", {
       cancelable: true,
@@ -748,7 +754,7 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
           </div>
 
           <div
-            className={`briefing-step${!isMagicTheme && activeStep === 1 ? " active" : ""}`}
+            className={`briefing-step${activeStep === 1 ? " active" : ""}`}
             data-briefing-panel="1"
             aria-hidden={isMagicTheme || activeStep !== 1}
           >
@@ -785,7 +791,7 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
           </div>
 
           {isMagicTheme ? (
-            <div className="briefing-step" data-briefing-panel="2" aria-hidden="true">
+            <div className={`briefing-step${activeStep === 2 ? " active" : ""}`} data-briefing-panel="2" aria-hidden={activeStep !== 2}>
               <p className="briefing-caption strong">세 권의 기록 책을 차례로 펼쳐 보십시오, 선생님.</p>
               <div className="magic-record-intro" data-record-kind="card">
                 <nav className="magic-record-tabs" aria-label="관계자 기록 바로가기">
@@ -910,7 +916,7 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
               id="startCase"
               type="button"
               aria-label={briefing.startLabel}
-              onClick={!isMagicTheme ? startJoseonInvestigation : undefined}
+              onClick={isMagicTheme ? startMagicInvestigation : startJoseonInvestigation}
               style={isMagicTheme ? {
                 width: "240px",
                 height: "72px",

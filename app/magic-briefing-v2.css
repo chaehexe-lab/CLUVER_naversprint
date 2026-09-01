@@ -226,9 +226,29 @@ html[data-samunmong-theme="magicSchool"] #toolPanel {
   display: none !important;
 }
 
-html[data-samunmong-theme="magicSchool"] #briefingScreen:not(.magic-entry-scene) .briefing-card,
-html[data-samunmong-theme="magicSchool"] #briefingScreen:not(.magic-entry-scene) .memory-restore-ritual {
+html[data-samunmong-theme="magicSchool"] #briefingScreen:not(.magic-entry-scene):not(.magic-entry-records) .briefing-card,
+html[data-samunmong-theme="magicSchool"] #briefingScreen:not(.magic-entry-scene):not(.magic-entry-records) .memory-restore-ritual {
   display: none !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen.magic-entry-records .briefing-actions {
+  position: fixed !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: 28px !important;
+  z-index: 10000 !important;
+  width: auto !important;
+  margin: 0 !important;
+  display: flex !important;
+  justify-content: center !important;
+  transform: translateX(-50%) !important;
+}
+
+html[data-samunmong-theme="magicSchool"] #briefingScreen.magic-entry-records #startCase {
+  display: grid !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 html[data-samunmong-theme="magicSchool"] #briefingScreen .magic-entry-welcome-panel,
