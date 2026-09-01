@@ -253,6 +253,16 @@ export default function GameShell({ initialScreen, initialTheme, routeMode }: Ga
         ).forEach((cursor) => cursor.classList.remove("show"));
       }
       document.querySelector<HTMLElement>("#evidenceBagPop")?.classList.remove("open", "closing");
+      document.querySelectorAll<HTMLElement>(
+        ".inspect-pop, .toast, .new-fact-toast, #toolResultPopup, #toolReactionLayer"
+      ).forEach((popup) => {
+        popup.classList.remove("show", "open", "closing", "success", "wrong");
+        popup.setAttribute("aria-hidden", "true");
+      });
+      document.querySelectorAll<HTMLElement>(".note-drawer").forEach((drawer) => {
+        drawer.classList.remove("open");
+        drawer.setAttribute("aria-hidden", "true");
+      });
       document.body.classList.remove("tool-cursor-active");
     }
     window.dispatchEvent(

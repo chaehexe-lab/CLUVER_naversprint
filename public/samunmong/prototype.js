@@ -2649,6 +2649,7 @@
 
     window.addEventListener("samunmong:screen-change", (event) => {
       const screenId = event.detail?.screenId || getActiveScreenId();
+      updateBgmForScreen(screenId);
       hideCollectedEvidenceTooltip();
       refreshFieldGuideNodes();
       setupEvidenceScreen(screenId);
@@ -3148,7 +3149,9 @@
       window.close();
     });
     on("#skipTutorial", "click", () => go("dreamScreen", "이동 중...", { loading: true }));
-    on("#nextTutorial", "click", () => go("dreamScreen", "이동 중...", { loading: true }));
+    window.addEventListener("samunmong:tutorial-complete", () => {
+      go("dreamScreen", "이동 중...", { loading: true });
+    });
     on("#closeDreamNotice", "click", closeDreamNotice);
     on("#closeDreamNoticeX", "click", closeDreamNotice);
     document.querySelectorAll("[data-dream-disabled='true']").forEach((button) => {

@@ -2,39 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-function getActiveScreenId() {
-  return document.querySelector(".screen.active")?.id ?? "mainScreen";
-}
-
 export default function GameSettingsOverlay() {
-  const [activeScreen, setActiveScreen] = useState("mainScreen");
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [confirmReset, setConfirmReset] = useState(false);
-  const showSettingsHomeButton = !["mainScreen", "tutorialScreen", "dreamScreen"].includes(activeScreen);
-
-  useEffect(() => {
-    const syncActiveScreen = () => setActiveScreen(getActiveScreenId());
-
-    syncActiveScreen();
-
-    const shell = document.querySelector(".game-shell");
-    if (!shell) return undefined;
-
-    const observer = new MutationObserver(syncActiveScreen);
-    observer.observe(shell, {
-      attributes: true,
-      attributeFilter: ["class"],
-      subtree: true
-    });
-
-    window.addEventListener("samunmong:screen-change", syncActiveScreen);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("samunmong:screen-change", syncActiveScreen);
-    };
-  }, []);
-
 
   useEffect(() => {
     const syncFullscreen = () => {
@@ -79,7 +48,6 @@ export default function GameSettingsOverlay() {
   };
 
   const closeSettings = () => {
-    setConfirmReset(false);
     const volumeSetting = document.querySelector<HTMLInputElement>("#volumeSetting");
     const contrastSetting = document.querySelector<HTMLInputElement>("#contrastSetting");
     const settings = {
@@ -92,82 +60,7 @@ export default function GameSettingsOverlay() {
     document.querySelector("#settingsDialog")?.classList.remove("open");
   };
 
-  const goToThemeSelection = () => {
-    setConfirmReset(false);
-    document.querySelector("#settingsDialog")?.classList.remove("open");
-    window.dispatchEvent(
-      new CustomEvent("samunmong:screen-request", {
-        cancelable: true,
-        detail: { screenId: "dreamScreen" }
-      })
-    );
-  };
-
-  const getCurrentTheme = () => {
-    const requestedTheme = new URLSearchParams(window.location.search).get("theme");
-    const storedTheme = window.localStorage.getItem("samunmong-current-theme");
-    const theme = requestedTheme || storedTheme || document.documentElement.dataset.samunmongTheme || "joseon";
-    if (["magic", "magicSchool", "magic-school"].includes(theme)) return "magicSchool";
-    if (["space", "spaceStation", "space-station"].includes(theme)) return "spaceStation";
-    return "joseon";
-  };
-
-  const resetCurrentDream = () => {
-    const theme = getCurrentTheme();
-    const suffix = theme === "magicSchool" ? "magic-school" : theme === "spaceStation" ? "space-station" : "joseon";
-    const progressKeys = [
-      `samunmong-collected-evidence-${suffix}`,
-      `samunmong-unread-evidence-${suffix}`,
-      `samunmong-analyzed-evidence-${suffix}`,
-      `samunmong-examined-clues-${suffix}`,
-      `samunmong-linked-evidence-${suffix}`,
-      `samunmong-conversation-notes-${suffix}`,
-      `samunmong-interrogation-question-count-${suffix}`,
-      `samunmong-interrogation-known-facts-${suffix}`
-    ];
-
-    progressKeys.forEach((key) => window.localStorage.removeItem(key));
-    if (theme === "joseon") {
-      window.localStorage.removeItem("samunmong-field-guide-seen");
-      window.localStorage.removeItem("samunmong-sato-skill-state");
-    }
-    if (theme === "magicSchool") {
-      window.localStorage.removeItem("samunmong-magic-library-frozen-book-thawed");
-    }
-
-    try {
-      const slots = JSON.parse(window.localStorage.getItem("samunmong-save-slots") || "{}");
-      if (slots && typeof slots === "object") {
-        delete slots[theme];
-        window.localStorage.setItem("samunmong-save-slots", JSON.stringify(slots));
-      }
-    } catch {
-      window.localStorage.removeItem("samunmong-save-slots");
-    }
-
-    try {
-      const legacySave = JSON.parse(window.localStorage.getItem("samunmong-demo-state") || "null");
-      const legacyTheme = ["magic", "magicSchool", "magic-school"].includes(legacySave?.theme)
-        ? "magicSchool"
-        : ["space", "spaceStation", "space-station"].includes(legacySave?.theme)
-          ? "spaceStation"
-          : "joseon";
-      if (!legacySave || legacyTheme === theme) {
-        window.localStorage.removeItem("samunmong-demo-state");
-      }
-    } catch {
-      window.localStorage.removeItem("samunmong-demo-state");
-    }
-
-    window.sessionStorage.removeItem("samunmong-field-guide-pending");
-    window.sessionStorage.removeItem("samunmong-new-dream-mode");
-    window.sessionStorage.removeItem("samunmong-truth-unlocked");
-    window.dispatchEvent(new CustomEvent("samunmong:progress-cleared"));
-    window.location.assign("/");
-  };
-
-  const exitToMain = () => {
-    setConfirmReset(false);
+  const goToMain = () => {
     document.querySelector("#settingsDialog")?.classList.remove("open");
     window.dispatchEvent(
       new CustomEvent("samunmong:screen-request", {
@@ -210,7 +103,6 @@ export default function GameSettingsOverlay() {
           data-open-settings="true"
           aria-label="설정 열기"
           onClick={() => {
-            setConfirmReset(false);
             document.querySelector<HTMLElement>("#settingsDialog")?.classList.add("open");
           }}
         >
@@ -229,44 +121,24 @@ export default function GameSettingsOverlay() {
             <span>고대비 화면</span>
             <input id="contrastSetting" type="checkbox" />
           </label>
-          <div className="settings-game-actions" aria-label="게임 진행 관리">
-            <button className="button settings-reset-button" type="button" onClick={() => setConfirmReset(true)}>
-              처음부터 시작
-            </button>
-            <button className="button settings-exit-button" type="button" onClick={exitToMain}>
-              게임 나가기
-            </button>
-          </div>
-          {confirmReset && (
-            <div className="settings-reset-confirm" role="alert">
-              <strong>현재 꿈을 처음부터 시작할까요?</strong>
-              <p>이 꿈의 수사 기록과 저장 지점만 삭제됩니다. 다른 꿈과 설정은 유지됩니다.</p>
-              <div>
-                <button className="button" type="button" onClick={() => setConfirmReset(false)}>취소</button>
-                <button className="button danger" type="button" onClick={resetCurrentDream}>기록 지우고 시작</button>
-              </div>
-            </div>
-          )}
           <div className="dialog-actions">
-            {showSettingsHomeButton && (
-              <button
-                className="button settings-home-button"
-                type="button"
-                aria-label="테마 선택 화면으로 이동"
-                title="처음 화면으로 나가기"
-                onClick={goToThemeSelection}
-              >
-                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            )}
+            <button
+              className="button settings-home-button"
+              type="button"
+              aria-label="메인 화면으로 이동"
+              title="메인 화면으로 이동"
+              onClick={goToMain}
+            >
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
             <button className="button primary" id="closeSettings" type="button" onClick={closeSettings}>
               확인
             </button>
