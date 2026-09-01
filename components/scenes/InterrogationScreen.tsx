@@ -4,6 +4,7 @@ import AccuseSuspect from "@/components/AccuseSuspect";
 import EvidenceInventory from "@/components/EvidenceInventory";
 import InvestigationNote from "@/components/InvestigationNote";
 import InterrogationCharacter2D from "@/components/effects/InterrogationCharacter2D";
+import JoseonLetterEvidence3D from "@/components/effects/JoseonLetterEvidence3D";
 import JoseonMapCandle3D from "@/components/effects/JoseonMapCandle3D";
 import type { GameTheme } from "@/lib/gameTheme";
 import { spaceStationInterrogationCopy, spaceStationMap, spaceStationTheme } from "@/lib/spaceStationTheme";
@@ -579,6 +580,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           </div>
           <p id="documentAssemblyGuide">조각을 끌어 윤곽에 맞추십시오 · 짧게 누르면 회전</p>
           <div className="document-assembly-stage" id="documentAssemblyStage" aria-label="찢어진 문서 조각 맞춤판">
+            <JoseonLetterEvidence3D />
             {[
               ["a", "fragment-a-v2.png"], ["b", "fragment-b-v2.png"], ["c", "fragment-c-v2.png"],
             ].map(([pieceId, fileName]) => (

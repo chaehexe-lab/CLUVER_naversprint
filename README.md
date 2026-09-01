@@ -47,6 +47,14 @@
 - `OPENAI_API_KEY` 또는 `MISTRAL_API_KEY`: 취조 답변을 생성할 AI 제공자의 서버 전용 키입니다.
 
 `GAME_STATE_SECRET`은 최소 32바이트의 무작위 문자열을 사용하고 클라이언트 환경 변수(`NEXT_PUBLIC_*`)로 노출하지 않습니다. 이 값을 바꾸면 기존 플레이어의 서명된 진행 기록은 초기화됩니다.
+AI 제공자 키는 진행 기록 서명에 재사용되지 않습니다. 배포 환경에 `GAME_STATE_SECRET`이 없으면 진행 기록 API가 오류를 반환하도록 분리되어 있습니다.
+
+## 품질 검사
+
+- `pnpm lint`: Next.js와 TypeScript 코드 규칙 검사
+- `pnpm typecheck`: TypeScript 타입 검사
+- `pnpm test:e2e`: 결과 화면 보호, 증거 수집 확인표, 숨김 패널 브라우저 검사
+- `pnpm check`: 위 검사를 순서대로 모두 실행
 
 ## 프로젝트 구조
 

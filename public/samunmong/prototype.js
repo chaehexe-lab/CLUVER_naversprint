@@ -219,23 +219,42 @@
     let spaceKeycardRecoveryTimer = 0;
     let progressSyncQueue = Promise.resolve();
 
+    async function requestServerProgress(action, payload = {}, targetTheme = themeId) {
+      const response = await fetch("/api/game/progress", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action, theme: targetTheme, ...payload })
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.error || "서버 진행 기록을 갱신하지 못했습니다.");
+      return data;
+    }
+
     function syncServerProgress(action, payload = {}, targetTheme = themeId) {
       progressSyncQueue = progressSyncQueue
         .catch(() => undefined)
-        .then(async () => {
-          const response = await fetch("/api/game/progress", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action, theme: targetTheme, ...payload })
-          });
-          if (!response.ok) {
-            const data = await response.json().catch(() => ({}));
-            throw new Error(data.error || "서버 진행 기록을 갱신하지 못했습니다.");
-          }
-          return response.json();
-        })
+        .then(() => requestServerProgress(action, payload, targetTheme))
         .catch((error) => {
           console.warn("[samunmong-progress]", error);
+        });
+      return progressSyncQueue;
+    }
+
+    function syncEvidenceInteraction(evidenceName, screenId = getActiveScreenId()) {
+      progressSyncQueue = progressSyncQueue
+        .catch(() => undefined)
+        .then(async () => {
+          const inspection = await requestServerProgress("inspect", { screenId, evidenceName });
+          if (!inspection.interactionToken) throw new Error("증거 확인표를 발급받지 못했습니다.");
+          return requestServerProgress("collect", {
+            screenId,
+            evidenceName,
+            interactionToken: inspection.interactionToken
+          });
+        })
+        .catch((error) => {
+          console.warn("[samunmong-evidence]", error);
+          return { ok: false, error: error instanceof Error ? error.message : "증거를 기록하지 못했습니다." };
         });
       return progressSyncQueue;
     }
@@ -677,9 +696,6 @@
       syncSpaceKeycardTerminal();
       if (isNewEvidence) markEvidenceBagUnread();
       if (isNewEvidence) syncMagicMapProgress({ announce: true });
-      if (isNewEvidence) {
-        syncServerProgress("collect", { screenId: getActiveScreenId(), evidenceName: name });
-      }
     }
 
     function syncEvidenceBagUnreadIndicator() {
@@ -5412,6 +5428,9 @@
         updateDocumentPiecePosition(button, state);
       });
       openGlobalPanel("documentAssemblyPanel");
+      if (!isHonseo) {
+        window.dispatchEvent(new CustomEvent("samunmong:letter-3d-open"));
+      }
       playSfx("map", 0.62);
     }
 
@@ -7041,19 +7060,15 @@
       document.querySelectorAll(".inspect-pop").forEach((panel) => panel.classList.remove("show"));
     }
 
-    function collectHopae() {
+    async function collectHopae() {
       if (hopaeCollected) {
         setAnalysisTarget("호패 조각");
         return;
       }
-      hopaeCollected = true;
-      document.querySelector("#hopaeHotspot")?.classList.add("collected");
-      dispatchEvidenceFeedback("호패 조각", document.querySelector("#hopaeHotspot"));
-      playSfx("evidence", 0.85);
-      addEvidenceToBag("호패 조각");
-      addEvidenceToNote("호패 조각");
+      const hotspot = document.querySelector("#hopaeHotspot");
+      if (hotspot && (await beginEvidenceCollection("호패 조각", hotspot))) hopaeCollected = true;
     }
-    function collectPortrait() {
+    async function collectPortrait() {
       const alreadyCollected = portraitCollected || readStoredNames(collectedEvidenceKey).includes("돌쇠의 그림");
       if (alreadyCollected) {
         portraitCollected = true;
@@ -7061,9 +7076,9 @@
         openGlobalPanel("toolPanel");
         return;
       }
-      portraitCollected = true;
       const portraitHotspot = document.querySelector("#portraitHotspot");
-      if (portraitHotspot) beginEvidenceCollection("돌쇠의 그림", portraitHotspot);
+      if (!portraitHotspot || !(await beginEvidenceCollection("돌쇠의 그림", portraitHotspot))) return;
+      portraitCollected = true;
       const collectButton = document.querySelector("#collectPortrait");
       if (collectButton) collectButton.textContent = "보따리에서 분석하기";
       hideInspectPanels();
@@ -7087,11 +7102,27 @@
       clearTimeout(showInspect.timer);
     }
 
-    function beginEvidenceCollection(name, hotspot) {
+    async function beginEvidenceCollection(name, hotspot) {
+      if (hotspot?.dataset.evidenceCollecting === "true") return false;
+      if (hotspot) {
+        hotspot.dataset.evidenceCollecting = "true";
+        hotspot.setAttribute("aria-busy", "true");
+      }
       hideInspectPanels();
       closeToast();
       pendingEvidenceName = name;
       pendingEvidenceHotspot = hotspot;
+      const synced = await syncEvidenceInteraction(name);
+      if (!synced?.ok) {
+        if (hotspot) {
+          delete hotspot.dataset.evidenceCollecting;
+          hotspot.removeAttribute("aria-busy");
+        }
+        pendingEvidenceName = "";
+        pendingEvidenceHotspot = null;
+        showToast(synced?.error || "증거를 기록하지 못했습니다. 잠시 뒤 다시 확인해 주세요.");
+        return false;
+      }
       markEvidenceCollectedInScene(name);
       dispatchEvidenceFeedback(name, hotspot);
       playSfx("evidence", 0.9);
@@ -7103,8 +7134,13 @@
         title: getEvidenceDisplayName(name),
         dismissible: true,
       });
+      if (hotspot) {
+        delete hotspot.dataset.evidenceCollecting;
+        hotspot.removeAttribute("aria-busy");
+      }
       pendingEvidenceName = "";
       pendingEvidenceHotspot = null;
+      return true;
     }
 
     document.addEventListener("click", (event) => {
@@ -7212,8 +7248,9 @@
       if (hotspot.id === "hopaeHotspot") {
         const hasHopae = readStoredNames(collectedEvidenceKey).includes("호패 조각");
         if (!hasHopae) {
-          hopaeCollected = true;
-          beginEvidenceCollection("호패 조각", hotspot);
+          beginEvidenceCollection("호패 조각", hotspot).then((collected) => {
+            if (collected) hopaeCollected = true;
+          });
         } else {
           hopaeCollected = true;
           addEvidenceCardToInterrogation("호패 조각");
@@ -7258,6 +7295,41 @@
     });
     document.querySelectorAll(".document-piece").forEach((button) => {
       button.addEventListener("pointerdown", (event) => startDocumentPieceDrag(button, event));
+    });
+    window.addEventListener("samunmong:letter-3d-progress", (event) => {
+      if (documentPuzzleEvidence !== "찢어진 약속 편지") return;
+      const count = Number(event.detail?.count || 0);
+      const guide = document.querySelector("#documentAssemblyGuide");
+      if (!guide) return;
+      if (event.detail?.rotated) {
+        guide.textContent = "찢긴 결이 이어지는 방향을 살펴보십시오";
+        playSfx("buttonAlt", 0.42);
+        return;
+      }
+      guide.textContent = count === 3
+        ? "편지가 이어졌습니다 · 돌려 살펴본 뒤 복원을 확인하십시오"
+        : `찢어진 한지 조각이 맞물렸습니다 · ${count}/3`;
+      playSfx(count === 3 ? "evidence" : "buttonAlt", count === 3 ? 0.82 : 0.58);
+    });
+    window.addEventListener("samunmong:letter-3d-reject", (event) => {
+      if (documentPuzzleEvidence !== "찢어진 약속 편지") return;
+      const guide = document.querySelector("#documentAssemblyGuide");
+      if (guide) {
+        guide.textContent = event.detail?.rotation
+          ? "찢긴 면의 방향이 맞지 않습니다"
+          : "섬유가 이어지는 자리를 더 가까이 맞추십시오";
+      }
+      playSfx("buttonAlt", 0.36);
+    });
+    window.addEventListener("samunmong:letter-3d-complete", () => {
+      if (documentPuzzleEvidence !== "찢어진 약속 편지") return;
+      const stage = document.querySelector("#documentAssemblyStage");
+      if (stage?.classList.contains("completed")) return;
+      stage?.classList.add("completed");
+      const guide = document.querySelector("#documentAssemblyGuide");
+      if (guide) guide.textContent = "문서 복원 완료";
+      playSfx("evidence", 0.9);
+      finishTactilePuzzle("문서 맞춤판");
     });
     document.querySelector("#documentAssemblyStage")?.addEventListener("pointermove", moveDocumentPiece);
     document.querySelector("#documentAssemblyStage")?.addEventListener("pointerup", finishDocumentPieceDrag);
@@ -7912,13 +7984,16 @@
       }
     }
 
-    function maybeCollectInterrogationEvidence(suspect, answer, usedEvidenceNames = []) {
+    async function maybeCollectInterrogationEvidence(suspect, answer, usedEvidenceNames = []) {
       if (!isMagicTheme || suspect.id !== "malposam") return;
       if (getCollectedEvidenceNames().includes("말포삼의 자백")) return;
 
       const hasCrystalEvidence = usedEvidenceNames.some((name) => ["기록의 수정구", "조작된 기록 수정구", "말포삼의 자백"].includes(name));
       const confessed = /말포일/.test(answer) && /(부탁|시켰|말했|환각|수정구)/.test(answer);
       if (!hasCrystalEvidence || !confessed) return;
+
+      const synced = await syncEvidenceInteraction("말포삼의 자백", "interrogationScreen");
+      if (!synced?.ok) return;
 
       addEvidenceToBag("말포삼의 자백");
       markEvidenceCollectedInScene("말포삼의 자백");
@@ -7959,7 +8034,7 @@
         history.push({ role: "user", content: question }, { role: "assistant", content: answer });
         while (history.length > 8) history.shift();
         addInterrogationAnswer(suspect, answer, data.source, data.warning);
-        maybeCollectInterrogationEvidence(suspect, answer, data.usedEvidenceNames);
+        await maybeCollectInterrogationEvidence(suspect, answer, data.usedEvidenceNames);
         setInterrogationReaction(getLieExpressionReaction(answer, data.reaction || "attentive"), data.newFactId ? 4200 : 3000);
         if (data.newFactId) showNewFactDiscovery(data.newFactId);
         if (data.newFactId) {
@@ -8058,17 +8133,23 @@
         }
         if (isMagicTheme && suspect.sprite) document.querySelector("#suspectSprite").src = suspect.sprite;
         if (suspect.id === "chunwol") {
-          addEvidenceToBag("긁힌 팔 흔적");
-          addEvidenceToNote("긁힌 팔 흔적");
-          addObservationToNote("소매 확인", `${suspect.name}의 소매 아래에서 긁힌 듯한 흔적을 확인했다.`);
-          setAnalysisTarget("긁힌 팔 흔적");
-          showToast("소매 밑에서 긁힌 팔 흔적을 발견했습니다.");
+          const synced = await syncEvidenceInteraction("긁힌 팔 흔적", "interrogationScreen");
+          if (synced?.ok) {
+            addEvidenceToBag("긁힌 팔 흔적");
+            addEvidenceToNote("긁힌 팔 흔적");
+            addObservationToNote("소매 확인", `${suspect.name}의 소매 아래에서 긁힌 듯한 흔적을 확인했다.`);
+            setAnalysisTarget("긁힌 팔 흔적");
+            showToast("소매 밑에서 긁힌 팔 흔적을 발견했습니다.");
+          }
         } else if (suspect.id === "dolsoe") {
-          addEvidenceToBag("돌쇠의 팔 상처");
-          addEvidenceToNote("돌쇠의 팔 상처");
-          addObservationToNote("소매 확인", `${suspect.name}의 소매 아래에서 붕대를 감았던 듯한 팔 상처를 확인했다.`);
-          setAnalysisTarget("돌쇠의 팔 상처");
-          showToast("돌쇠의 팔 상처를 증거로 기록했습니다.");
+          const synced = await syncEvidenceInteraction("돌쇠의 팔 상처", "interrogationScreen");
+          if (synced?.ok) {
+            addEvidenceToBag("돌쇠의 팔 상처");
+            addEvidenceToNote("돌쇠의 팔 상처");
+            addObservationToNote("소매 확인", `${suspect.name}의 소매 아래에서 붕대를 감았던 듯한 팔 상처를 확인했다.`);
+            setAnalysisTarget("돌쇠의 팔 상처");
+            showToast("돌쇠의 팔 상처를 증거로 기록했습니다.");
+          }
         } else {
           addObservationToNote("소매 확인", `${suspect.name}의 소매 아래를 확인했지만 뚜렷한 상처는 보이지 않았다.`);
           showToast(`${suspect.name}의 소매 아래를 확인했습니다.`);

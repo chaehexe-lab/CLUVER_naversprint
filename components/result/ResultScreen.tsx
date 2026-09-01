@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { finalCulpritId } from "@/lib/persona";
 import { joseonAjeonAssets, joseonSatoSkillAssets } from "@/lib/joseonSatoSkillAssets";
 import { spaceStationResultSuspects, spaceStationTheme } from "@/lib/spaceStationTheme";
 import type { VerifiedAccusation } from "@/lib/gameProgressTypes";
@@ -128,7 +127,6 @@ const accusationBgmByTheme = {
   magicSchool: { key: "magicSchoolAccusation", path: `${soundBase}/bgm/magic-accusation.mp3` },
   spaceStation: { key: "spaceStationAccusation", path: `${soundBase}/bgm/space-accusation.mp3` }
 } as const;
-const truthUnlockKey = "samunmong-truth-unlocked";
 const typeSfxPaths = [
   `${soundBase}/sfx/type-1.mp3`,
   `${soundBase}/sfx/type-2.mp3`,
@@ -237,11 +235,6 @@ function returnToBriefingWithProgress() {
   );
   window.localStorage.setItem("samunmong-field-guide-seen", "1");
   window.sessionStorage.removeItem("samunmong-field-guide-pending");
-}
-
-function unlockTruthPage() {
-  if (typeof window === "undefined") return;
-  window.sessionStorage.setItem(truthUnlockKey, finalCulpritId);
 }
 
 function readAudioVolume() {
@@ -597,7 +590,7 @@ export default function ResultScreen({
                 <button
                   className="wood-result-button"
                   type="button"
-                  onClick={() => navigateWithLoading("/interpretation", unlockTruthPage)}
+                  onClick={() => navigateWithLoading("/interpretation")}
                 >
                   해몽하기
                 </button>

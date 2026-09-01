@@ -11,6 +11,13 @@ export type VerifiedAccusation = {
   accusedAt: number;
 };
 
+export type PendingEvidenceInteraction = {
+  screenId: string;
+  evidenceName: string;
+  token: string;
+  issuedAt: number;
+};
+
 export type GameProgress = {
   version: 1;
   theme: GameTheme;
@@ -19,6 +26,7 @@ export type GameProgress = {
   collectedEvidenceNames: string[];
   analyzedEvidenceNames: string[];
   knownFactIds: string[];
+  pendingEvidenceInteraction?: PendingEvidenceInteraction;
   accusation?: VerifiedAccusation;
   updatedAt: number;
 };

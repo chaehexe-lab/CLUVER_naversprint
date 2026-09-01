@@ -9,7 +9,11 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "lint": "eslint app components lib tests playwright.config.ts --max-warnings=0",
+    "typecheck": "tsc --noEmit",
+    "test:e2e": "playwright test",
+    "check": "pnpm lint && pnpm typecheck && pnpm test:e2e"
   },
   "dependencies": {
     "next": "^15.3.5",
@@ -18,10 +22,15 @@
     "three": "^0.185.1"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "3.3.1",
+    "@playwright/test": "1.55.0",
     "@types/node": "^22.10.7",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
     "@types/three": "^0.185.4",
-    "typescript": "^5.7.3"
+    "eslint": "^9.39.5",
+    "eslint-config-next": "15.5.22",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.68.0"
   }
 }

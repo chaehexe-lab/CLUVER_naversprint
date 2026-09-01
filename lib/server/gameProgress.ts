@@ -1,8 +1,14 @@
-import type { GameProgress, GameTheme, VerifiedAccusation } from "@/lib/gameProgressTypes";
+import type {
+  GameProgress,
+  GameTheme,
+  PendingEvidenceInteraction,
+  VerifiedAccusation
+} from "@/lib/gameProgressTypes";
 
 const COOKIE_PREFIX = "samunmong_progress";
 const COOKIE_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 const MAX_PROGRESS_AGE_MS = COOKIE_MAX_AGE_SECONDS * 1000;
+const EVIDENCE_INTERACTION_MAX_AGE_MS = 30 * 1000;
 const publicScreens = new Set(["tutorialScreen", "dreamScreen", "briefingScreen"]);
 
 const joseonInvestigationScreens = [
@@ -98,11 +104,7 @@ function unique(values: string[]) {
 }
 
 function getSecret() {
-  const configured =
-    process.env.GAME_STATE_SECRET ||
-    process.env.OPENAI_API_KEY ||
-    process.env.MISTRAL_API_KEY ||
-    process.env.AUTH_SECRET;
+  const configured = process.env.GAME_STATE_SECRET;
 
   if (configured) return configured;
   if (process.env.NODE_ENV !== "production") return "samunmong-local-progress-secret";
@@ -168,6 +170,16 @@ function normalizeProgress(value: unknown, expectedTheme?: GameTheme): GameProgr
     typeof accusation.accusedAt === "number"
       ? accusation
       : undefined;
+  const interaction = candidate.pendingEvidenceInteraction;
+  const normalizedInteraction: PendingEvidenceInteraction | undefined =
+    interaction &&
+    typeof interaction.screenId === "string" &&
+    typeof interaction.evidenceName === "string" &&
+    typeof interaction.token === "string" &&
+    typeof interaction.issuedAt === "number" &&
+    Date.now() - interaction.issuedAt <= EVIDENCE_INTERACTION_MAX_AGE_MS
+      ? interaction
+      : undefined;
 
   return {
     version: 1,
@@ -177,6 +189,7 @@ function normalizeProgress(value: unknown, expectedTheme?: GameTheme): GameProgr
     collectedEvidenceNames: migrateEvidenceNames(candidate.theme, sanitizeStringArray(candidate.collectedEvidenceNames)),
     analyzedEvidenceNames: migrateEvidenceNames(candidate.theme, sanitizeStringArray(candidate.analyzedEvidenceNames)),
     knownFactIds: sanitizeStringArray(candidate.knownFactIds),
+    pendingEvidenceInteraction: normalizedInteraction,
     accusation: normalizedAccusation,
     updatedAt: candidate.updatedAt
   };
@@ -308,7 +321,27 @@ export function enterProgressScreen(progress: GameProgress, screenId: string) {
     ...progress,
     currentScreen: screenId,
     visitedScreens: unique([...progress.visitedScreens, screenId]),
+    pendingEvidenceInteraction: undefined,
     accusation: undefined,
+    updatedAt: Date.now()
+  } satisfies GameProgress;
+}
+
+export function beginEvidenceInteraction(progress: GameProgress, screenId: string, evidenceName: string) {
+  const allowedScreens = evidenceScreens[progress.theme][evidenceName];
+  if (!allowedScreens?.includes(screenId)) return null;
+  if (progress.currentScreen !== screenId || !progress.visitedScreens.includes(screenId)) return null;
+
+  const pendingEvidenceInteraction: PendingEvidenceInteraction = {
+    screenId,
+    evidenceName,
+    token: crypto.randomUUID(),
+    issuedAt: Date.now()
+  };
+
+  return {
+    ...progress,
+    pendingEvidenceInteraction,
     updatedAt: Date.now()
   } satisfies GameProgress;
 }
@@ -320,9 +353,23 @@ export function recordCollectedEvidence(progress: GameProgress, screenId: string
   return {
     ...progress,
     collectedEvidenceNames: unique([...progress.collectedEvidenceNames, evidenceName]),
+    pendingEvidenceInteraction: undefined,
     accusation: undefined,
     updatedAt: Date.now()
   } satisfies GameProgress;
+}
+
+export function recordCollectedEvidenceFromInteraction(
+  progress: GameProgress,
+  screenId: string,
+  evidenceName: string,
+  interactionToken: string
+) {
+  const interaction = progress.pendingEvidenceInteraction;
+  if (!interaction || interaction.token !== interactionToken) return null;
+  if (interaction.screenId !== screenId || interaction.evidenceName !== evidenceName) return null;
+  if (Date.now() - interaction.issuedAt > EVIDENCE_INTERACTION_MAX_AGE_MS) return null;
+  return recordCollectedEvidence(progress, screenId, evidenceName);
 }
 
 export function recordAnalyzedEvidence(progress: GameProgress, evidenceName: string) {

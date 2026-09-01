@@ -1,11 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { finalCulpritId } from "@/lib/persona";
-
-const truthUnlockKey = "samunmong-truth-unlocked";
 
 const evidence = [
   {
@@ -31,26 +26,6 @@ const evidence = [
 ] as const;
 
 export default function InterpretationScreen() {
-  const router = useRouter();
-  const [unlocked, setUnlocked] = useState(false);
-
-  useEffect(() => {
-    const hasSolvedDream = window.sessionStorage.getItem(truthUnlockKey) === finalCulpritId;
-    if (!hasSolvedDream) {
-      router.replace("/result");
-      return;
-    }
-    setUnlocked(true);
-  }, [router]);
-
-  if (!unlocked) {
-    return (
-      <main className="interpretation-screen interpretation-loading">
-        <p>꿈의 흔적을 확인하고 있습니다...</p>
-      </main>
-    );
-  }
-
   return (
     <main className="interpretation-screen">
       <div className="interpretation-moon" aria-hidden="true" />
