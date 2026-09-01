@@ -13,10 +13,7 @@ export default function TutorialScreen() {
           <p key={paragraph}>{paragraph}</p>
         ))}
         <button className="button primary" id="nextTutorial" type="button" onClick={() => {
-          window.dispatchEvent(new CustomEvent("samunmong:screen-request", {
-            cancelable: true,
-            detail: { screenId: "dreamScreen" }
-          }));
+          window.dispatchEvent(new CustomEvent("samunmong:tutorial-complete"));
         }}>
           계속
         </button>

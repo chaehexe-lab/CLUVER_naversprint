@@ -2,38 +2,8 @@
 
 import { useEffect, useState } from "react";
 
-function getActiveScreenId() {
-  return document.querySelector(".screen.active")?.id ?? "mainScreen";
-}
-
 export default function GameSettingsOverlay() {
-  const [activeScreen, setActiveScreen] = useState("mainScreen");
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const showSettingsHomeButton = !["mainScreen", "tutorialScreen", "dreamScreen"].includes(activeScreen);
-
-  useEffect(() => {
-    const syncActiveScreen = () => setActiveScreen(getActiveScreenId());
-
-    syncActiveScreen();
-
-    const shell = document.querySelector(".game-shell");
-    if (!shell) return undefined;
-
-    const observer = new MutationObserver(syncActiveScreen);
-    observer.observe(shell, {
-      attributes: true,
-      attributeFilter: ["class"],
-      subtree: true
-    });
-
-    window.addEventListener("samunmong:screen-change", syncActiveScreen);
-
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("samunmong:screen-change", syncActiveScreen);
-    };
-  }, []);
-
 
   useEffect(() => {
     const syncFullscreen = () => {
@@ -152,25 +122,23 @@ export default function GameSettingsOverlay() {
             <input id="contrastSetting" type="checkbox" />
           </label>
           <div className="dialog-actions">
-            {showSettingsHomeButton && (
-              <button
-                className="button settings-home-button"
-                type="button"
-                aria-label="메인 화면으로 이동"
-                title="메인 화면으로 이동"
-                onClick={goToMain}
-              >
-                <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none">
-                  <path
-                    d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
-              </button>
-            )}
+            <button
+              className="button settings-home-button"
+              type="button"
+              aria-label="메인 화면으로 이동"
+              title="메인 화면으로 이동"
+              onClick={goToMain}
+            >
+              <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none">
+                <path
+                  d="M4 10.5 12 4l8 6.5V20h-5v-6H9v6H4z"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
             <button className="button primary" id="closeSettings" type="button" onClick={closeSettings}>
               확인
             </button>
