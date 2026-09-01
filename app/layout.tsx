@@ -1,5 +1,6 @@
 ﻿import type { Metadata } from "next";
 import "./game.css";
+import "./space-station.css";
 import "./globals.css";
 import "./magic-briefing-v2.css";
 

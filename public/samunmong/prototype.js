@@ -765,6 +765,7 @@
         ? stored.map((name) => {
           if (name === "커피 텀블러") return "혈액 시료 분석 기록";
           if (name === "암호화된 연구 보상 계약") return "암호화된 파일";
+          if (name === "미승인 약물 앰풀") return "미승인 약물";
           return name;
         })
         : stored;
@@ -1702,7 +1703,7 @@
       "접속 키카드 칩": { x: 20, y: 34 },
       "암호화된 파일": { x: -55, y: 20 },
       "혈액 시료 분석 기록": { x: -55, y: 15 },
-      "미승인 약물 앰풀": { x: 31, y: 60 },
+      "미승인 약물": { x: 31, y: 60 },
       "성분 분석 장치": { x: -35, y: 20 },
       "접속 기록 복구 단말기": { x: -58, y: 9 }
     };
@@ -1840,11 +1841,11 @@
           "분석 시각: 사건 전날 OST 19:26"
         ]
       },
-      "미승인 약물 앰풀": {
+      "미승인 약물": {
         kicker: "ORBIT-13 · MEDICAL SUBSTANCE REPORT",
-        title: "미승인 약물 앰풀",
+        title: "미승인 약물",
         image: "/assets/space-station/evidence/unauthorized-drug-ampoule.webp",
-        imageAlt: "일부가 사용된 청색 미승인 약물 앰풀",
+        imageAlt: "일부가 사용된 청색 미승인 약물",
         description: "",
         items: [
           "약물: 실험용 근육 재생제",

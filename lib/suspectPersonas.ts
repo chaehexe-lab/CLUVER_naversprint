@@ -249,8 +249,8 @@ export const evidenceCatalog = [
     aliases: ["혈액 시료", "혈액 분석", "분석 기록", "RX-47B", "과학 실험실"]
   },
   {
-    name: "미승인 약물 앰풀",
-    aliases: ["약물 앰풀", "앰풀", "미승인 약물", "근육 재생 약물", "제조 코드", "약물 샘플"]
+    name: "미승인 약물",
+    aliases: ["미승인 약물 앰풀", "약물 앰풀", "앰풀", "근육 재생 약물", "제조 코드", "약물 샘플"]
   }
 ] as const;
 
@@ -516,12 +516,12 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "데이비드의 구조 요청을 수신하고 채널을 차단했다는 기록에 크게 흔들린다. 통신 장애였다고 주장하지만 수동 차단 로그는 설명하지 못한다."
       },
       {
-        evidenceNames: ["암호화된 파일", "미승인 약물 앰풀"],
+        evidenceNames: ["암호화된 파일", "미승인 약물"],
         intentTags: ["illegalTrial", "researchReward"],
         responseGuide: "계약과 앰풀이 자신의 의료 권한에 연결된다는 점을 부정하다가, 연구 성과와 우선 귀환권을 잃을 수 없었다는 탐욕을 드러낸다."
       }
     ],
-    breakEvidenceNames: ["EVA 지원 단말기", "소독천과 장갑", "조작된 전압 센서", "비인가 지연 타이머", "삭제된 의료 기록", "암호화된 파일", "미승인 약물 앰풀", "마지막 무전 기록"],
+    breakEvidenceNames: ["EVA 지원 단말기", "소독천과 장갑", "조작된 전압 센서", "비인가 지연 타이머", "삭제된 의료 기록", "암호화된 파일", "미승인 약물", "마지막 무전 기록"],
     finalBehavior: "불법 임상시험과 부작용 은폐, 구조 채널 차단이 드러나고 공개되지 않은 증상 시각과 투여량을 말실수한 뒤 연구 보상과 지구 귀환 특혜를 잃을 수 없었다는 악의적 동기를 드러낸다."
   },
   {
@@ -572,9 +572,9 @@ export const suspectPersonas: SuspectPersona[] = [
     ],
     evidenceReactions: [
       {
-        evidenceNames: ["혈액 시료 분석 기록", "미승인 약물 앰풀"],
+        evidenceNames: ["혈액 시료 분석 기록", "미승인 약물"],
         intentTags: ["bloodSample", "rx47b"],
-        responseGuide: "혈액 시료 분석은 데이비드의 의뢰로 자신이 진행했고 RX-47B가 검출됐다고 설명한다. 미승인 약물 앰풀은 자신의 것이 아니며, 추궁하면 21시 47분경 메르스가 앰풀이 든 냉각 보관함을 의료실 방향으로 운반하는 모습을 봤다고 밝힌다."
+        responseGuide: "혈액 시료 분석은 데이비드의 의뢰로 자신이 진행했고 RX-47B가 검출됐다고 설명한다. 미승인 약물은 자신의 것이 아니며, 추궁하면 21시 47분경 메르스가 약물이 든 냉각 보관함을 의료실 방향으로 운반하는 모습을 봤다고 밝힌다."
       },
       {
         evidenceNames: ["EVA 지원 단말기", "소독천과 장갑"],
@@ -582,7 +582,7 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "EVA 지원 단말기의 마지막 원격 진단 기록과 소독천에 남은 젤 성분을 비교해, 실험실 시약보다 의료용 밀봉재가 원인에 가깝다고 설명한다. 극저온에서 단단해지는 성질이 수법의 핵심이라고 말한다."
       }
     ],
-    breakEvidenceNames: ["혈액 시료 분석 기록", "미승인 약물 앰풀", "EVA 지원 단말기"],
+    breakEvidenceNames: ["혈액 시료 분석 기록", "미승인 약물", "EVA 지원 단말기"],
     finalBehavior: "불법 실험은 인정하지만, 수법은 자기 실험실이 아니라 의료실 물품과 더 맞는다고 설명한다."
   }
 ];
@@ -659,7 +659,7 @@ export function getSpaceStationFallbackDialogue(
     if (hasAnyEvidence("마지막 무전 기록")) {
       return "그때는 통신 장애가 있었습니다. 수동 차단 기록이 왜 남았는지는 지금 확인 없이 단정할 수 없습니다.";
     }
-    if (hasAnyEvidence("암호화된 연구 보상 계약", "미승인 약물 앰풀")) {
+    if (hasAnyEvidence("암호화된 연구 보상 계약", "미승인 약물")) {
       return "그 계약과 앰풀이 제 의료 권한에 연결된 것은 맞습니다. 하지만 연구 보상만을 위해 환자를 위험에 빠뜨렸다는 결론은 받아들일 수 없습니다.";
     }
     if (hasAnyEvidence("조작된 전압 센서", "비인가 지연 타이머")) {
@@ -687,8 +687,8 @@ export function getSpaceStationFallbackDialogue(
 
   if (suspectId === "einspanner") {
     if (asksAlibi) return "정전 전부터 과학 실험실에서 개인 실험을 정리하고 있었습니다. 다른 구역에는 가지 않았습니다.";
-    if (hasAnyEvidence("혈액 시료 분석 기록", "미승인 약물 앰풀")) {
-      return "혈액 시료는 데이비드의 의뢰로 제가 분석했고, 미승인 약물 성분이 검출됐습니다. 그 앰풀은 제 것이 아닙니다. 21시 47분쯤 메르스가 냉각 보관함을 의료실 방향으로 옮기는 모습도 봤습니다.";
+    if (hasAnyEvidence("혈액 시료 분석 기록", "미승인 약물")) {
+      return "혈액 시료는 데이비드의 의뢰로 제가 분석했고, 미승인 약물 성분이 검출됐습니다. 그 약물은 제 것이 아닙니다. 21시 47분쯤 메르스가 냉각 보관함을 의료실 방향으로 옮기는 모습도 봤습니다.";
     }
     if (hasAnyEvidence("추진 레버 결빙 기록", "소독천과 장갑")) {
       return "두 시료의 젤 성분을 비교하면 실험실 시약보다 의료용 밀봉재에 가깝습니다. 극저온에서 단단해지는 성질이 추진 레버 결빙과도 맞습니다.";

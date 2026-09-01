@@ -76,7 +76,7 @@ const evidenceScreens: Record<GameTheme, Record<string, string[]>> = {
     "암호화된 파일": ["spaceDataCore"],
     "암호화된 연구 보상 계약": ["spaceDataCore"],
     "혈액 시료 분석 기록": ["spaceScienceLab"],
-    "미승인 약물 앰풀": ["spaceScienceLab"],
+    "미승인 약물": ["spaceScienceLab"],
     "전력 제어실 출입 카드": ["interrogationScreen"]
   }
 };
@@ -144,6 +144,13 @@ function sanitizeStringArray(value: unknown) {
     : [];
 }
 
+function migrateEvidenceNames(theme: GameTheme, names: string[]) {
+  if (theme !== "spaceStation") return names;
+  return unique(names.map((name) =>
+    name === "미승인 약물 앰풀" ? "미승인 약물" : name
+  ));
+}
+
 function normalizeProgress(value: unknown, expectedTheme?: GameTheme): GameProgress | null {
   if (!value || typeof value !== "object") return null;
   const candidate = value as Partial<GameProgress>;
@@ -167,8 +174,8 @@ function normalizeProgress(value: unknown, expectedTheme?: GameTheme): GameProgr
     theme: candidate.theme,
     currentScreen: candidate.currentScreen,
     visitedScreens: sanitizeStringArray(candidate.visitedScreens),
-    collectedEvidenceNames: sanitizeStringArray(candidate.collectedEvidenceNames),
-    analyzedEvidenceNames: sanitizeStringArray(candidate.analyzedEvidenceNames),
+    collectedEvidenceNames: migrateEvidenceNames(candidate.theme, sanitizeStringArray(candidate.collectedEvidenceNames)),
+    analyzedEvidenceNames: migrateEvidenceNames(candidate.theme, sanitizeStringArray(candidate.analyzedEvidenceNames)),
     knownFactIds: sanitizeStringArray(candidate.knownFactIds),
     accusation: normalizedAccusation,
     updatedAt: candidate.updatedAt

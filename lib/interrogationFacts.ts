@@ -417,7 +417,7 @@ export const interrogationFacts: InterrogationFact[] = [
     fact: "약물 증거로 추궁받은 아인슈페너는 21시 47분경 메르스가 앰풀이 든 냉각 보관함을 의료실 방향으로 옮기는 모습을 봤다고 밝힌다.",
     reasoningGuide: "메르스가 약물에 직접 접근했다는 가능성을 높이지만, 실제 투여 기록과 연결해야 한다.",
     visibility: "collected",
-    evidenceNames: ["혈액 시료 분석 기록", "미승인 약물 앰풀"],
+    evidenceNames: ["혈액 시료 분석 기록", "미승인 약물"],
     responseMode: "nervous",
     pressure: 2,
     discoverable: true

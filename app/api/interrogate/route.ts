@@ -118,7 +118,7 @@ const LOCKED_SECRET_RULES = [
     questionPattern: /(21시\s*47분|메르스.{0,18}냉각\s*보관함|냉각\s*보관함.{0,18}메르스)/,
     pattern: /(21시\s*47분|메르스.{0,18}냉각\s*보관함|냉각\s*보관함.{0,18}메르스|누군가.{0,18}옮|옮기는.{0,18}봤|옮겨.{0,18}본)/,
     confirmationPattern: /(봤|보았|본\s*적|옮|보관함)/,
-    requiredEvidenceNames: ["혈액 시료 분석 기록", "미승인 약물 앰풀"]
+    requiredEvidenceNames: ["혈액 시료 분석 기록", "미승인 약물"]
   }
 ] as const;
 

@@ -47,10 +47,10 @@ export const spaceStationTheme = {
     "전력 제어실 출입 카드": { role: "출입 권한", location: "보안 조사실", note: "알라딘딘에게서 받은 전력 제어실 출입 카드다.", logic: "전력 제어실의 잠금을 해제한다.", relatedSuspects: ["알라딘딘"], img: "/assets/space-station/evidence/power-control-access-card.png" },
     "암호화된 파일": { role: "결정적 동기 증거", location: "데이터실", note: "암호가 걸린 파일이다. 보안 키를 알아내기 전에는 내용을 확인할 수 없다.", cardNote: "암호가 걸린 파일이다. 보안 키를 알아내기 전에는 내용을 확인할 수 없다.", recoveredName: "암호화된 연구 보상 계약", recoveredCardNote: "미승인 약물 연구의 책임자와 보상 조건이 기록된 비밀 계약서다.", recoveredImg: "/assets/space-station/evidence/encrypted-research-contract-decrypted.png", logic: "메르스가 폭로를 막으려 한 악의적 동기를 보여준다.", relatedSuspects: ["메르스", "해리"], img: "/assets/space-station/evidence/encrypted-research-contract.webp" },
     "혈액 시료 분석 기록": { role: "불법 투약 추적 증거", location: "과학 실험실", note: "데이비드가 사건 전날 과학 실험실에 맡긴 혈액 시료의 분석 기록이다.", logic: "데이비드가 미승인 약물 투여 사실을 알아내고 관련 자료를 직접 조사하기 시작했음을 보여준다.", relatedSuspects: ["데이비드", "아인슈페너", "메르스"], img: "/assets/space-station/evidence/blood-sample-analysis-report.png" },
-    "미승인 약물 앰풀": { role: "위장 및 동기 증거", location: "과학 실험실", note: "삭제된 투약 기록과 같은 제조 코드가 남은 파란 근육 재생 약물 앰풀.", cardNote: "정식 의료 목록에 등록되지 않은 청색 약물 앰풀. 일부가 사용된 상태다.", logic: "메르스가 불법 약물을 숨기고 아인슈페너에게 책임을 씌우려 했다.", relatedSuspects: ["메르스", "아인슈페너"], img: "/assets/space-station/evidence/unauthorized-drug-ampoule.webp" }
+    "미승인 약물": { role: "위장 및 동기 증거", location: "과학 실험실", note: "삭제된 투약 기록과 같은 제조 코드가 남은 파란 근육 재생 약물.", cardNote: "정식 의료 목록에 등록되지 않은 청색 약물. 일부가 사용된 상태다.", logic: "메르스가 불법 약물을 숨기고 아인슈페너에게 책임을 씌우려 했다.", relatedSuspects: ["메르스", "아인슈페너"], img: "/assets/space-station/evidence/unauthorized-drug-ampoule.webp" }
   },
   requiredEvidence: ["EVA 지원 단말기", "조작된 전압 센서", "비인가 지연 타이머", "삭제된 의료 기록", "접속 키카드 칩", "암호화된 파일", "마지막 무전 기록"],
-  deductionRoute: ["외벽 장비 담당 알라딘딘이 먼저 의심받는다.", "약물 앰풀 때문에 아인슈페너가 의심받는다.", "삭제 로그 때문에 해리가 의심받는다.", "산소 복구 과정에서 사고가 예약 실행됐음이 드러난다.", "심문과 의료실 증거가 메르스의 행동을 완성한다.", "최종 지목은 메르스다."]
+  deductionRoute: ["외벽 장비 담당 알라딘딘이 먼저 의심받는다.", "미승인 약물 때문에 아인슈페너가 의심받는다.", "삭제 로그 때문에 해리가 의심받는다.", "산소 복구 과정에서 사고가 예약 실행됐음이 드러난다.", "심문과 의료실 증거가 메르스의 행동을 완성한다.", "최종 지목은 메르스다."]
 } as const;
 
 const dock = [
@@ -82,7 +82,7 @@ const hotspots: Record<string, SceneHotspot[]> = {
   ],
   spaceScienceLab: [
     { evidenceName: "혈액 시료 분석 기록", ariaLabel: "혈액 시료 분석 기록 조사", x: "39.5%", y: "60%", w: "10%", h: "5.5%", clipPath: "polygon(3% 3%, 97% 3%, 96% 96%, 4% 96%)", radius: "4px", rot: "0deg" },
-    { evidenceName: "미승인 약물 앰풀", ariaLabel: "미승인 약물 앰풀 조사", x: "66.7%", y: "62.3%", w: "6.2%", h: "13.3%", clipPath: "polygon(28% 2%, 75% 4%, 94% 91%, 7% 96%)", radius: "999px", rot: "0deg" }
+    { evidenceName: "미승인 약물", ariaLabel: "미승인 약물 조사", x: "66.7%", y: "62.3%", w: "6.2%", h: "13.3%", clipPath: "polygon(28% 2%, 75% 4%, 94% 91%, 7% 96%)", radius: "999px", rot: "0deg" }
   ]
 };
 
