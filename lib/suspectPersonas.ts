@@ -245,10 +245,6 @@ export const evidenceCatalog = [
     aliases: ["연구 계약", "보상 계약", "암호화 계약", "연구 보상", "우선 귀환권", "임상 자료", "성과보상 계약서"]
   },
   {
-    name: "엔지니어 공구 클램프",
-    aliases: ["공구 클램프", "클램프", "공구", "점검 도구", "우주복 점검"]
-  },
-  {
     name: "혈액 시료 분석 기록",
     aliases: ["혈액 시료", "혈액 분석", "분석 기록", "RX-47B", "과학 실험실"]
   },
@@ -546,9 +542,9 @@ export const suspectPersonas: SuspectPersona[] = [
     ],
     evidenceReactions: [
       {
-        evidenceNames: ["EVA 지원 단말기", "엔지니어 공구 클램프"],
+        evidenceNames: ["EVA 지원 단말기"],
         intentTags: ["gelNotVisible", "suitCheck"],
-        responseGuide: "출발 전 점검에서는 레버가 정상이었고 외부 작업 중 급격히 결빙된 기록이 남았다고 설명한다. 공구 클램프에는 젤 흔적이 없으니 엔지니어 도구로 만든 고장이 아니라고 반박한다."
+        responseGuide: "출발 전 점검에서는 레버가 정상이었고 외부 작업 중 급격히 결빙된 기록이 남았다고 설명한다. 따라서 출발 전 점검 누락이나 단순 장비 결함으로 생긴 사고는 아니라고 반박한다."
       },
       {
         evidenceNames: ["조작된 전압 센서", "비인가 지연 타이머"],
@@ -556,7 +552,7 @@ export const suspectPersonas: SuspectPersona[] = [
         responseGuide: "외벽 통신 장치의 고정 전력이 끊겨 패널이 이탈했다고 설명한다. 타이머의 22시 05분 예약 기록을 제시하면 22시 11분경 에어록 근처에서 메르스가 '이제 시간만 맞으면 된다'고 무전하는 것을 들었다고 밝힌다."
       }
     ],
-    breakEvidenceNames: ["EVA 지원 단말기", "엔지니어 공구 클램프"],
+    breakEvidenceNames: ["EVA 지원 단말기"],
     finalBehavior: "장비 점검 과실 의심에서 벗어나고, 수법이 의료용 젤과 정전 유도였다는 쪽으로 시선을 돌린다."
   },
   {

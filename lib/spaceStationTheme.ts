@@ -37,7 +37,6 @@ export const spaceStationTheme = {
     { id: "interrogationScreen", name: "보안 조사실", map: { x: "50.2%", y: "79%", labelY: "88.6%" }, indicator: { x: "50%", y: "76%" }, image: room, alt: "오르빗-13 보안 조사실" }
   ],
   evidence: {
-    "엔지니어 공구 클램프": { role: "무혐의 증거", location: "에어록", note: "공구함 반납 기록을 확인할 수 있다.", logic: "알라딘딘이 장비를 조작했다는 의혹을 약화한다.", relatedSuspects: ["알라딘딘"], img: "/assets/space-station/evidence/engineer-tool-clamp.webp" },
     "EVA 지원 단말기": { role: "수법 증거", location: "에어록", note: "외부 작업용 우주복의 점검 및 상태 기록을 확인할 수 있다.", logic: "출발 전에는 정상이었던 산소 공급 장치와 비상 추진 장치가 외부 작업 중 비정상 상태로 바뀐 사실을 보여준다.", relatedSuspects: ["메르스", "알라딘딘"], img: "/assets/space-station/evidence/eva-support-terminal.png" },
     "마지막 무전 기록": { role: "결정타 증거", location: "에어록", note: "사건 당시 데이비드가 송신한 무전 기록을 시간순으로 확인할 수 있다.", logic: "메르스가 구조 요청을 받고도 채널을 차단했다.", relatedSuspects: ["데이비드", "메르스"], img: "/assets/space-station/evidence/final-radio-log.webp" },
     "소독천과 장갑": { role: "연결 증거", location: "의료실", note: "흰 소독천과 수술용 장갑에 투명 젤 성분이 남아 있다.", cardNote: "흰 소독천과 수술용 장갑에 정체를 알 수 없는 물질이 묻어 있다.", logic: "추진 레버를 막은 젤과 의료실을 연결한다.", relatedSuspects: ["메르스"], img: "/assets/space-station/evidence/disinfectant-cloth-glove.webp" },
@@ -64,7 +63,6 @@ const dock = [
 
 const hotspots: Record<string, SceneHotspot[]> = {
   spaceAirlock: [
-    { evidenceName: "엔지니어 공구 클램프", ariaLabel: "엔지니어 공구 클램프 조사", x: "30.9%", y: "87.8%", w: "11%", h: "10%", clipPath: "polygon(2% 36%, 85% 12%, 98% 68%, 18% 96%)", radius: "999px", rot: "5deg" },
     { evidenceName: "EVA 지원 단말기", ariaLabel: "EVA 지원 단말기 조사", x: "61.5%", y: "40.5%", w: "7%", h: "17%", clipPath: "polygon(8% 4%, 92% 4%, 96% 94%, 4% 96%)", radius: "12px", rot: "0deg" },
     { evidenceName: "마지막 무전 기록", ariaLabel: "마지막 무전 기록 조사", x: "96.5%", y: "35.4%", w: "7%", h: "17%", clipPath: "polygon(12% 4%, 88% 8%, 98% 92%, 4% 96%)", radius: "14px", rot: "0deg" }
   ],

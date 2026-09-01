@@ -1,3 +1,5 @@
+import { getSpaceStationRoute } from "./spaceStationRoutes";
+
 export type GameTheme = "joseon" | "magicSchool" | "spaceStation";
 
 const JOSEON_SCREENS = new Set([
@@ -23,6 +25,9 @@ export function getThemeForScreen(screenId: string | null | undefined): GameThem
 }
 
 export function getThemeEntryHref(screenId: string, theme: GameTheme) {
+  if (theme === "spaceStation") {
+    return getSpaceStationRoute(screenId) ?? "/space-station/briefing";
+  }
   const params = new URLSearchParams({ start: screenId, theme });
   return `/?${params.toString()}`;
 }

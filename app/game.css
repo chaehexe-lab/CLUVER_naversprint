@@ -4301,6 +4301,14 @@
       right: 18px;
     }
 
+    html[data-samunmong-theme="spaceStation"] #mapPanel:not(.show) > .map-floating-close {
+      display: none !important;
+    }
+
+    html[data-samunmong-theme="spaceStation"] #mapPanel.show > .map-floating-close {
+      display: grid;
+    }
+
     html[data-samunmong-theme="spaceStation"] .map-floating-close:hover,
     html[data-samunmong-theme="spaceStation"] .map-floating-close:focus-visible {
       color: #effbff;
@@ -20398,6 +20406,78 @@ html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-choice > p {
   font-size: 16px;
 }
 
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-empty-slot {
+  min-height: 170px;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  border: 2px dashed rgba(68, 113, 143, .58);
+  border-radius: 14px;
+  color: rgba(29, 68, 96, .58);
+  background: rgba(226, 238, 248, .2);
+  cursor: pointer;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-empty-slot span {
+  padding: 10px 18px;
+  border: 1px solid rgba(68, 113, 143, .22);
+  border-radius: 6px;
+  font-size: 12px;
+  letter-spacing: .14em;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-empty-slot[hidden],
+html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip[hidden] {
+  display: none;
+}
+
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .scene-dock {
+  display: contents;
+}
+
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .scene-dock .scene-chip,
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .scene-dock .tool-prop {
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .scene-dock .bag-chip {
+  z-index: 78;
+  pointer-events: auto;
+}
+
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .evidence-bag-pop {
+  z-index: 80;
+}
+
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .evidence-card[data-evidence="접속 키카드 칩"] {
+  cursor: grab;
+}
+
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .evidence-card[data-evidence="접속 키카드 칩"]:hover,
+html[data-samunmong-theme="spaceStation"].space-keycard-terminal-active .evidence-card[data-evidence="접속 키카드 칩"]:focus-visible {
+  border-color: rgba(75, 163, 211, .9);
+  box-shadow: 0 0 0 2px rgba(74, 176, 230, .14), inset 0 0 20px rgba(91, 187, 236, .1);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-cursor {
+  position: fixed;
+  z-index: 82;
+  left: 0;
+  top: 0;
+  width: 108px;
+  height: 108px;
+  display: none;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, .48));
+  transform: translate(-50%, -44%);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-cursor.show {
+  display: block;
+}
+
+
 html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip {
   width: 100%;
   min-height: 170px;
@@ -20433,6 +20513,19 @@ html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip strong {
   font-size: 20px;
   font-weight: 500;
 }
+
+html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip > span {
+  display: grid;
+  gap: 8px;
+  text-align: left;
+}
+
+html[data-samunmong-theme="spaceStation"] #spaceKeycardTerminalChip small {
+  color: rgba(16, 59, 88, .62);
+  font-size: 11px;
+  letter-spacing: .08em;
+}
+
 
 html[data-samunmong-theme="spaceStation"] .space-keycard-terminal-loading {
   position: relative;
@@ -20584,6 +20677,78 @@ html[data-samunmong-theme="spaceStation"] .space-analysis-guide {
   font-size: 16px;
 }
 
+html[data-samunmong-theme="spaceStation"] .space-analysis-insertion {
+  position: relative;
+  z-index: 1;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-empty-slot {
+  min-height: 230px;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  border: 2px dashed rgba(68, 113, 143, .58);
+  border-radius: 14px;
+  color: rgba(29, 68, 96, .58);
+  background: rgba(226, 238, 248, .2);
+  cursor: pointer;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-empty-slot span {
+  padding: 10px 18px;
+  border: 1px solid rgba(68, 113, 143, .22);
+  border-radius: 6px;
+  font-size: 12px;
+  letter-spacing: .14em;
+}
+
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .scene-dock {
+  display: contents;
+}
+
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .scene-dock .scene-chip,
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .scene-dock .tool-prop {
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .scene-dock .bag-chip {
+  z-index: 78;
+  pointer-events: auto;
+}
+
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .evidence-bag-pop {
+  z-index: 80;
+}
+
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .evidence-card[data-evidence="소독천과 장갑"] {
+  cursor: grab;
+}
+
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .evidence-card[data-evidence="소독천과 장갑"]:hover,
+html[data-samunmong-theme="spaceStation"].space-analysis-insertion-active .evidence-card[data-evidence="소독천과 장갑"]:focus-visible {
+  border-color: rgba(75, 163, 211, .9);
+  box-shadow: 0 0 0 2px rgba(74, 176, 230, .14), inset 0 0 20px rgba(91, 187, 236, .1);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-sample-cursor {
+  position: fixed;
+  z-index: 82;
+  left: 0;
+  top: 0;
+  width: 112px;
+  height: 112px;
+  display: none;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, .48));
+  transform: translate(-50%, -44%);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-analysis-sample-cursor.show {
+  display: block;
+}
+
+
 html[data-samunmong-theme="spaceStation"] .space-analysis-evidence-list {
   position: relative;
   z-index: 1;
@@ -20596,7 +20761,7 @@ html[data-samunmong-theme="spaceStation"] .space-analysis-evidence-list {
 
 html[data-samunmong-theme="spaceStation"] .space-analysis-evidence-option {
   min-width: 0;
-  min-height: 170px;
+  min-height: 230px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20704,6 +20869,635 @@ html[data-samunmong-theme="spaceStation"] #spaceAnalysisBack {
   font: inherit;
   cursor: pointer;
 }
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="암호화된 파일"].contract-decrypted {
+  width: min(1040px, 90vw);
+  height: min(640px, 88vh);
+  align-items: center;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="암호화된 파일"].contract-encrypted {
+  width: min(520px, 88vw);
+  grid-template-columns: minmax(0, 1fr);
+  padding-inline: 44px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="암호화된 파일"].contract-encrypted .space-evidence-detail-visual {
+  display: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="암호화된 파일"].contract-encrypted .space-evidence-detail-copy {
+  width: 100%;
+  max-width: 410px;
+  margin-inline: auto;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="암호화된 파일"].contract-decrypted .space-evidence-detail-copy {
+  max-height: calc(min(640px, 88vh) - 92px);
+  padding-right: 12px;
+  overflow-y: auto;
+  scrollbar-color: rgba(70, 135, 178, .72) rgba(7, 31, 53, .12);
+  scrollbar-width: thin;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="암호화된 파일"].contract-decrypted .space-evidence-detail-copy h2 {
+  font-size: clamp(23px, 2vw, 30px);
+}
+
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="암호화된 파일"].contract-decrypted .space-evidence-detail-visual img {
+  width: 100%;
+  height: 440px;
+  clip-path: polygon(8% 5%, 92% 3%, 94% 96%, 7% 93%);
+}
+
+
+html[data-samunmong-theme="spaceStation"] .space-contract-decryption-form:not([hidden]) {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-contract-decryption-form label {
+  color: #102b44;
+  font-size: clamp(16px, 1.4vw, 19px);
+  line-height: 1.6;
+  word-break: keep-all;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-contract-key-fields {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-contract-key-group {
+  display: flex;
+  gap: 7px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-contract-key-fields input {
+  width: 42px;
+  min-width: 42px;
+  box-sizing: border-box;
+  padding: 12px 4px;
+  border: 1px solid rgba(50, 106, 145, .7);
+  border-radius: 9px;
+  outline: 0;
+  color: #0b2942;
+  background: rgba(235, 246, 255, .58);
+  box-shadow: inset 0 1px 8px rgba(25, 63, 92, .12);
+  font: 600 16px/1.2 "Consolas", monospace;
+  letter-spacing: .06em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-contract-key-fields input::placeholder {
+  color: rgba(16, 59, 88, .46);
+  font-size: 11px;
+  letter-spacing: .02em;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-contract-key-fields input:focus {
+  border-color: rgba(42, 139, 194, .95);
+  box-shadow: 0 0 0 2px rgba(83, 184, 235, .2), inset 0 1px 8px rgba(25, 63, 92, .12);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-contract-decryption-form button {
+  justify-self: start;
+  padding: 10px 18px;
+  border: 1px solid rgba(47, 116, 159, .78);
+  border-radius: 9px;
+  color: #e9f8ff;
+  background: linear-gradient(180deg, rgba(48, 131, 180, .92), rgba(24, 83, 124, .94));
+  box-shadow: 0 5px 14px rgba(24, 70, 103, .24);
+  font: inherit;
+  cursor: pointer;
+}
+
+
+html[data-samunmong-theme="spaceStation"] .space-contract-section {
+  padding: 14px 0 4px;
+  border-top: 1px solid rgba(36, 84, 118, .2);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-contract-section h3 {
+  margin: 0 0 9px;
+  color: #103b58;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-contract-section p,
+html[data-samunmong-theme="spaceStation"] .space-contract-footer p {
+  padding: 0;
+  border: 0;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-contract-section .space-contract-paragraph {
+  line-height: 1.75;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-contract-section strong,
+html[data-samunmong-theme="spaceStation"] .space-contract-footer strong {
+  color: #071f35;
+  font-weight: 700;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-contract-footer {
+  display: grid;
+  gap: 4px;
+  margin-top: 12px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(36, 84, 118, .42);
+}
+
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail.medical-record-recovered {
+  width: min(1120px, 92vw);
+  grid-template-columns: minmax(0, 1fr);
+  padding-inline: 48px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail.medical-record-recovered .space-evidence-detail-visual {
+  display: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail.medical-record-recovered .space-evidence-detail-copy {
+  width: 100%;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail.medical-record-recovered .space-evidence-detail-copy h2 {
+  margin-bottom: 20px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid rgba(53, 105, 141, .28);
+  border-radius: 12px;
+  background: rgba(238, 246, 252, .28);
+  box-shadow: inset 0 0 18px rgba(57, 112, 148, .08);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table {
+  width: 100%;
+  min-width: 820px;
+  border-collapse: collapse;
+  color: #102b44;
+  table-layout: fixed;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table th,
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table td {
+  padding: 13px 16px;
+  border-right: 1px solid rgba(36, 84, 118, .16);
+  border-bottom: 1px solid rgba(36, 84, 118, .16);
+  text-align: left;
+  font-size: clamp(14px, 1.2vw, 17px);
+  line-height: 1.45;
+  word-break: keep-all;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table th {
+  color: #0c304b;
+  background: rgba(221, 237, 248, .42);
+  font-weight: 700;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table th:nth-child(1),
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table td:nth-child(1) {
+  width: 20%;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table th:nth-child(2),
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table td:nth-child(2) {
+  width: 17%;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table th:nth-child(3),
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table td:nth-child(3) {
+  width: 29%;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table th:nth-child(4),
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table td:nth-child(4) {
+  width: 34%;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table th:last-child,
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table td:last-child {
+  border-right: 0;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-medical-record-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="EVA 지원 단말기"] {
+  width: min(650px, 88vw);
+  min-height: 350px;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-detail[data-evidence="EVA 지원 단말기"] .space-evidence-detail-visual {
+  display: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-evidence-description-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-eva-support-help .space-power-access-help-tooltip {
+  right: -72px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-eva-record-menu {
+  display: grid;
+  gap: 14px;
+  margin-top: 26px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-eva-record-menu[hidden] {
+  display: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-eva-record-menu button {
+  min-height: 58px;
+  padding: 12px 22px;
+  border: 1px solid rgba(61, 128, 174, .56);
+  border-radius: 12px;
+  color: #123650;
+  background: rgba(235, 246, 254, .5);
+  box-shadow: inset 0 0 18px rgba(73, 145, 190, .08);
+  font: inherit;
+  font-size: 18px;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color .18s ease, background .18s ease, transform .18s ease;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-eva-record-menu button:hover,
+html[data-samunmong-theme="spaceStation"] .space-eva-record-menu button:focus-visible {
+  border-color: rgba(36, 148, 215, .9);
+  background: rgba(226, 245, 255, .86);
+  transform: translateY(-1px);
+}
+
+
+html[data-samunmong-theme="spaceStation"] .space-eva-record-dialog {
+  position: fixed;
+  z-index: 73;
+  left: 50%;
+  top: 50%;
+  box-sizing: border-box;
+  width: min(680px, 86vw);
+  display: none;
+  padding: 42px 48px;
+  border: 1px solid rgba(188, 229, 255, .95);
+  border-radius: 22px;
+  color: #102b44;
+  background: linear-gradient(145deg, rgba(225, 237, 249, .98), rgba(185, 204, 229, .97));
+  box-shadow: 0 28px 80px rgba(0, 0, 0, .7), 0 0 24px rgba(112, 205, 255, .25), inset 0 0 0 1px rgba(226, 246, 255, .4);
+  transform: translate(-50%, -50%);
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-eva-record-dialog.show {
+  display: block;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-eva-record-dialog > span {
+  display: block;
+  margin-bottom: 8px;
+  color: rgba(16, 59, 88, .68);
+  font-size: 12px;
+  letter-spacing: .12em;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-eva-record-dialog h2 {
+  margin: 0 0 22px;
+  font-size: clamp(25px, 2.3vw, 34px);
+  font-weight: 500;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-eva-record-dialog > p {
+  margin: 0 0 20px;
+  font-size: 17px;
+  line-height: 1.7;
+  word-break: keep-all;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-eva-record-items p {
+  margin: 0;
+  padding: 12px 4px;
+  border-bottom: 1px solid rgba(36, 84, 118, .16);
+  font-size: 17px;
+  line-height: 1.5;
+}
+
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-overlay {
+  position: fixed;
+  z-index: 76;
+  inset: 0;
+  visibility: hidden;
+  background: rgba(0, 0, 0, .48);
+  opacity: 0;
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-overlay.show {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-panel {
+  position: fixed;
+  z-index: 77;
+  left: 50%;
+  top: 50%;
+  box-sizing: border-box;
+  width: min(650px, 86vw);
+  display: none;
+  padding: 42px 52px 46px;
+  border: 1px solid rgba(188, 229, 255, .9);
+  border-radius: 24px;
+  color: #102b44;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, .16), transparent 19%),
+    radial-gradient(ellipse at 24% 0%, rgba(214, 240, 252, .24), transparent 48%),
+    linear-gradient(145deg, rgba(221, 233, 248, .94), rgba(185, 204, 229, .9));
+  box-shadow:
+    0 26px 76px rgba(0, 0, 0, .58),
+    0 0 22px rgba(112, 205, 255, .2),
+    inset 0 0 0 1px rgba(226, 246, 255, .34);
+  transform: translate(-50%, -50%);
+  -webkit-backdrop-filter: blur(12px) saturate(1.08);
+  backdrop-filter: blur(12px) saturate(1.08);
+  font-family: "VitroPride", "Noto Sans KR", sans-serif;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-panel::before {
+  content: "";
+  position: absolute;
+  inset: 8px;
+  border: 1px solid rgba(132, 198, 238, .52);
+  border-radius: 18px;
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-panel.show {
+  display: block;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-panel > span {
+  position: relative;
+  z-index: 1;
+  display: block;
+  margin-bottom: 7px;
+  color: rgba(16, 59, 88, .68);
+  font-size: 12px;
+  letter-spacing: .12em;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-panel h2 {
+  position: relative;
+  z-index: 1;
+  margin: 0 0 15px;
+  font-size: clamp(27px, 2.4vw, 36px);
+  font-weight: 500;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-guide {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  color: #24445f;
+  font-size: 16px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-guide-row {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 0 0 20px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-help {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-help::before {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  width: 100%;
+  height: 9px;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-trigger {
+  width: 30px;
+  height: 30px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  color: #ffc83d;
+  background: transparent;
+  box-shadow: none;
+  cursor: pointer;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-trigger:hover,
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-trigger:focus-visible,
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-trigger[aria-expanded="true"] {
+  color: #ffe382;
+  background: radial-gradient(circle, rgba(255, 211, 79, .3) 0%, rgba(255, 194, 24, .14) 44%, transparent 72%);
+  filter: drop-shadow(0 0 5px rgba(255, 205, 62, .72));
+  outline: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-trigger svg {
+  width: 21px;
+  height: 21px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-bulb-body,
+html[data-samunmong-theme="spaceStation"] .space-power-access-bulb-base {
+  fill: currentColor;
+  stroke: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-bulb-hole {
+  fill: rgba(76, 59, 8, .88);
+  stroke: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-tooltip {
+  position: absolute;
+  z-index: 4;
+  right: -100px;
+  bottom: calc(100% + 7px);
+  width: max-content;
+  max-width: none;
+  padding: 7px 9px;
+  border: 1px solid rgba(210, 225, 236, .78);
+  border-radius: 7px;
+  color: #eaf7ff;
+  background: rgba(8, 22, 34, .94);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, .34);
+  font-size: 12px;
+  line-height: 1.25;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-tooltip:hover,
+html[data-samunmong-theme="spaceStation"] .space-power-access-help-tooltip:focus-visible {
+  border-color: rgba(255, 207, 75, .85);
+  color: #fff4c9;
+  outline: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-empty-slot {
+  position: relative;
+  z-index: 1;
+  min-height: 150px;
+  display: grid;
+  place-items: center;
+  box-sizing: border-box;
+  border: 2px dashed rgba(68, 113, 143, .58);
+  border-radius: 14px;
+  color: rgba(29, 68, 96, .58);
+  background: rgba(226, 238, 248, .2);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-empty-slot[hidden],
+html[data-samunmong-theme="spaceStation"] .space-power-access-card[hidden] {
+  display: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-empty-slot span {
+  padding: 10px 18px;
+  border: 1px solid rgba(68, 113, 143, .22);
+  border-radius: 6px;
+  font-size: 12px;
+  letter-spacing: .14em;
+}
+
+html[data-samunmong-theme="spaceStation"].space-power-access-active .scene-dock {
+  display: contents;
+}
+
+html[data-samunmong-theme="spaceStation"].space-power-access-active .scene-dock .scene-chip,
+html[data-samunmong-theme="spaceStation"].space-power-access-active .scene-dock .tool-prop {
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="spaceStation"].space-power-access-active .scene-dock .bag-chip {
+  z-index: 78;
+  pointer-events: auto;
+}
+
+html[data-samunmong-theme="spaceStation"].space-power-access-active .evidence-bag-pop {
+  z-index: 80;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-cursor {
+  position: fixed;
+  z-index: 82;
+  left: 0;
+  top: 0;
+  width: 150px;
+  height: 100px;
+  display: none;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 10px 16px rgba(0, 0, 0, .48));
+  transform: translate(-50%, -44%);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-cursor.show {
+  display: block;
+}
+
+html[data-samunmong-theme="spaceStation"].space-power-access-active .evidence-card[data-evidence="전력 제어실 출입 카드"] {
+  cursor: grab;
+}
+
+html[data-samunmong-theme="spaceStation"].space-power-access-active .evidence-card[data-evidence="전력 제어실 출입 카드"]:hover,
+html[data-samunmong-theme="spaceStation"].space-power-access-active .evidence-card[data-evidence="전력 제어실 출입 카드"]:focus-visible {
+  border-color: rgba(75, 163, 211, .9);
+  box-shadow: 0 0 0 2px rgba(74, 176, 230, .14), inset 0 0 20px rgba(91, 187, 236, .1);
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  min-height: 150px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  padding: 18px 26px;
+  border: 1px solid rgba(74, 129, 166, .42);
+  border-radius: 14px;
+  color: #102b44;
+  background: rgba(234, 244, 252, .46);
+  cursor: pointer;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-card:hover,
+html[data-samunmong-theme="spaceStation"] .space-power-access-card:focus-visible {
+  border-color: rgba(54, 145, 196, .82);
+  background: rgba(229, 245, 255, .72);
+  box-shadow: 0 0 0 2px rgba(85, 184, 235, .15);
+  outline: none;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-card img {
+  width: 105px;
+  height: 105px;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .24));
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-card span {
+  display: grid;
+  gap: 8px;
+  text-align: left;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-card small {
+  color: rgba(16, 59, 88, .62);
+  font-size: 11px;
+  letter-spacing: .08em;
+}
+
+html[data-samunmong-theme="spaceStation"] .space-power-access-card strong {
+  font-size: 20px;
+  font-weight: 500;
+}
+
 
 html[data-samunmong-theme="spaceStation"] .space-evidence-detail-close {
   position: absolute;

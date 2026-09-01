@@ -293,7 +293,7 @@ function SpaceStationBriefingScreen() {
           backdropFilter: "blur(3px)"
         }}
       >
-        <button className="close-button map-floating-close briefing-journal-close" id="closeBriefingJournal" type="button" aria-label="사건 브리핑 닫기">
+        <button className="close-button briefing-journal-close" id="closeBriefingJournal" type="button" aria-label="사건 브리핑 닫기">
           닫기
         </button>
         {briefingStep === 0 ? <p className="briefing-kicker">ORBIT-13 INCIDENT LOG</p> : null}

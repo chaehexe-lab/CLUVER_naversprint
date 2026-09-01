@@ -25,6 +25,11 @@ import { magicSchoolScenes, spaceStationScenes } from "@/lib/gameData";
 import { spaceStationRuntimeConfig } from "@/lib/spaceStationTheme";
 import { STARTABLE_SCREENS } from "@/lib/gameState";
 import {
+  getSpaceStationRoute,
+  getSpaceStationScreen,
+  normalizeSpaceStationHref
+} from "@/lib/spaceStationRoutes";
+import {
   getThemeEntryHref,
   getThemeForScreen,
   normalizeGameTheme,
@@ -54,10 +59,12 @@ const SPACE_SCENES_BY_ID = new Map<string, (typeof spaceStationScenes)[number]>(
 type GameShellProps = {
   initialScreen?: string;
   initialTheme?: GameTheme;
+  routeMode?: "spaceStation";
 };
 
 function getThemeFromHref(href: string): GameTheme | undefined {
   const destination = new URL(href, window.location.href);
+  if (destination.pathname.startsWith("/space-station")) return "spaceStation";
   const requestedTheme = destination.searchParams.get("theme");
   if (requestedTheme === "joseon" || requestedTheme === "magicSchool" || requestedTheme === "spaceStation") {
     return requestedTheme;
@@ -121,7 +128,7 @@ function ActiveInvestigationScene({ screenId }: { screenId: string }) {
   return spaceScene ? <SpaceStationScene key={spaceScene.id} scene={spaceScene} /> : null;
 }
 
-export default function GameShell({ initialScreen, initialTheme }: GameShellProps) {
+export default function GameShell({ initialScreen, initialTheme, routeMode }: GameShellProps) {
   const router = useRouter();
   const skipIntro = Boolean(initialScreen);
   const renderedTheme = initialTheme ?? getThemeForScreen(initialScreen) ?? "joseon";
@@ -144,6 +151,13 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
   useEffect(() => {
     const navigationWindow = window as Window & { samunmongNavigate?: (href: string) => void };
     const navigate = (href: string) => {
+      if (routeMode === "spaceStation") {
+        const normalizedHref = normalizeSpaceStationHref(href, window.location.href);
+        if (normalizedHref !== href) {
+          window.location.assign(normalizedHref);
+          return;
+        }
+      }
       const destinationTheme = getThemeFromHref(href);
       const mountedTheme = normalizeGameTheme(document.documentElement.dataset.samunmongTheme);
       const hasExplicitTheme = new URL(href, window.location.href).searchParams.has("theme");
@@ -164,7 +178,7 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
         delete navigationWindow.samunmongNavigate;
       }
     };
-  }, [router]);
+  }, [routeMode, router]);
 
   useEffect(() => {
     const handleScreenRequest = (event: Event) => {
@@ -181,32 +195,70 @@ export default function GameShell({ initialScreen, initialTheme }: GameShellProp
       }
 
       event.preventDefault();
+      if (routeMode === "spaceStation") {
+        const route = getSpaceStationRoute(screenId);
+        if (route && window.location.pathname !== route) {
+          window.history.pushState({ samunmongScreen: screenId }, "", route);
+        }
+      }
       setCurrentScreen(screenId);
     };
 
     window.addEventListener("samunmong:screen-request", handleScreenRequest);
     return () => window.removeEventListener("samunmong:screen-request", handleScreenRequest);
-  }, []);
+  }, [routeMode]);
+
+  useEffect(() => {
+    if (routeMode !== "spaceStation") return;
+
+    const handlePopState = () => {
+      const screenId = getSpaceStationScreen(window.location.pathname);
+      if (screenId) setCurrentScreen(screenId);
+    };
+
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [routeMode]);
 
   useLayoutEffect(() => {
+    if (routeMode === "spaceStation") {
+      const briefingScreen = document.querySelector<HTMLElement>("#briefingScreen");
+      briefingScreen?.classList.remove("journal-overlay-open");
+      briefingScreen?.querySelector<HTMLElement>(".briefing-card")?.classList.remove("journal-mode");
+      window.dispatchEvent(new CustomEvent("samunmong:briefing-journal-close"));
+    }
     document.querySelectorAll(".screen").forEach((screen) => {
       screen.classList.toggle("active", screen.id === currentScreen);
     });
-    if (currentScreen === MAIN_SCREEN) {
+    if (currentScreen === MAIN_SCREEN || routeMode === "spaceStation") {
       document.querySelectorAll<HTMLElement>(".global-panel").forEach((panel) => {
         panel.classList.remove("show", "closing");
         panel.setAttribute("aria-hidden", "true");
       });
-      document.querySelectorAll<HTMLElement>("#globalOverlay, #overlay").forEach((overlay) => {
+      document.querySelectorAll<HTMLElement>(
+        "#globalOverlay, #overlay, .space-evidence-detail-overlay, .space-analysis-overlay, .space-keycard-terminal-overlay, .space-power-access-overlay"
+      ).forEach((overlay) => {
         overlay.classList.remove("show");
+        overlay.setAttribute("aria-hidden", "true");
       });
+      if (routeMode === "spaceStation") {
+        document.querySelectorAll<HTMLElement>(
+          ".space-evidence-detail, .space-eva-record-dialog, .space-analysis-panel, .space-keycard-terminal-panel, .space-power-access-panel"
+        ).forEach((panel) => {
+          panel.classList.remove("show");
+          panel.setAttribute("aria-hidden", "true");
+        });
+        document.querySelectorAll<HTMLElement>(
+          "#spacePowerAccessCursor, #spaceKeycardTerminalCursor, #spaceAnalysisSampleCursor"
+        ).forEach((cursor) => cursor.classList.remove("show"));
+      }
       document.querySelector<HTMLElement>("#evidenceBagPop")?.classList.remove("open", "closing");
       document.body.classList.remove("tool-cursor-active");
     }
     window.dispatchEvent(
       new CustomEvent("samunmong:screen-change", { detail: { screenId: currentScreen } })
     );
-  }, [currentScreen]);
+  }, [currentScreen, routeMode]);
 
   useEffect(() => {
     const syncGameScale = () => {

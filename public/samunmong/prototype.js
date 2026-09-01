@@ -1693,7 +1693,6 @@
 
     // Collected evidence tooltip offsets: +x right, -x left, +y down, -y up.
     const collectedEvidenceTooltipOffsets = {
-      "엔지니어 공구 클램프": { x: -10, y: 30 },
       "EVA 지원 단말기": { x: 60, y: 60 },
       "마지막 무전 기록": { x: -130, y: 95 },
       "소독천과 장갑": { x: 40, y: 35 },
@@ -1767,19 +1766,6 @@
         imageAlt: "검은 화면의 EVA 지원 단말기",
         description: "외부 작업용 우주복의 점검 및 상태 기록을 확인할 수 있습니다.",
         evaRecordMenu: true
-      },
-      "엔지니어 공구 클램프": {
-        kicker: "ORBIT-13 · TOOL RETURN LOG",
-        title: "공구함 반납 기록",
-        image: "/assets/space-station/evidence/engineer-tool-clamp.webp",
-        imageAlt: "엔지니어 공구 클램프",
-        description: "",
-        items: [
-          "사용 목적: 우주복 점검",
-          "공구함 반납 시각: OST 21:37",
-          "마지막 사용자 ID: ORBIT-13-ENG-0821",
-          "점검 결과: 실내 작동 점검 정상"
-        ]
       },
       "소독천과 장갑": {
         kicker: "ORBIT-13 · UNKNOWN RESIDUE",
@@ -2051,7 +2037,7 @@
     }
 
     window.addEventListener("samunmong:space-power-access-request", requestSpacePowerAccess);
-    const spacePowerAccessHelp = document.querySelector(".space-power-access-help");
+    const spacePowerAccessHelp = document.querySelector("#spacePowerAccessHelpTrigger")?.closest(".space-power-access-help");
     spacePowerAccessHelp?.addEventListener("pointerenter", () => setSpacePowerAccessHelp(true));
     spacePowerAccessHelp?.addEventListener("pointerleave", () => setSpacePowerAccessHelp(false));
     spacePowerAccessHelp?.addEventListener("focusin", () => setSpacePowerAccessHelp(true));
@@ -2794,7 +2780,6 @@
       "/assets/space-station/evidence/access-keycard-chip.webp",
       "/assets/space-station/evidence/power-control-access-card.png",
       "/assets/space-station/evidence/encrypted-research-contract.webp",
-      "/assets/space-station/evidence/engineer-tool-clamp.webp",
       "/assets/space-station/evidence/blood-sample-analysis-report.png",
       "/assets/space-station/evidence/unauthorized-drug-ampoule.webp",
       "/assets/space-station/panels/digital-human-scan-v3.png",

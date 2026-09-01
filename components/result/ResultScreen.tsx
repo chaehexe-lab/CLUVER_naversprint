@@ -15,6 +15,8 @@ type ResultScreenProps = {
   collectedEvidenceNames: string[];
   analyzedEvidenceNames: string[];
   verifiedVerdict?: VerifiedAccusation;
+  backToInterrogationHref?: string;
+  resultBasePath?: string;
 };
 
 const suspects = [
@@ -417,7 +419,9 @@ export default function ResultScreen({
   initialTheme,
   collectedEvidenceNames,
   analyzedEvidenceNames,
-  verifiedVerdict
+  verifiedVerdict,
+  backToInterrogationHref: forcedBackHref,
+  resultBasePath = "/result"
 }: ResultScreenProps) {
   const router = useRouter();
   const theme = initialTheme;
@@ -430,11 +434,11 @@ export default function ResultScreen({
       ? "/samunmong/assets/magic-school/interrogation/office-empty.webp"
       : "/samunmong/assets/final-accusation-bg.webp";
   const accusationTitle = theme === "spaceStation" ? "최종 보고 대상 지목" : theme === "magicSchool" ? "최종 방화범 지목" : "최종 범인 지목";
-  const backToInterrogationHref = theme === "spaceStation"
+  const backToInterrogationHref = forcedBackHref ?? (theme === "spaceStation"
     ? "/?start=interrogationScreen&theme=spaceStation"
     : theme === "magicSchool"
       ? "/?start=interrogationScreen&theme=magicSchool"
-      : "/interrogation";
+      : "/interrogation");
   const [selectedSuspectId, setSelectedSuspectId] = useState<string>(activeSuspects[0].id);
   const [showWarning, setShowWarning] = useState(false);
   const [showExitPrompt, setShowExitPrompt] = useState(false);
@@ -486,7 +490,11 @@ export default function ResultScreen({
   function navigateWithLoading(path: string, beforeNavigate?: () => void) {
     beforeNavigate?.();
     withLoading(() => {
-      router.push(path);
+      if (resultBasePath.startsWith("/space-station")) {
+        window.location.assign(path);
+      } else {
+        router.push(path);
+      }
     });
   }
 
@@ -503,7 +511,13 @@ export default function ResultScreen({
       });
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.error || "최종 지목을 검증하지 못했습니다.");
-      router.push(`/result?theme=${theme}&verdict=1`);
+      const themeQuery = resultBasePath === "/result" ? `theme=${theme}&` : "";
+      const verdictPath = `${resultBasePath}?${themeQuery}verdict=1`;
+      if (resultBasePath.startsWith("/space-station")) {
+        window.location.assign(verdictPath);
+      } else {
+        router.push(verdictPath);
+      }
     } catch (error) {
       setShowLoading(false);
       setShowSealRitual(false);
