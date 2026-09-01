@@ -2649,6 +2649,7 @@
 
     window.addEventListener("samunmong:screen-change", (event) => {
       const screenId = event.detail?.screenId || getActiveScreenId();
+      updateBgmForScreen(screenId);
       hideCollectedEvidenceTooltip();
       refreshFieldGuideNodes();
       setupEvidenceScreen(screenId);

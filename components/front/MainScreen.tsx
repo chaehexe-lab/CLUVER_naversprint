@@ -14,6 +14,24 @@ type MainScreenProps = {
   active?: boolean;
 };
 
+const nonResumableScreens = new Set(["mainScreen", "tutorialScreen", "dreamScreen"]);
+
+function hasStoredDreamProgress() {
+  try {
+    const slots = JSON.parse(window.localStorage.getItem("samunmong-save-slots") || "{}");
+    const hasSlot = Object.values(slots || {}).some((slot) => {
+      const screenId = (slot as { screenId?: string } | null)?.screenId;
+      return Boolean(screenId && !nonResumableScreens.has(screenId));
+    });
+    if (hasSlot) return true;
+
+    const legacy = JSON.parse(window.localStorage.getItem("samunmong-demo-state") || "null");
+    return Boolean(legacy?.screenId && !nonResumableScreens.has(legacy.screenId));
+  } catch {
+    return false;
+  }
+}
+
 export default function MainScreen({ active = false }: MainScreenProps) {
   const [showNewDreamWarning, setShowNewDreamWarning] = useState(false);
 
@@ -37,6 +55,12 @@ export default function MainScreen({ active = false }: MainScreenProps) {
       // The legacy prototype also listens to this button. Always stop it here so
       // the theme-aware confirmation flow owns navigation.
       event.stopPropagation();
+      const hasSavedProgress = hasStoredDreamProgress()
+        || !document.querySelector<HTMLButtonElement>("#continueDream")?.disabled;
+      if (!hasSavedProgress) {
+        startNewDream("restart");
+        return;
+      }
       setShowNewDreamWarning(true);
       return;
     }
