@@ -240,7 +240,7 @@ function MagicStartCaseButtonArt({ label }: { label: string }) {
         y="45"
         textAnchor="middle"
         fill="#f8ead0"
-        fontFamily="NanumBareunJeongsin, Noto Serif KR, serif"
+        fontFamily="Paperlogy, Noto Sans KR, sans-serif"
         fontSize="20"
         fontWeight="700"
         letterSpacing="1"
