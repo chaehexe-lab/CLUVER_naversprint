@@ -107,6 +107,9 @@
           : "joseon";
     const isMagicTheme = activeTheme === "magicSchool";
     const isSpaceTheme = activeTheme === "spaceStation";
+    const isLocalMagicReview = isMagicTheme
+      && entryParams.get("magicReview") === "1"
+      && (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost");
     if (isMagicTheme || isSpaceTheme) startCaseLabel = "조사 시작";
     document.documentElement.dataset.samunmongTheme = activeTheme;
     const magicBriefingText = sentenceBreakText("“선생님, 제1 연금술 실습실이 밤새 불탔습니다.”\n\n당신은 이 꿈에서 갓 부임한 마법 교사입니다.\n마력의 시선으로 잔류 마법을 살피고, 학생과 교직원을 심문해 방화의 진범을 찾아야 합니다.");
@@ -243,6 +246,7 @@
     let progressSyncQueue = Promise.resolve();
 
     function syncServerProgress(action, payload = {}, targetTheme = themeId) {
+      if (isLocalMagicReview) return Promise.resolve({ ok: true, review: true });
       progressSyncQueue = progressSyncQueue
         .catch(() => undefined)
         .then(async () => {
@@ -273,6 +277,16 @@
       { screenId: "magicDormHallway", name: "학생들 기숙사", evidence: ["버려진 지팡이 조각"] },
       { screenId: "interrogationScreen", name: "교무 조사실", evidence: [] }
     ];
+    const magicEvidenceCatalog = magicLinearProgression
+      .filter((location) => location.evidence.length)
+      .flatMap((location) => location.evidence)
+      .map((name, order) => ({ name, id: `M${order + 1}`, order }));
+    const magicEvidenceCatalogByName = new Map(magicEvidenceCatalog.map((entry) => [entry.name, entry]));
+    const magicEvidenceLocationOrder = new Map(
+      magicLinearProgression
+        .filter((location) => location.evidence.length)
+        .map((location, order) => [location.name, order])
+    );
     const magicGandalfReports = [
       {
         id: "alchemy-lab",
@@ -647,6 +661,7 @@
       }
       if (normalizedTheme === "magicSchool") {
         localStorage.removeItem("samunmong-magic-library-frozen-book-thawed");
+        localStorage.removeItem("samunmong-magic-alchemy-light-cast");
       }
       if (normalizedTheme === "joseon") {
         localStorage.removeItem(fieldGuideSeenKey);
@@ -2184,6 +2199,8 @@
           && completedAnalysis.has("glove");
         const keycardRecovered = evidenceName === "접속 키카드 칩"
           && localStorage.getItem(spaceKeycardRecoveryKey) === "1";
+        const contractEncrypted = evidenceName === "암호화된 파일"
+          && localStorage.getItem(spaceEncryptedFileDecryptionKey) !== "1";
         const detail = keycardRecovered
           ? { ...baseDetail, description: "", items: baseDetail.recoveredItems }
           : baseDetail;
@@ -2594,9 +2611,10 @@
       readStoredNames(collectedEvidenceKey).forEach((name) => {
         screen.querySelectorAll(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((item) => {
           item.classList.add("collected");
-          const revisitableSpace = item.classList.contains("concealed-space-hotspot");
-          if (item instanceof HTMLButtonElement) item.disabled = !isSpaceTheme && !revisitableSpace;
-          item.setAttribute("aria-disabled", String(!revisitableSpace));
+          const revisitable = item.classList.contains("concealed-space-hotspot")
+            || (isSpaceTheme && Boolean(detailedSpaceEvidence[name]));
+          if (item instanceof HTMLButtonElement) item.disabled = !revisitable;
+          item.setAttribute("aria-disabled", String(!revisitable));
         });
       });
       readStoredNames(analyzedEvidenceKey).forEach((name) => {
@@ -2633,12 +2651,25 @@
       }
       hint.addEventListener("click", () => {
         const collectedNames = isSpaceTheme ? new Set(readStoredNames(collectedEvidenceKey)) : null;
+        const isHintEligible = (hotspot) => {
+          if (!(hotspot instanceof HTMLElement)) return false;
+          if (collectedNames?.has(hotspot.dataset.evidenceName || "")) return false;
+          if (hotspot.classList.contains("collected") || hotspot.getAttribute("aria-disabled") === "true") return false;
+          if (hotspot instanceof HTMLButtonElement && hotspot.disabled) return false;
+          const style = window.getComputedStyle(hotspot);
+          if (style.display === "none" || style.visibility === "hidden" || Number(style.opacity) <= 0.02) return false;
+          const rect = hotspot.getBoundingClientRect();
+          return rect.width > 2 && rect.height > 2
+            && rect.right > 0 && rect.bottom > 0
+            && rect.left < window.innerWidth && rect.top < window.innerHeight;
+        };
         const activeAnalysisDevice = isSpaceTheme
           ? screen.querySelector("#spaceMedicalAnalyzer.analysis-device-unlocked, #spaceKeycardTerminal.space-keycard-terminal-unlocked:not(.keycard-recovered)")
           : null;
+        const sceneHotspots = [...screen.querySelectorAll(".hotspot[data-evidence-name]")];
+        sceneHotspots.forEach((hotspot) => hotspot.classList.toggle("hint-ineligible", isSpaceTheme && !isHintEligible(hotspot)));
         const remainingEvidence = isSpaceTheme
-          ? [...screen.querySelectorAll(".hotspot[data-evidence-name]")]
-              .filter((hotspot) => !collectedNames.has(hotspot.dataset.evidenceName || ""))
+          ? sceneHotspots.filter(isHintEligible)
           : evidenceHotspots.filter((hotspot) => !hotspot.classList.contains("collected"));
         if (!remainingEvidence.length && !activeAnalysisDevice) {
           showToast("이 장면의 증거를 모두 찾았습니다.", { variant: "hint" });
@@ -2740,18 +2771,94 @@
 
     const loadingDuration = 2600;
     const themeStartLoadingDuration = 4200;
-    const themeStartMaxWait = 9000;
+    const themeStartMaxWait = 30000;
     const joseonThemeStartAssets = [
+      "/samunmong/assets/scenes-integrated/scene-field-one-clean-v3.webp",
+      "/samunmong/assets/scenes-integrated/scene-chunwol-room-separate-chest-v2.webp",
+      "/samunmong/assets/scenes-integrated/scene-mudeok-servant-room-clean-v3.webp",
+      "/samunmong/assets/scenes-integrated/scene-yoomunseok-sarangbang-clean-v3.webp",
+      "/samunmong/assets/scenes-integrated/scene-dolsoe-quarters-clean-v3.webp",
+      "/samunmong/assets/scenes-integrated/scene-back-gate-courtyard-clean-v3.webp",
       "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.webp",
       "/samunmong/assets/mudeok-interaction/evidence-jeomsun-hand-exam-paper.webp",
       "/samunmong/assets/suspects/dolsoe-seated.webp",
       "/samunmong/assets/suspects/chunwol-seated.webp",
       "/samunmong/assets/suspects/yoomunseok-seated.webp",
-      "/samunmong/assets/suspects/mudeok-seated.webp"
+      "/samunmong/assets/suspects/mudeok-seated.webp",
+      ...[
+        "chunwol-screen-covered-v1",
+        "chunwol-screen-revealed-v1",
+        "chunwol-screen-empty-v1",
+        "sarangbang-drawer-locked-v2",
+        "sarangbang-drawer-open-v1",
+        "sarangbang-drawer-empty-v1",
+        "sarangbang-ledger-covered-v1",
+        "sarangbang-ledger-revealed-v1",
+        "sarangbang-ledger-empty-v1",
+        "sarangbang-honseo-locked-v1",
+        "sarangbang-honseo-revealed-v1",
+        "sarangbang-honseo-empty-v1",
+        "dolsoe-bandage-drawer-closed-v1",
+        "dolsoe-bandage-drawer-open-v1",
+        "dolsoe-bandage-drawer-empty-v1",
+        "dolsoe-bundle-basket-closed-v1",
+        "dolsoe-bundle-basket-open-v1",
+        "dolsoe-bundle-basket-empty-v1",
+        "field-letter-hand-closed-v1",
+        "field-letter-hand-open-v1",
+        "field-letter-hand-empty-v1",
+        "field-hopae-clothing-closed-v1",
+        "field-hopae-clothing-open-v1",
+        "field-hopae-clothing-empty-v1",
+        "mudeok-diary-bedding-closed-v1",
+        "mudeok-diary-bedding-open-v2",
+        "mudeok-diary-bedding-empty-v1",
+        "mudeok-shoes-basket-closed-v1",
+        "mudeok-shoes-basket-open-v1",
+        "mudeok-shoes-basket-empty-v1",
+        "backgate-footprints-covered-v1",
+        "backgate-footprints-revealed-v1",
+        "backgate-cord-basket-closed-v1",
+        "backgate-cord-basket-open-v1",
+        "backgate-cord-basket-empty-v1",
+        "backgate-onggi-closed-v1",
+        "backgate-onggi-goreum-v1",
+        "backgate-onggi-empty-v1"
+      ].map((name) => `/samunmong/assets/interactions/spatial-search/${name}.webp`),
+      ...[
+        "chest-locked-v2",
+        "chest-open-jeogori-v2",
+        "chest-open-empty-v2"
+      ].map((name) => `/samunmong/assets/interactions/spatial-search/chunwol-separate-chest/${name}.webp`),
+      ...[
+        "cabinet-closed-v1",
+        "drawer-open-false-bottom-v1",
+        "secret-key-v1",
+        "secret-empty-v1"
+      ].map((name) => `/samunmong/assets/interactions/spatial-search/chunwol-key-cabinet/${name}.webp`)
     ];
     const magicThemeStartAssets = [
       "/samunmong/assets/magic-school/scenes/alchemy-lab.webp",
-      "/samunmong/assets/magic-school/scenes/library.webp",
+      "/samunmong/assets/magic-school/scenes/alchemy-lab-motion-base-v2.webp",
+      "/samunmong/assets/magic-school/scenes/cleaning-closet-motion-base-v3.webp",
+      "/samunmong/assets/magic-school/scenes/library-motion-base-v3.webp",
+      "/samunmong/assets/magic-school/scenes/record-crystal-room-motion-base-v2.webp",
+      "/samunmong/assets/magic-school/scenes/dorm-hallway-motion-base-v2.webp",
+      "/samunmong/assets/magic-school/effects/arcane-residue-ring-v1.webp",
+      "/samunmong/assets/magic-school/effects/lightning-bolt-a-v1.webp",
+      "/samunmong/assets/magic-school/effects/lightning-bolt-b-v1.webp",
+      "/samunmong/assets/magic-school/effects/alchemy-lab-window-glass-mask-v2.png",
+      "/samunmong/assets/magic-school/effects/library-window-glass-mask-v2.png",
+      "/samunmong/assets/magic-school/effects/record-crystal-room-window-glass-mask-v2.png",
+      "/samunmong/assets/magic-school/effects/dorm-hallway-window-glass-mask-v2.png",
+      "/samunmong/assets/magic-school/effects/tobacco-smoke-v1.webp",
+      "/samunmong/assets/magic-school/evidence-cutouts/broken-wand.webp",
+      "/samunmong/assets/magic-school/evidence-cutouts/fire-rune-stone.webp",
+      "/samunmong/assets/magic-school/evidence-cutouts/record-crystal.webp",
+      "/samunmong/assets/magic-school/evidence-cutouts/magic-cigarette-ash.webp",
+      "/samunmong/assets/magic-school/evidence-cutouts/library-loan-ledger.webp",
+      "/samunmong/assets/magic-school/evidence-cutouts/frost-returned-book.webp",
+      "/samunmong/assets/magic-school/evidence-cutouts/discarded-wand-shard.webp",
       "/samunmong/assets/magic-school/interrogation/malpoi.webp",
       "/samunmong/assets/magic-school/interrogation/malposam.webp",
       "/samunmong/assets/magic-school/interrogation/malpoil.webp"
@@ -2863,14 +2970,19 @@
           return;
         }
 
+        const settle = () => {
+          if (typeof image.decode !== "function") {
+            resolve(src);
+            return;
+          }
+          image.decode().catch(() => undefined).finally(() => resolve(src));
+        };
         const image = new Image();
-        image.onload = () => resolve(src);
+        image.onload = settle;
         image.onerror = () => resolve(src);
         image.src = src;
 
-        if (image.complete) {
-          resolve(src);
-        }
+        if (image.complete && image.naturalWidth > 0) settle();
       });
     }
 
@@ -2878,6 +2990,34 @@
       const uniqueSources = [...new Set(sources.filter(Boolean))];
       if (!uniqueSources.length) return Promise.resolve();
       return Promise.all(uniqueSources.map((src) => preloadImage(src)));
+    }
+
+    function getScreenImageSources(screenId) {
+      const screen = document.getElementById(screenId);
+      if (!screen) return [];
+      return [...screen.querySelectorAll("img[src]")]
+        .map((image) => image.currentSrc || image.getAttribute("src"))
+        .filter(Boolean);
+    }
+
+    function navigateAfterThemePreload(theme, destination, assets, message) {
+      stopBriefingTyping();
+      playSfx("dream", 0.9);
+      showLoading(message, "briefingScreen");
+
+      const startedAt = Date.now();
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        const elapsed = Date.now() - startedAt;
+        const delay = Math.max(0, themeStartLoadingDuration - elapsed);
+        window.setTimeout(() => navigateWithinApp(destination), delay);
+      };
+
+      preloadImages(assets).then(finish);
+      window.setTimeout(finish, themeStartMaxWait);
+      localStorage.setItem(themeKey, theme);
     }
 
     function activateScreen(id, { rush = false } = {}) {
@@ -2937,16 +3077,25 @@
       stopBriefingTyping();
       document.querySelector(".game-shell")?.removeAttribute("data-start-screen");
       playSfx("move", 0.82);
-      const duration = options.loading ? options.duration || loadingDuration : 260;
       showLoading(message, id);
-      setTimeout(() => {
+      const startedAt = Date.now();
+      const minimumDuration = options.loading ? options.duration || loadingDuration : 260;
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        const delay = Math.max(0, minimumDuration - (Date.now() - startedAt));
+        setTimeout(() => {
         activateScreen(id);
         updateCurrentLocation(id);
         saveProgress(id);
         hideLoading();
         updateBgmForScreen(id);
         if (id === "fieldOne") maybeStartFieldGuide();
-      }, duration);
+        }, delay);
+      };
+      preloadImages(getScreenImageSources(id)).then(finish);
+      setTimeout(finish, Math.max(minimumDuration, options.maxWait || themeStartMaxWait));
     }
 
     function goRush(id, message = "현장으로 이동 중...") {
@@ -2957,15 +3106,24 @@
       fade?.classList.add("show");
       if (fade) fade.textContent = message;
       fade?.classList.add("long");
-      setTimeout(() => {
-        activateScreen(id, { rush: true });
-        fade?.classList.remove("show");
-        fade?.style.removeProperty("background");
-        updateCurrentLocation(id);
-        saveProgress(id);
-        updateBgmForScreen(id);
-        if (id === "fieldOne") maybeStartFieldGuide();
-      }, 520);
+      const startedAt = Date.now();
+      let done = false;
+      const finish = () => {
+        if (done) return;
+        done = true;
+        const delay = Math.max(0, 520 - (Date.now() - startedAt));
+        setTimeout(() => {
+          activateScreen(id, { rush: true });
+          fade?.classList.remove("show");
+          fade?.style.removeProperty("background");
+          updateCurrentLocation(id);
+          saveProgress(id);
+          updateBgmForScreen(id);
+          if (id === "fieldOne") maybeStartFieldGuide();
+        }, delay);
+      };
+      preloadImages(getScreenImageSources(id)).then(finish);
+      setTimeout(finish, themeStartMaxWait);
       setTimeout(() => fade?.classList.remove("long"), 980);
     }
 
@@ -3175,11 +3333,16 @@
     });
     on("#chooseJoseon", "click", () => {
       consumeNewDreamMode("joseon");
-      localStorage.setItem(themeKey, "joseon");
       if (activeTheme !== "joseon") {
-        navigateWithinApp("/?start=briefingScreen&theme=joseon");
+        navigateAfterThemePreload(
+          "joseon",
+          "/?start=briefingScreen&theme=joseon",
+          joseonThemeStartAssets,
+          "조선의 꿈을 불러오는 중..."
+        );
         return;
       }
+      localStorage.setItem(themeKey, "joseon");
       goAfterPreload("briefingScreen", joseonThemeStartAssets, {
         sfx: "dream",
         volume: 0.9,
@@ -3190,13 +3353,21 @@
     });
     on("#chooseMagicSchool", "click", () => {
       consumeNewDreamMode("magicSchool");
-      localStorage.setItem(themeKey, "magicSchool");
-      navigateWithinApp("/?start=briefingScreen&theme=magicSchool");
+      navigateAfterThemePreload(
+        "magicSchool",
+        "/?start=briefingScreen&theme=magicSchool",
+        magicThemeStartAssets,
+        "마법학교의 기억을 불러오는 중..."
+      );
     });
     on("#chooseSpaceStation", "click", () => {
       consumeNewDreamMode("spaceStation");
-      localStorage.setItem(themeKey, "spaceStation");
-      navigateWithinApp("/?start=briefingScreen&theme=spaceStation");
+      navigateAfterThemePreload(
+        "spaceStation",
+        "/?start=briefingScreen&theme=spaceStation",
+        spaceThemeStartAssets,
+        "정거장의 기록을 불러오는 중..."
+      );
     });
     on("#memoryOrbTrigger", "click", beginMemoryRestoration);
     document.addEventListener("click", (event) => {
@@ -4414,10 +4585,12 @@
         : meaningRevealed
           ? "/samunmong/assets/interactions/sato-skills/inventory-states/resolved.png"
           : "/samunmong/assets/interactions/sato-skills/inventory-states/basic.png";
+      const magicCatalogEntry = isMagicTheme && !data.derived ? magicEvidenceCatalogByName.get(name) : null;
       return `
         <span class="evidence-visual">
           <img class="evidence-thumb" src="${escapeHtml(getEvidenceImage(name))}" alt="">
           <img class="evidence-state-frame" src="${stateFrame}" alt="">
+          ${magicCatalogEntry ? `<span class="magic-evidence-catalog-id">${magicCatalogEntry.id}</span>` : ""}
         </span>
         <span class="evidence-card-copy">
           <span class="evidence-kind-mark">${data.derived ? data.isNew ? "새 증좌" : "검험 증좌" : statementRevealed ? "진술로 확인" : meaningRevealed ? "감식 완료" : "미확인 증거"}</span>
@@ -4568,8 +4741,42 @@
       `;
       list.appendChild(section);
       addEvidenceLocationTab(location);
+      sortMagicEvidenceBag();
       setActiveEvidenceLocation(getActiveEvidenceLocation() || location);
       return section.querySelector(".evidence-location-grid");
+    }
+
+    function sortMagicEvidenceBag() {
+      if (!isMagicTheme) return;
+      const list = document.querySelector("#evidenceList");
+      const tabs = document.querySelector("#evidenceLocationTabs");
+      if (!list || !tabs) return;
+
+      [...list.querySelectorAll(".evidence-location-section")]
+        .sort((first, second) => {
+          const firstOrder = magicEvidenceLocationOrder.get(first.dataset.evidenceLocationSection) ?? Number.MAX_SAFE_INTEGER;
+          const secondOrder = magicEvidenceLocationOrder.get(second.dataset.evidenceLocationSection) ?? Number.MAX_SAFE_INTEGER;
+          return firstOrder - secondOrder;
+        })
+        .forEach((section) => list.appendChild(section));
+
+      [...tabs.querySelectorAll(".evidence-location-tab")]
+        .sort((first, second) => {
+          const firstOrder = magicEvidenceLocationOrder.get(first.dataset.evidenceLocation) ?? Number.MAX_SAFE_INTEGER;
+          const secondOrder = magicEvidenceLocationOrder.get(second.dataset.evidenceLocation) ?? Number.MAX_SAFE_INTEGER;
+          return firstOrder - secondOrder;
+        })
+        .forEach((tab) => tabs.appendChild(tab));
+
+      list.querySelectorAll(".evidence-location-grid").forEach((grid) => {
+        [...grid.querySelectorAll(".evidence[data-evidence]")]
+          .sort((first, second) => {
+            const firstOrder = magicEvidenceCatalogByName.get(first.dataset.evidence)?.order ?? Number.MAX_SAFE_INTEGER;
+            const secondOrder = magicEvidenceCatalogByName.get(second.dataset.evidence)?.order ?? Number.MAX_SAFE_INTEGER;
+            return firstOrder - secondOrder;
+          })
+          .forEach((card) => grid.appendChild(card));
+      });
     }
 
     function getActiveEvidenceLocation() {
@@ -4622,11 +4829,12 @@
     }
 
     function markEvidenceCollectedInScene(name) {
-      document.querySelectorAll(`[data-evidence-name="${name}"]`).forEach((item) => {
+      document.querySelectorAll(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((item) => {
         item.classList.add("collected");
-        const revisitableSpace = item.classList.contains("concealed-space-hotspot");
-        if (item instanceof HTMLButtonElement) item.disabled = !isSpaceTheme && !revisitableSpace;
-        item.setAttribute("aria-disabled", String(!revisitableSpace));
+        const revisitable = item.classList.contains("concealed-space-hotspot")
+          || (isSpaceTheme && Boolean(detailedSpaceEvidence[name]));
+        if (item instanceof HTMLButtonElement) item.disabled = !revisitable;
+        item.setAttribute("aria-disabled", String(!revisitable));
       });
       const propSelectors = {
         "작은 발자국": ".footprints-prop",
@@ -4636,6 +4844,9 @@
       if (propSelector) {
         document.querySelectorAll(propSelector).forEach((item) => item.classList.add("collected"));
       }
+      document.querySelectorAll(`[data-evidence-prop="${CSS.escape(name)}"]`).forEach((item) => {
+        item.classList.add("collected");
+      });
     }
 
     function addObservationToNote(name, text) {
@@ -4988,6 +5199,11 @@
       button.dataset.evidence = name;
       button.dataset.location = location;
       button.dataset.storyRole = meaningRevealed ? getEvidenceStoryCue(name, data)[0] : "???";
+      const magicCatalogEntry = isMagicTheme && !data.derived ? magicEvidenceCatalogByName.get(name) : null;
+      if (magicCatalogEntry) {
+        button.dataset.magicEvidenceId = magicCatalogEntry.id;
+        button.dataset.magicEvidenceOrder = String(magicCatalogEntry.order);
+      }
       button.innerHTML = evidenceCardHtml(name);
       button.addEventListener("click", () => {
         if (isSpaceTheme && detailedSpaceEvidence[name]) {
@@ -5005,6 +5221,7 @@
         selectEvidence(button);
       });
       sectionGrid.appendChild(button);
+      sortMagicEvidenceBag();
       updateEvidenceLocationCounts();
       setActiveEvidenceLocation(location);
     }
@@ -7737,9 +7954,9 @@
       "돌쇠의 그림": {
         title: "병풍의 천자락 젖히기",
         guide: "자주빛 천자락을 눌러 뒤쪽을 젖혀 보십시오.",
-        closed: "/samunmong/assets/interactions/spatial-search/chunwol-screen-covered-v1.png",
-        opened: "/samunmong/assets/interactions/spatial-search/chunwol-screen-revealed-v1.png",
-        empty: "/samunmong/assets/interactions/spatial-search/chunwol-screen-empty-v1.png",
+        closed: "/samunmong/assets/interactions/spatial-search/chunwol-screen-covered-v1.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/chunwol-screen-revealed-v1.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/chunwol-screen-empty-v1.webp",
         handle: { x: 58, y: 18, w: 27, h: 70 },
         axis: "x", direction: 1,
         discovery: "천 뒤에서 묶인 두루마리가 드러났습니다."
@@ -7749,9 +7966,9 @@
         guide: "의복장 두 문짝 사이의 쇠 자물쇠를 살펴보십시오.",
         lockedGuide: "작은 열쇠가 필요한 조선식 쇠 자물쇠다. 최근에도 여닫은 듯 열쇠 구멍의 먼지만 닦여 있다.",
         requiredFieldTool: "작은 쇠열쇠",
-        closed: "/samunmong/assets/interactions/spatial-search/chunwol-separate-chest/chest-locked-v2.png",
-        opened: "/samunmong/assets/interactions/spatial-search/chunwol-separate-chest/chest-open-jeogori-v2.png",
-        empty: "/samunmong/assets/interactions/spatial-search/chunwol-separate-chest/chest-open-empty-v2.png",
+        closed: "/samunmong/assets/interactions/spatial-search/chunwol-separate-chest/chest-locked-v2.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/chunwol-separate-chest/chest-open-jeogori-v2.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/chunwol-separate-chest/chest-open-empty-v2.webp",
         handle: { x: 45, y: 39, w: 12, h: 25 },
         axis: "y", direction: -1,
         discovery: "열쇠가 맞았다. 열린 의복장 안에서 고름 한 짝이 뜯긴 자주빛 저고리가 드러났습니다."
@@ -7761,10 +7978,10 @@
         guide: "문갑의 잠금쇠를 살펴보십시오.",
         requiredFieldTool: "매화무늬 장열쇠",
         lockedGuide: "문갑은 단단히 잠겨 있다. 방 주인이 아니라면 열쇠가 어디 있는지 알기 어렵다.",
-        closed: "/samunmong/assets/interactions/spatial-search/chunwol-key-cabinet/cabinet-closed-v1.png",
-        intermediate: "/samunmong/assets/interactions/spatial-search/chunwol-key-cabinet/drawer-open-false-bottom-v1.png",
-        opened: "/samunmong/assets/interactions/spatial-search/chunwol-key-cabinet/secret-key-v1.png",
-        empty: "/samunmong/assets/interactions/spatial-search/chunwol-key-cabinet/secret-empty-v1.png",
+        closed: "/samunmong/assets/interactions/spatial-search/chunwol-key-cabinet/cabinet-closed-v1.webp",
+        intermediate: "/samunmong/assets/interactions/spatial-search/chunwol-key-cabinet/drawer-open-false-bottom-v1.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/chunwol-key-cabinet/secret-key-v1.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/chunwol-key-cabinet/secret-empty-v1.webp",
         handle: { x: 20, y: 34, w: 64, h: 43 },
         secondHandle: { x: 43, y: 43, w: 37, h: 25 },
         axis: "y", direction: 1,
@@ -7775,9 +7992,9 @@
         guide: "서랍의 작은 자물쇠를 살펴보십시오.",
         requiredFieldTool: "놋쇠 고리열쇠",
         lockedGuide: "호패함이 든 서랍은 잠겨 있다. 사랑방 안에 열쇠를 따로 두었을 법하다.",
-        closed: "/samunmong/assets/interactions/spatial-search/sarangbang-drawer-locked-v2.png",
-        opened: "/samunmong/assets/interactions/spatial-search/sarangbang-drawer-open-v1.png",
-        empty: "/samunmong/assets/interactions/spatial-search/sarangbang-drawer-empty-v1.png",
+        closed: "/samunmong/assets/interactions/spatial-search/sarangbang-drawer-locked-v2.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/sarangbang-drawer-open-v1.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/sarangbang-drawer-empty-v1.webp",
         handle: { x: 38, y: 54, w: 25, h: 28 },
         axis: "y", direction: 1,
         discovery: "열린 서랍 안에서 가운데 자리만 빈 호패함이 드러났습니다."
@@ -7785,9 +8002,9 @@
       "하인 장부": {
         title: "쌓인 문서 더미 살피기",
         guide: "남색 책의 책갈피를 눌러 문서 더미를 살펴보십시오.",
-        closed: "/samunmong/assets/interactions/spatial-search/sarangbang-ledger-covered-v1.png",
-        opened: "/samunmong/assets/interactions/spatial-search/sarangbang-ledger-revealed-v1.png",
-        empty: "/samunmong/assets/interactions/spatial-search/sarangbang-ledger-empty-v1.png",
+        closed: "/samunmong/assets/interactions/spatial-search/sarangbang-ledger-covered-v1.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/sarangbang-ledger-revealed-v1.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/sarangbang-ledger-empty-v1.webp",
         handle: { x: 40, y: 47, w: 43, h: 32 },
         axis: "x", direction: -1,
         discovery: "큰 책 아래에서 먹으로 덧칠된 출입 장부가 드러났습니다."
@@ -7797,9 +8014,9 @@
         guide: "문서함 앞의 잠금쇠를 살펴보십시오.",
         requiredFieldTool: "놋쇠 고리열쇠",
         lockedGuide: "혼서 문서함은 잠겨 있다. 사랑방 안에서 열쇠를 먼저 찾아야 한다.",
-        closed: "/samunmong/assets/interactions/spatial-search/sarangbang-honseo-locked-v1.png",
-        opened: "/samunmong/assets/interactions/spatial-search/sarangbang-honseo-revealed-v1.png",
-        empty: "/samunmong/assets/interactions/spatial-search/sarangbang-honseo-empty-v1.png",
+        closed: "/samunmong/assets/interactions/spatial-search/sarangbang-honseo-locked-v1.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/sarangbang-honseo-revealed-v1.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/sarangbang-honseo-empty-v1.webp",
         handle: { x: 52, y: 38, w: 12, h: 24 },
         axis: "y", direction: -1,
         discovery: "열린 문서함 안에서 붉은 인장이 나뉜 혼서 조각이 드러났습니다."
@@ -7807,9 +8024,9 @@
       "피 묻은 붕대": {
         title: "침상 곁 작은 서랍 열기",
         guide: "서랍의 쇠고리를 눌러 열어 보십시오.",
-        closed: "/samunmong/assets/interactions/spatial-search/dolsoe-bandage-drawer-closed-v1.png",
-        opened: "/samunmong/assets/interactions/spatial-search/dolsoe-bandage-drawer-open-v1.png",
-        empty: "/samunmong/assets/interactions/spatial-search/dolsoe-bandage-drawer-empty-v1.png",
+        closed: "/samunmong/assets/interactions/spatial-search/dolsoe-bandage-drawer-closed-v1.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/dolsoe-bandage-drawer-open-v1.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/dolsoe-bandage-drawer-empty-v1.webp",
         handle: { x: 32, y: 43, w: 22, h: 31 },
         axis: "y", direction: 1,
         discovery: "열린 서랍 안에서 마른 피가 밴 붕대가 드러났습니다."
@@ -7817,9 +8034,9 @@
       "도망 보따리": {
         title: "작업대의 짚바구니 열기",
         guide: "바구니 덮개의 고리를 눌러 덮개를 여십시오.",
-        closed: "/samunmong/assets/interactions/spatial-search/dolsoe-bundle-basket-closed-v1.png",
-        opened: "/samunmong/assets/interactions/spatial-search/dolsoe-bundle-basket-open-v1.png",
-        empty: "/samunmong/assets/interactions/spatial-search/dolsoe-bundle-basket-empty-v1.png",
+        closed: "/samunmong/assets/interactions/spatial-search/dolsoe-bundle-basket-closed-v1.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/dolsoe-bundle-basket-open-v1.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/dolsoe-bundle-basket-empty-v1.webp",
         handle: { x: 35, y: 31, w: 27, h: 29 },
         axis: "x", direction: 1,
         discovery: "덮개 아래에서 갈색 끈으로 단단히 묶인 모시 보따리가 드러났습니다."
@@ -7827,9 +8044,9 @@
       "찢어진 약속 편지": {
         title: "점순이 쥔 손 살피기",
         guide: "손가락 사이의 종이 끝을 눌러 조심스럽게 꺼내십시오.",
-        closed: "/samunmong/assets/interactions/spatial-search/field-letter-hand-closed-v1.png",
-        opened: "/samunmong/assets/interactions/spatial-search/field-letter-hand-open-v1.png",
-        empty: "/samunmong/assets/interactions/spatial-search/field-letter-hand-empty-v1.png",
+        closed: "/samunmong/assets/interactions/spatial-search/field-letter-hand-closed-v1.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/field-letter-hand-open-v1.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/field-letter-hand-empty-v1.webp",
         handle: { x: 57, y: 43, w: 23, h: 31 },
         axis: "x", direction: 1,
         discovery: "점순의 손 안에서 찢어진 글줄 세 조각이 드러났습니다."
@@ -7837,9 +8054,9 @@
       "호패 조각": {
         title: "점순의 겉옷 안쪽 살피기",
         guide: "겹쳐진 겉옷 자락을 눌러 안쪽을 살펴보십시오.",
-        closed: "/samunmong/assets/interactions/spatial-search/field-hopae-clothing-closed-v1.png",
-        opened: "/samunmong/assets/interactions/spatial-search/field-hopae-clothing-open-v1.png",
-        empty: "/samunmong/assets/interactions/spatial-search/field-hopae-clothing-empty-v1.png",
+        closed: "/samunmong/assets/interactions/spatial-search/field-hopae-clothing-closed-v1.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/field-hopae-clothing-open-v1.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/field-hopae-clothing-empty-v1.webp",
         handle: { x: 28, y: 38, w: 39, h: 35 },
         axis: "y", direction: -1,
         discovery: "겉옷 안쪽에서 끈이 없고 글자가 지워진 나무패 조각이 드러났습니다."
@@ -7847,9 +8064,9 @@
       "무덕의 번진 일기": {
         title: "궤짝 위 침구 더미 살피기",
         guide: "윗이불의 앞쪽 모서리를 눌러 들춰 보십시오.",
-        closed: "/samunmong/assets/interactions/spatial-search/mudeok-diary-bedding-closed-v1.png",
-        opened: "/samunmong/assets/interactions/spatial-search/mudeok-diary-bedding-open-v2.png",
-        empty: "/samunmong/assets/interactions/spatial-search/mudeok-diary-bedding-empty-v1.png",
+        closed: "/samunmong/assets/interactions/spatial-search/mudeok-diary-bedding-closed-v1.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/mudeok-diary-bedding-open-v2.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/mudeok-diary-bedding-empty-v1.webp",
         handle: { x: 41, y: 41, w: 43, h: 35 },
         axis: "y", direction: -1,
         discovery: "겹친 침구 사이에서 물과 먹이 번진 작은 일기장이 드러났습니다."
@@ -7857,9 +8074,9 @@
       "진흙 묻은 짚신": {
         title: "빨랫바구니 안쪽 살피기",
         guide: "바구니에 걸친 천을 눌러 안쪽을 살펴보십시오.",
-        closed: "/samunmong/assets/interactions/spatial-search/mudeok-shoes-basket-closed-v1.png",
-        opened: "/samunmong/assets/interactions/spatial-search/mudeok-shoes-basket-open-v1.png",
-        empty: "/samunmong/assets/interactions/spatial-search/mudeok-shoes-basket-empty-v1.png",
+        closed: "/samunmong/assets/interactions/spatial-search/mudeok-shoes-basket-closed-v1.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/mudeok-shoes-basket-open-v1.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/mudeok-shoes-basket-empty-v1.webp",
         handle: { x: 50, y: 39, w: 39, h: 47 },
         axis: "x", direction: 1,
         discovery: "걷힌 천 아래에서 가장자리에 젖은 흙이 남은 짚신 한 켤레가 드러났습니다."
@@ -7867,9 +8084,9 @@
       "작은 발자국": {
         title: "젖은 낙엽 아래 흔적 살피기",
         guide: "한데 뭉친 젖은 낙엽과 짚을 눌러 걷어 내십시오.",
-        closed: "/samunmong/assets/interactions/spatial-search/backgate-footprints-covered-v1.png",
-        opened: "/samunmong/assets/interactions/spatial-search/backgate-footprints-revealed-v1.png",
-        empty: "/samunmong/assets/interactions/spatial-search/backgate-footprints-revealed-v1.png",
+        closed: "/samunmong/assets/interactions/spatial-search/backgate-footprints-covered-v1.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/backgate-footprints-revealed-v1.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/backgate-footprints-revealed-v1.webp",
         handle: { x: 32, y: 48, w: 42, h: 34 },
         axis: "x", direction: -1,
         discovery: "비에 씻겨 일부만 남은 작은 짚신 자국 세 곳이 불규칙하게 드러났습니다."
@@ -7877,9 +8094,9 @@
       "끊어진 호패끈": {
         title: "뒤집힌 짚바구니 들어 보기",
         guide: "뒤집힌 짚바구니를 눌러 들어 보십시오.",
-        closed: "/samunmong/assets/interactions/spatial-search/backgate-cord-basket-closed-v1.png",
-        opened: "/samunmong/assets/interactions/spatial-search/backgate-cord-basket-open-v1.png",
-        empty: "/samunmong/assets/interactions/spatial-search/backgate-cord-basket-empty-v1.png",
+        closed: "/samunmong/assets/interactions/spatial-search/backgate-cord-basket-closed-v1.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/backgate-cord-basket-open-v1.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/backgate-cord-basket-empty-v1.webp",
         handle: { x: 34, y: 35, w: 36, h: 43 },
         axis: "x", direction: -1,
         discovery: "바구니 아래에서 한쪽 끝이 거칠게 끊어진 붉은 호패끈이 드러났습니다."
@@ -7887,9 +8104,9 @@
       "찢어진 옷고름": {
         title: "금이 간 장독 열기",
         guide: "장독은 단단히 봉해져 있다. 돌쇠 처소에서 챙긴 장작 도끼로 금 간 윗부분을 내리치십시오.",
-        closed: "/samunmong/assets/interactions/spatial-search/backgate-onggi-closed-v1.png",
-        opened: "/samunmong/assets/interactions/spatial-search/backgate-onggi-goreum-v1.png",
-        empty: "/samunmong/assets/interactions/spatial-search/backgate-onggi-empty-v1.png",
+        closed: "/samunmong/assets/interactions/spatial-search/backgate-onggi-closed-v1.webp",
+        opened: "/samunmong/assets/interactions/spatial-search/backgate-onggi-goreum-v1.webp",
+        empty: "/samunmong/assets/interactions/spatial-search/backgate-onggi-empty-v1.webp",
         handle: { x: 35, y: 18, w: 34, h: 44 },
         axis: "y", direction: 1,
         discovery: "금 간 윗부분이 무너지자 짚 사이에 숨겨 둔 자주빛 옷고름이 드러났습니다."
@@ -8649,6 +8866,12 @@
       }
 
       if (target.closest("#spacePowerAccessEmptySlot")) {
+        if (!hasSpacePowerAccessCard()) {
+          setSpacePowerAccessPanel(false);
+          closeGlobalPanel();
+          go("interrogationScreen", "출입 권한 담당자를 찾는 중...");
+          return;
+        }
         insertSpacePowerAccessCard();
         return;
       }

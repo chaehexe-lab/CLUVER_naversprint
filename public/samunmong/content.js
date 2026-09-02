@@ -3,12 +3,12 @@
     mainScreen: "/samunmong/assets/main-screen-v2.webp",
     tutorialScreen: "/samunmong/assets/main-screen-v2.webp",
     dreamScreen: "/samunmong/assets/main-screen-v2.webp",
-    fieldOne: "/samunmong/assets/scenes-integrated/scene-field-one-clean-v3.png",
-    chunwolRoom: "/samunmong/assets/scenes-integrated/scene-chunwol-room-separate-chest-v2.png",
-    mudeokServantRoom: "/samunmong/assets/scenes-integrated/scene-mudeok-servant-room-clean-v3.png",
-    yoomunseokSarangbang: "/samunmong/assets/scenes-integrated/scene-yoomunseok-sarangbang-clean-v3.png",
-    dolsoeQuarters: "/samunmong/assets/scenes-integrated/scene-dolsoe-quarters-clean-v3.png",
-    backGateCourtyard: "/samunmong/assets/scenes-integrated/scene-back-gate-courtyard-clean-v3.png",
+    fieldOne: "/samunmong/assets/scenes-integrated/scene-field-one-clean-v3.webp",
+    chunwolRoom: "/samunmong/assets/scenes-integrated/scene-chunwol-room-separate-chest-v2.webp",
+    mudeokServantRoom: "/samunmong/assets/scenes-integrated/scene-mudeok-servant-room-clean-v3.webp",
+    yoomunseokSarangbang: "/samunmong/assets/scenes-integrated/scene-yoomunseok-sarangbang-clean-v3.webp",
+    dolsoeQuarters: "/samunmong/assets/scenes-integrated/scene-dolsoe-quarters-clean-v3.webp",
+    backGateCourtyard: "/samunmong/assets/scenes-integrated/scene-back-gate-courtyard-clean-v3.webp",
     interrogationScreen: "/samunmong/assets/scene-interrogation-dolsoe.webp?v=scene-20260707"
   },
 
