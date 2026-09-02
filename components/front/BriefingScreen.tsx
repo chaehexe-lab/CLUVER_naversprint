@@ -482,8 +482,8 @@ function SpaceStationBriefingScreen() {
             조사 시작
           </button>
         </div>
-        {!isJournalOpen ? <div className="space-briefing-step-navigation">
-          {briefingStep > 0 ? <button
+        <div className="space-briefing-step-navigation">
+          {briefingStep > (isJournalOpen ? 1 : 0) ? <button
             id="spaceBriefingPrevious"
             type="button"
             aria-label="이전 브리핑으로 이동"
@@ -499,7 +499,7 @@ function SpaceStationBriefingScreen() {
               draggable={false}
             />
           </button> : null}
-          <button
+          {(!isJournalOpen || briefingStep < 2) ? <button
               key={briefingStep}
               id={briefingStep < 2 ? "spaceBriefingReportNext" : "spaceBriefingNext"}
               type="button"
@@ -518,8 +518,8 @@ function SpaceStationBriefingScreen() {
                 alt={briefingStep < 2 ? "다음" : "조사 시작"}
                 draggable={false}
               />
-            </button>
-        </div> : null}
+            </button> : null}
+        </div>
       </article>
     </section>
   );

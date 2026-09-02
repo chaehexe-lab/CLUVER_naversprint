@@ -2309,8 +2309,16 @@
       if (!list) return;
       list.replaceChildren();
       const samples = [
-        { id: "cloth", label: "소독천" },
-        { id: "glove", label: "수술용 장갑" }
+        {
+          id: "cloth",
+          label: "소독천",
+          image: "/assets/space-station/evidence/disinfectant-cloth.png"
+        },
+        {
+          id: "glove",
+          label: "수술용 장갑",
+          image: "/assets/space-station/evidence/surgical-glove.png"
+        }
       ];
       samples.forEach((sample) => {
         const button = document.createElement("button");
@@ -2319,7 +2327,7 @@
         button.type = "button";
         button.className = "space-analysis-evidence-option";
         button.dataset.analysisSample = sample.id;
-        image.src = getEvidenceImage("소독천과 장갑");
+        image.src = sample.image;
         image.alt = "";
         label.textContent = sample.label;
         button.append(image, label);
@@ -2785,6 +2793,8 @@
       "/assets/space-station/evidence/control-terminal.webp",
       "/assets/space-station/evidence/final-radio-log.webp",
       "/assets/space-station/evidence/disinfectant-cloth-glove.webp",
+      "/assets/space-station/evidence/disinfectant-cloth.png",
+      "/assets/space-station/evidence/surgical-glove.png",
       "/assets/space-station/evidence/deleted-medical-record.webp",
       "/assets/space-station/evidence/voltage-sensor-no-scalpel.png",
       "/assets/space-station/evidence/tampered-delay-timer.webp",

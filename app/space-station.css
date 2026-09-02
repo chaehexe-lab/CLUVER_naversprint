@@ -1152,6 +1152,14 @@ html[data-samunmong-theme="spaceStation"] .toast-evidence-image[hidden] {
       display: grid;
     }
 
+    html[data-samunmong-theme="spaceStation"] #briefingScreen.journal-overlay-open .briefing-card[data-briefing-step="2"] {
+      padding-top: 34px !important;
+    }
+
+    html[data-samunmong-theme="spaceStation"] #briefingScreen.journal-overlay-open .briefing-card[data-briefing-step="2"] .space-briefing-step-navigation {
+      margin-top: -10px;
+    }
+
     html[data-samunmong-theme="spaceStation"] #briefingScreen.journal-overlay-open,
 html[data-samunmong-theme="spaceStation"] #briefingScreen.journal-overlay-open .briefing-card,
 html[data-samunmong-theme="spaceStation"] #briefingScreen.journal-overlay-open .briefing-card *,
@@ -2883,7 +2891,7 @@ html[data-samunmong-theme="spaceStation"] .space-eva-record-menu button:focus-vi
   border: 1px solid rgba(188, 229, 255, .95);
   border-radius: 22px;
   color: #102b44;
-  background: linear-gradient(145deg, rgba(225, 237, 249, .98), rgba(185, 204, 229, .97));
+  background: linear-gradient(145deg, rgb(225, 237, 249), rgb(185, 204, 229));
   box-shadow: 0 28px 80px rgba(0, 0, 0, .7), 0 0 24px rgba(112, 205, 255, .25), inset 0 0 0 1px rgba(226, 246, 255, .4);
   transform: translate(-50%, -50%);
   font-family: "VitroPride", "Noto Sans KR", sans-serif;
