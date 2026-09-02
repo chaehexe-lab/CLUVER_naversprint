@@ -251,9 +251,61 @@ function MagicStartCaseButtonArt({ label }: { label: string }) {
   );
 }
 
+const spaceBriefingSuspects = [
+  {
+    id: "harry",
+    name: "해리",
+    role: "데이터 시스템 관리자",
+    authId: "ORBIT-13-DAT-0319",
+    image: "/assets/space-station/characters/harry-upper-transparent.png",
+    duty: "정거장의 서버와 대원들의 계정을 관리한다.",
+    incident: "사건 당시 데이터실에서 정전으로 멈춘 서버를 복구하고 있었다고 주장한다."
+  },
+  {
+    id: "mers",
+    name: "메르스",
+    role: "의료 책임자",
+    authId: "ORBIT-13-MED-0427",
+    image: "/assets/space-station/characters/mers-upper-transparent.png",
+    duty: "대원들의 건강검진과 의료 처치를 담당한다.",
+    incident: "사건 당시 의료실에서 비상 의약품을 점검하고 있었다고 주장한다."
+  },
+  {
+    id: "aladdindin",
+    name: "알라딘딘",
+    role: "정비 담당 엔지니어",
+    authId: "ORBIT-13-ENG-0821",
+    image: "/assets/space-station/characters/aladdindin-upper-transparent.png",
+    duty: "정거장 설비와 외부 작업용 우주복을 점검한다.",
+    incident: "데이비드가 출발하기 전 마지막으로 우주복을 점검한 대원이다."
+  },
+  {
+    id: "einspanner",
+    name: "아인슈페너",
+    role: "생명과학 연구원",
+    authId: "ORBIT-13-SCI-0516",
+    image: "/assets/space-station/characters/einspanner-upper-transparent.png",
+    duty: "과학 실험실에서 생체 시료와 약물 성분을 분석한다.",
+    incident: "사건 전 데이비드로부터 개인적인 분석을 부탁받았다고 진술한다."
+  }
+] as const;
+
 function SpaceStationBriefingScreen() {
   const [briefingStep, setBriefingStep] = useState(0);
   const [isJournalOpen, setIsJournalOpen] = useState(false);
+  const [selectedSuspectIndex, setSelectedSuspectIndex] = useState(0);
+  const selectedSuspect = spaceBriefingSuspects[selectedSuspectIndex];
+
+  const showBriefingStep = (step: number) => {
+    window.dispatchEvent(new CustomEvent("samunmong:briefing-step-change", { detail: { step } }));
+    setBriefingStep(step);
+  };
+
+  const moveSuspect = (direction: -1 | 1) => {
+    setSelectedSuspectIndex((current) => (
+      current + direction + spaceBriefingSuspects.length
+    ) % spaceBriefingSuspects.length);
+  };
 
   useEffect(() => {
     const openJournal = () => {
@@ -306,7 +358,11 @@ function SpaceStationBriefingScreen() {
           닫기
         </button>
         {briefingStep === 0 ? <p className="briefing-kicker">ORBIT-13 INCIDENT LOG</p> : null}
-        <h2>{briefingStep === 0 ? "우주정거장 의문사 사건" : "데이비드의 마지막 생체 기록"}</h2>
+        <h2>{briefingStep === 0
+          ? "우주정거장 의문사 사건"
+          : briefingStep === 1
+            ? "데이비드의 마지막 생체 기록"
+            : "사건 관련 대원"}</h2>
         <div className={`briefing-step${briefingStep === 0 ? " active" : ""}`} data-briefing-panel="0">
           <div className="briefing-copy" id="briefingCopy" aria-live="polite" />
         </div>
@@ -359,6 +415,63 @@ function SpaceStationBriefingScreen() {
             </section>
           </div>
         </div>
+        <div className={`briefing-step space-suspect-briefing${briefingStep === 2 ? " active" : ""}`} data-briefing-panel="2">
+          <nav className="space-suspect-list" aria-label="사건 관련 대원 목록">
+            {spaceBriefingSuspects.map((suspect, index) => (
+              <button
+                key={suspect.id}
+                className={index === selectedSuspectIndex ? "active" : ""}
+                type="button"
+                aria-pressed={index === selectedSuspectIndex}
+                onClick={() => setSelectedSuspectIndex(index)}
+              >
+                <img src={suspect.image} alt="" draggable={false} />
+                <span>
+                  <strong>{suspect.name}</strong>
+                  <small>{suspect.role}</small>
+                  <em>ID : {suspect.authId}</em>
+                </span>
+              </button>
+            ))}
+          </nav>
+          <section className="space-suspect-profile" aria-live="polite">
+            <div className="space-suspect-portrait">
+              <img src={selectedSuspect.image} alt={`${selectedSuspect.name} 대원`} draggable={false} />
+            </div>
+            <div className="space-suspect-profile-copy">
+              <header>
+                <h3>{selectedSuspect.name}</h3>
+                <p>{selectedSuspect.role}</p>
+              </header>
+              <dl>
+                <div>
+                  <dt>인증 ID</dt>
+                  <dd>{selectedSuspect.authId}</dd>
+                </div>
+                <div>
+                  <dt>주요 담당 업무</dt>
+                  <dd>{selectedSuspect.duty}</dd>
+                </div>
+                <div>
+                  <dt>사건 당시 정보</dt>
+                  <dd>{selectedSuspect.incident}</dd>
+                </div>
+              </dl>
+            </div>
+          </section>
+          <div className="space-suspect-pagination" aria-label="대원 정보 탐색">
+            <button type="button" aria-label="이전 대원" onClick={() => moveSuspect(-1)}>‹</button>
+            <div className="space-suspect-progress">
+              <span><strong>{selectedSuspectIndex + 1}</strong> / {spaceBriefingSuspects.length}</span>
+              <div aria-hidden="true">
+                {spaceBriefingSuspects.map((suspect, index) => (
+                  <i key={suspect.id} className={index === selectedSuspectIndex ? "active" : ""} />
+                ))}
+              </div>
+            </div>
+            <button type="button" aria-label="다음 대원" onClick={() => moveSuspect(1)}>›</button>
+          </div>
+        </div>
         <div className="briefing-actions">
           <button
             className="button primary briefing-start ready"
@@ -369,39 +482,44 @@ function SpaceStationBriefingScreen() {
             조사 시작
           </button>
         </div>
-        {!isJournalOpen ? <button
-            key={briefingStep}
-            id={briefingStep === 0 ? "spaceBriefingReportNext" : "spaceBriefingNext"}
+        {!isJournalOpen ? <div className="space-briefing-step-navigation">
+          {briefingStep > 0 ? <button
+            id="spaceBriefingPrevious"
             type="button"
-            {...(briefingStep === 1 ? { "data-go": "spaceAirlock" } : {})}
-            onClick={briefingStep === 0 ? ((event) => {
+            aria-label="이전 브리핑으로 이동"
+            onClick={(event) => {
               event.preventDefault();
               event.stopPropagation();
-              window.dispatchEvent(new CustomEvent("samunmong:briefing-step-change", { detail: { step: 1 } }));
-              setBriefingStep(1);
-            }) : undefined}
-            aria-label={briefingStep === 0 ? "생체 기록 보기" : "에어록으로 이동"}
-            style={{
-              justifySelf: "center",
-              width: "clamp(155px, 16.2vw, 234px)",
-              aspectRatio: "420 / 132",
-              padding: 0,
-              border: 0,
-              background: "transparent",
-              cursor: "pointer",
-              zIndex: 8,
-              filter: "drop-shadow(0 18px 28px rgba(0,0,0,.48))"
+              showBriefingStep(briefingStep - 1);
             }}
           >
             <img
-              src={briefingStep === 0
-                ? "/assets/space-station/ui-buttons/space-next-button.svg"
-                : "/assets/space-station/ui-buttons/space-investigation-start-button.svg"}
-              alt={briefingStep === 0 ? "다음" : "조사 시작"}
+              src="/assets/space-station/ui-buttons/space-prev-button.svg"
+              alt="이전"
               draggable={false}
-              style={{ width: "100%", height: "100%", objectFit: "contain", display: "block" }}
             />
           </button> : null}
+          <button
+              key={briefingStep}
+              id={briefingStep < 2 ? "spaceBriefingReportNext" : "spaceBriefingNext"}
+              type="button"
+              {...(briefingStep === 2 ? { "data-go": "spaceAirlock" } : {})}
+              onClick={briefingStep < 2 ? ((event) => {
+                event.preventDefault();
+                event.stopPropagation();
+                showBriefingStep(briefingStep + 1);
+              }) : undefined}
+              aria-label={briefingStep === 0 ? "생체 기록 보기" : briefingStep === 1 ? "사건 관련 대원 보기" : "에어록으로 이동"}
+            >
+              <img
+                src={briefingStep < 2
+                  ? "/assets/space-station/ui-buttons/space-next-button.svg"
+                  : "/assets/space-station/ui-buttons/space-investigation-start-button.svg"}
+                alt={briefingStep < 2 ? "다음" : "조사 시작"}
+                draggable={false}
+              />
+            </button>
+        </div> : null}
       </article>
     </section>
   );

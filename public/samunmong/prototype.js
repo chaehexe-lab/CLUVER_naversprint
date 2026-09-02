@@ -992,6 +992,10 @@
         briefingCopy.replaceChildren();
         briefingCopy.classList.add("done");
         briefingCopy.classList.remove("rune-decoding");
+      } else if (briefingCopy && requestedStep === 0 && isSpaceTheme) {
+        renderBriefingText(briefingText);
+        briefingCopy.classList.add("done");
+        briefingCopy.classList.remove("rune-decoding");
       }
       updateBriefingStep();
     }
@@ -2768,7 +2772,12 @@
       "/assets/space-station/ui-icons-v3/final-report.webp",
       "/assets/space-station/ui-icons-v3/accuse-target.webp",
       "/assets/space-station/ui-icons-v3/hint-beacon.webp",
+      "/assets/space-station/ui-buttons/space-prev-button.svg",
       "/assets/space-station/ui-buttons/space-next-button.svg",
+      "/assets/space-station/characters/harry-upper-transparent.png",
+      "/assets/space-station/characters/mers-upper-transparent.png",
+      "/assets/space-station/characters/aladdindin-upper-transparent.png",
+      "/assets/space-station/characters/einspanner-upper-transparent.png",
       "/assets/space-station/characters/harry-upper.webp",
       "/assets/space-station/characters/mers-upper.webp",
       "/assets/space-station/characters/aladdindin-upper.webp",
