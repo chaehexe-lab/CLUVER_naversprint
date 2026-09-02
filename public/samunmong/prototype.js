@@ -5416,7 +5416,9 @@
         if (image) image.src = isHonseo ? honseoPieces[pieceId] : promiseLetterPieces[pieceId];
       });
       document.querySelector("#documentAssemblyTitle").textContent = evidenceName;
-      document.querySelector("#documentAssemblyGuide").textContent = isHonseo ? "인장과 테두리가 이어지도록 혼서 조각을 직접 맞추십시오 · 짧게 누르면 회전" : "찢긴 글줄이 이어지도록 편지 조각을 끌어 맞추십시오 · 짧게 누르면 회전";
+      document.querySelector("#documentAssemblyGuide").textContent = isHonseo
+        ? "인장과 테두리가 이어지도록 혼서 조각을 직접 맞추십시오 · 짧게 누르면 회전"
+        : "찢긴 섬유와 글줄이 이어지는 조각을 가까이 놓으십시오";
       document.querySelector("#documentAssemblyBoard").src = "/samunmong/assets/interactions/document-puzzle/board-empty.webp";
       document.querySelector("#documentAssemblyStage")?.classList.remove("completed");
       document.querySelectorAll(".document-piece").forEach((button) => {
@@ -6199,6 +6201,11 @@
 
     function prepareSpecialPuzzle(mode, folder, title, guide, gesture) {
       specialPuzzleMode = mode;
+      const specialStage = document.querySelector("#specialPuzzleStage");
+      if (specialStage) {
+        specialStage.dataset.specialMode = mode;
+        specialStage.removeAttribute("data-webgl-evidence");
+      }
       specialPuzzleStep = 0;
       tactilePuzzleProgress = 0;
       tactilePuzzlePointer = null;
@@ -6283,6 +6290,9 @@
         button.style.removeProperty("--special-y");
       });
       openGlobalPanel("specialEvidencePuzzlePanel");
+      if (["hopaeMark", "diary", "silk", "bundle", "norigae", "bandage", "portrait", "hopaeThread", "pouch", "ledger", "shoeMud", "footprintTrace"].includes(mode)) {
+        window.dispatchEvent(new CustomEvent("samunmong:evidence-3d-open", { detail: { mode } }));
+      }
       requestAnimationFrame(syncDirectAffordanceFragments);
       playSfx("map", 0.62);
     }
@@ -7299,24 +7309,20 @@
     window.addEventListener("samunmong:letter-3d-progress", (event) => {
       if (documentPuzzleEvidence !== "찢어진 약속 편지") return;
       const count = Number(event.detail?.count || 0);
+      const total = Number(event.detail?.total || 5);
       const guide = document.querySelector("#documentAssemblyGuide");
       if (!guide) return;
-      if (event.detail?.rotated) {
-        guide.textContent = "찢긴 결이 이어지는 방향을 살펴보십시오";
-        playSfx("buttonAlt", 0.42);
-        return;
-      }
-      guide.textContent = count === 3
-        ? "편지가 이어졌습니다 · 돌려 살펴본 뒤 복원을 확인하십시오"
-        : `찢어진 한지 조각이 맞물렸습니다 · ${count}/3`;
-      playSfx(count === 3 ? "evidence" : "buttonAlt", count === 3 ? 0.82 : 0.58);
+      guide.textContent = count === total
+        ? "편지가 이어졌습니다 · 먹빛이 드러날 때까지 잠시 살펴보십시오"
+        : `찢어진 한지의 섬유가 맞물렸습니다 · ${count}/${total}`;
+      playSfx(count === total ? "evidence" : "buttonAlt", count === total ? 0.82 : 0.58);
     });
     window.addEventListener("samunmong:letter-3d-reject", (event) => {
       if (documentPuzzleEvidence !== "찢어진 약속 편지") return;
       const guide = document.querySelector("#documentAssemblyGuide");
       if (guide) {
-        guide.textContent = event.detail?.rotation
-          ? "찢긴 면의 방향이 맞지 않습니다"
+        guide.textContent = event.detail?.overlap
+          ? "조각이 겹쳤습니다 · 찢긴 단면이 맞닿도록 놓으십시오"
           : "섬유가 이어지는 자리를 더 가까이 맞추십시오";
       }
       playSfx("buttonAlt", 0.36);
@@ -7330,6 +7336,23 @@
       if (guide) guide.textContent = "문서 복원 완료";
       playSfx("evidence", 0.9);
       finishTactilePuzzle("문서 맞춤판");
+    });
+    window.addEventListener("samunmong:evidence-3d-reject", (event) => {
+      const guide = document.querySelector("#specialPuzzleGuide");
+      if (guide) {
+        const prefix = event.detail?.reason === "miss" ? "움직일 수 있는 끝부분을 잡으십시오. " : "방향이 맞지 않습니다. ";
+        guide.textContent = `${prefix}${event.detail?.guide || "물건이 풀리는 방향을 따라 끝까지 당기십시오."}`;
+      }
+      const panel = document.querySelector("#specialEvidencePuzzlePanel");
+      panel?.classList.remove("puzzle-miss");
+      void panel?.offsetWidth;
+      panel?.classList.add("puzzle-miss");
+      window.setTimeout(() => panel?.classList.remove("puzzle-miss"), 280);
+      playSfx("buttonAlt", 0.34);
+    });
+    window.addEventListener("samunmong:evidence-3d-complete", (event) => {
+      if (event.detail?.mode !== specialPuzzleMode) return;
+      selectSpecialPoint("1");
     });
     document.querySelector("#documentAssemblyStage")?.addEventListener("pointermove", moveDocumentPiece);
     document.querySelector("#documentAssemblyStage")?.addEventListener("pointerup", finishDocumentPieceDrag);

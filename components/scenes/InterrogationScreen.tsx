@@ -5,6 +5,7 @@ import EvidenceInventory from "@/components/EvidenceInventory";
 import InvestigationNote from "@/components/InvestigationNote";
 import InterrogationCharacter2D from "@/components/effects/InterrogationCharacter2D";
 import JoseonLetterEvidence3D from "@/components/effects/JoseonLetterEvidence3D";
+import JoseonEvidenceInspection3D from "@/components/effects/JoseonEvidenceInspection3D";
 import JoseonMapCandle3D from "@/components/effects/JoseonMapCandle3D";
 import type { GameTheme } from "@/lib/gameTheme";
 import { spaceStationInterrogationCopy, spaceStationMap, spaceStationTheme } from "@/lib/spaceStationTheme";
@@ -576,9 +577,9 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               <p className="tool-panel-kicker">문서 복원</p>
               <h2 id="documentAssemblyTitle">찢어진 조각 맞추기</h2>
             </div>
-            <button className="close-button global-close" type="button">그만두기</button>
+            <button className="close-button global-close" type="button">증거로 돌아가기</button>
           </div>
-          <p id="documentAssemblyGuide">조각을 끌어 윤곽에 맞추십시오 · 짧게 누르면 회전</p>
+          <p id="documentAssemblyGuide">찢긴 섬유와 글줄이 이어지는 조각을 가까이 놓으십시오</p>
           <div className="document-assembly-stage" id="documentAssemblyStage" aria-label="찢어진 문서 조각 맞춤판">
             <JoseonLetterEvidence3D />
             {[
@@ -603,7 +604,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           <aside className="global-panel tactile-puzzle-panel" id="rubbingPuzzlePanel" aria-hidden="true" aria-live="polite">
             <div className="global-panel-head">
               <div><p className="tool-panel-kicker">장부 검험</p><h2>지워진 출입 기록 압흔 뜨기</h2></div>
-              <button className="close-button global-close" type="button">그만두기</button>
+              <button className="close-button global-close" type="button">증거로 돌아가기</button>
             </div>
             <p id="rubbingPuzzleGuide">붉은 손가락 고리가 달린 먹뭉치를 잡아 장부를 덮은 한지 위로 길게 문지르십시오.</p>
             <div className="tactile-puzzle-stage" id="rubbingPuzzleStage">
@@ -620,7 +621,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           <aside className="global-panel tactile-puzzle-panel" id="knotPuzzlePanel" aria-hidden="true" aria-live="polite">
             <div className="global-panel-head">
               <div><p className="tool-panel-kicker">손끝 채증</p><h2>매듭 풀기</h2></div>
-              <button className="close-button global-close" type="button">그만두기</button>
+              <button className="close-button global-close" type="button">증거로 돌아가기</button>
             </div>
             <p id="knotPuzzleGuide">느슨한 고리부터 차례로 당기십시오.</p>
             <div className="tactile-puzzle-stage knot-puzzle-stage" id="knotPuzzleStage">
@@ -634,7 +635,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           <aside className="global-panel tactile-puzzle-panel" id="footprintPuzzlePanel" aria-hidden="true" aria-live="polite">
             <div className="global-panel-head">
               <div><p className="tool-panel-kicker">흔적 대조</p><h2>짚신 밑창 포개기</h2></div>
-              <button className="close-button global-close" type="button">그만두기</button>
+              <button className="close-button global-close" type="button">증거로 돌아가기</button>
             </div>
             <p id="footprintPuzzleGuide">짚신을 흔적 쪽으로 끌어 정확히 포개십시오.</p>
             <div className="tactile-puzzle-stage footprint-match-stage" id="footprintPuzzleStage">
@@ -655,7 +656,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           <aside className="global-panel tactile-puzzle-panel" id="materialPuzzlePanel" aria-hidden="true" aria-live="polite">
             <div className="global-panel-head">
               <div><p className="tool-panel-kicker" id="materialPuzzleKicker">손끝 감식</p><h2 id="materialPuzzleTitle">증거 살피기</h2></div>
-              <button className="close-button global-close" type="button">그만두기</button>
+              <button className="close-button global-close" type="button">증거로 돌아가기</button>
             </div>
             <p id="materialPuzzleGuide">흔적을 직접 확인하십시오.</p>
             <div className="tactile-puzzle-stage material-puzzle-stage" id="materialPuzzleStage">
@@ -690,10 +691,11 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           <aside className="global-panel tactile-puzzle-panel" id="specialEvidencePuzzlePanel" aria-hidden="true" aria-live="polite">
             <div className="global-panel-head">
               <div><p className="tool-panel-kicker" id="specialPuzzleKicker">증거 복원</p><h2 id="specialPuzzleTitle">흔적 연결하기</h2></div>
-              <button className="close-button global-close" type="button">그만두기</button>
+              <button className="close-button global-close" type="button">증거로 돌아가기</button>
             </div>
             <p id="specialPuzzleGuide">조각을 순서대로 연결하십시오.</p>
             <div className="tactile-puzzle-stage special-puzzle-stage" id="specialPuzzleStage">
+              <JoseonEvidenceInspection3D />
               <img id="specialPuzzleImage" src="/samunmong/assets/interactions/red-thread-puzzle/state-1.png" alt="증거 연결 작업판" draggable={false} />
               <span className="tactile-hand-guide" id="specialPuzzleGesture">핀 연결하기</span>
               <div className="sample-touch-points special-touch-points" id="specialTouchPoints">
