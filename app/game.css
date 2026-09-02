@@ -20317,3 +20317,343 @@ html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-au
   left: -20% !important;
   bottom: -34% !important;
 }
+
+/* Search order redesign: one coordinate system for all three room warrants. */
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-redesign.room-authority.order-open {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100dvh !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  max-width: none !important;
+  max-height: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: #0e0906 !important;
+  box-shadow: none !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-order-paper {
+  position: absolute !important;
+  inset: 0 !important;
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+  opacity: 1 !important;
+  transform: none !important;
+  pointer-events: none !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-order-paper > img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-order-roll {
+  display: none !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .global-close {
+  position: absolute !important;
+  top: clamp(24px, 3.5vh, 44px) !important;
+  right: clamp(28px, 3vw, 54px) !important;
+  width: clamp(48px, 4vw, 64px) !important;
+  height: clamp(48px, 4vw, 64px) !important;
+  z-index: 50 !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-heading {
+  position: absolute !important;
+  left: 14% !important;
+  top: 15.5% !important;
+  width: 66% !important;
+  height: auto !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  display: block !important;
+  text-align: center !important;
+  z-index: 4 !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-heading > div,
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-heading > div > span,
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-heading h2,
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-heading p {
+  width: 100% !important;
+  text-align: center !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-heading > div > span {
+  display: block !important;
+  color: #a23b31 !important;
+  font-family: "NanumBareunJeongsin", "ChosunNm", serif !important;
+  font-size: clamp(15px, 1.1vw, 21px) !important;
+  line-height: 1.2 !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-heading h2 {
+  margin: 4px 0 8px !important;
+  color: #2b170d !important;
+  font-family: "ChilgokLjh", "NanumBareunJeongsin", serif !important;
+  font-size: clamp(40px, 4.1vw, 66px) !important;
+  font-weight: 400 !important;
+  line-height: 1.05 !important;
+  white-space: nowrap !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-heading p {
+  display: block !important;
+  margin: 0 !important;
+  color: #593a28 !important;
+  font-family: "NanumBareunJeongsin", "ChosunNm", serif !important;
+  font-size: clamp(17px, 1.35vw, 24px) !important;
+  line-height: 1.35 !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-body {
+  position: absolute !important;
+  left: 14% !important;
+  top: 31% !important;
+  width: 66% !important;
+  height: 49% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: block !important;
+  z-index: 4 !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-reason {
+  position: static !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: clamp(18px, 2vh, 28px) clamp(20px, 2vw, 34px) !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-rows: auto auto minmax(0, 1fr) !important;
+  grid-template-areas: "reason" "hint" "evidence" !important;
+  row-gap: clamp(7px, 1vh, 13px) !important;
+  align-items: start !important;
+  justify-items: center !important;
+  border: 0 !important;
+  border-top: 1px solid rgba(102, 59, 34, .28) !important;
+  border-bottom: 1px solid rgba(102, 59, 34, .22) !important;
+  border-radius: 0 !important;
+  background: rgba(247, 226, 184, .16) !important;
+  box-shadow: none !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-reason > strong {
+  grid-area: reason !important;
+  margin: 0 !important;
+  color: #321b10 !important;
+  font-family: "ChilgokLjh", "NanumBareunJeongsin", serif !important;
+  font-size: clamp(26px, 2.35vw, 40px) !important;
+  font-weight: 400 !important;
+  line-height: 1.2 !important;
+  text-align: center !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open #joseonAuthorityHint {
+  grid-area: hint !important;
+  margin: 0 !important;
+  color: #8d4033 !important;
+  font-family: "NanumBareunJeongsin", "ChosunNm", serif !important;
+  font-size: clamp(16px, 1.25vw, 22px) !important;
+  line-height: 1.35 !important;
+  text-align: center !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-evidence {
+  grid-area: evidence !important;
+  align-self: stretch !important;
+  width: min(50%, 470px) !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  gap: clamp(14px, 1.5vw, 26px) !important;
+  place-items: stretch !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-evidence.multiple {
+  width: min(82%, 820px) !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-evidence-card,
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-evidence-card.ready,
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-evidence-card.missing {
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: clamp(8px, 1vh, 14px) !important;
+  box-sizing: border-box !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) !important;
+  grid-template-rows: minmax(0, 1fr) auto !important;
+  gap: 5px !important;
+  place-items: center !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-evidence-card img {
+  width: min(100%, 220px) !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 9px 8px rgba(59, 30, 16, .24)) !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-evidence-card > span {
+  display: grid !important;
+  gap: 2px !important;
+  text-align: center !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-evidence-card b {
+  color: #3a2115 !important;
+  font-family: "NanumBareunJeongsin", "ChosunNm", serif !important;
+  font-size: clamp(17px, 1.25vw, 22px) !important;
+  line-height: 1.2 !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-evidence-card small {
+  color: #a24236 !important;
+  font-family: "NanumBareunJeongsin", "ChosunNm", serif !important;
+  font-size: clamp(14px, 1vw, 18px) !important;
+  line-height: 1.2 !important;
+}
+
+/* The seal and the printed square are direct panel children, so both use the artwork's coordinates. */
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-command {
+  position: absolute !important;
+  left: 84.7% !important;
+  top: 51.5% !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: clamp(112px, 9vw, 168px) !important;
+  height: clamp(112px, 9vw, 168px) !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  overflow: visible !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 8 !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-command > img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  opacity: 1 !important;
+  filter: drop-shadow(0 14px 10px rgba(48, 20, 10, .4)) !important;
+  transform-origin: 50% 50% !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-command:disabled {
+  opacity: .58 !important;
+  filter: grayscale(.32) !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-order-stamp-target {
+  position: absolute !important;
+  left: 84.7% !important;
+  top: 75% !important;
+  right: auto !important;
+  bottom: auto !important;
+  width: clamp(70px, 5.8vw, 108px) !important;
+  height: clamp(70px, 5.8vw, 108px) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 0 !important;
+  background: transparent !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 7 !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-order-stamp-target > img {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain !important;
+  opacity: 0;
+  filter: saturate(1.12) contrast(1.06) !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.seal-striking #joseonAuthorityPlaque {
+  animation: joseon-physical-seal-strike .92s cubic-bezier(.24,.72,.2,1) both !important;
+}
+
+html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-sealed .joseon-order-stamp-target > img {
+  animation: joseon-real-imprint-land .38s cubic-bezier(.15,.8,.25,1) both !important;
+}
+
+@media (max-width: 900px), (max-height: 640px) {
+  html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-heading {
+    top: 14% !important;
+  }
+  html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-heading h2 {
+    font-size: clamp(32px, 5vw, 48px) !important;
+  }
+  html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-heading p {
+    display: none !important;
+  }
+  html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-body {
+    top: 27% !important;
+    height: 54% !important;
+  }
+  html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-reason > strong {
+    font-size: clamp(23px, 3.2vw, 32px) !important;
+  }
+  html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open #joseonAuthorityHint {
+    font-size: clamp(14px, 2vw, 18px) !important;
+  }
+  html[data-samunmong-theme="joseon"] .joseon-authority-redesign.order-open .joseon-authority-command {
+    width: clamp(86px, 11vw, 118px) !important;
+    height: clamp(86px, 11vw, 118px) !important;
+  }
+}
+
+/* Keep the physical seal locked to the printed seal box. Legacy room-authority
+   selectors use four-value inset shorthands, so target the actual elements here. */
+html[data-samunmong-theme="joseon"] #joseonAuthorityPanel.joseon-authority-redesign.room-authority.order-open #issueJoseonAuthority {
+  position: absolute !important;
+  inset: auto !important;
+  left: 84.7% !important;
+  top: 53% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+}
+
+html[data-samunmong-theme="joseon"] #joseonAuthorityPanel.joseon-authority-redesign.room-authority.order-open #joseonOrderStampTarget {
+  position: absolute !important;
+  inset: auto !important;
+  left: 84.7% !important;
+  top: 75% !important;
+  right: auto !important;
+  bottom: auto !important;
+  transform: translate(-50%, -50%) !important;
+}

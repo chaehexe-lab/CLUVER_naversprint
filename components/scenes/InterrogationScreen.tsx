@@ -437,7 +437,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
 
       <div className="global-overlay" id="globalOverlay" />
       {!isMagicTheme && !isSpaceTheme ? (
-        <aside className="global-panel joseon-authority-panel" id="joseonAuthorityPanel" aria-hidden="true">
+        <aside className="global-panel joseon-authority-panel joseon-authority-redesign" id="joseonAuthorityPanel" aria-hidden="true">
           <button className="global-close" id="closeJoseonAuthority" type="button" aria-label="수색 전령 닫기">×</button>
           <button className="joseon-order-roll" id="unrollJoseonOrder" type="button" aria-label="수색 전령 펼치기">
             <img src="/samunmong/assets/interactions/sato-skills/search-order/search-order-rolled-v1.png" alt="붉은 끈으로 묶인 수색 전령" draggable={false} />
@@ -455,20 +455,17 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           </header>
           <div className="joseon-authority-body">
             <section className="joseon-authority-reason">
-              <small>지금까지 확인한 근거</small>
               <strong id="joseonAuthorityReason">아직 수색을 명할 근거가 부족합니다.</strong>
               <div className="joseon-authority-evidence" id="joseonAuthorityEvidence" aria-label="수색 전령에 올릴 근거" />
               <p id="joseonAuthorityHint">먼저 관련 단서를 찾아 보따리에서 살펴보십시오.</p>
             </section>
-            <div className="joseon-authority-flow" aria-hidden="true"><span>증거</span><i>→</i><span>명분</span><i>→</i><span>수색</span></div>
-            <button className="joseon-authority-command" id="issueJoseonAuthority" type="button">
-              <img id="joseonAuthorityPlaque" src="/samunmong/assets/interactions/sato-skills/official-seal/objects/seal-inked.png" alt="관인" draggable={false} />
-              <span><small>관인을 눌러</small><b id="joseonAuthorityAction">수색 전령 확정하기</b></span>
-            </button>
-            <div className="joseon-order-stamp-target" id="joseonOrderStampTarget" aria-hidden="true">
-              <span>관인 자리</span>
-              <img src="/samunmong/assets/interactions/sato-skills/official-seal/objects/seal-imprint-transparent-v2.png" alt="" draggable={false} />
-            </div>
+          </div>
+          <button className="joseon-authority-command" id="issueJoseonAuthority" type="button">
+            <img id="joseonAuthorityPlaque" src="/samunmong/assets/interactions/sato-skills/official-seal/objects/seal-inked.png" alt="관인 찍기" draggable={false} />
+            <span className="sr-only"><b id="joseonAuthorityAction">수색 전령 확정하기</b></span>
+          </button>
+          <div className="joseon-order-stamp-target" id="joseonOrderStampTarget" aria-hidden="true">
+            <img src="/samunmong/assets/interactions/sato-skills/official-seal/objects/seal-imprint-transparent-v2.png" alt="" draggable={false} />
           </div>
         </aside>
       ) : null}
