@@ -7,7 +7,7 @@ import InterrogationCharacter2D from "@/components/effects/InterrogationCharacte
 import JoseonMapCandle3D from "@/components/effects/JoseonMapCandle3D";
 import type { GameTheme } from "@/lib/gameTheme";
 import { spaceStationInterrogationCopy, spaceStationMap, spaceStationTheme } from "@/lib/spaceStationTheme";
-import type { CSSProperties } from "react";
+import type { CSSProperties, MouseEvent as ReactMouseEvent } from "react";
 
 type PinStyle = CSSProperties & {
   "--x": string;
@@ -42,6 +42,12 @@ type MapLocation = {
   y: string;
   labelY?: string;
   rot?: string;
+};
+
+const JOSEON_SEARCH_AUTHORITY_IDS: Record<string, string> = {
+  backGateCourtyard: "search-back-gate",
+  yoomunseokSarangbang: "search-yoomunseok-room",
+  chunwolRoom: "search-chunwol-room"
 };
 
 const THEME_MAPS: Record<GameTheme, { image: string; alt: string; locations: MapLocation[] }> = {
@@ -157,7 +163,6 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
   const briefingIcon = spaceStationTheme.assets.briefingIcon;
   const journalIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/final-report.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-investigation-journal.webp" : "/samunmong/assets/ui-generated/tool-case-journal.webp";
   const bagIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/evidence-vault.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-magic-bag.webp" : "/samunmong/assets/labels/transparent/tool-bag-short.webp";
-  const toolIcon = isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-mana-tools.webp" : "/samunmong/assets/labels/transparent/tool-investigation-tools.webp";
   const hintIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/hint-beacon.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-arcane-hint-compass.png" : "/samunmong/assets/ui-generated/tool-hint.webp";
   const accuseIcon = isSpaceTheme ? "/assets/space-station/ui-icons-v3/accuse-target.webp" : isMagicTheme ? "/samunmong/assets/magic-school/ui/icon-final-accuse.webp" : "/samunmong/assets/labels/transparent/tool-accuse-short.webp";
   const bagPanelStyle = isSpaceTheme
@@ -166,7 +171,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
   const toolPanelStyle = undefined;
   const suggestedQuestions = isMagicTheme ? magicPromptLines : promptLines;
 
-  const moveFromMap = (location: MapLocation) => {
+  const moveFromMap = (location: MapLocation, event?: ReactMouseEvent<HTMLButtonElement>) => {
     if (!location.goTo) return;
     const currentScreenId = document.querySelector<HTMLElement>(".screen.active")?.id;
     const needsGateway = Boolean(
@@ -179,6 +184,23 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
     if (isSpaceTheme && screenId === "spaceOxygenGenerator") {
       window.dispatchEvent(new CustomEvent("samunmong:space-power-access-request"));
       return;
+    }
+    const joseonAuthorityId = JOSEON_SEARCH_AUTHORITY_IDS[screenId];
+    if (initialTheme === "joseon" && joseonAuthorityId) {
+      let authorized = false;
+      try {
+        const stored = JSON.parse(window.localStorage.getItem("samunmong-joseon-investigation-authority-v1") || "[]");
+        authorized = Array.isArray(stored) && stored.includes(joseonAuthorityId);
+      } catch {
+        authorized = false;
+      }
+      if (!authorized) {
+        const nativeEvent = event?.nativeEvent as Event & { __samunmongAuthorityHandled?: boolean };
+        if (nativeEvent?.__samunmongAuthorityHandled) return;
+        if (nativeEvent) nativeEvent.__samunmongAuthorityHandled = true;
+        window.dispatchEvent(new CustomEvent("samunmong:joseon-room-access-request", { detail: { screenId } }));
+        return;
+      }
     }
     document.querySelector<HTMLElement>("#mapPanel")?.classList.remove("show", "closing");
     document.querySelector<HTMLElement>("#mapPanel")?.setAttribute("aria-hidden", "true");
@@ -220,6 +242,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
         <div className="new-fact-toast" id="newFactToast" role="status" aria-live="polite" aria-hidden="true">
           <span>수사 노트</span>
           <strong id="newFactTitle">새로운 사실이 기록되었습니다</strong>
+          <small id="newFactEvidenceUnlock" hidden />
         </div>
 
         <div className="hud suspect-name" id="suspectName">
@@ -288,12 +311,6 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             <img src={bagIcon} alt="" />
             <span className="sr-only">{copy.bag}</span>
           </button>
-          {isMagicTheme ? (
-            <button className="scene-chip tool-chip open-tool-panel" type="button" aria-label={`${copy.tools} 열기`}>
-              <img src={toolIcon} alt="" />
-              <span className="sr-only">{copy.tools}</span>
-            </button>
-          ) : null}
           <button className="tool-prop hint-prop" id="interrogationHint" type="button" aria-label="심문 힌트">
             <img src={hintIcon} alt="" />
             <span className="sr-only">힌트</span>
@@ -367,6 +384,11 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           <div className="evidence-response-marker" id="evidenceResponseMarker" hidden>
             <img id="responseEvidenceImage" src="/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp" alt="" />
             <span><b id="responseEvidenceRole">증거 대면</b><small id="responseEvidenceMeaning">진술과 비교해 보십시오</small></span>
+            <div className="letter-speech-comparison" id="letterSpeechComparison" hidden>
+              <span><small>복원한 편지</small><b>“오늘 밤 창고에서 기다리시오. 함께 떠납시다.”</b></span>
+              <i aria-hidden="true">↔</i>
+              <span><small>돌쇠의 주장</small><b>“뒷문에서 보자고 했소. 창고는 말한 적 없소.”</b></span>
+            </div>
           </div>
         </div>
 
@@ -414,6 +436,57 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
       </aside>
 
       <div className="global-overlay" id="globalOverlay" />
+      {!isMagicTheme && !isSpaceTheme ? (
+        <aside className="global-panel joseon-authority-panel" id="joseonAuthorityPanel" aria-hidden="true">
+          <button className="global-close" id="closeJoseonAuthority" type="button" aria-label="수색 전령 닫기">×</button>
+          <button className="joseon-order-roll" id="unrollJoseonOrder" type="button" aria-label="수색 전령 펼치기">
+            <img src="/samunmong/assets/interactions/sato-skills/search-order/search-order-rolled-v1.png" alt="붉은 끈으로 묶인 수색 전령" draggable={false} />
+            <span>두루마리를 눌러 펼치기</span>
+          </button>
+          <div className="joseon-order-paper" aria-hidden="true">
+            <img src="/samunmong/assets/interactions/sato-skills/search-order/search-order-open-v1.png" alt="" draggable={false} />
+          </div>
+          <header className="joseon-authority-heading">
+            <div>
+              <span id="joseonAuthorityKicker">사또의 수색 전령</span>
+              <h2 id="joseonAuthorityTitle">수사 명분을 살핍니다</h2>
+              <p id="joseonAuthorityLead">앞서 얻은 단서가 있어야 다음 물건을 공식적으로 조사할 수 있습니다.</p>
+            </div>
+          </header>
+          <div className="joseon-authority-body">
+            <section className="joseon-authority-reason">
+              <small>지금까지 확인한 근거</small>
+              <strong id="joseonAuthorityReason">아직 수색을 명할 근거가 부족합니다.</strong>
+              <div className="joseon-authority-evidence" id="joseonAuthorityEvidence" aria-label="수색 전령에 올릴 근거" />
+              <p id="joseonAuthorityHint">먼저 관련 단서를 찾아 보따리에서 살펴보십시오.</p>
+            </section>
+            <div className="joseon-authority-flow" aria-hidden="true"><span>증거</span><i>→</i><span>명분</span><i>→</i><span>수색</span></div>
+            <button className="joseon-authority-command" id="issueJoseonAuthority" type="button">
+              <img id="joseonAuthorityPlaque" src="/samunmong/assets/interactions/sato-skills/official-seal/objects/seal-inked.png" alt="관인" draggable={false} />
+              <span><small>관인을 눌러</small><b id="joseonAuthorityAction">수색 전령 확정하기</b></span>
+            </button>
+            <div className="joseon-order-stamp-target" id="joseonOrderStampTarget" aria-hidden="true">
+              <span>관인 자리</span>
+              <img src="/samunmong/assets/interactions/sato-skills/official-seal/objects/seal-imprint-transparent-v2.png" alt="" draggable={false} />
+            </div>
+          </div>
+        </aside>
+      ) : null}
+
+      {!isMagicTheme && !isSpaceTheme ? (
+        <aside className="global-panel spatial-search-panel" id="spatialSearchPanel" aria-hidden="true" aria-live="polite">
+          <div className="global-panel-head spatial-search-head">
+            <div><p className="tool-panel-kicker">공간 수색</p><h2 id="spatialSearchTitle">가려진 곳 살피기</h2></div>
+            <button className="close-button global-close" type="button" aria-label="공간 수색 닫기">×</button>
+          </div>
+          <div className="spatial-search-stage" id="spatialSearchStage">
+            <img id="spatialSearchImage" src="/samunmong/assets/interactions/spatial-search/chunwol-screen-covered-v1.png" alt="가려진 공간 확대 화면" draggable={false} />
+            <p className="spatial-search-guide" id="spatialSearchGuide">물건을 직접 움직여 안쪽을 살피십시오.</p>
+            <button className="spatial-search-handle" id="spatialSearchHandle" type="button" aria-label="가리고 있는 물건을 눌러 살펴보기" />
+            <button className="spatial-search-discovery" id="spatialSearchDiscovery" type="button" hidden>드러난 증거 살펴보기</button>
+          </div>
+        </aside>
+      ) : null}
 
       {/* 현장과 취조실이 함께 사용하는 보따리 팝업 */}
       <EvidenceInventory>
@@ -431,6 +504,39 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               ×
             </button>
           </div>
+          {!isMagicTheme && !isSpaceTheme ? (
+            <nav className="evidence-story-nav" aria-label="사건 흐름으로 증거 모아보기">
+              <span>사건 흐름</span>
+              <div className="evidence-story-filters" id="evidenceStoryFilters">
+                <button className="active" type="button" data-story-filter="all" aria-pressed="true">전체</button>
+                <button type="button" data-story-filter="???" aria-pressed="false">미확인</button>
+              </div>
+            </nav>
+          ) : null}
+          {!isMagicTheme && !isSpaceTheme ? (
+            <section className="joseon-field-tools" id="joseonFieldTools" aria-label="보따리 속 물건" hidden>
+              <button className="joseon-field-tool-card" id="selectJoseonFieldAxe" type="button" aria-pressed="false">
+                <img src="/samunmong/assets/evidence-transparent/field-tool-chopping-axe-v1.png" alt="장작 도끼" draggable={false} />
+                <strong>장작 도끼</strong>
+                <small>어디에 쓸 수 있을까?</small>
+              </button>
+              <button className="joseon-field-tool-card" id="selectJoseonFieldKey" type="button" aria-pressed="false">
+                <img src="/samunmong/assets/evidence-transparent/field-tool-joseon-wardrobe-key-v1.png" alt="작은 쇠열쇠" draggable={false} />
+                <strong>작은 쇠열쇠</strong>
+                <small>어디에 맞는 열쇠일까?</small>
+              </button>
+              <button className="joseon-field-tool-card" id="selectJoseonCabinetKey" type="button" aria-pressed="false">
+                <img src="/samunmong/assets/evidence-transparent/field-tool-joseon-black-cabinet-key-v1.png" alt="매화무늬 장열쇠" draggable={false} />
+                <strong>매화무늬 장열쇠</strong>
+                <small>무덕이 내놓은 열쇠</small>
+              </button>
+              <button className="joseon-field-tool-card" id="selectYoomunseokRoomKey" type="button" aria-pressed="false">
+                <img src="/samunmong/assets/evidence-transparent/field-tool-joseon-sarangbang-key-v1.png" alt="놋쇠 고리열쇠" draggable={false} />
+                <strong>놋쇠 고리열쇠</strong>
+                <small>사랑방의 잠금쇠에 맞을까?</small>
+              </button>
+            </section>
+          ) : null}
           <div className="evidence-location-tabs" id="evidenceLocationTabs" aria-label="증거 장소 선택" />
           <div className="evidence-list evidence-grid" id="evidenceList">
             <div className="evidence-empty" id="emptyInterrogationEvidence">
@@ -466,6 +572,33 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
           ) : null}
         </aside>
       </EvidenceInventory>
+
+      {!isMagicTheme && !isSpaceTheme ? (
+        <aside className="hud evidence-link-reveal" id="evidenceLinkReveal" aria-hidden="true" aria-labelledby="evidenceLinkRevealTitle">
+          <button className="evidence-link-reveal-close" id="closeEvidenceLinkReveal" type="button" aria-label="연결 결과 닫기">×</button>
+          <header>
+            <span>두 증거가 맞물렸습니다</span>
+            <h2 id="evidenceLinkRevealTitle">이어진 실마리</h2>
+          </header>
+          <figure className="evidence-link-reveal-scene">
+            <img id="evidenceLinkRevealImage" src="/samunmong/assets/evidence-wooden-tag.webp" alt="두 증거 대조 결과" draggable={false} />
+            <figcaption><span>맞아떨어진 흔적</span><strong id="evidenceLinkRevealFact">두 증거에서 같은 흔적을 확인했습니다.</strong></figcaption>
+          </figure>
+          <div className="evidence-link-reveal-side">
+            <div className="evidence-link-reveal-pair" aria-label="연결한 두 증거">
+              <article><img id="evidenceLinkRevealA" alt="" draggable={false} /><strong id="evidenceLinkRevealNameA">첫 증거</strong></article>
+              <i aria-hidden="true">↔</i>
+              <article><img id="evidenceLinkRevealB" alt="" draggable={false} /><strong id="evidenceLinkRevealNameB">둘째 증거</strong></article>
+            </div>
+            <section className="evidence-link-reveal-verdict" aria-label="확정된 결론">
+              <span>확정된 결론</span>
+              <h3 id="evidenceLinkRevealVerdict">두 증거는 서로 이어집니다</h3>
+              <p id="evidenceLinkRevealConfirmed">같은 흔적을 확인했습니다.</p>
+            </section>
+            <p className="evidence-link-reveal-question"><span>아직 단정할 수 없는 것</span><strong id="evidenceLinkRevealQuestion">이 흔적은 사건의 어느 순간에 남았을까?</strong></p>
+          </div>
+        </aside>
+      ) : null}
 
       <aside className="global-panel tool-panel" id="toolPanel" aria-hidden="true" style={toolPanelStyle}>
         {isMagicTheme ? (
@@ -710,21 +843,6 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             </div>
           </aside>
 
-          <aside className="global-panel tactile-puzzle-panel" id="evidenceConfrontationPanel" aria-hidden="true" aria-live="polite">
-            <div className="global-panel-head">
-              <div><p className="tool-panel-kicker">심문 대면</p><h2 id="confrontationTitle">증거를 심문상에 올리기</h2></div>
-              <button className="close-button global-close" type="button">대면 취소</button>
-            </div>
-            <p id="confrontationGuide">증거패를 심문상에 올린 뒤 관인을 끌어 찍으십시오.</p>
-            <div className="tactile-puzzle-stage ritual-drag-stage" id="confrontationStage">
-              <img id="confrontationImage" src="/samunmong/assets/interactions/confrontation-puzzle/state-1.png" alt="증거 대면 심문상" draggable={false} />
-              <span className="ritual-drop-target confrontation-target-one" data-ritual-target="confrontation-1" aria-hidden="true" />
-              <span className="ritual-drop-target confrontation-target-three" data-ritual-target="confrontation-2" aria-hidden="true" />
-              <button className="ritual-drag-piece evidence-tablet active" type="button" data-ritual-kind="confrontation" data-ritual-step="1"><strong>증거패</strong><span id="confrontationEvidenceName">선택 증거</span></button>
-              <button className="ritual-drag-piece official-seal" type="button" data-ritual-kind="confrontation" data-ritual-step="2"><strong>관인</strong><span>끌어 찍기</span></button>
-            </div>
-          </aside>
-
           <aside className="global-panel tactile-puzzle-panel" id="sleeveInspectionPanel" aria-hidden="true" aria-live="polite">
             <div className="global-panel-head">
               <div><p className="tool-panel-kicker">신체 확인</p><h2 id="sleeveInspectionTitle">소매 아래 확인</h2></div>
@@ -802,7 +920,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               style={mapPinStyle(location)}
               aria-label={location.label}
               disabled={!location.goTo}
-              onClick={() => moveFromMap(location)}
+              onClick={(event) => moveFromMap(location, event)}
               key={`pin-${location.screen}`}
             />
           ))}

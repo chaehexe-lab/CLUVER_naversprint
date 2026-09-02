@@ -37,8 +37,9 @@ export default function InvestigationScene({
     collectedNames.forEach((name) => {
       screen.querySelectorAll<HTMLElement>(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((hotspot) => {
         hotspot.classList.add("collected");
-        hotspot.setAttribute("aria-disabled", "true");
-        if (hotspot instanceof HTMLButtonElement) hotspot.disabled = true;
+        const revisitableSpace = hotspot.classList.contains("concealed-space-hotspot");
+        hotspot.setAttribute("aria-disabled", String(!revisitableSpace));
+        if (hotspot instanceof HTMLButtonElement) hotspot.disabled = !revisitableSpace;
       });
     });
     screen.dataset.evidenceStateReady = "true";

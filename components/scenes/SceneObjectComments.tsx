@@ -87,7 +87,22 @@ export default function SceneObjectComments({ sceneId }: { sceneId: string }) {
   if (objects.length === 0) return null;
 
   const inspect = (object: SceneObject) => {
-    setMessage(object.message);
+    let nextMessage = object.message;
+    if (sceneId === "dolsoeQuarters" && object.id === "axe") {
+      const key = "samunmong-joseon-field-tools-v1";
+      const stored = (() => {
+        try { return JSON.parse(window.localStorage.getItem(key) || "[]") as string[]; }
+        catch { return []; }
+      })();
+      if (!stored.includes("장작 도끼")) {
+        window.localStorage.setItem(key, JSON.stringify([...stored, "장작 도끼"]));
+        window.dispatchEvent(new CustomEvent("samunmong:joseon-field-tool-acquired", { detail: { name: "장작 도끼" } }));
+        nextMessage = "";
+      } else {
+        nextMessage = "장작 도끼는 이미 챙겨 두었다.";
+      }
+    }
+    setMessage(nextMessage);
     if (timerRef.current) window.clearTimeout(timerRef.current);
     timerRef.current = window.setTimeout(() => setMessage(""), 2600);
   };

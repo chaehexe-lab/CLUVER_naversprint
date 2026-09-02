@@ -5938,6 +5938,78 @@ html[data-samunmong-theme="magicSchool"] .interrogation-candle,
       margin: 0 0 16px;
     }
 
+    .joseon-field-tools {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 14px;
+      max-width: calc(100% - clamp(12px, 2.2vw, 34px));
+      margin: 2px 0 14px;
+      padding: 10px 12px;
+      border: 1px solid rgba(91, 46, 25, .2);
+      border-radius: 5px;
+      background: rgba(255, 238, 191, .18);
+    }
+
+    .joseon-field-tools[hidden] { display: none !important; }
+
+    .joseon-field-tools > span {
+      flex: 0 0 auto;
+      color: #542b1d;
+      font-family: "VitroPride", "Noto Serif KR", serif;
+      font-size: 15px;
+    }
+
+    .joseon-field-tool-card {
+      display: grid;
+      grid-template-columns: 58px auto;
+      grid-template-rows: auto auto;
+      align-items: center;
+      column-gap: 10px;
+      min-width: 224px;
+      min-height: 68px;
+      padding: 5px 14px 5px 8px;
+      border: 1px solid rgba(105, 58, 31, .4);
+      border-radius: 4px;
+      color: #392015;
+      background: rgba(247, 225, 182, .42);
+      font-family: "Nanum BareunJeongsin", serif;
+      text-align: left;
+    }
+    .joseon-field-tool-card[hidden] { display: none !important; }
+
+    .joseon-field-tool-card img {
+      grid-row: 1 / 3;
+      width: 58px;
+      height: 58px;
+      object-fit: contain;
+      filter: drop-shadow(0 5px 5px rgba(45, 24, 13, .28));
+    }
+
+    .joseon-field-tool-card strong { align-self: end; font-size: 18px; }
+    .joseon-field-tool-card small { align-self: start; color: #87402d; font-size: 13px; }
+    .joseon-field-tool-card[aria-pressed="true"] {
+      color: #fff0d2;
+      border-color: #813128;
+      background: linear-gradient(180deg, #8c3027, #571c18);
+    }
+    .joseon-field-tool-card[aria-pressed="true"] small { color: #f4c286; }
+    .joseon-field-tool-card:disabled {
+      opacity: .5;
+      filter: grayscale(.55);
+      cursor: not-allowed;
+    }
+
+    body:has(#spatialSearchPanel.show) .evidence-bag-pop.open {
+      z-index: 72 !important;
+    }
+
+    body:has(#spatialSearchPanel.show) .screen.active .scene-dock {
+      z-index: 58 !important;
+    }
+
     .evidence-story-nav {
       position: relative;
       z-index: 1;
@@ -8352,10 +8424,10 @@ html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel .special-touch-p
 }
 html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel .special-touch-points[data-special-mode="goreumJeogoriFit"] button[data-special-point="1"] {
   display: block !important;
-  left: 48%;
-  top: 40%;
-  width: 18%;
-  height: 26%;
+  left: 29%;
+  top: 31%;
+  width: 16%;
+  height: 24%;
   pointer-events: auto;
 }
 html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel .special-touch-points[data-special-mode="goreumJeogoriFit"] button::after,
@@ -8363,22 +8435,32 @@ html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel .special-touch-p
 html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel .special-touch-points[data-special-mode="goreumJeogoriFit"] .physical-pull-affordance,
 html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel .special-touch-points[data-special-mode="goreumJeogoriFit"] .physical-contact-trace { display: none !important; }
 html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel:has(.special-touch-points[data-special-mode="goreumJeogoriFit"]) .special-explorer-tool {
-  right: 4%;
-  bottom: 7%;
-  width: 270px;
-  height: 160px;
+  right: 5%;
+  bottom: 5%;
+  width: min(25vw, 300px);
+  height: min(34vh, 320px);
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel:has(.special-touch-points[data-special-mode="goreumJeogoriFit"]) .special-explorer-tool.placed {
-  left: 54%;
+  left: 37%;
   right: auto;
-  top: 52%;
+  top: 45%;
   bottom: auto;
-  width: 28%;
-  height: 16%;
-  transform: translate(-50%, -50%) rotate(-10deg);
+  width: 23%;
+  height: 33%;
+  transform: translate(-50%, -50%) rotate(-13deg);
   opacity: .96;
   pointer-events: none;
   animation: none;
+}
+html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel:has(.special-touch-points[data-special-mode="goreumJeogoriFit"]) .special-puzzle-stage,
+html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel:has(.special-touch-points[data-special-mode="goreumJeogoriFit"]) #specialPuzzleImage {
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
 }
 
 /* Compare the exact collected straw shoes against the exact courtyard prints. */
@@ -8944,25 +9026,6 @@ html[data-samunmong-theme="joseon"] .knot-drag-handle:disabled { opacity: 0; poi
 html[data-samunmong-theme="joseon"] .knot-puzzle-stage .knot-drag-handle { display: none; }
 html[data-samunmong-theme="joseon"] .knot-puzzle-stage[data-knot-step="1"] .knot-center,
 html[data-samunmong-theme="joseon"] .knot-puzzle-stage[data-knot-step="2"] .knot-right { display: grid; }
-html[data-samunmong-theme="joseon"] .confrontation-actions {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
-  margin-top: 12px;
-}
-html[data-samunmong-theme="joseon"] .confrontation-actions button {
-  min-height: 64px;
-  padding: 9px 12px;
-  border: 1px solid #8a5d35;
-  background: linear-gradient(#3a2417,#1b100b);
-  color: #ead6ae;
-  font: inherit;
-  cursor: pointer;
-}
-html[data-samunmong-theme="joseon"] .confrontation-actions strong,
-html[data-samunmong-theme="joseon"] .confrontation-actions span { display: block; }
-html[data-samunmong-theme="joseon"] .confrontation-actions span { margin-top: 3px; color: #bda987; font-size: 13px; }
-html[data-samunmong-theme="joseon"] .confrontation-actions button:disabled { opacity: .38; cursor: default; }
 html[data-samunmong-theme="joseon"] .ritual-drag-stage { cursor: default; min-height: 320px; }
 html[data-samunmong-theme="joseon"] .ritual-drop-target {
   position: absolute; width: 23%; height: 22%; border: 2px dashed #e7b75a; border-radius: 14px;
@@ -8971,9 +9034,6 @@ html[data-samunmong-theme="joseon"] .ritual-drop-target {
 }
 html[data-samunmong-theme="joseon"] .ritual-drop-target.active { opacity: .82; transform: scale(1); animation: tactile-guide-pulse 1s ease-in-out infinite alternate; }
 html[data-samunmong-theme="joseon"] .ritual-drop-target.complete { opacity: 0; }
-html[data-samunmong-theme="joseon"] .confrontation-target-one { left: 37%; top: 43%; }
-html[data-samunmong-theme="joseon"] .confrontation-target-two { left: 26%; top: 25%; }
-html[data-samunmong-theme="joseon"] .confrontation-target-three { right: 16%; bottom: 13%; width: 18%; height: 24%; border-radius: 50%; }
 html[data-samunmong-theme="joseon"] .sleeve-target-one { right: 9%; top: 48%; width: 19%; height: 18%; }
 html[data-samunmong-theme="joseon"] .sleeve-target-two { left: 43%; top: 12%; width: 24%; height: 20%; }
 html[data-samunmong-theme="joseon"] .sleeve-target-three { left: 43%; top: 39%; width: 22%; height: 24%; }
@@ -8989,9 +9049,8 @@ html[data-samunmong-theme="joseon"] .ritual-drag-piece.complete { display: none;
 html[data-samunmong-theme="joseon"] .ritual-drag-piece.wrong-fit { animation: documentPieceReject .3s ease; }
 html[data-samunmong-theme="joseon"] .ritual-drag-piece strong, html[data-samunmong-theme="joseon"] .ritual-drag-piece span { display: block; pointer-events: none; }
 html[data-samunmong-theme="joseon"] .ritual-drag-piece span { margin-top: 2px; color: #c9b28b; font-size: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-html[data-samunmong-theme="joseon"] .evidence-tablet, html[data-samunmong-theme="joseon"] .wrist-cord { left: 7%; bottom: 8%; }
-html[data-samunmong-theme="joseon"] .statement-tablet, html[data-samunmong-theme="joseon"] .sleeve-fold { right: 7%; bottom: 8%; }
-html[data-samunmong-theme="joseon"] .official-seal, html[data-samunmong-theme="joseon"] .evidence-tag { right: 8%; top: 8%; border-radius: 50%; min-width: 86px; min-height: 86px; background: radial-gradient(circle,#8f281d,#3e0d09 70%); }
+html[data-samunmong-theme="joseon"] .wrist-cord { left: 7%; bottom: 8%; }
+html[data-samunmong-theme="joseon"] .sleeve-fold { right: 7%; bottom: 8%; }
 html[data-samunmong-theme="joseon"] .tactile-puzzle-panel.puzzle-miss { animation: tactile-miss .28s ease; }
 html[data-samunmong-theme="joseon"] .sample-touch-points { position: absolute; inset: 0; }
 html[data-samunmong-theme="joseon"] .sample-touch-points[hidden] { display: none; }
@@ -9589,6 +9648,72 @@ html[data-samunmong-theme="joseon"] .evidence-acquisition-object {
   transform: translate(-50%, -50%) scale(.2);
   opacity: 0;
   filter: brightness(1.14) saturate(1.06) drop-shadow(0 14px 18px #000d);
+}
+
+/* Hide the unused bottom strip that contains a stray white scan line. */
+html[data-samunmong-theme="joseon"] #toolResultImage[src*="result-document-reconstruction.png"] {
+  clip-path: inset(0 0 11% 0);
+}
+
+/* Joseon interaction objects sit directly on the work surface.
+   Remove generic rectangular card/slot chrome without removing the popup shell. */
+html[data-samunmong-theme="joseon"] :is(
+  #documentAssemblyPanel,
+  #rubbingPuzzlePanel,
+  #knotPuzzlePanel,
+  #footprintPuzzlePanel,
+  #materialPuzzlePanel,
+  #specialEvidencePuzzlePanel,
+  #sleeveInspectionPanel
+) :is(.document-assembly-stage, .tactile-puzzle-stage) {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+html[data-samunmong-theme="joseon"] :is(
+  #documentAssemblyPanel,
+  #rubbingPuzzlePanel,
+  #knotPuzzlePanel,
+  #footprintPuzzlePanel,
+  #materialPuzzlePanel,
+  #specialEvidencePuzzlePanel,
+  #sleeveInspectionPanel
+) :is(.tactile-puzzle-board, .tactile-puzzle-stage > img, .document-assembly-board) {
+  border: 0 !important;
+  outline: 0 !important;
+  box-shadow: none !important;
+}
+
+html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel :is(
+  .special-explorer-tool,
+  .special-surface-handle,
+  .special-touch-points button
+) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+
+html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel :is(
+  .special-explorer-tool-image,
+  .special-surface-handle > img
+) {
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+html[data-samunmong-theme="joseon"] .sample-touch-points button:has(img) {
+  border: 0 !important;
+  border-radius: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 html[data-samunmong-theme="joseon"] .sample-drop-zone[data-sample-target="1"] { left: 29%; top: 63%; }
 html[data-samunmong-theme="joseon"] .sample-drop-zone[data-sample-target="2"] { left: 71%; top: 63%; }
@@ -13049,8 +13174,10 @@ html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-au
   position: fixed !important;
   z-index: 44 !important;
   inset: 0 !important;
-  width: 100vw !important;
-  height: 100dvh !important;
+  /* This panel lives inside the scaled 1600×900 game shell. Viewport units
+     would be scaled a second time, leaving the bottom fifth clipped. */
+  width: 100% !important;
+  height: 100% !important;
   max-width: none !important;
   max-height: none !important;
   padding: 0 !important;
@@ -13125,21 +13252,24 @@ html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-au
   position: absolute;
   z-index: 6;
   left: 50%;
-  bottom: clamp(26px, 5vh, 64px);
+  bottom: 12.5%;
   width: max-content;
   max-width: calc(100vw - 40px);
   margin: 0;
-  padding: 12px 24px;
+  padding: 10px 18px;
   transform: translateX(-50%);
   color: #f3dfb4;
-  border: 1px solid rgba(187,130,72,.56);
-  border-radius: 999px;
-  background: rgba(20,11,7,.72);
-  box-shadow: 0 10px 30px rgba(0,0,0,.55);
-  font-size: clamp(16px, 1.4vw, 22px);
+  border: 1px solid rgba(199,161,105,.48);
+  border-radius: 4px;
+  background: rgba(19,13,9,.88);
+  box-shadow: 0 12px 32px rgba(0,0,0,.48);
+  font-family: "Nanum BareunJeongsin", serif;
+  font-size: clamp(16px, 1.25vw, 20px);
+  line-height: 1.45;
   text-align: center;
   pointer-events: none;
 }
+.spatial-search-guide[hidden] { display: none !important; }
 .spatial-search-stage.dragging > img {
   filter: brightness(1.06);
   transform: scale(1.008);
@@ -13172,23 +13302,29 @@ html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-au
   touch-action: none;
 }
 .spatial-search-handle:active { cursor: grabbing; }
+.spatial-search-stage.field-tool-required:not(.field-tool-selected) .spatial-search-handle {
+  cursor: not-allowed;
+}
 .spatial-search-handle[hidden],
 .spatial-search-discovery[hidden] { display: none !important; }
 .spatial-search-discovery {
   position: absolute;
   z-index: 5;
   left: 50%;
-  bottom: 20px;
-  min-width: min(620px, calc(100% - 40px));
-  padding: 15px 28px;
+  bottom: 12.5%;
+  width: max-content;
+  min-width: 0;
+  max-width: calc(100% - 56px);
+  padding: 10px 18px;
   transform: translateX(-50%);
   color: #fff0c9;
-  border: 2px solid #c3843e;
-  border-radius: 8px;
-  background: #27120de8;
-  box-shadow: 0 12px 28px #000a, inset 0 0 18px #6f281b55;
-  font-family: "NanumBareunJeongsin", "ChosunNm", serif;
-  font-size: clamp(17px, 1.45vw, 22px);
+  border: 1px solid rgba(199,161,105,.48);
+  border-radius: 4px;
+  background: rgba(19,13,9,.88);
+  box-shadow: 0 12px 32px rgba(0,0,0,.48);
+  font-family: "Nanum BareunJeongsin", serif;
+  font-size: clamp(16px, 1.25vw, 20px);
+  line-height: 1.45;
   cursor: pointer;
   animation: spatialDiscoveryButton .4s .12s ease both;
 }
@@ -13196,8 +13332,30 @@ html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-au
   content: "증거 습득";
   display: inline-block;
   margin-right: 12px;
-  color: #e7ad62;
+  color: #d7a45f;
   font-size: .78em;
+}
+
+.joseon-field-tool-cursor {
+  position: fixed;
+  z-index: 120;
+  left: -999px;
+  top: -999px;
+  width: 168px;
+  height: 168px;
+  display: none;
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 16px 13px rgba(0,0,0,.7));
+  transform: rotate(-8deg);
+  transform-origin: 28% 28%;
+}
+
+.joseon-field-tool-cursor.show { display: block; }
+
+body.joseon-field-tool-cursor-active #spatialSearchStage,
+body.joseon-field-tool-cursor-active #spatialSearchStage .spatial-search-handle {
+  cursor: none !important;
 }
 @keyframes spatialEvidenceReveal {
   from { opacity: .35; filter: brightness(1.5); transform: scale(1.018); }
@@ -13208,7 +13366,7 @@ html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-au
   to { opacity: 1; transform: translate(-50%, 0); }
 }
 @media (max-width: 760px) {
-  .spatial-search-panel { width: 100vw !important; padding: 0 !important; }
+  .spatial-search-panel { width: 100% !important; height: 100% !important; padding: 0 !important; }
   .spatial-search-stage { min-height: 100dvh; aspect-ratio: auto; }
   .spatial-search-stage > img { object-fit: cover; }
   .spatial-search-discovery { bottom: 12px; padding: 12px 14px; }
@@ -18609,6 +18767,25 @@ html[data-samunmong-theme="joseon"] .global-panel.tool-panel .tool-preview-image
 .hotspot.scene-evidence-object { overflow:visible; }
 .hotspot.scene-evidence-object .hotspot-evidence-visual { position:absolute; inset:0; width:100%; height:100%; object-fit:contain; opacity:.58; filter:brightness(.66) contrast(.94) saturate(.58) sepia(.08) drop-shadow(0 3px 4px rgba(0,0,0,.42)); pointer-events:none; animation:none; }
 .hotspot.scene-evidence-object.collected .hotspot-evidence-visual { opacity:0; }
+
+/* The sarangbang key is mixed into the brush pot. Only its brass bow peeks
+   between the wooden brush handles; the first click lifts it into view. */
+html[data-samunmong-theme="joseon"] .yoomunseok-room-key-concealed:not(.key-revealed):not(.collected) .hotspot-evidence-visual {
+  clip-path: inset(0 0 66% 0);
+  opacity: .3;
+  filter: brightness(.46) contrast(1.08) saturate(.6) drop-shadow(0 2px 3px rgba(0,0,0,.72));
+  transform: translate(5%, 11%) rotate(59deg) scale(.64);
+}
+html[data-samunmong-theme="joseon"] .yoomunseok-room-key-concealed.key-revealed .hotspot-evidence-visual {
+  opacity: .72;
+  clip-path: none;
+  transform: translate(2%, -18%) rotate(59deg) scale(.69);
+  animation: yoomunseokKeyLiftOut .46s ease both;
+}
+@keyframes yoomunseokKeyLiftOut {
+  from { opacity: .28; transform: translate(5%, 11%) rotate(59deg) scale(.64); }
+  to { opacity: .72; transform: translate(2%, -18%) rotate(59deg) scale(.69); }
+}
 .hotspot.backgate-footprints-evidence .hotspot-evidence-visual { opacity:.64; filter:brightness(.72) contrast(.98) saturate(.48) drop-shadow(0 3px 4px rgba(0,0,0,.46)); }
 .hotspot.backgate-cord-evidence .hotspot-evidence-visual { opacity:.68; filter:brightness(.68) saturate(.58) drop-shadow(0 3px 4px rgba(0,0,0,.48)); }
 .hotspot.field-letter-evidence .hotspot-evidence-visual,
@@ -19977,6 +20154,166 @@ html[data-samunmong-theme="joseon"] .hotspot.concealed-space-hotspot.collected {
 
 html[data-samunmong-theme="joseon"] .spatial-search-handle,
 html[data-samunmong-theme="joseon"] .spatial-search-stage.revealed:not(.collected),
+html[data-samunmong-theme="joseon"] .spatial-search-stage.revealed.collected,
 html[data-samunmong-theme="joseon"] .spatial-search-discovery {
   cursor: pointer !important;
+}
+
+html[data-samunmong-theme="joseon"] .spatial-search-stage.closing-object > img {
+  animation: joseonSpatialObjectClose .28s ease both !important;
+}
+
+@keyframes joseonSpatialObjectClose {
+  from { opacity: .72; filter: brightness(1.08); transform: scale(1.01); }
+  to { opacity: 1; filter: brightness(.92); transform: scale(1); }
+}
+
+/* Search order v4: align every element to the parchment's printed inner frame. */
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-heading {
+  left: 18% !important;
+  top: 9.5% !important;
+  width: 64% !important;
+  text-align: center !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-heading > div,
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-heading > div > span,
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-heading h2,
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-heading p {
+  width: 100% !important;
+  text-align: center !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-heading h2 {
+  white-space: nowrap !important;
+  font-size: clamp(42px, 4vw, 66px) !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-body {
+  left: 13% !important;
+  top: 27% !important;
+  width: 74% !important;
+  height: 61% !important;
+}
+
+/* Both the physical seal and its imprint share the center of the printed square. */
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-command {
+  inset: auto auto 20% 97.5% !important;
+  transform: translateX(-50%) !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-order-stamp-target {
+  inset: auto auto -1% 97.5% !important;
+  transform: translateX(-50%) !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-back {
+  left: 1.5% !important;
+  bottom: 10% !important;
+}
+
+/* Search order v5: keep all copy inside the printed frame and use the empty lower stage. */
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-heading {
+  left: 20% !important;
+  top: 18% !important;
+  width: 60% !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-heading h2 {
+  margin: 3px 0 8px !important;
+  font-size: clamp(40px, 3.7vw, 62px) !important;
+  line-height: 1.05 !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-heading p {
+  font-size: clamp(19px, 1.45vw, 25px) !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-body {
+  left: 18% !important;
+  top: 34% !important;
+  width: 64% !important;
+  height: 46% !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-reason {
+  width: 100% !important;
+  height: 100% !important;
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  grid-template-rows: auto auto minmax(0, 1fr) !important;
+  grid-template-areas: "reason" "hint" "evidence" !important;
+  justify-items: center !important;
+  align-items: start !important;
+  row-gap: clamp(5px, .7vw, 11px) !important;
+  padding: clamp(16px, 1.5vw, 24px) 0 0 !important;
+  border-top: 1px solid rgba(103, 57, 31, .28) !important;
+  border-bottom: 0 !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-reason > strong {
+  grid-area: reason !important;
+  align-self: start !important;
+  margin: 0 !important;
+  text-align: center !important;
+  font-size: clamp(30px, 2.45vw, 42px) !important;
+  line-height: 1.2 !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open #joseonAuthorityHint {
+  grid-area: hint !important;
+  align-self: start !important;
+  margin: 0 !important;
+  text-align: center !important;
+  font-size: clamp(19px, 1.4vw, 24px) !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-evidence {
+  grid-area: evidence !important;
+  align-self: stretch !important;
+  justify-self: center !important;
+  width: min(54%, 520px) !important;
+  height: 100% !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-evidence-card,
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-evidence-card.ready,
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-evidence-card.missing {
+  justify-self: center !important;
+  width: 100% !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-evidence-card img {
+  width: min(100%, 310px) !important;
+  height: min(28vh, 280px) !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-evidence.multiple {
+  width: min(72%, 900px) !important;
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: clamp(28px, 4vw, 68px) !important;
+  align-items: stretch !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-evidence.multiple .joseon-authority-evidence-card img {
+  width: min(100%, 250px) !important;
+  height: min(24vh, 230px) !important;
+}
+
+/* A disabled seal is unavailable, not faded: its physical object must stay crisp. */
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-command:disabled {
+  opacity: 1 !important;
+  filter: none !important;
+}
+
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-command:disabled img {
+  opacity: 1 !important;
+  filter: drop-shadow(0 12px 10px rgba(54, 24, 12, .34)) !important;
+}
+
+/* The return control sits below the rolled sheet, not on its printed writing area. */
+html[data-samunmong-theme="joseon"] .global-panel.joseon-authority-panel.room-authority.order-open .joseon-authority-back {
+  left: -20% !important;
+  bottom: -34% !important;
 }

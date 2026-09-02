@@ -5,7 +5,7 @@
     const knownScreenIds = new Set([
       "mainScreen", "tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne",
       "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters",
-      "backGateCourtyard", "magicAlchemyLab", "magicUnlockDoor", "magicCleaningCloset", "magicLibrary",
+      "backGateCourtyard", "magicAlchemyLab", "magicCleaningCloset", "magicLibrary",
       "magicRecordCrystalRoom", "magicDormHallway", "spaceAirlock", "spaceMedicalBay",
       "spaceOxygenGenerator", "spaceDataCore", "spaceScienceLab", "interrogationScreen"
     ]);
@@ -28,18 +28,27 @@
     const magicStudentPrevButton = document.querySelector("[data-student-prev]");
     const magicStudentNextButton = document.querySelector("[data-student-next]");
     const magicStudentPageIndicator = document.querySelector("[data-student-page-indicator]");
+    const magicStudentRecords = [...document.querySelectorAll("[data-magic-student-record]")];
+    const magicStudentTabs = [...document.querySelectorAll("[data-magic-student-tab]")];
     const memoryTraceSequence = document.querySelector(".memory-trace-sequence");
     const memoryDrawZone = document.querySelector("[data-memory-draw-zone]");
     const memoryDrawPath = document.querySelector("[data-memory-draw-path]");
+    const memoryTraceProgressCircle = document.querySelector("[data-memory-trace-progress]");
+    const memoryTraceWand = document.querySelector("[data-memory-trace-wand]");
     const memoryTraceEvidenceNodes = [...document.querySelectorAll("[data-memory-evidence]")];
     const memoryTraceInstruction = document.querySelector("[data-memory-trace-instruction]");
     const memoryTraceCopy = document.querySelector("[data-memory-trace-copy]");
     const memoryTraceContinue = document.querySelector("[data-memory-trace-continue]");
     let startCaseLabel = startCaseButton?.textContent?.trim() || "수사 시작";
     let magicStudentPageIndex = 0;
+    let magicLedgerStudentIndex = 0;
     let memoryTraceComplete = false;
     let memoryTraceTypingTimer = 0;
     let memoryTracePoints = [];
+    let memoryTraceProgress = 0;
+    let memoryTraceAccumulatedAngle = 0;
+    let memoryTraceLastAngle = null;
+    let memoryTraceDrawingActive = false;
     const briefingPanels = [...document.querySelectorAll("[data-briefing-panel]")];
     let fieldGuide = document.querySelector("#fieldOnboarding");
     let fieldGuidePanels = [...document.querySelectorAll("[data-field-guide-panel]")];
@@ -101,7 +110,7 @@
     if (isMagicTheme || isSpaceTheme) startCaseLabel = "조사 시작";
     document.documentElement.dataset.samunmongTheme = activeTheme;
     const magicBriefingText = sentenceBreakText("“선생님, 제1 연금술 실습실이 밤새 불탔습니다.”\n\n당신은 이 꿈에서 갓 부임한 마법 교사입니다.\n마력의 시선으로 잔류 마법을 살피고, 학생과 교직원을 심문해 방화의 진범을 찾아야 합니다.");
-    const spaceBriefingText = sentenceBreakText("“오르빗-13에서 한 대원이 외부 작업 중 정거장 밖으로 이탈했습니다.”\n\n당신은 이 꿈에서 사건 조사관입니다.\n현장에 남겨진 단서와 대원들의 진술을 맞춰 보며,\n사고처럼 보이는 죽음의 진실을 추적해야 합니다.");
+    const spaceBriefingText = sentenceBreakText("“오르빗-13에서 외부 작업 중 정거장 밖으로 이탈했습니다.”\n\n당신은 이 꿈에서 사건 조사관입니다.\n현장에 남겨진 단서와 대원들의 진술을 맞춰 보며,\n사고처럼 보이는 죽음의 진실을 추적해야 합니다.");
     const briefingText = isSpaceTheme
       ? spaceBriefingText
       : isMagicTheme
@@ -187,6 +196,7 @@
     const analyzedEvidenceKey = `samunmong-analyzed-evidence-${themeStorageSuffix}`;
     const examinedCluesKey = `samunmong-examined-clues-${themeStorageSuffix}`;
     const linkedEvidenceKey = `samunmong-linked-evidence-${themeStorageSuffix}`;
+    const manualEvidenceLinksMigrationKey = `samunmong-manual-evidence-links-v1-${themeStorageSuffix}`;
     const spaceMedicalRecordRecoveryKey = "samunmong-space-medical-record-recovered";
     const spaceEncryptedFileDecryptionKey = "samunmong-space-encrypted-file-decrypted";
     const spaceAnalysisResultsKey = "samunmong-space-analysis-results";
@@ -198,10 +208,23 @@
     let spaceKeycardChipInserted = false;
     let spaceAnalysisSampleHeld = false;
     let spaceAnalysisSampleInserted = false;
-    const retiredJoseonEvidenceNames = new Set(["헐거워진 노리개"]);
+    const chunwolJeogoriRestorationKey = `samunmong-chunwol-jeogori-restored-v1-${themeStorageSuffix}`;
+    const joseonInvestigationAuthorityKey = "samunmong-joseon-investigation-authority-v1";
+    const joseonDreamTraceViewedKey = "samunmong-joseon-dream-traces-viewed-v1";
+    const joseonFieldToolsKey = "samunmong-joseon-field-tools-v1";
+    const joseonFieldToolTutorialSeenKey = "samunmong-joseon-field-tool-tutorial-seen-v1";
+    const canonicalJoseonEvidenceNames = new Set([
+      "점순의 목 압박 흔적", "점순의 손톱 밑 흔적", "호패 조각", "돌쇠의 그림",
+      "무덕의 번진 일기", "진흙 묻은 짚신", "찢어진 옷고름", "고름이 뜯긴 저고리",
+      "빈 호패 주머니", "하인 장부", "혼서 조각", "피 묻은 붕대", "돌쇠의 팔 상처",
+      "도망 보따리", "작은 발자국", "끊어진 호패끈", "찢어진 약속 편지", "긁힌 팔 흔적"
+    ]);
+    const retiredJoseonEvidenceNames = new Set(["헐거워진 노리개", "매화 무늬 편지지"]);
     const conversationNotesKey = `samunmong-conversation-notes-${themeStorageSuffix}`;
     const interrogationQuestionCountKey = `samunmong-interrogation-question-count-${themeStorageSuffix}`;
     const interrogationKnownFactsKey = `samunmong-interrogation-known-facts-${themeStorageSuffix}`;
+    const statementRevealedEvidenceKey = `samunmong-statement-revealed-evidence-${themeStorageSuffix}`;
+    const statementEvidenceLinksKey = `samunmong-statement-evidence-links-${themeStorageSuffix}`;
     const magicGandalfReportsKey = "samunmong-magic-gandalf-reports";
     const fieldGuidePendingKey = "samunmong-field-guide-pending";
     const fieldGuideSeenKey = "samunmong-field-guide-seen";
@@ -611,6 +634,8 @@
       localStorage.removeItem(`samunmong-conversation-notes-${suffix}`);
       localStorage.removeItem(`samunmong-interrogation-question-count-${suffix}`);
       localStorage.removeItem(`samunmong-interrogation-known-facts-${suffix}`);
+      localStorage.removeItem(`samunmong-statement-revealed-evidence-${suffix}`);
+      localStorage.removeItem(`samunmong-statement-evidence-links-${suffix}`);
       if (normalizedTheme === "magicSchool") {
         localStorage.removeItem(magicGandalfReportsKey);
       }
@@ -623,7 +648,13 @@
       if (normalizedTheme === "magicSchool") {
         localStorage.removeItem("samunmong-magic-library-frozen-book-thawed");
       }
-      if (normalizedTheme === "joseon") localStorage.removeItem(fieldGuideSeenKey);
+      if (normalizedTheme === "joseon") {
+        localStorage.removeItem(fieldGuideSeenKey);
+        localStorage.removeItem(joseonInvestigationAuthorityKey);
+        localStorage.removeItem(joseonDreamTraceViewedKey);
+        localStorage.removeItem(joseonFieldToolsKey);
+        localStorage.removeItem(joseonFieldToolTutorialSeenKey);
+      }
 
       const slots = readSaveSlots();
       delete slots[normalizedTheme];
@@ -1059,41 +1090,59 @@
     function resetMemoryTrace() {
       memoryTraceComplete = false;
       memoryTracePoints = [];
+      memoryTraceProgress = 0;
+      memoryTraceAccumulatedAngle = 0;
+      memoryTraceLastAngle = null;
+      memoryTraceDrawingActive = false;
       clearInterval(memoryTraceTypingTimer);
       memoryTraceSequence?.setAttribute("data-memory-trace-state", "intro");
       if (memoryDrawPath) memoryDrawPath.setAttribute("d", "");
+      if (memoryTraceProgressCircle) memoryTraceProgressCircle.style.strokeDashoffset = "100";
+      if (memoryTraceWand) {
+        memoryTraceWand.style.removeProperty("--wand-x");
+        memoryTraceWand.style.removeProperty("--wand-y");
+        memoryTraceWand.style.removeProperty("--wand-angle");
+      }
       memoryTraceEvidenceNodes.forEach((node) => node.classList.remove("revealed"));
       if (memoryTraceInstruction) {
-        memoryTraceInstruction.textContent = "지팡이를 이용해 원을 그려 사건의 잔상을 확인하세요.";
+        memoryTraceInstruction.textContent = "불길과 얼어붙은 경보 룬, 깨진 수정구를 차례로 조사하십시오.";
       }
       if (memoryTraceCopy) memoryTraceCopy.textContent = "";
       if (memoryTraceContinue) memoryTraceContinue.disabled = true;
     }
 
     function typeMemoryTraceStory() {
-      const story = [
-        "선생님께서 처음 이 학교에 부임하셨을 때...",
-        "제1 연금술 실습실에서 좋지 않은 사건이 발생했다고 합니다.",
-        "흩어진 잔상 속 단서들을 따라, 그 사건의 진실을 밝혀야 합니다."
-      ].join("\n\n");
-      let index = 0;
+      const storyLines = [
+        "불길에서는 강한 화염 마력이 검출되었습니다.",
+        "작동하지 않은 경보 룬에는 빙결 마력이, 깨진 수정구에는 환각 마력이 남아 있습니다.",
+        "서로 다른 세 마법이 한 현장에 남은 이유를 조사해야 합니다."
+      ];
+      const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
       clearInterval(memoryTraceTypingTimer);
-      if (memoryTraceCopy) memoryTraceCopy.textContent = "";
+      if (memoryTraceCopy) {
+        memoryTraceCopy.replaceChildren();
+        storyLines.forEach((line, index) => {
+          const inkLine = document.createElement("span");
+          inkLine.className = "magic-ink-line";
+          inkLine.textContent = line;
+          inkLine.style.setProperty("--ink-delay", reduceMotion ? "0ms" : `${index * 430}ms`);
+          memoryTraceCopy.appendChild(inkLine);
+        });
+      }
       if (memoryTraceContinue) memoryTraceContinue.disabled = true;
-      memoryTraceTypingTimer = window.setInterval(() => {
-        index += 1;
-        if (memoryTraceCopy) memoryTraceCopy.textContent = story.slice(0, index);
-        if (index >= story.length) {
-          clearInterval(memoryTraceTypingTimer);
-          if (memoryTraceContinue) memoryTraceContinue.disabled = false;
-        }
-      }, window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 0 : 28);
+      memoryTraceTypingTimer = window.setTimeout(() => {
+        if (memoryTraceContinue) memoryTraceContinue.disabled = false;
+      }, reduceMotion ? 0 : 2050);
     }
 
     function completeMemoryTrace() {
       if (memoryTraceComplete) return;
       memoryTraceComplete = true;
       memoryTraceSequence?.setAttribute("data-memory-trace-state", "complete");
+      const magicInkAudio = new Audio("/samunmong/sound/sfx/magic-school-ink-type.mp3");
+      magicInkAudio.volume = 0.48;
+      magicInkAudio.loop = false;
+      void magicInkAudio.play().catch(() => undefined);
       memoryTraceEvidenceNodes.forEach((node, index) => {
         setTimeout(() => node.classList.add("revealed"), index * 180);
       });
@@ -1107,6 +1156,40 @@
       if (!memoryDrawPath || memoryTracePoints.length < 2) return;
       const d = memoryTracePoints.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
       memoryDrawPath.setAttribute("d", d);
+    }
+
+    function updateMemoryTraceGesture(point) {
+      if (!point) return;
+      const dx = point.x - 50;
+      const dy = point.y - 50;
+      const radius = Math.hypot(dx, dy);
+      const angle = Math.atan2(dy, dx);
+      if (memoryTraceWand) {
+        memoryTraceWand.style.setProperty("--wand-x", `${point.x}%`);
+        memoryTraceWand.style.setProperty("--wand-y", `${point.y}%`);
+        memoryTraceWand.style.setProperty("--wand-angle", `${angle * 180 / Math.PI + 45}deg`);
+      }
+      if (radius < 23 || radius > 42) {
+        memoryTraceLastAngle = angle;
+        return;
+      }
+      if (memoryTraceLastAngle !== null) {
+        let delta = angle - memoryTraceLastAngle;
+        if (delta > Math.PI) delta -= Math.PI * 2;
+        if (delta < -Math.PI) delta += Math.PI * 2;
+        if (Math.abs(delta) < .42) memoryTraceAccumulatedAngle += Math.abs(delta);
+      }
+      memoryTraceLastAngle = angle;
+      memoryTraceProgress = Math.min(1, memoryTraceAccumulatedAngle / (Math.PI * 2 * .92));
+      if (memoryTraceProgressCircle) {
+        memoryTraceProgressCircle.style.strokeDashoffset = String(100 - memoryTraceProgress * 100);
+      }
+      const revealCount = Math.min(memoryTraceEvidenceNodes.length, Math.floor(memoryTraceProgress * (memoryTraceEvidenceNodes.length + 1)));
+      memoryTraceEvidenceNodes.forEach((node, index) => node.classList.toggle("revealed", index < revealCount));
+      if (memoryTraceInstruction) {
+        memoryTraceInstruction.textContent = `기억 궤적 복원 중 · ${Math.round(memoryTraceProgress * 100)}%`;
+      }
+      if (memoryTraceProgress >= .98) completeMemoryTrace();
     }
 
     function getMemoryDrawPoint(event) {
@@ -1246,13 +1329,11 @@
       briefingScreen.classList.remove("awaiting-memory-orb");
       briefingScreen.classList.remove("memory-restored");
       briefingScreen.classList.add("memory-restoring");
-      showLoading("이동 중...", "briefingScreen", { plain: true });
       playSfx("briefingNext", 0.75);
       briefingRestoreTimer = window.setTimeout(() => {
         briefingScreen.classList.remove("memory-restoring");
         briefingScreen.classList.remove("awaiting-memory-orb");
         briefingScreen.classList.add("memory-restored");
-        hideLoading();
         if (isMagicTheme) {
           finishBriefingTyping();
         } else {
@@ -1298,6 +1379,7 @@
           ? "증거 보관함에 저장되었습니다."
           : message;
         messageEl.textContent = sentenceBreakText(displayMessage);
+        messageEl.hidden = !String(displayMessage || "").trim();
       }
       toast.classList.add("show");
       clearTimeout(showToast.timer);
@@ -1586,7 +1668,7 @@
       }
 
       const suspectCaption = document.querySelector("[data-briefing-panel='2'] .briefing-caption");
-      if (suspectCaption) suspectCaption.textContent = "다섯 명의 관계자 기록을 차례로 확인하십시오, 선생님.";
+      if (suspectCaption) suspectCaption.textContent = "세 권의 기록 책을 차례로 펼쳐 보십시오, 선생님.";
 
       const suspectGrid = document.querySelector(".briefing-suspect-tags");
       if (suspectGrid && !magicRecordIntro) {
@@ -1666,6 +1748,25 @@
       updateMagicStudentPage(Number(tabName) || 0);
     }
 
+    function updateMagicLedgerStudent(nextIndex) {
+      if (!magicStudentRecords.length) return;
+      const total = magicStudentRecords.length;
+      magicLedgerStudentIndex = (nextIndex + total) % total;
+      magicStudentRecords.forEach((record, index) => {
+        const isActive = index === magicLedgerStudentIndex;
+        record.classList.toggle("active", isActive);
+        record.setAttribute("aria-hidden", String(!isActive));
+      });
+      magicStudentTabs.forEach((tab, index) => {
+        const isActive = index === magicLedgerStudentIndex;
+        tab.classList.toggle("active", isActive);
+        tab.setAttribute("aria-selected", String(isActive));
+      });
+      if (magicStudentPageIndicator && magicStudentPageIndex === 1) {
+        magicStudentPageIndicator.textContent = `${magicLedgerStudentIndex + 1} / ${total}`;
+      }
+    }
+
     function updateMagicStudentPage(nextIndex) {
       if (!magicStudentPages.length) return;
       const total = magicStudentPages.length;
@@ -1681,7 +1782,9 @@
         tab.setAttribute("aria-selected", String(isActive));
       });
       if (magicStudentPageIndicator) {
-        magicStudentPageIndicator.textContent = `${magicStudentPageIndex + 1} / ${total}`;
+        magicStudentPageIndicator.textContent = magicStudentPageIndex === 1
+          ? `${magicLedgerStudentIndex + 1} / ${magicStudentRecords.length}`
+          : `${magicStudentPageIndex + 1} / ${total}`;
       }
     }
 
@@ -1730,14 +1833,7 @@
       if (!isSpaceTheme || !hotspot.classList.contains("collected")) return;
       const tooltip = getCollectedEvidenceTooltip();
       const title = tooltip.querySelector(".collected-evidence-tooltip-title");
-      const deviceTooltipNames = {
-        spaceMedicalAnalyzer: "성분 분석 장치",
-        spaceKeycardTerminal: "접속 기록 복구 단말기"
-      };
-      const name = deviceTooltipNames[hotspot.id]
-        || hotspot.dataset.evidenceName
-        || hotspot.getAttribute("aria-label")
-        || "수집한 증거";
+      const name = hotspot.dataset.evidenceName || hotspot.getAttribute("aria-label") || "수집한 증거";
       if (title) title.textContent = getEvidenceDisplayName(name);
 
       tooltip.classList.add("show");
@@ -1784,7 +1880,7 @@
         title: "마지막 무전 기록",
         image: "/assets/space-station/evidence/final-radio-log.webp",
         imageAlt: "데이비드의 마지막 무전 기록 장치",
-        description: "[OST 22:14]\n“오르빗-13 관제실, 데이비드다.\n외부 통신 장치 점검을 시작한다.\n안전 로프와 우주복 상태 모두 정상이다.”\n\n[OST 22:19]\n“관제실, 심박이 갑자기 불규칙해졌다.\n손에도 힘이 잘 들어가지 않아.\n우주복 문제인지 확인해 줘.”\n\n[OST 22:21]\n“비상 추진 장치를 점검 중이다.\n레버 작동 신호는 들어가는데 가스 밸브가 반응하지 않는다.”\n\n“레버 연결부에 투명한 물질이 붙어 있어.\n외부 온도에서 완전히 얼어붙은 것 같다.”\n\n[OST 22:22]\n“우주복 산소 수치가 급격히 떨어지고 있다.\n누출 경고는 없는데 잔량만 계속 감소한다.\n관제실, 즉시 복귀 허가를 요청한다.”\n\n[OST 22:23]\n“외벽 통신 장치의 고정 전력이 끊겼다!\n패널 하나가 구조물에서 이탈했다.”\n\n“외벽 패널이 안전 로프를 쳤다.\n연결 고리가 파손됐다!”\n\n“정거장에서 멀어지고 있다.\n몸이 계속 회전해… 추진 레버도 움직이지 않아.”\n\n[OST 22:24]\n“오르빗-13, 응답해.\n안전 로프가 끊어졌고 비상 추진 장치도 작동하지 않는다.”\n\n“정거장 뒤편의 통신 음영 구역(Shadow Zone)으로 진입하고 있다.\n태양광이 사라졌고 외부 온도가 계속 내려간다.\n아직 정거장 신호는 잡힌다. 구조 장비를 보내 줘..”\n\n“Danger often comes through ordinary remedies misused.”"
+        description: "[OST 22:14]\n“오르빗-13 관제실, 데이비드다.\n외부 통신 장치 점검을 시작한다.\n안전 로프와 우주복 상태 모두 정상이다.”\n\n[OST 22:19]\n“관제실, 심박이 갑자기 불규칙해졌다.\n손에도 힘이 잘 들어가지 않아.\n우주복 문제인지 확인해 줘.”\n\n[OST 22:21]\n“비상 추진 장치를 점검 중이다.\n레버 작동 신호는 들어가는데 가스 밸브가 반응하지 않는다.”\n\n“레버 연결부에 투명한 물질이 붙어 있어.\n외부 온도에서 완전히 얼어붙은 것 같다.”\n\n[OST 22:22]\n“우주복 산소 수치가 급격히 떨어지고 있다.\n누출 경고는 없는데 잔량만 계속 감소한다.\n관제실, 즉시 복귀 허가를 요청한다.”\n\n[OST 22:23]\n“외벽 통신 장치의 고정 전력이 끊겼다!\n패널 하나가 구조물에서 이탈했다.”\n\n“외벽 패널이 안전 로프를 쳤다.\n연결 고리가 파손됐다!”\n\n“정거장에서 멀어지고 있다.\n몸이 계속 회전해… 추진 레버도 움직이지 않아.”\n\n[OST 22:24]\n“오르빗-13, 응답해.\n안전 로프가 끊어졌고 비상 추진 장치도 작동하지 않는다.”\n\n“정거장 뒤편의 통신 음영 구역(Shadow Zone)으로 진입하고 있다.\n태양광이 사라졌고 외부 온도가 계속 내려간다.\n아직 정거장 신호는 잡힌다. 구조 장비를 보내 줘..”"
       },
       "접속 키카드 칩": {
         kicker: "ORBIT-13 · ACCESS LOG",
@@ -1856,20 +1952,6 @@
           "의료 승인: 없음",
           "부작용: 근력 저하, 심박 이상, 저산소 반응"
         ]
-      },
-      "조작된 전압 센서": {
-        kicker: "ORBIT-13 · POWER CONTROL SENSOR",
-        title: "조작된 전압 센서",
-        image: "/assets/space-station/evidence/voltage-sensor-no-scalpel.png",
-        imageAlt: "전력 이상 감지 신호가 조작된 전압 센서",
-        description: "전력 이상을 감지하지 못하도록 조작된 센서다. 타이머가 보조 전력선에 연결된 사실을 감춰 경고가 울리지 않았으며, 정전 직전까지 정상 신호를 보냈다."
-      },
-      "비인가 지연 타이머": {
-        kicker: "ORBIT-13 · UNAUTHORIZED DELAY TIMER",
-        title: "비인가 지연 타이머",
-        image: "/assets/space-station/evidence/tampered-delay-timer.webp",
-        imageAlt: "보조 전력선에 연결된 비인가 지연 타이머",
-        description: "누군가 OST 22:05에 외부 작업 구역의 보조 전력을 차단하도록 타이머를 예약했다. 타이머는 13분 후인 OST 22:18에 작동하여 해당 구역의 전력 공급을 일시적으로 끊었다."
       },
       "삭제된 의료 기록": {
         kicker: "ORBIT-13 · MEDICAL ARCHIVE",
@@ -2084,22 +2166,10 @@
           && completedAnalysis.has("glove");
         const keycardRecovered = evidenceName === "접속 키카드 칩"
           && localStorage.getItem(spaceKeycardRecoveryKey) === "1";
-        const contractEncrypted = evidenceName === "암호화된 파일"
-          && localStorage.getItem(spaceEncryptedFileDecryptionKey) !== "1";
-        const detail = contractEncrypted
-          ? {
-            ...baseDetail,
-            title: baseDetail.lockedTitle,
-            description: baseDetail.lockedDescription,
-            sections: null,
-            footerItems: null
-          }
-          : keycardRecovered
+        const detail = keycardRecovered
           ? { ...baseDetail, description: "", items: baseDetail.recoveredItems }
           : baseDetail;
         panel.classList.toggle("residue-analysis-complete", hasCompleteResidueAnalysis);
-        panel.classList.toggle("contract-encrypted", contractEncrypted);
-        panel.classList.toggle("contract-decrypted", evidenceName === "암호화된 파일" && !contractEncrypted);
         panel.setAttribute(
           "aria-labelledby",
           hasCompleteResidueAnalysis ? "spaceResidueAnalysisTitle" : "spaceEvidenceDetailTitle"
@@ -2295,11 +2365,8 @@
       const device = document.querySelector("#spaceMedicalAnalyzer");
       if (!device) return;
       const unlocked = readStoredNames(collectedEvidenceKey).includes("소독천과 장갑");
-      const used = readStoredNames(spaceAnalysisResultsKey).length > 0;
       device.classList.toggle("analysis-device-unlocked", unlocked);
-      device.classList.toggle("analysis-device-used", used);
       device.classList.toggle("evidence-hotspot", unlocked);
-      device.classList.toggle("collected", used);
       device.toggleAttribute("disabled", !unlocked);
       device.setAttribute("aria-disabled", String(!unlocked));
     }
@@ -2338,16 +2405,11 @@
     function showSpaceAnalysisChooser() {
       clearTimeout(spaceAnalysisTimer);
       const guide = document.querySelector("#spaceAnalysisGuide");
-      const insertion = document.querySelector("#spaceAnalysisInsertion");
       const list = document.querySelector("#spaceAnalysisEvidenceList");
       const progress = document.querySelector("#spaceAnalysisProgress");
       const result = document.querySelector("#spaceAnalysisResult");
       const bar = document.querySelector("#spaceAnalysisProgressBar");
-      if (guide) {
-        guide.hidden = false;
-        guide.textContent = "어떤 증거를 분석하시겠습니까?";
-      }
-      if (insertion) insertion.hidden = true;
+      if (guide) guide.textContent = "어떤 증거를 분석하시겠습니까?";
       if (list) list.hidden = false;
       if (progress) progress.hidden = true;
       if (result) result.hidden = true;
@@ -2364,7 +2426,7 @@
       const result = document.querySelector("#spaceAnalysisResult");
       const title = document.querySelector("#spaceAnalysisResultTitle");
       const lines = document.querySelector("#spaceAnalysisResultLines");
-      if (guide) guide.hidden = true;
+      if (guide) guide.textContent = "분석 결과";
       if (list) list.hidden = true;
       if (progress) progress.hidden = true;
       if (result) result.hidden = false;
@@ -2389,10 +2451,7 @@
       const result = document.querySelector("#spaceAnalysisResult");
       const label = document.querySelector("#spaceAnalysisProgressLabel");
       const bar = document.querySelector("#spaceAnalysisProgressBar");
-      if (guide) {
-        guide.hidden = false;
-        guide.textContent = "시료의 성분을 확인하고 있습니다.";
-      }
+      if (guide) guide.textContent = "시료의 성분을 확인하고 있습니다.";
       if (list) list.hidden = true;
       if (progress) progress.hidden = false;
       if (result) result.hidden = true;
@@ -2404,7 +2463,6 @@
       spaceAnalysisTimer = setTimeout(() => {
         analyzed.add(sampleId);
         localStorage.setItem(spaceAnalysisResultsKey, JSON.stringify([...analyzed]));
-        syncSpaceAnalysisDevice();
         showSpaceAnalysisResult(sampleId);
         playSfx("evidence", 0.55);
       }, 1800);
@@ -2414,57 +2472,18 @@
       if (!isSpaceTheme) return;
       const panel = document.querySelector("#spaceAnalysisPanel");
       const overlay = document.querySelector("#spaceAnalysisOverlay");
-      const insertion = document.querySelector("#spaceAnalysisInsertion");
-      const list = document.querySelector("#spaceAnalysisEvidenceList");
-      const progress = document.querySelector("#spaceAnalysisProgress");
-      const result = document.querySelector("#spaceAnalysisResult");
-      const guide = document.querySelector("#spaceAnalysisGuide");
       if (!panel || !overlay) return;
-      spaceAnalysisSampleHeld = false;
-      spaceAnalysisSampleInserted = false;
-      document.querySelector("#spaceAnalysisSampleCursor")?.classList.remove("show");
       panel.classList.toggle("show", open);
       overlay.classList.toggle("show", open);
       panel.setAttribute("aria-hidden", String(!open));
       overlay.setAttribute("aria-hidden", String(!open));
-      document.documentElement.classList.toggle("space-analysis-insertion-active", open);
-      clearTimeout(spaceAnalysisTimer);
-      if (insertion) insertion.hidden = false;
-      if (list) list.hidden = true;
-      if (progress) progress.hidden = true;
-      if (result) result.hidden = true;
-      if (guide) {
-        guide.hidden = false;
-        guide.textContent = "증거 보관함에서 분석할 증거를 선택하십시오.";
-      }
       if (open) {
         hideCollectedEvidenceTooltip();
-        renderSpaceAnalysisChoices();
+        showSpaceAnalysisChooser();
         document.querySelector("#closeSpaceAnalysis")?.focus();
       } else {
-        setEvidenceBag(false);
+        clearTimeout(spaceAnalysisTimer);
       }
-    }
-
-    function holdSpaceAnalysisSample() {
-      if (!document.querySelector("#spaceAnalysisPanel")?.classList.contains("show")) return;
-      if (!readStoredNames(collectedEvidenceKey).includes("소독천과 장갑")) return;
-      spaceAnalysisSampleHeld = true;
-      document.querySelector("#spaceAnalysisSampleCursor")?.classList.add("show");
-      setEvidenceBag(false);
-      const guide = document.querySelector("#spaceAnalysisGuide");
-      if (guide) guide.textContent = "소독천과 장갑을 점선 슬롯에 놓고 클릭하십시오.";
-      playSfx("buttonAlt", 0.48);
-    }
-
-    function insertSpaceAnalysisSample() {
-      if (!spaceAnalysisSampleHeld || spaceAnalysisSampleInserted) return;
-      spaceAnalysisSampleHeld = false;
-      spaceAnalysisSampleInserted = true;
-      document.querySelector("#spaceAnalysisSampleCursor")?.classList.remove("show");
-      playSfx("evidence", 0.68);
-      showSpaceAnalysisChooser();
-      document.querySelector(".space-analysis-evidence-option")?.focus();
     }
 
     document.querySelector("#spaceAnalysisEvidenceList")?.addEventListener("click", (event) => {
@@ -2472,7 +2491,6 @@
       if (!button) return;
       startSpaceAnalysis(button.dataset.analysisSample || "");
     });
-    document.querySelector("#spaceAnalysisEmptySlot")?.addEventListener("click", insertSpaceAnalysisSample);
     document.querySelector("#spaceAnalysisBack")?.addEventListener("click", showSpaceAnalysisChooser);
 
     function syncSpaceKeycardTerminal() {
@@ -2483,8 +2501,7 @@
       const recovered = localStorage.getItem(spaceKeycardRecoveryKey) === "1";
       terminal.classList.toggle("space-keycard-terminal-unlocked", unlocked);
       terminal.classList.toggle("keycard-recovered", recovered);
-      terminal.classList.toggle("evidence-hotspot", unlocked);
-      terminal.classList.toggle("collected", recovered);
+      terminal.classList.toggle("evidence-hotspot", unlocked && !recovered);
       terminal.toggleAttribute("disabled", !unlocked);
       terminal.setAttribute("aria-disabled", String(!unlocked));
     }
@@ -2499,7 +2516,6 @@
     }
 
     function startSpaceKeycardRecovery() {
-      if (!spaceKeycardChipInserted) return;
       const choice = document.querySelector("#spaceKeycardTerminalChoice");
       const loading = document.querySelector("#spaceKeycardTerminalLoading");
       const result = document.querySelector("#spaceKeycardTerminalResult");
@@ -2523,61 +2539,22 @@
       const choice = document.querySelector("#spaceKeycardTerminalChoice");
       const loading = document.querySelector("#spaceKeycardTerminalLoading");
       const result = document.querySelector("#spaceKeycardTerminalResult");
-      const emptySlot = document.querySelector("#spaceKeycardTerminalEmptySlot");
-      const chip = document.querySelector("#spaceKeycardTerminalChip");
-      const guide = document.querySelector("#spaceKeycardTerminalGuide");
       if (!panel || !overlay) return;
-      spaceKeycardChipHeld = false;
-      spaceKeycardChipInserted = false;
-      document.querySelector("#spaceKeycardTerminalCursor")?.classList.remove("show");
       panel.classList.toggle("show", open);
       overlay.classList.toggle("show", open);
       panel.setAttribute("aria-hidden", String(!open));
       overlay.setAttribute("aria-hidden", String(!open));
-      document.documentElement.classList.toggle("space-keycard-terminal-active", open);
       clearTimeout(spaceKeycardRecoveryTimer);
-      if (choice) choice.hidden = false;
-      if (loading) loading.hidden = true;
-      if (result) result.hidden = true;
-      if (emptySlot) emptySlot.hidden = false;
-      if (chip) chip.hidden = true;
-      if (guide) guide.textContent = "증거 보관함에서 연결할 칩을 선택하십시오.";
-      if (!open) {
-        setEvidenceBag(false);
-        return;
-      }
+      if (!open) return;
       hideCollectedEvidenceTooltip();
+      const recovered = localStorage.getItem(spaceKeycardRecoveryKey) === "1";
+      if (choice) choice.hidden = recovered;
+      if (loading) loading.hidden = true;
+      if (result) result.hidden = !recovered;
       document.querySelector("#closeSpaceKeycardTerminal")?.focus();
     }
 
-    function holdSpaceKeycardChip() {
-      if (!document.querySelector("#spaceKeycardTerminalPanel")?.classList.contains("show")) return;
-      if (!readStoredNames(collectedEvidenceKey).includes("접속 키카드 칩")) return;
-      spaceKeycardChipHeld = true;
-      document.querySelector("#spaceKeycardTerminalCursor")?.classList.add("show");
-      setEvidenceBag(false);
-      const guide = document.querySelector("#spaceKeycardTerminalGuide");
-      if (guide) guide.textContent = "칩을 점선 슬롯에 놓고 클릭하십시오.";
-      playSfx("buttonAlt", 0.48);
-    }
-
-    function insertSpaceKeycardChip() {
-      if (!spaceKeycardChipHeld || spaceKeycardChipInserted) return;
-      spaceKeycardChipHeld = false;
-      spaceKeycardChipInserted = true;
-      document.querySelector("#spaceKeycardTerminalCursor")?.classList.remove("show");
-      const emptySlot = document.querySelector("#spaceKeycardTerminalEmptySlot");
-      const chip = document.querySelector("#spaceKeycardTerminalChip");
-      const guide = document.querySelector("#spaceKeycardTerminalGuide");
-      if (emptySlot) emptySlot.hidden = true;
-      if (chip) chip.hidden = false;
-      if (guide) guide.textContent = "접속 키카드 칩이 연결되었습니다. 칩을 다시 눌러 기록을 확인하십시오.";
-      playSfx("evidence", 0.68);
-      chip?.focus();
-    }
-
     document.querySelector("#spaceKeycardTerminalChip")?.addEventListener("click", startSpaceKeycardRecovery);
-    document.querySelector("#spaceKeycardTerminalEmptySlot")?.addEventListener("click", insertSpaceKeycardChip);
 
     function setupEvidenceScreen(screenId) {
       const screen = document.getElementById(screenId);
@@ -2586,11 +2563,9 @@
       syncSpaceAnalysisDevice();
       syncSpaceKeycardTerminal();
 
-      const evidenceHotspots = [...screen.querySelectorAll(".hotspot[data-evidence-name], #spaceMedicalAnalyzer, #spaceKeycardTerminal, #hopaeHotspot, #portraitHotspot")];
+      const evidenceHotspots = [...screen.querySelectorAll(".hotspot[data-evidence-name], #hopaeHotspot, #portraitHotspot")];
       evidenceHotspots.forEach((hotspot) => {
-        if (hotspot.id !== "spaceMedicalAnalyzer" && hotspot.id !== "spaceKeycardTerminal") {
-          hotspot.classList.add("evidence-hotspot");
-        }
+        hotspot.classList.add("evidence-hotspot");
         if (!isSpaceTheme || hotspot.dataset.collectedTooltipBound === "true") return;
         hotspot.dataset.collectedTooltipBound = "true";
         hotspot.addEventListener("mouseenter", () => showCollectedEvidenceTooltip(hotspot));
@@ -2601,8 +2576,9 @@
       readStoredNames(collectedEvidenceKey).forEach((name) => {
         screen.querySelectorAll(`[data-evidence-name="${CSS.escape(name)}"]`).forEach((item) => {
           item.classList.add("collected");
-          if (item instanceof HTMLButtonElement) item.disabled = !isSpaceTheme;
-          item.setAttribute("aria-disabled", "true");
+          const revisitableSpace = item.classList.contains("concealed-space-hotspot");
+          if (item instanceof HTMLButtonElement) item.disabled = !isSpaceTheme && !revisitableSpace;
+          item.setAttribute("aria-disabled", String(!revisitableSpace));
         });
       });
       readStoredNames(analyzedEvidenceKey).forEach((name) => {
@@ -2640,7 +2616,7 @@
       hint.addEventListener("click", () => {
         const collectedNames = isSpaceTheme ? new Set(readStoredNames(collectedEvidenceKey)) : null;
         const activeAnalysisDevice = isSpaceTheme
-          ? screen.querySelector("#spaceMedicalAnalyzer.analysis-device-unlocked:not(.analysis-device-used), #spaceKeycardTerminal.space-keycard-terminal-unlocked:not(.keycard-recovered)")
+          ? screen.querySelector("#spaceMedicalAnalyzer.analysis-device-unlocked, #spaceKeycardTerminal.space-keycard-terminal-unlocked:not(.keycard-recovered)")
           : null;
         const remainingEvidence = isSpaceTheme
           ? [...screen.querySelectorAll(".hotspot[data-evidence-name]")]
@@ -2768,7 +2744,7 @@
       "/assets/space-station/backgrounds/medical-bay-evidence-v2.webp",
       "/assets/space-station/backgrounds/oxygen-generator-evidence-v2.webp",
       "/assets/space-station/backgrounds/data-core-evidence-v2.webp",
-      "/assets/space-station/backgrounds/science-lab-blood-report.png",
+      "/assets/space-station/backgrounds/science-lab-evidence-v2.webp",
       "/assets/space-station/panels/log-record-panel-v2.webp",
       "/assets/space-station/panels/evidence-vault-panel-v2.webp",
       "/assets/space-station/maps/orbit-13-six-location-map.webp",
@@ -2814,7 +2790,6 @@
     const magicThemeLoadingScreens = new Set([
       "briefingScreen",
       "magicAlchemyLab",
-      "magicUnlockDoor",
       "magicCleaningCloset",
       "magicLibrary",
       "magicRecordCrystalRoom",
@@ -2851,17 +2826,8 @@
       }
     }
 
-    function showLoading(message = "이동 중...", targetScreenId, options = {}) {
-      if (options.plain) {
-        fade?.classList.remove("magic-rune-transition");
-        if (fade) {
-          fade.style.background = "black";
-          fade.style.opacity = "1";
-        }
-      } else {
-        fade?.style.removeProperty("opacity");
-        setLoadingArtwork(targetScreenId);
-      }
+    function showLoading(message = "이동 중...", targetScreenId) {
+      setLoadingArtwork(targetScreenId);
       fade?.classList.add("show");
       if (fade) fade.textContent = message;
     }
@@ -2869,7 +2835,6 @@
     function hideLoading() {
       fade?.classList.remove("show");
       fade?.classList.remove("magic-rune-transition");
-      fade?.style.removeProperty("opacity");
       fade?.style.removeProperty("background");
     }
 
@@ -3057,7 +3022,7 @@
 
     function showInitialScreenFromSetup() {
       const startScreen = entryParams.get("start") || document.querySelector(".game-shell")?.dataset.startScreen;
-      const allowedScreens = new Set(["tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne", "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters", "backGateCourtyard", "magicAlchemyLab", "magicUnlockDoor", "magicCleaningCloset", "magicLibrary", "magicRecordCrystalRoom", "magicDormHallway", "spaceAirlock", "spaceMedicalBay", "spaceOxygenGenerator", "spaceDataCore", "spaceScienceLab", "interrogationScreen"]);
+      const allowedScreens = new Set(["tutorialScreen", "dreamScreen", "briefingScreen", "fieldOne", "chunwolRoom", "mudeokServantRoom", "yoomunseokSarangbang", "dolsoeQuarters", "backGateCourtyard", "magicAlchemyLab", "magicCleaningCloset", "magicLibrary", "magicRecordCrystalRoom", "magicDormHallway", "spaceAirlock", "spaceMedicalBay", "spaceOxygenGenerator", "spaceDataCore", "spaceScienceLab", "interrogationScreen"]);
 
       if (!allowedScreens.has(startScreen)) {
         return;
@@ -3213,42 +3178,84 @@
       if (!recordTab) return;
       setMagicRecordTab(recordTab.dataset.recordCardTab || "0");
     });
-    magicStudentPrevButton?.addEventListener("click", () => updateMagicStudentPage(magicStudentPageIndex - 1));
-    magicStudentNextButton?.addEventListener("click", () => updateMagicStudentPage(magicStudentPageIndex + 1));
+    magicStudentPrevButton?.addEventListener("click", () => {
+      if (magicStudentPageIndex === 1) updateMagicLedgerStudent(magicLedgerStudentIndex - 1);
+      else updateMagicStudentPage(magicStudentPageIndex - 1);
+    });
+    magicStudentNextButton?.addEventListener("click", () => {
+      if (magicStudentPageIndex === 1) updateMagicLedgerStudent(magicLedgerStudentIndex + 1);
+      else updateMagicStudentPage(magicStudentPageIndex + 1);
+    });
+    magicStudentTabs.forEach((tab) => tab.addEventListener("click", () => {
+      updateMagicLedgerStudent(Number(tab.dataset.magicStudentTab) || 0);
+    }));
 
     memoryDrawZone?.addEventListener("pointerdown", (event) => {
       if (memoryTraceComplete) return;
       event.preventDefault();
+      memoryTraceDrawingActive = true;
       memoryTraceSequence?.setAttribute("data-memory-trace-state", "drawing");
-      memoryTracePoints = [];
       const point = getMemoryDrawPoint(event);
-      if (point) memoryTracePoints.push(point);
+      if (point) {
+        memoryTracePoints.push(point);
+        updateMemoryTraceGesture(point);
+      }
       updateMemoryDrawPath();
       memoryDrawZone.setPointerCapture?.(event.pointerId);
     });
 
     memoryDrawZone?.addEventListener("pointermove", (event) => {
-      if (memoryTraceComplete || !memoryDrawZone.hasPointerCapture?.(event.pointerId)) return;
+      if (memoryTraceComplete || !memoryTraceDrawingActive) return;
       const pointerEvents = event.getCoalescedEvents?.() || [];
       const sampledEvents = pointerEvents.length > 0 ? pointerEvents : [event];
       sampledEvents.forEach((sampledEvent) => {
         const point = getMemoryDrawPoint(sampledEvent);
-        if (point) memoryTracePoints.push(point);
+        if (point) {
+          memoryTracePoints.push(point);
+          updateMemoryTraceGesture(point);
+        }
       });
       updateMemoryDrawPath();
-      if (isMemoryCircleComplete()) completeMemoryTrace();
     });
 
     memoryDrawZone?.addEventListener("pointerup", (event) => {
       if (memoryDrawZone.hasPointerCapture?.(event.pointerId)) {
         memoryDrawZone.releasePointerCapture(event.pointerId);
       }
-      if (!memoryTraceComplete && isMemoryCircleComplete()) {
-        completeMemoryTrace();
-      }
+      memoryTraceDrawingActive = false;
+      memoryTraceLastAngle = null;
+    });
+
+    memoryDrawZone?.addEventListener("pointercancel", () => {
+      memoryTraceDrawingActive = false;
+      memoryTraceLastAngle = null;
+    });
+
+    memoryTraceEvidenceNodes.forEach((node) => {
+      node.addEventListener("click", () => {
+        if (memoryTraceComplete || node.classList.contains("revealed")) return;
+        node.classList.add("revealed");
+        const magicButtonAudio = new Audio("/samunmong/sound/sfx/button.mp3");
+        magicButtonAudio.volume = 0.64;
+        void magicButtonAudio.play().catch(() => undefined);
+        const remaining = memoryTraceEvidenceNodes.filter((item) => !item.classList.contains("revealed")).length;
+        if (memoryTraceInstruction) {
+          memoryTraceInstruction.textContent = remaining > 0
+            ? `현장에서 조사하지 않은 물건이 ${remaining}개 남아 있습니다.`
+            : "세 물건에서 서로 다른 마법 사용 흔적이 확인되었습니다.";
+        }
+        if (remaining === 0) window.setTimeout(completeMemoryTrace, 450);
+      });
     });
 
     memoryTraceContinue?.addEventListener("click", () => {
+      const magicButtonAudio = new Audio("/samunmong/sound/sfx/button.mp3");
+      magicButtonAudio.volume = 0.64;
+      void magicButtonAudio.play().catch(() => undefined);
+      if (isMagicTheme) {
+        startCaseButton?.click();
+        return;
+      }
       briefingStepIndex = 2;
       updateBriefingStep();
     });
@@ -3340,7 +3347,6 @@
       }
     });
     briefingJournalCloseButton?.addEventListener("click", closeBriefingJournal);
-    window.addEventListener("samunmong:briefing-step-change", handleBriefingStepChange);
     window.addEventListener("samunmong:briefing-journal-ready", revealBriefingJournal);
     window.addEventListener("samunmong:briefing-journal-close-request", closeBriefingJournal);
     on("#accuseButton", "click", openResultPage);
@@ -3380,13 +3386,12 @@
     let materialLastDirection = 0;
     let materialDirectDrag = null;
     let specialPuzzleMode = "";
+    let specialPuzzleFolder = "";
     let specialPuzzleStep = 0;
     let specialDragState = null;
     let specialSurfaceDrag = null;
     let specialExplorerDrag = null;
     let pendingEvidenceComparison = null;
-    let pendingConfrontationQuestion = "";
-    let confrontationStep = 0;
     let ritualDragState = null;
     let pendingSleeveQuestion = "";
     let sleeveInspectionStep = 0;
@@ -3587,47 +3592,43 @@
         img: "/samunmong/assets/evidence-transparent/evidence-portrait-concealed-v1.png",
         toolResultAsset: "/samunmong/assets/evidence-transparent/evidence-portrait-strokes-clean-v2.png",
         tool: "돋보기",
-        toolResult: "돋보기로 보니 돌쇠의 눈매와 옷깃이 여러 번 고쳐져 있고, 그림 가장자리에는 지운 글씨의 눌린 획이 남아 있다."
-      },
-      "고름이 뜯긴 저고리": {
-        note: "춘월의 방 병풍에 걸린 자주빛 저고리. 한쪽 고름이 뜯겨 실밥만 남아 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-chunwol-jeogori-torn-goreum-v1.png"
-      },
-      "헐거워진 노리개": {
-        note: "끊어진 장식과 급히 잡아챈 듯한 흔적이 남은 노리개. 누가 지녔는지 확인해야 한다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.webp"
+        toolResult: "두루마리를 펼치자 돌쇠의 얼굴이 드러난다. 눈매와 옷깃은 여러 번 고쳐졌고, 가장자리에는 지우다 남은 ‘떠나지 마라’가 보인다. 누가 그렸고 왜 이 방에 숨겼을까?"
       },
       "무덕의 번진 일기": {
-        note: "먹이 번져 읽기 어려운 일기. 사건 전 며칠의 밤 이동과 전달 경로를 추적할 수 있다.",
+        note: "먹이 번져 붙은 세 날짜의 일기. 무덕이 들은 소리와 말을 옮긴 순서가 남아 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-smeared-diary-clean-v2.png",
         tool: "촛불 비추기",
         toolResultAsset: "/samunmong/assets/interactions/diary-timeline-puzzle/state-2.png",
-        toolResult: "번진 세 장을 펼치자 사건 전날까지의 기록이 이어진다. 무덕은 뒷문이 열린 밤을 보았고, 마지막 장에는 아씨가 돌쇠의 이름을 되물었다고 적었다. 왜 돌쇠를 물었을까?"
+        toolResult: "무덕은 점순의 밤 외출을 다음 날 안채에 말했고, 그 뒤 누군가 돌쇠 이름을 되묻는 소리를 들었다. 얼굴은 보지 못했다. 누가 도망 계획을 알게 된 것일까?"
       },
       "진흙 묻은 짚신": {
-        note: "문밖 젖은 길과 닮은 진흙이 묻은 짚신. 이동 경로를 비교할 단서다.",
+        note: "무덕의 방에 놓인 진흙 묻은 짚신. 뒷문 발자국보다 커 보이지만 직접 포개 봐야 한다.",
         img: "/samunmong/assets/evidence-transparent/evidence-muddy-straw-shoes-clean-v2.png"
       },
       "찢어진 옷고름": {
-        note: "무덕의 방 바닥에서 발견된 붉은 비단끈. 가운데가 단단히 조여 있고 한쪽 끝이 찢어져 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-torn-silk-tie-clean-v2.png",
+        note: "뒷문 마당의 금 간 장독 속 짚 아래 숨겨진 자주빛 비단 옷고름. 가운데가 좁게 눌렸고 한쪽 끝이 거칠게 찢어져 있다.",
+        img: "/samunmong/assets/evidence-transparent/evidence-torn-wine-goreum-v1.png",
         tool: "돋보기",
-        toolResultAsset: "/samunmong/assets/interactions/silk-tension-puzzle/state-2.png",
-        toolResult: "매듭을 펴자 가운데에 좁게 조여 마찰로 번들거린 자국과, 힘을 받아 한 방향으로 늘어난 찢김이 드러난다. 단순히 낡아 끊어진 끈은 아닌 것 같다."
+        toolResultAsset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-wine-goreum-neck-width-v1.png",
+        toolResult: "검안서에 포개자 중앙의 좁게 눌린 폭과 목 자국의 폭이 닮아 있다. 같은 끈인지 확인하려면 이 옷고름이 떨어져 나온 저고리를 찾아야 한다."
+      },
+      "고름이 뜯긴 저고리": {
+        note: "춘월의 방에서 자물쇠로 잠긴 의복 궤 안에 접어 숨긴 자주빛 저고리. 오른쪽 고름 한 짝이 뜯겨 나가 실밥이 드러나 있다.",
+        img: "/samunmong/assets/evidence-transparent/evidence-chunwol-jeogori-torn-goreum-v1.png"
       },
       "빈 호패 주머니": {
-        note: "호패가 빠진 듯한 빈 주머니. 주인과 호패 조각의 관계를 확인할 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-empty-hopae-holder.webp",
+        note: "세 칸 가운데 호패 자리만 비어 있는 목제 보관함.",
+        img: "/samunmong/assets/evidence-transparent/evidence-empty-hopae-case-v2.png",
         tool: "돋보기",
-        toolResultAsset: "/samunmong/assets/interactions/pouch-lining-puzzle/state-2.png",
-        toolResult: "안감을 끝까지 뒤집자 길쭉한 나무패 눌림과 잘린 붉은 끈 섬유가 함께 드러난다. 이 주머니에는 호패가 들어 있었고, 저절로 빠진 것이 아니라 누군가 끈을 끊어 꺼낸 것일까?"
+        toolResultAsset: "/samunmong/assets/evidence-transparent/evidence-empty-hopae-case-v2.png",
+        toolResult: "현장의 호패를 가운데 빈 홈에 넣자 크기와 윗부분의 둥근 모양이 정확히 맞는다."
       },
       "하인 장부": {
-        note: "하인들의 출입과 심부름 기록이 적힌 장부. 장소 이동을 대조할 수 있다.",
+        note: "평범한 심부름 사이 한 사람의 이름만 먹으로 덮인 출입 장부. 누가 어느 방에 들어갈 기회가 있었는지 살필 수 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-servant-ledger.webp"
       },
       "혼서 조각": {
-        note: "춘월의 혼인을 재촉하는 문서 조각. 춘월이 자기 삶을 통제하지 못하던 처지를 보여 준다.",
+        note: "‘두 집안의 혼인을 정히 약조하오’라는 글과 큰 붉은 인장이 나뉘어 남은 혼서 조각. 춘월의 뜻은 적혀 있지 않다.",
         img: "/samunmong/assets/evidence-transparent/evidence-marriage-letter.webp"
       },
       "피 묻은 붕대": {
@@ -3639,7 +3640,7 @@
         img: "/samunmong/assets/evidence-transparent/evidence-dolsoe-work-cut-v3.png"
       },
       "도망 보따리": {
-        note: "급히 싼 듯한 보따리. 점순과 돌쇠가 떠나려 했고, 그 사실이 누군가의 감정을 건드렸는지 확인해야 한다.",
+        note: "베이지색 천 틈으로 짚바구니와 크기가 다른 옷가지가 보인다. 한 사람의 짐일까?",
         img: "/samunmong/assets/evidence-transparent/evidence-escape-bundle.webp"
       },
       "긁힌 팔 흔적": {
@@ -3647,15 +3648,15 @@
         img: "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp"
       },
       "작은 발자국": {
-        note: "뒷문 마당에 남은 작은 발자국. 젖은 돌길의 이동 경로와 맞춰볼 수 있다.",
-        img: "/samunmong/assets/evidence-transparent/evidence-small-footprints.webp"
+        note: "뒷문 마당에 자연스럽게 이어진 짧고 좁은 신발 자국.",
+        img: "/samunmong/assets/evidence-transparent/evidence-small-footprints-v2.png"
       },
       "끊어진 호패끈": {
         note: "뒷문 마당에서 발견된 짙은 붉은 꼰끈. 한쪽에는 매듭과 술이 남고, 반대쪽 끝은 거칠게 끊겨 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord-v2.png"
       },
       "찢어진 약속 편지": {
-        note: "점순의 손에서 발견된 찢어진 약속 편지. 정중한 말투가 돌쇠의 평소 말투와 맞지 않는다.",
+        note: "점순의 손에서 발견된 찢어진 약속 편지. 정중한 말투로 오늘 밤 창고에서 만나자는 문장이 남아 있다.",
         img: "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v6.png"
       }
     };
@@ -3665,9 +3666,7 @@
       const stored = readStored(collectedEvidenceKey, []);
       if (!Array.isArray(stored)) return;
       const renamedEvidence = {
-        "마지막 무전 로그": "마지막 무전 기록",
-        "손상된 압력 센서": "조작된 전압 센서",
-        "조작된 지연 타이머": "비인가 지연 타이머"
+        "마지막 무전 로그": "마지막 무전 기록"
       };
       const migrated = stored.map((name) => renamedEvidence[name] || name);
       const valid = [...new Set(migrated.filter((name) => typeof name === "string" && evidenceData[name]))];
@@ -3681,19 +3680,18 @@
     const joseonEvidenceImageByName = {
       "호패 조각": "/samunmong/assets/evidence-transparent/evidence-wooden-tag-transparent.webp",
       "돌쇠의 그림": "/samunmong/assets/evidence-transparent/evidence-portrait-concealed-v1.png",
-      "고름이 뜯긴 저고리": "/samunmong/assets/evidence-transparent/evidence-chunwol-jeogori-torn-goreum-v1.png",
-      "헐거워진 노리개": "/samunmong/assets/evidence-transparent/evidence-norigae-transparent.webp",
       "무덕의 번진 일기": "/samunmong/assets/evidence-transparent/evidence-smeared-diary-clean-v2.png",
       "진흙 묻은 짚신": "/samunmong/assets/evidence-transparent/evidence-muddy-straw-shoes-clean-v2.png",
-      "찢어진 옷고름": "/samunmong/assets/evidence-transparent/evidence-torn-silk-tie-clean-v2.png",
-      "빈 호패 주머니": "/samunmong/assets/evidence-transparent/evidence-empty-hopae-holder.webp",
+      "찢어진 옷고름": "/samunmong/assets/evidence-transparent/evidence-torn-wine-goreum-v1.png",
+      "고름이 뜯긴 저고리": "/samunmong/assets/evidence-transparent/evidence-chunwol-jeogori-torn-goreum-v1.png",
+      "빈 호패 주머니": "/samunmong/assets/evidence-transparent/evidence-empty-hopae-case-v2.png",
       "하인 장부": "/samunmong/assets/evidence-transparent/evidence-servant-ledger.webp",
       "혼서 조각": "/samunmong/assets/evidence-transparent/evidence-marriage-letter.webp",
       "피 묻은 붕대": "/samunmong/assets/evidence-transparent/evidence-bloodied-bandage.webp",
       "돌쇠의 팔 상처": "/samunmong/assets/evidence-transparent/evidence-dolsoe-work-cut-v3.png",
       "도망 보따리": "/samunmong/assets/evidence-transparent/evidence-escape-bundle.webp",
       "긁힌 팔 흔적": "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp",
-      "작은 발자국": "/samunmong/assets/evidence-transparent/evidence-small-footprints.webp",
+      "작은 발자국": "/samunmong/assets/evidence-transparent/evidence-small-footprints-v2.png",
       "끊어진 호패끈": "/samunmong/assets/evidence-transparent/evidence-cut-hopae-cord-v2.png",
       "찢어진 약속 편지": "/samunmong/assets/evidence-transparent/evidence-torn-letter-master-v6.png"
     };
@@ -3703,11 +3701,11 @@
     const joseonUnexaminedEvidenceNames = {
       "호패 조각": "글자 지워진 나무패",
       "돌쇠의 그림": "의문의 그림",
-      "고름이 뜯긴 저고리": "고름이 뜯긴 저고리",
       "무덕의 번진 일기": "먹 번진 책자",
       "진흙 묻은 짚신": "흙 묻은 짚신",
       "찢어진 옷고름": "찢긴 비단끈",
-      "빈 호패 주머니": "빈 가죽 주머니",
+      "고름이 뜯긴 저고리": "고름 한 짝 없는 저고리",
+      "빈 호패 주머니": "빈 호패함",
       "하인 장부": "낡은 기록 장부",
       "혼서 조각": "글씨 적힌 종잇조각",
       "피 묻은 붕대": "붉은 얼룩 천",
@@ -3718,31 +3716,50 @@
     };
 
     const joseonUnexaminedEvidenceSummaries = {
-      "호패 조각": "낡은 나무패의 글자 부분이 긁혀 있다.",
-      "돌쇠의 그림": "붉은 끈이 단단히 감겨 안쪽이 보이지 않는다.",
-      "고름이 뜯긴 저고리": "한쪽 고름이 뜯겨 실밥만 남아 있다. 떨어진 끈은 어디에 있을까?",
-      "무덕의 번진 일기": "표지와 종이에 번진 먹 때문에 내용을 읽기 어렵다.",
-      "진흙 묻은 짚신": "밑창에 마르지 않은 흙이 붙어 있다.",
-      "찢어진 옷고름": "찢긴 결이 고운 천 조각이다.",
-      "빈 호패 주머니": "안에 무엇이 들었는지 알 수 없는 빈 주머니다.",
-      "하인 장부": "몇몇 줄이 흐리고 덧칠되어 있다.",
-      "혼서 조각": "글과 인장이 잘려 전체 뜻을 읽을 수 없다.",
-      "피 묻은 붕대": "붉고 검게 마른 얼룩이 남아 있다.",
-      "도망 보따리": "매듭이 단단해 내용물을 볼 수 없다.",
-      "작은 발자국": "젖은 마당에 짧고 좁은 자국이 이어진다.",
-      "끊어진 호패끈": "매듭과 술은 남아 있지만 반대쪽 끝이 끊겨 있다. 무엇에 매였던 끈인지는 알 수 없다.",
-      "찢어진 약속 편지": "찢어진 글줄 몇 자만 흩어져 보인다."
+      "호패 조각": "매달던 구멍은 있는데… 끈은 어디 갔지?",
+      "돌쇠의 그림": "그림 한 장을 왜 이토록 단단히 감춰 둔 걸까?",
+      "무덕의 번진 일기": "유독 이 대목만 먹이 번졌다… 무엇을 적었던 걸까?",
+      "진흙 묻은 짚신": "방 안의 짚신에 아직 흙이 묻어 있다… 어디를 다녀온 걸까?",
+      "찢어진 옷고름": "고운 비단인데 한쪽이 거칠게 뜯겼다… 원래 어디에 달렸던 걸까?",
+      "고름이 뜯긴 저고리": "고름 한 짝이 통째로 없다… 뒷문에서 주운 비단끈과 이어질까?",
+      "빈 호패 주머니": "세 칸짜리 목제 함의 가운데 호패 자리만 비어 있다… 현장의 호패가 들어갈까?",
+      "하인 장부": "몇 줄만 흐리고 덧칠되어 있다… 굳이 감춘 기록이 있는 걸까?",
+      "혼서 조각": "글과 인장이 찢겨 있다… 누가 이 내용을 읽히고 싶지 않았던 걸까?",
+      "피 묻은 붕대": "마른 붉은 얼룩이 남아 있다… 누구의 상처를 감쌌던 천일까?",
+      "도망 보따리": "금방이라도 들고 나갈 듯 단단히 묶여 있다… 누가 떠나려 했던 걸까?",
+      "작은 발자국": "생각보다 짧고 좁은 발자국이다… 누구의 신과 맞을까?",
+      "끊어진 호패끈": "한쪽엔 매듭이 남고 다른 쪽은 끊겼다… 무엇에 매여 있었던 걸까?",
+      "찢어진 약속 편지": "남은 글투가 이상하리만치 정중하다… 정말 약속한 사람이 쓴 걸까?"
     };
 
+    const joseonEvidenceObservationComments = {
+      "점순의 목 압박 흔적": "목에 좁은 끈 같은 자국이 남아 있다… 무엇이 이런 흔적을 만든 걸까?",
+      "점순의 손톱 밑 흔적": "손톱 밑에 미세한 흔적이 남아 있다… 마지막에 누구를 붙잡았던 걸까?",
+      "호패 조각": "매달던 구멍은 있는데… 끈은 어디 갔지?",
+      "돌쇠의 그림": "그림 한 장을 왜 이토록 단단히 감춰 둔 걸까?",
+      "무덕의 번진 일기": "유독 이 대목만 먹이 번졌다… 무엇을 적었던 걸까?",
+      "진흙 묻은 짚신": "방 안의 짚신에 아직 흙이 묻어 있다… 어디를 다녀온 걸까?",
+      "찢어진 옷고름": "고운 비단인데 한쪽이 거칠게 뜯겼다… 원래 어디에 달렸던 걸까?",
+      "고름이 뜯긴 저고리": "고름 한 짝이 통째로 없다… 뒷문에서 주운 비단끈과 이어질까?",
+      "빈 호패 주머니": "세 칸짜리 목제 함의 가운데 호패 자리만 비어 있다… 현장의 호패가 들어갈까?",
+      "하인 장부": "몇 줄만 흐리고 덧칠되어 있다… 굳이 감춘 기록이 있는 걸까?",
+      "혼서 조각": "글과 인장이 찢겨 있다… 누가 이 내용을 읽히고 싶지 않았던 걸까?",
+      "피 묻은 붕대": "마른 붉은 얼룩이 남아 있다… 누구의 상처를 감쌌던 천일까?",
+      "돌쇠의 팔 상처": "팔에 붕대를 감았던 듯한 자국이 있다… 처소의 천과 이어질까?",
+      "도망 보따리": "금방이라도 들고 나갈 듯 단단히 묶여 있다… 누가 떠나려 했던 걸까?",
+      "긁힌 팔 흔적": "손톱에 긁힌 듯한 자국이다… 언제 누구와 맞닥뜨린 걸까?",
+      "작은 발자국": "생각보다 짧고 좁은 발자국이다… 누구의 신과 맞을까?",
+      "끊어진 호패끈": "한쪽엔 매듭이 남고 다른 쪽은 끊겼다… 무엇에 매여 있었던 걸까?",
+      "찢어진 약속 편지": "남은 글투가 이상하리만치 정중하다… 정말 약속한 사람이 쓴 걸까?"
+    };
+
+    function getEvidenceObservationComment(name) {
+      return joseonEvidenceObservationComments[name]
+        || joseonUnexaminedEvidenceSummaries[name]
+        || "이 물건은 왜 이곳에 남아 있었을까?";
+    }
+
     function getEvidenceImage(name, fallback = "/samunmong/assets/evidence-wooden-tag.webp") {
-      if (
-        isSpaceTheme
-        && name === "암호화된 파일"
-        && localStorage.getItem(spaceEncryptedFileDecryptionKey) === "1"
-        && evidenceData[name]?.recoveredImg
-      ) {
-        return evidenceData[name].recoveredImg;
-      }
       if (!isJoseonToolInteraction) return evidenceData[name]?.img || fallback;
       const transformed = readExaminedClues().filter((clue) => clue.source === name).at(-1);
       if (transformed?.img) return transformed.img;
@@ -3851,20 +3868,20 @@
       "점순의 손톱 밑 흔적": ["저항", "몸싸움 중 남은 흔적"],
       "호패 조각": ["누명", "오래된 새김 위 새 긁힘"],
       "돌쇠의 그림": ["동기", "여러 번 고쳐 그린 초상"],
-      "헐거워진 노리개": ["접촉", "장식 고리에 걸린 옷감"],
       "무덕의 번진 일기": ["진술", "도망 계획을 아는 인물"],
       "진흙 묻은 짚신": ["동선", "짚신 ≠ 작은 발자국"],
       "찢어진 옷고름": ["수법", "좁게 눌린 비단 끈"],
+      "고름이 뜯긴 저고리": ["소유", "고름 한 짝이 뜯긴 자주빛 저고리"],
       "빈 호패 주머니": ["누명", "방에서 사라진 호패"],
       "하인 장부": ["동선", "지워진 출입 기록"],
-      "혼서 조각": ["동기", "강요된 혼인 → 압박"],
+      "혼서 조각": ["배경", "두 집안이 추진한 혼인"],
       "피 묻은 붕대": ["상흔", "사건 전후를 알 수 없는 피"],
       "돌쇠의 팔 상처": ["상흔", "붕대를 감았던 자리"],
       "도망 보따리": ["동기", "점순·돌쇠의 도망"],
       "긁힌 팔 흔적": ["저항", "점순이 남긴 상처"],
       "작은 발자국": ["동선", "뒷문을 지난 작은 신발 자국"],
       "끊어진 호패끈": ["누명", "잘라낸 호패끈"],
-      "찢어진 약속 편지": ["진술", "평소와 다른 말투"]
+      "찢어진 약속 편지": ["진술", "돌쇠 말투와 대조 필요"]
     };
 
     const evidenceStoryMeanings = {
@@ -3872,32 +3889,33 @@
       "점순의 손톱 밑 흔적": "마지막에 붙잡은 누군가의 흔적인 것 같다.",
       "호패 조각": "이름을 감추려 뒤늦게 긁어 낸 것인가?",
       "돌쇠의 그림": "여러 번 고쳐 그릴 만큼 마음에 둔 사람이 있었던 것 같다.",
-      "고름이 뜯긴 저고리": "뜯겨 나간 고름은 어디에 남아 있는 것일까?",
-      "헐거워진 노리개": "벌어진 고리에 다른 옷감이 걸린 것인가? 언제 스친 흔적인지는 더 따져봐야 한다.",
       "무덕의 번진 일기": "밤의 기척을 들은 사람이 있었던 것 같다.",
       "진흙 묻은 짚신": "작은 발자국과 맞지 않는다면 다른 동선의 흔적인가?",
       "찢어진 옷고름": "목의 흔적과 닮았지만, 정말 같은 끈인 것일까?",
+      "고름이 뜯긴 저고리": "없어진 고름 한 짝이 뒷문에 남은 비단끈일까?",
       "빈 호패 주머니": "주인이 꺼낸 것일까, 누군가 몰래 가져간 것일까?",
       "하인 장부": "감추고 싶은 출입이 한 줄쯤 있었던 것 같다.",
-      "혼서 조각": "원치 않은 혼인이 누군가의 마음을 뒤틀어 놓은 것일까?",
+      "혼서 조각": "두 집안은 혼인을 약조했다. 춘월도 이를 원했던 것일까?",
       "피 묻은 붕대": "몸싸움의 피인가, 그보다 먼저 생긴 상처의 피인가?",
       "돌쇠의 팔 상처": "붕대를 감았던 자리 같지만, 언제 생긴 상처일까?",
       "도망 보따리": "두 사람이 함께 떠날 준비를 했던 것 같다.",
       "긁힌 팔 흔적": "점순이 마지막으로 붙잡은 사람에게 남긴 것인가?",
       "작은 발자국": "누군가 뒷문을 평범하게 지나며 남긴 자국 같다. 일부러 만든 흔적으로 보이지는 않는다.",
       "끊어진 호패끈": "저절로 끊어진 것이 아니라 누군가 손을 댄 것인가?",
-      "찢어진 약속 편지": "돌쇠의 말투를 흉내 낸 글은 아닐까?"
+      "찢어진 약속 편지": "돌쇠는 이 문장과 창고 약속이 자기 말이 아니라고 주장한다. 실제로 말투와 장소가 다른가?"
     };
 
     const evidenceConnections = [
       ["호패 조각", "빈 호패 주머니", "크기는 맞는다. 그렇다면 호패는 이 주머니에서 빠져나온 것인가?"],
       ["호패 조각", "끊어진 호패끈", "마찰 홈과 끈은 이어지는 듯하다. 누가 끈을 끊었을까?"],
-      ["빈 호패 주머니", "끊어진 호패끈", "안쪽 섬유와 끈의 결이 닮았다. 원래 한 물건이었던 것인가?"],
       ["진흙 묻은 짚신", "작은 발자국", "크기가 맞지 않는다. 서로 다른 사람이 지나간 것일까?"],
       ["피 묻은 붕대", "돌쇠의 팔 상처", "감긴 자리는 닮았다. 하지만 이 상처가 그날 밤 생긴 것인지는 알 수 없다."],
       ["도망 보따리", "무덕의 번진 일기", "도망 준비를 눈치챈 사람이 있었던 것 같다. 이야기는 어디까지 퍼졌을까?"],
+      ["혼서 조각", "하인 장부", "장부에 적힌 춘월의 사랑방 방문은 혼서 문갑 때문이었다. 그날 무엇을 확인했을까?"],
+      ["돌쇠의 그림", "도망 보따리", "그림에는 ‘떠나지 마라’가 남고, 보따리에는 실제로 떠날 준비가 남았다. 그림을 숨긴 사람은 계획을 언제 알았을까?"],
       ["찢어진 옷고름", "점순의 목 압박 흔적", "폭과 마찰 자국은 닮았다. 정말 같은 끈이 남긴 흔적일까?"],
-      ["긁힌 팔 흔적", "점순의 손톱 밑 흔적", "세 흔적의 간격과 방향이 닮았다. 같은 접촉에서 남은 것일까?"]
+      ["찢어진 옷고름", "고름이 뜯긴 저고리", "색과 직조, 찢긴 실밥이 이어진다. 이 고름은 언제 저고리에서 뜯겼을까?"],
+      ["긁힌 팔 흔적", "점순의 손톱 밑 흔적", "손톱 밑 조직과 얕은 긁힘은 직접 접촉을 떠올리게 한다. 같은 밤에 생긴 흔적일까?"]
     ];
 
     function getEvidenceSource(name) {
@@ -3956,6 +3974,85 @@
       ]
     };
 
+    const linkedEvidenceQuestionSets = new Map([
+      [evidencePairKey("호패 조각", "빈 호패 주머니"), [
+        "이 호패가 원래 사랑방의 호패함에 있던 것이 맞나?",
+        "호패함을 마지막으로 열어 본 사람은 누구지?",
+        "이름을 지운 호패가 현장에 놓인 까닭을 짐작하나?"
+      ]],
+      [evidencePairKey("호패 조각", "끊어진 호패끈"), [
+        "호패에서 끈이 끊어진 때를 알고 있나?",
+        "누가 호패의 이름과 끈을 함께 훼손할 수 있었지?",
+        "끈이 없는 호패를 사건 전에 본 적 있나?"
+      ]],
+      [evidencePairKey("진흙 묻은 짚신", "작은 발자국"), [
+        "이 짚신보다 작은 신을 신은 사람을 보았나?",
+        "사건 밤 뒷문을 드나든 사람은 누구였지?",
+        "이 발자국이 무덕의 것이 아니라면 누구의 것 같나?"
+      ]],
+      [evidencePairKey("피 묻은 붕대", "돌쇠의 팔 상처"), [
+        "돌쇠의 팔 상처는 언제 어디서 생겼지?",
+        "붕대를 처소에 감춰 둔 까닭을 알고 있나?",
+        "그 상처가 사건 밤의 몸싸움과 이어진다고 보나?"
+      ]],
+      [evidencePairKey("도망 보따리", "무덕의 번진 일기"), [
+        "도망 준비를 눈치챈 사람은 또 누구였지?",
+        "그날 밤 뒷문이 열린 시각을 기억하나?",
+        "돌쇠의 이름을 되묻던 목소리를 들었나?"
+      ]],
+      [evidencePairKey("혼서 조각", "하인 장부"), [
+        "혼서 문갑을 찾으러 사랑방에 간 시각이 언제였지?",
+        "그날 혼서의 내용을 처음 확인했나?",
+        "장부에 적힌 방문 사유를 누가 기록했지?"
+      ]],
+      [evidencePairKey("돌쇠의 그림", "도망 보따리"), [
+        "초상의 ‘떠나지 마라’는 누가 쓴 말이지?",
+        "돌쇠와 점순이 떠날 계획을 언제 알았나?",
+        "그림을 숨긴 때와 보따리를 꾸린 때 중 무엇이 먼저였지?"
+      ]],
+      [evidencePairKey("찢어진 옷고름", "점순의 목 압박 흔적"), [
+        "이 옷고름이 목의 흔적을 남길 수 있었다고 보나?",
+        "사건 뒤 옷고름 한 짝이 사라진 사람은 누구지?",
+        "점순과 몸싸움을 한 적이 정말 없나?"
+      ]],
+      [evidencePairKey("찢어진 옷고름", "고름이 뜯긴 저고리"), [
+        "저고리의 옷고름은 언제 뜯겼지?",
+        "사건 밤 이 저고리를 입은 사람은 누구였나?",
+        "뜯긴 옷고름이 뒷문에 남은 까닭을 설명해라."
+      ]],
+      [evidencePairKey("긁힌 팔 흔적", "점순의 손톱 밑 흔적"), [
+        "팔의 긁힌 상처는 언제 생겼지?",
+        "점순과 직접 몸이 닿은 적이 없다는 말이 맞나?",
+        "손톱 밑 흔적과 네 상처가 닮은 까닭을 설명해라."
+      ]]
+    ]);
+
+    function getLinkedEvidenceQuestions(name) {
+      const source = getEvidenceSource(name);
+      const linkedKeys = readStoredNames(linkedEvidenceKey);
+      for (let index = linkedKeys.length - 1; index >= 0; index -= 1) {
+        const key = linkedKeys[index];
+        const pair = evidenceConnections.find(([first, second]) =>
+          evidencePairKey(first, second) === key && (first === source || second === source));
+        if (!pair) continue;
+        const questions = linkedEvidenceQuestionSets.get(key);
+        if (questions) return questions;
+      }
+      return null;
+    }
+
+    function getPresentedEvidenceContextNames(name) {
+      if (!name) return [];
+      const source = getEvidenceSource(name);
+      const names = new Set([source]);
+      getUnlockedStoryConnections().forEach(([first, second]) => {
+        if (first !== source && second !== source) return;
+        names.add(first);
+        names.add(second);
+      });
+      return [...names];
+    }
+
     function updateEvidenceInterrogationUI(name) {
       if (themeId !== "joseon") return;
       const data = evidenceData[name] || {};
@@ -3972,7 +4069,13 @@
         roleBadge.textContent = role;
         roleBadge.hidden = false;
       }
-      const templates = evidenceQuestionTemplates[role] || [
+      const isDolsoeLetterComparison = name === "찢어진 약속 편지" && suspects[suspectIndex]?.id === "dolsoe";
+      const linkedQuestions = getLinkedEvidenceQuestions(name);
+      const templates = isDolsoeLetterComparison ? [
+        () => "이 편지를 네가 직접 썼나?",
+        () => "점순과 만나기로 한 곳은 창고인가, 뒷문인가?",
+        () => "평소에도 ‘기다리시오’ 같은 말을 쓰나?"
+      ] : linkedQuestions?.map((question) => () => question) || evidenceQuestionTemplates[role] || [
         (evidenceName) => `${evidenceName}을 본 적 있나?`,
         () => "이 증거와 네 진술이 어떻게 이어지지?",
         () => "이 증거에 대해 숨긴 말이 있나?"
@@ -4014,10 +4117,15 @@
       if (marker.hidden) return;
       const data = evidenceData[name] || {};
       const [role] = getEvidenceStoryCue(name, data);
+      const source = getEvidenceSource(name);
+      const linkedConnection = [...getUnlockedStoryConnections()].reverse()
+        .find(([first, second]) => first === source || second === source);
       document.querySelector("#responseEvidenceImage").src = getEvidenceImage(name);
-      document.querySelector("#responseEvidenceImage").alt = getEvidenceSource(name);
-      document.querySelector("#responseEvidenceRole").textContent = `${role} 증거와 대면`;
-      document.querySelector("#responseEvidenceMeaning").textContent = getEvidenceStoryMeaning(name, data);
+      document.querySelector("#responseEvidenceImage").alt = source;
+      document.querySelector("#responseEvidenceRole").textContent = linkedConnection ? "이어진 증거와 대면" : `${role} 증거와 대면`;
+      document.querySelector("#responseEvidenceMeaning").textContent = linkedConnection?.[2] || getEvidenceStoryMeaning(name, data);
+      const speechComparison = document.querySelector("#letterSpeechComparison");
+      if (speechComparison) speechComparison.hidden = !(name === "찢어진 약속 편지" && suspects[suspectIndex]?.id === "dolsoe");
     }
 
     function saveEvidenceConnection(first, second) {
@@ -4032,13 +4140,28 @@
       return evidenceConnections.filter(([first, second]) => linked.has(evidencePairKey(first, second)));
     }
 
+    function readStatementEvidenceLinks() {
+      try {
+        const saved = JSON.parse(localStorage.getItem(statementEvidenceLinksKey) || "[]");
+        return Array.isArray(saved) ? saved.filter((item) => item && typeof item.factId === "string") : [];
+      } catch {
+        return [];
+      }
+    }
+
     function updateEvidenceThreadUI() {
+      const unlocked = getUnlockedStoryConnections();
+      const statementCount = readStatementEvidenceLinks().length;
+      const linkedSources = new Set(unlocked.flatMap(([first, second]) => [first, second]));
       const count = document.querySelector("#evidenceThreadCount");
-      if (count) count.textContent = "0";
+      if (count) count.textContent = String(unlocked.length + statementCount);
       const trigger = document.querySelector("#openEvidenceThread");
-      trigger?.classList.remove("has-clues");
+      trigger?.classList.toggle("has-clues", unlocked.length + statementCount > 0);
       document.querySelectorAll("#evidenceList .evidence[data-evidence]").forEach((card) => {
-        card.classList.remove("story-linked");
+        const name = card.dataset.evidence;
+        const source = getEvidenceSource(name);
+        card.classList.toggle("story-linked", linkedSources.has(source));
+        if (linkedSources.has(source)) refreshEvidenceCard(name);
       });
     }
 
@@ -4047,10 +4170,36 @@
       if (!list) return;
       const unlocked = getUnlockedStoryConnections();
       const examined = readExaminedClues();
-      if (!unlocked.length && !examined.length) {
+      const statements = readStatementEvidenceLinks();
+      if (!unlocked.length && !examined.length && !statements.length) {
         list.innerHTML = `<div class="evidence-thread-empty"><b>아직 이어진 실마리가 없습니다</b><span>증거를 열고 관련 증거 하나를 골라 이어 보십시오.</span></div>`;
         return;
       }
+      const statementsByConnection = new Map();
+      const unattachedStatements = [];
+      statements.forEach((statement) => {
+        const evidenceNames = new Set(statement.evidenceNames || []);
+        const bestConnection = unlocked
+          .map((connection) => ({
+            connection,
+            score: [connection[0], connection[1]].filter((name) => evidenceNames.has(name)).length
+          }))
+          .sort((a, b) => b.score - a.score)[0];
+        if (!bestConnection?.score) {
+          unattachedStatements.push(statement);
+          return;
+        }
+        const key = evidencePairKey(bestConnection.connection[0], bestConnection.connection[1]);
+        const saved = statementsByConnection.get(key) || [];
+        saved.push(statement);
+        statementsByConnection.set(key, saved);
+      });
+      const statementSlipHtml = (statement) => `<div class="evidence-thread-statement">
+        <span>진술로 확인</span>
+        <b>${escapeHtml(statement.suspectName || "용의자")}</b>
+        <strong>${escapeHtml(statement.summary || "새로운 사실")}</strong>
+        <q>${escapeHtml(statement.quote || "진술의 의미가 증거와 이어진다.")}</q>
+      </div>`;
       const examinedHtml = examined.map((clue, index) => {
         const data = evidenceData[clue.name] || { source: clue.source, note: clue.note, img: clue.img };
         const [role] = getEvidenceStoryCue(clue.name, data);
@@ -4067,6 +4216,7 @@
       const linkedHtml = unlocked.map(([first, second, conclusion], index) => {
         const firstData = evidenceData[first] || {};
         const secondData = evidenceData[second] || {};
+        const linkedStatements = statementsByConnection.get(evidencePairKey(first, second)) || [];
         return `<article class="evidence-thread-entry">
           <em>${String(examined.length + index + 1).padStart(2, "0")}</em>
           <div class="evidence-thread-pair">
@@ -4075,39 +4225,49 @@
             <span><img src="${escapeHtml(getEvidenceImage(second))}" alt=""><b>${escapeHtml(second)}</b></span>
           </div>
           <strong>${escapeHtml(conclusion)}</strong>
+          ${linkedStatements.length ? `<div class="evidence-thread-statement-list">${linkedStatements.map(statementSlipHtml).join("")}</div>` : ""}
         </article>`;
       }).join("");
-      list.innerHTML = examinedHtml + linkedHtml;
+      const unattachedHtml = unattachedStatements.map((statement, index) => `<article class="evidence-thread-entry statement-only-thread-entry">
+        <em>${String(examined.length + unlocked.length + index + 1).padStart(2, "0")}</em>
+        <div class="evidence-thread-pair">${(statement.evidenceNames || []).map((name) => `<span><img src="${escapeHtml(getEvidenceImage(name))}" alt=""><b>${escapeHtml(getEvidenceDisplayName(name))}</b></span>`).join("")}</div>
+        <strong>${escapeHtml(statement.summary || "진술에서 새 의미를 확인했다.")}</strong>
+        <div class="evidence-thread-statement-list">${statementSlipHtml(statement)}</div>
+      </article>`).join("");
+      list.innerHTML = examinedHtml + linkedHtml + unattachedHtml;
     }
 
     function getEvidenceStoryCue(name, data) {
+      if ((data.source || name) === "찢어진 약속 편지" && !readStoredNames(interrogationKnownFactsKey).includes("DOLSOE_LETTER_MISMATCH")) {
+        return ["동선", "정중한 말투로 적힌 창고 약속"];
+      }
       const cue = evidenceStoryCues[data.source || name] || ["단서", "사건과 연결"];
       return cue;
     }
 
     function getEvidenceStoryMeaning(name, data) {
+      if ((data.source || name) === "찢어진 약속 편지" && !readStoredNames(interrogationKnownFactsKey).includes("DOLSOE_LETTER_MISMATCH")) {
+        return "점순은 이 편지를 믿고 창고로 간 것 같다. 누가 썼는지는 아직 알 수 없다.";
+      }
       return evidenceStoryMeanings[data.source || name] || "다른 증거와 이어지는 단서";
     }
 
     function isEvidenceMeaningRevealed(name, data = evidenceData[name] || {}) {
       if (data.derived) return true;
+      const source = data.source || name;
+      if (isEvidenceRevealedByStatement(source)) return true;
+      const linked = new Set(readStoredNames(linkedEvidenceKey));
+      if (evidenceConnections.some(([first, second]) =>
+        (first === source || second === source) && linked.has(evidencePairKey(first, second)))) return true;
       if (name === "끊어진 호패끈") {
         return readExaminedClues().some((clue) => clue.source === name);
       }
       if (!data.tool) return true;
-      const source = data.source || name;
       return readExaminedClues().some((clue) => clue.source === source);
     }
 
     function getEvidenceDisplayName(name) {
-      if (
-        isSpaceTheme
-        && name === "암호화된 파일"
-        && localStorage.getItem(spaceEncryptedFileDecryptionKey) === "1"
-        && evidenceData[name]?.recoveredName
-      ) {
-        return evidenceData[name].recoveredName;
-      }
+      if (isJoseonToolInteraction && name === "빈 호패 주머니") return "빈 호패함";
       if (isJoseonToolInteraction && !isEvidenceMeaningRevealed(name)) {
         return joseonUnexaminedEvidenceNames[name] || "정체 모를 물건";
       }
@@ -4125,19 +4285,14 @@
       if (isJoseonToolInteraction) {
         const transformed = readExaminedClues().filter((clue) => clue.source === name).at(-1);
         if (transformed?.note) return transformed.note;
+        if (!data.derived && joseonEvidenceObservationComments[name]) {
+          return joseonEvidenceObservationComments[name];
+        }
       }
       if (
         isSpaceTheme
         && name === "접속 키카드 칩"
         && localStorage.getItem(spaceKeycardRecoveryKey) === "1"
-        && data.recoveredCardNote
-      ) {
-        return data.recoveredCardNote;
-      }
-      if (
-        isSpaceTheme
-        && name === "암호화된 파일"
-        && localStorage.getItem(spaceEncryptedFileDecryptionKey) === "1"
         && data.recoveredCardNote
       ) {
         return data.recoveredCardNote;
@@ -4155,6 +4310,7 @@
       card.dataset.storyRole = revealed ? getEvidenceStoryCue(name, data)[0] : "???";
       card.classList.toggle("meaning-revealed", revealed);
       card.classList.toggle("meaning-unknown", !revealed);
+      card.classList.toggle("statement-revealed", isEvidenceRevealedByStatement(name));
       card.innerHTML = evidenceCardHtml(name);
     }
 
@@ -4177,7 +4333,8 @@
 
     function matchesEvidenceStoryFilter(role, filter) {
       if (filter === "all") return true;
-      if (filter === "수법") return ["수법", "상흔", "저항"].includes(role);
+      if (filter === "동기") return ["동기", "배경"].includes(role);
+      if (filter === "수법") return ["수법", "상흔", "저항", "소유"].includes(role);
       return role === filter;
     }
 
@@ -4222,6 +4379,7 @@
       const data = evidenceData[name] || {};
       const summary = getEvidenceCardSummary(name, data);
       const meaningRevealed = isEvidenceMeaningRevealed(name, data);
+      const statementRevealed = isEvidenceRevealedByStatement(name);
       const stateFrame = data.derived
         ? data.isNew
           ? "/samunmong/assets/interactions/sato-skills/inventory-states/new.png"
@@ -4235,7 +4393,7 @@
           <img class="evidence-state-frame" src="${stateFrame}" alt="">
         </span>
         <span class="evidence-card-copy">
-          <span class="evidence-kind-mark">${data.derived ? data.isNew ? "새 증좌" : "검험 증좌" : meaningRevealed ? "감식 완료" : "미확인 증거"}</span>
+          <span class="evidence-kind-mark">${data.derived ? data.isNew ? "새 증좌" : "검험 증좌" : statementRevealed ? "진술로 확인" : meaningRevealed ? "감식 완료" : "미확인 증거"}</span>
           <strong>${escapeHtml(getEvidenceDisplayName(name))}</strong>
           <span class="evidence-summary">${escapeHtml(summary)}</span>
         </span>`;
@@ -4246,10 +4404,13 @@
         return "일기 속 밤 기록";
       }
       if (evidenceName === "빈 호패 주머니" && toolName === "돋보기") {
-        return "주머니 속 호패 자국";
+        return "호패가 빠진 목제함";
       }
       if (evidenceName === "찢어진 옷고름" && toolName === "돋보기") {
-        return "비단끈의 조임 흔적";
+        return "비단끈 가운데 눌린 자국";
+      }
+      if (evidenceName === "피 묻은 붕대" && toolName === "혈흔 시험포") {
+        return "붕대 안쪽 마른 피 자국";
       }
       if (evidenceName === "끊어진 호패끈" && toolName === "호패 조각과 대조") {
         return "호패에서 끊긴 매듭끈";
@@ -4287,6 +4448,9 @@
         if (item.source === "돌쇠의 그림") {
           return { ...item, img: "/samunmong/assets/evidence-transparent/evidence-portrait-strokes-clean-v2.png" };
         }
+        if (item.source === "빈 호패 주머니") return { ...item, name: "호패가 빠진 목제함" };
+        if (item.source === "찢어진 옷고름") return { ...item, name: "비단끈 가운데 눌린 자국" };
+        if (item.source === "피 묻은 붕대" && item.tool === "혈흔 시험포") return { ...item, name: "붕대 안쪽 마른 피 자국" };
         return item;
       });
       if (JSON.stringify(valid) !== JSON.stringify(stored)) {
@@ -4433,8 +4597,9 @@
     function markEvidenceCollectedInScene(name) {
       document.querySelectorAll(`[data-evidence-name="${name}"]`).forEach((item) => {
         item.classList.add("collected");
-        if (item instanceof HTMLButtonElement) item.disabled = !isSpaceTheme;
-        item.setAttribute("aria-disabled", "true");
+        const revisitableSpace = item.classList.contains("concealed-space-hotspot");
+        if (item instanceof HTMLButtonElement) item.disabled = !isSpaceTheme && !revisitableSpace;
+        item.setAttribute("aria-disabled", String(!revisitableSpace));
       });
       const propSelectors = {
         "작은 발자국": ".footprints-prop",
@@ -4454,23 +4619,63 @@
       saveCollectedEvidence(name);
       addEvidenceCardToInterrogation(name);
       addEvidenceToToolPanel(name);
-      unlockCollectedEvidenceConnections();
       playSfx("bag", 0.7);
     }
 
-    function unlockCollectedEvidenceConnections() {
+    function migrateToManualEvidenceConnections() {
       if (!isJoseonToolInteraction) return;
-      const collected = new Set(readStoredNames(collectedEvidenceKey));
-      const linked = new Set(readStoredNames(linkedEvidenceKey));
-      let changed = false;
-      evidenceConnections.forEach(([first, second]) => {
-        if (!collected.has(first) || !collected.has(second)) return;
-        const key = evidencePairKey(first, second);
-        if (linked.has(key)) return;
-        linked.add(key);
-        changed = true;
+      if (localStorage.getItem(manualEvidenceLinksMigrationKey) === "1") return;
+      localStorage.removeItem(linkedEvidenceKey);
+      localStorage.setItem(manualEvidenceLinksMigrationKey, "1");
+    }
+
+    function migrateJoseonEvidenceCatalog() {
+      if (!isJoseonToolInteraction) return;
+      const isCanonical = (name) => typeof name === "string" && canonicalJoseonEvidenceNames.has(name);
+      const cleanNameList = (key, predicate = isCanonical) => {
+        const values = readStored(key, []);
+        if (!Array.isArray(values)) return;
+        localStorage.setItem(key, JSON.stringify(values.filter((value) => typeof value === "string" && predicate(value))));
+      };
+
+      cleanNameList(collectedEvidenceKey);
+      cleanNameList(unreadEvidenceKey);
+      cleanNameList(analyzedEvidenceKey, (value) => isCanonical(value.split("::")[0]));
+      cleanNameList(statementRevealedEvidenceKey);
+      cleanNameList(linkedEvidenceKey, (value) => {
+        const pair = value.split("::");
+        return pair.length === 2 && pair.every(isCanonical);
       });
-      if (changed) localStorage.setItem(linkedEvidenceKey, JSON.stringify([...linked]));
+
+      const examined = readStored(examinedCluesKey, []);
+      if (Array.isArray(examined)) {
+        localStorage.setItem(examinedCluesKey, JSON.stringify(examined.filter((clue) => isCanonical(clue?.source))));
+      }
+      const statementLinks = readStored(statementEvidenceLinksKey, []);
+      if (Array.isArray(statementLinks)) {
+        const cleaned = statementLinks.map((record) => ({
+          ...record,
+          evidenceNames: Array.isArray(record?.evidenceNames) ? record.evidenceNames.filter(isCanonical) : []
+        })).filter((record) => record.evidenceNames.length > 0);
+        localStorage.setItem(statementEvidenceLinksKey, JSON.stringify(cleaned));
+      }
+    }
+
+    function restoreChunwolJeogoriEvidenceState() {
+      if (!isJoseonToolInteraction || localStorage.getItem(chunwolJeogoriRestorationKey) === "1") return;
+      const evidenceName = "헐거워진 노리개";
+      localStorage.setItem(collectedEvidenceKey, JSON.stringify(readStoredNames(collectedEvidenceKey).filter((name) => name !== evidenceName)));
+      localStorage.setItem(analyzedEvidenceKey, JSON.stringify(readStoredNames(analyzedEvidenceKey).filter((name) => !name.startsWith(`${evidenceName}::`) && name !== evidenceName)));
+      const examined = readStored(examinedCluesKey, []);
+      if (Array.isArray(examined)) {
+        localStorage.setItem(examinedCluesKey, JSON.stringify(examined.filter((clue) => clue?.source !== evidenceName)));
+      }
+      document.querySelectorAll(`[data-evidence-name="${evidenceName}"]`).forEach((item) => {
+        item.classList.remove("collected", "analyzed");
+        item.removeAttribute("aria-disabled");
+        if (item instanceof HTMLButtonElement) item.disabled = false;
+      });
+      localStorage.setItem(chunwolJeogoriRestorationKey, "1");
     }
 
     function ensureJoseonBriefingEvidence() {
@@ -4483,6 +4688,9 @@
     }
 
     function restoreSavedInvestigation() {
+      migrateJoseonEvidenceCatalog();
+      migrateToManualEvidenceConnections();
+      restoreChunwolJeogoriEvidenceState();
       ensureJoseonBriefingEvidence();
       const collectedEvidence = readStoredNames(collectedEvidenceKey);
       const analyzedEvidence = new Set(readStoredNames(analyzedEvidenceKey));
@@ -4503,7 +4711,6 @@
         document.querySelectorAll(`[data-evidence-name="${name}"]`).forEach((item) => item.classList.add("analyzed"));
         document.querySelectorAll(`#toolEvidenceList [data-evidence="${name}"]`).forEach((item) => item.classList.add("analyzed"));
       });
-      unlockCollectedEvidenceConnections();
     }
 
     function setAnalysisTarget(name) {
@@ -4523,28 +4730,74 @@
 
     const evidencePairComparisons = new Map([
       [["호패 조각", "빈 호패 주머니"], {
-        result: "주머니 안쪽의 눌린 자리와 호패 조각의 폭이 맞는다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-hopae-three-way-link.webp"
+        verdict: "현장 호패는 이 목제함의 빈자리에 있던 물건이다",
+        confirmed: "호패를 가운데 빈 홈에 넣자 크기와 윗부분의 둥근 모양이 정확히 맞는다.",
+        unresolved: "누가 함에서 호패를 꺼내 이름을 지운 뒤 현장에 옮겼을까?",
+        result: "현장에서 발견한 호패가 목제 호패함의 가운데 빈자리에 정확히 맞는다.",
+        asset: "/samunmong/assets/evidence-transparent/evidence-empty-hopae-case-v2.png"
       }],
       [["호패 조각", "끊어진 호패끈"], {
+        verdict: "끊어진 붉은 끈은 이 호패의 끈이었다",
+        confirmed: "끈의 굵기와 호패 구멍 안쪽의 오래된 마찰 홈이 맞는다.",
+        unresolved: "끈을 끊은 사람과 그 이유는 아직 알 수 없다.",
         result: "끊어진 끝을 호패 구멍에 대자 끈의 굵기와 오래 눌린 마찰 홈이 맞는다. 이 끈은 호패에 매여 있던 끈인 것 같다.",
         asset: "/samunmong/assets/interactions/hopae-thread-puzzle/state-2.png"
       }],
       [["진흙 묻은 짚신", "작은 발자국"], {
-        result: "뒤꿈치를 맞춰 겹치자 짚신이 발자국보다 길고 폭도 넓다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/expanded/result-footprint-shoe-mismatch-v3.png"
+        verdict: "무덕의 짚신은 뒷문의 작은 발자국보다 크다",
+        confirmed: "뒤꿈치를 맞춰 포개자 짚신의 앞코와 양옆이 발자국 밖으로 나온다. 밑창 크기가 서로 다르다.",
+        unresolved: "무덕의 짚신이 남긴 자국은 아닌 듯하다. 그렇다면 그날 뒷문을 평범하게 지나간 작은 신의 주인은 누구일까?",
+        result: "무덕 방의 짚신은 작은 발자국보다 길고 넓다. 발자국은 무덕을 지목하는 흔적이 아니라 다른 사람의 자연스러운 이동 흔적인 듯하다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-shoes-footprints-size-v1.png"
       }],
       [["피 묻은 붕대", "돌쇠의 팔 상처"], {
-        result: "감긴 방향은 돌쇠의 팔과 닮았다. 그러나 한 줄로 아문 상처는 손톱에 긁힌 흔적과 달라 보인다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-bandage-work-cut-v2.png"
+        verdict: "붕대는 돌쇠 팔의 한 줄 베인 상처를 감쌌던 듯하다",
+        confirmed: "실제 붕대를 팔에 대자 감긴 눌림과 핏자국 중심이 한 줄 베인 상처 위치에 맞는다.",
+        unresolved: "한 줄 베임은 여러 갈래 손톱 자국과 다르다. 돌쇠는 언제 어디서 이 상처를 입었을까?",
+        result: "붕대의 감긴 크기와 핏자국은 돌쇠의 한 줄 베임에 맞는다. 붕대의 주인은 좁혀졌지만 점순의 피나 살해 접촉 흔적이라고 볼 근거는 없다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-bandage-dolsoe-arm-v1.png"
       }],
       [["찢어진 옷고름", "점순의 목 압박 흔적"], {
-        result: "옷고름의 폭과 눌린 마찰 자국이 목에 남은 좁은 압박 흔적과 맞는다.",
-        asset: "/samunmong/assets/interactions/evidence-tools/expanded/result-fiber-comparison.png"
+        verdict: "옷고름의 눌린 폭은 점순의 목 자국과 닮았다",
+        confirmed: "자주빛 옷고름의 중앙 주름을 검안서에 포개자, 좁게 눌린 폭과 목을 가로지른 자국의 폭이 닮아 있다.",
+        unresolved: "폭이 닮은 것만으로 같은 끈이라고 할 수 있을까? 이 옷고름이 떨어져 나온 저고리와 당시 착용자의 진술이 더 필요하다.",
+        result: "옷고름의 중앙 조임과 목 자국의 폭이 닮았다. 범행 도구라고 확정한 것이 아니라, 어떤 저고리에서 뜯겼는지 물을 근거를 얻었다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-wine-goreum-neck-width-v1.png"
+      }],
+      [["찢어진 옷고름", "고름이 뜯긴 저고리"], {
+        verdict: "뒷문의 자주빛 옷고름은 춘월 방 저고리에서 뜯긴 한 짝으로 보인다",
+        confirmed: "색과 꽃무늬 직조, 고름의 폭이 같고 양쪽의 거칠게 끊긴 실밥이 서로 이어진다.",
+        unresolved: "춘월이 그날 이 저고리를 입었는지, 옷고름이 언제 어디서 뜯겼는지는 아직 진술이 필요하다.",
+        result: "옷고름의 찢긴 끝을 저고리의 빈자리에 대자 직조와 실밥이 이어진다. 이제 춘월에게 저고리를 입은 시점과 옷고름이 사라진 때를 물을 수 있다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-goreum-jeogori-fit-v1.png"
       }],
       [["긁힌 팔 흔적", "점순의 손톱 밑 흔적"], {
-        result: "세 흔적의 간격과 방향이 닮았다. 같은 접촉에서 남은 것일까?",
-        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-nail-trace-scratch-v2.png"
+        verdict: "점순이 누군가를 긁었고, 춘월의 팔에는 이에 부합할 얕은 상처가 있다",
+        confirmed: "검안서에는 점순의 손톱 밑 미세 조직이 기록됐고, 춘월의 팔에는 손톱에 긁힌 듯한 얕고 나란한 상처가 남아 있다.",
+        unresolved: "두 흔적이 같은 접촉에서 생겼는지는 아직 확정할 수 없다. 춘월의 상처는 언제 누구에게 생겼을까?",
+        result: "두 증거는 점순과 춘월의 직접 접촉 가능성을 높인다. 그러나 상처 시점에 대한 진술 없이는 그날 밤의 저항 흔적이라고 단정할 수 없다.",
+        asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-scratched-arm-hand-record-v1.png"
+      }],
+      [["도망 보따리", "무덕의 번진 일기"], {
+        verdict: "두 사람의 도망 준비와 무덕이 들은 밤의 기척이 이어진다",
+        confirmed: "보따리에는 두 사람 몫의 옷과 식량이 있고, 무덕은 그날 밤 뒷문이 열리고 점순이 오래 돌아오지 않은 일을 적었다.",
+        unresolved: "무덕이 다음 날 안채에 이 일을 말한 뒤, 도망 계획은 누구에게까지 전해졌을까?",
+        result: "보따리는 돌쇠와 점순이 함께 떠날 준비를 했음을 보여 주고, 일기는 무덕이 그날 밤의 기척을 눈치챈 뒤 다음 날 안채에 알렸음을 보여 준다.",
+        asset: "/samunmong/assets/interactions/bundle-canonical-puzzle/state-2.png"
+      }],
+      [["혼서 조각", "하인 장부"], {
+        verdict: "춘월은 혼서 문갑을 찾기 위해 사랑방에 들어갔다",
+        confirmed: "복원된 장부의 초경 반 기록에는 춘월이 혼서 문갑을 찾으러 사랑방에 다녀갔다고 적혀 있다.",
+        unresolved: "춘월이 그때 혼서 내용을 처음 알았는지, 문갑 외의 물건을 건드렸는지는 아직 모른다.",
+        result: "혼서 조각은 추진된 혼인의 내용을, 장부는 춘월이 그 혼서 문갑 때문에 사랑방에 들어간 시각과 이유를 보여 준다.",
+        asset: "/samunmong/assets/evidence-transparent/evidence-marriage-letter.webp"
+      }],
+      [["돌쇠의 그림", "도망 보따리"], {
+        verdict: "숨긴 초상의 문구와 돌쇠·점순의 도망 준비는 서로 반대되는 바람을 보여 준다",
+        confirmed: "펼친 초상에는 ‘떠나지 마라’가 남아 있고, 보따리에는 돌쇠와 점순 두 사람이 함께 떠날 옷과 식량이 들어 있다.",
+        unresolved: "그림을 숨긴 사람이 도망 계획을 언제 알았는지와 그 감정이 사건으로 이어졌는지는 아직 모른다.",
+        result: "한쪽은 돌쇠가 남기를 바라고, 다른 한쪽은 실제로 떠날 준비를 보여 준다. 이제 그림의 주인에게 도망 계획을 안 시점을 물을 수 있다.",
+        asset: "/samunmong/assets/interactions/bundle-canonical-puzzle/state-2.png"
       }]
     ].map(([names, comparison]) => [evidencePairKey(names[0], names[1]), comparison]));
 
@@ -4703,25 +4956,13 @@
       const sectionGrid = getEvidenceLocationSection(list, location);
       const button = document.createElement("button");
       const meaningRevealed = isEvidenceMeaningRevealed(name, data);
-      button.className = `evidence evidence-card${data.derived ? " examined-evidence" : " field-evidence"}${data.isNew ? " new-evidence" : ""}${meaningRevealed ? " meaning-revealed" : " meaning-unknown"}`;
+      button.className = `evidence evidence-card${data.derived ? " examined-evidence" : " field-evidence"}${data.isNew ? " new-evidence" : ""}${meaningRevealed ? " meaning-revealed" : " meaning-unknown"}${isEvidenceRevealedByStatement(name) ? " statement-revealed" : ""}`;
       button.type = "button";
       button.dataset.evidence = name;
       button.dataset.location = location;
       button.dataset.storyRole = meaningRevealed ? getEvidenceStoryCue(name, data)[0] : "???";
       button.innerHTML = evidenceCardHtml(name);
       button.addEventListener("click", () => {
-        if (isSpaceTheme && document.querySelector("#spacePowerAccessPanel")?.classList.contains("show")) {
-          if (name === spacePowerAccessCardName) holdSpacePowerAccessCard();
-          return;
-        }
-        if (isSpaceTheme && document.querySelector("#spaceKeycardTerminalPanel")?.classList.contains("show")) {
-          if (name === "접속 키카드 칩") holdSpaceKeycardChip();
-          return;
-        }
-        if (isSpaceTheme && document.querySelector("#spaceAnalysisPanel")?.classList.contains("show")) {
-          if (name === "소독천과 장갑") holdSpaceAnalysisSample();
-          return;
-        }
         if (isSpaceTheme && detailedSpaceEvidence[name]) {
           setSpaceEvidenceDetail(true, name);
           playSfx("buttonAlt", 0.48);
@@ -4771,7 +5012,7 @@
       const [role, fact] = getEvidenceStoryCue(name, data);
       const meaningRevealed = isEvidenceMeaningRevealed(name, data);
       preview.hidden = false;
-      document.querySelector("#evidencePreviewKind").textContent = data.derived ? "검험으로 얻은 증좌" : meaningRevealed ? `감식으로 확인한 ${role} 증거` : "아직 의미를 모르는 현장 증거";
+      document.querySelector("#evidencePreviewKind").textContent = data.derived ? "검험으로 얻은 증좌" : isEvidenceRevealedByStatement(name) ? `진술로 확인한 ${role} 증거` : meaningRevealed ? `감식으로 확인한 ${role} 증거` : "아직 의미를 모르는 현장 증거";
       document.querySelector("#evidencePreviewTitle").textContent = getEvidenceDisplayName(data.source || name);
       document.querySelector("#evidencePreviewImage").src = getEvidenceImage(name);
       document.querySelector("#evidencePreviewImage").alt = name;
@@ -4808,28 +5049,33 @@
         related.push(card);
       });
       const collected = new Set(readStoredNames(collectedEvidenceKey));
-      const automaticConnections = evidenceConnections.filter(([first, second]) => {
+      const availableConnections = evidenceConnections.filter(([first, second]) => {
         const source = data.source || name;
-        return (first === source || second === source) && collected.has(first) && collected.has(second);
+        const key = evidencePairKey(first, second);
+        return (first === source || second === source)
+          && collected.has(first)
+          && collected.has(second)
+          && evidencePairComparisons.has(key);
       });
-      relatedRow.innerHTML = automaticConnections.length ? `<span>함께 모여 자동으로 이어진 증거</span>` : "";
-      automaticConnections.forEach(([first, second, conclusion]) => {
+      const linkedConnections = new Set(readStoredNames(linkedEvidenceKey));
+      relatedRow.innerHTML = availableConnections.length ? `<span>직접 맞춰 볼 증거</span>` : "";
+      availableConnections.forEach(([first, second]) => {
+        const key = evidencePairKey(first, second);
+        const isLinked = linkedConnections.has(key);
         const relatedButton = document.createElement("button");
         relatedButton.type = "button";
-        relatedButton.className = "connected";
+        relatedButton.className = isLinked ? "connected" : "";
         relatedButton.textContent = first === (data.source || name) ? second : first;
         relatedButton.addEventListener("click", () => {
           const other = first === (data.source || name) ? second : first;
-          connectEvidenceClues(name, other, relatedButton);
-          document.querySelector("#evidenceConnectionText").textContent = conclusion;
+          if (isLinked) {
+            connectEvidenceClues(name, other, relatedButton);
+            return;
+          }
+          compareEvidencePair(name, other);
         });
         relatedRow.appendChild(relatedButton);
       });
-      if (automaticConnections.length) {
-        const [first, second, conclusion] = automaticConnections[0];
-        connectEvidenceClues(first, second);
-        document.querySelector("#evidenceConnectionText").textContent = conclusion;
-      }
       if (isJoseonToolInteraction) return;
       related.forEach((card) => {
         const relatedButton = document.createElement("button");
@@ -4843,8 +5089,12 @@
     const joseonDirectEvidenceInteractions = {
       "돌쇠의 그림": { tool: "돋보기", label: "두루마리 직접 펼치기", open: () => openPortraitStrokePuzzle() },
       "찢어진 약속 편지": { tool: "문서 맞춤판", label: "편지 조각 직접 맞추기", open: () => openDocumentAssembly("찢어진 약속 편지") },
-      "빈 호패 주머니": { tool: "돋보기", label: "주머니 안감 직접 뒤집기", open: () => openPouchLiningPuzzle() },
-      "찢어진 옷고름": { tool: "돋보기", label: "조인 비단끈 직접 펼치기", open: () => openSilkTensionPuzzle() },
+      "빈 호패 주머니": { tool: "돋보기", label: "현장의 호패를 빈자리에 넣어 보기", open: () => openPouchLiningPuzzle() },
+      "끊어진 호패끈": { tool: "호패 조각과 대조", label: "끊어진 끝을 호패 구멍에 직접 대어 보기", open: () => openHopaeThreadComparison() },
+      "찢어진 옷고름": { tool: "돋보기", label: "매듭을 펼쳐 눌린 구간 확인", open: () => openSilkTensionPuzzle() },
+      "진흙 묻은 짚신": { tool: "발자국 실측줄", label: "뒷문 발자국 위에 직접 포개 보기", open: () => openShoeFootprintComparison("진흙 묻은 짚신") },
+      "작은 발자국": { tool: "발자국 실측줄", label: "무덕의 짚신을 직접 포개 보기", open: () => openShoeFootprintComparison("작은 발자국") },
+      "피 묻은 붕대": { tool: "상처 대조첩", label: "돌쇠의 팔에 붕대를 직접 대어 보기", open: () => openBandagePuzzle() },
       "하인 장부": { tool: "촛불 비추기", label: "지워진 장부 직접 복원하기", open: () => openLedgerTimelinePuzzle() },
       "도망 보따리": { tool: "먼지털이 붓", label: "보따리 매듭 직접 풀기", open: () => openBundlePuzzle() },
       "무덕의 번진 일기": { tool: "촛불 비추기", label: "번진 일기 직접 읽어 보기", open: () => openDiaryTimelinePuzzle() }
@@ -4936,8 +5186,51 @@
       button?.classList.add("connected");
       saveEvidenceConnection(first, second);
       playSfx("seal", 0.58);
-      showToast("실마리가 이어졌습니다");
+      const comparison = evidencePairComparisons.get(evidencePairKey(first, second));
+      if (comparison) {
+        showEvidenceLinkReveal({ firstName: first, secondName: second, comparison }, connection[2]);
+      } else {
+        showToast("실마리가 이어졌습니다");
+      }
     }
+
+    function closeEvidenceLinkReveal({ returnToBag = true } = {}) {
+      const reveal = document.querySelector("#evidenceLinkReveal");
+      if (!reveal?.classList.contains("show")) return;
+      reveal.classList.remove("show");
+      reveal.setAttribute("aria-hidden", "true");
+      if (returnToBag) {
+        setEvidenceBag(true);
+      } else {
+        globalOverlay.classList.remove("show");
+      }
+    }
+
+    function showEvidenceLinkReveal(pending, storyQuestion) {
+      const reveal = document.querySelector("#evidenceLinkReveal");
+      if (!reveal || !pending) return;
+      globalPanels.forEach((panel) => {
+        panel.classList.remove("show", "closing");
+        panel.setAttribute("aria-hidden", "true");
+      });
+      setEvidenceBag(false);
+      document.querySelector("#evidenceLinkRevealImage").src = pending.comparison.asset;
+      document.querySelector("#evidenceLinkRevealImage").alt = `${getEvidenceDisplayName(pending.firstName)}와 ${getEvidenceDisplayName(pending.secondName)} 대조 결과`;
+      document.querySelector("#evidenceLinkRevealFact").textContent = pending.comparison.confirmed || pending.comparison.result;
+      document.querySelector("#evidenceLinkRevealVerdict").textContent = pending.comparison.verdict || "두 증거는 서로 이어진다";
+      document.querySelector("#evidenceLinkRevealConfirmed").textContent = pending.comparison.confirmed || pending.comparison.result;
+      document.querySelector("#evidenceLinkRevealA").src = getEvidenceImage(pending.firstName);
+      document.querySelector("#evidenceLinkRevealB").src = getEvidenceImage(pending.secondName);
+      document.querySelector("#evidenceLinkRevealNameA").textContent = getEvidenceDisplayName(pending.firstName);
+      document.querySelector("#evidenceLinkRevealNameB").textContent = getEvidenceDisplayName(pending.secondName);
+      document.querySelector("#evidenceLinkRevealQuestion").textContent = pending.comparison.unresolved || storyQuestion;
+      reveal.classList.add("show");
+      reveal.setAttribute("aria-hidden", "false");
+      globalOverlay.classList.add("show");
+      playSfx("seal", 0.72);
+    }
+
+    document.querySelector("#closeEvidenceLinkReveal")?.addEventListener("click", () => closeEvidenceLinkReveal());
 
     function closeEvidenceStoryPreview() {
       const preview = document.querySelector("#evidenceStoryPreview");
@@ -5551,9 +5844,9 @@
       "돌쇠의 그림": {
         image: "/samunmong/assets/interactions/dream-traces/portrait-redrawn-v1.png",
         alt: "정체를 감춘 인물이 돌쇠의 초상을 여러 번 덧그리는 몽흔",
-        observed: "눈매와 옷깃에 지우고 덧그린 획이 여러 겹 남음",
-        scene: "누군가 감춰 둔 초상을 오래 고쳐 그린 순간",
-        question: "그린 이는 왜 이 얼굴을 거듭 붙잡았을까?"
+        observed: "돌쇠의 눈매와 옷깃에 지우고 덧그린 획이 여러 겹 남고, 가장자리에는 ‘떠나지 마라’가 희미하게 남음",
+        scene: "정체를 알 수 없는 누군가가 돌쇠의 초상을 오래 고쳐 그린 순간",
+        question: "그린 사람은 누구이며, 왜 돌쇠가 떠나는 일을 두려워했을까?"
       },
       "무덕의 번진 일기": {
         image: "/samunmong/assets/interactions/dream-traces/mudeok-diary-overheard-v4.png",
@@ -5564,12 +5857,24 @@
       }
     };
 
+    const nextEvidenceComparisonBySource = {
+      "빈 호패 주머니": {
+        target: "호패 조각",
+        action: "현장의 호패 조각과 윤곽 맞춰 보기",
+        purpose: "호패가 이 주머니에서 꺼내져 현장에 놓였는지 확인"
+      }
+    };
+
     function renderInteractionEarnedEvidence(panel, clue) {
       if (!panel || !clue) return;
       clearInteractionEarnedEvidence(panel);
       const data = evidenceData[clue.name] || { source: clue.source, note: clue.note, img: clue.img };
       const sourceName = clue.source || data.source || clue.name;
       const dreamTrace = joseonDreamTraceByEvidence[sourceName];
+      const nextComparison = nextEvidenceComparisonBySource[sourceName];
+      const hasComparisonTarget = nextComparison
+        ? readStoredNames(collectedEvidenceKey).includes(nextComparison.target)
+        : false;
       const [storyRole] = getEvidenceStoryCue(sourceName, evidenceData[sourceName] || data);
       const storyQuestion = getEvidenceStoryMeaning(sourceName, evidenceData[sourceName] || data);
       const result = document.createElement("article");
@@ -5590,6 +5895,18 @@
               <i aria-hidden="true">→</i>
               <span><b>${escapeHtml(storyRole)}</b>${escapeHtml(storyQuestion)}</span>
             </div>
+            ${nextComparison ? `<section class="evidence-next-comparison${hasComparisonTarget ? "" : " locked"}">
+              <span>그래서 무엇을 확인할 수 있나?</span>
+              <strong>${escapeHtml(nextComparison.purpose)}</strong>
+              <button type="button" ${hasComparisonTarget ? "" : "disabled"}>
+                <img src="${escapeHtml(getEvidenceImage(nextComparison.target))}" alt="" draggable="false">
+                <span>
+                  <small>다음 대조</small>
+                  <b>${escapeHtml(nextComparison.action)}</b>
+                  <em>${hasComparisonTarget ? "눌러서 두 증거를 직접 대조" : `${escapeHtml(nextComparison.target)}을 아직 확보하지 못함`}</em>
+                </span>
+              </button>
+            </section>` : ""}
             ${dreamTrace ? '<button type="button" class="dream-trace-toggle"><b>꿈자취 살피기</b><em>증좌에 밴 지난 순간을 엿봄</em></button>' : ""}
           </div>
         </section>
@@ -5609,7 +5926,16 @@
       const dreamTraceStill = result.querySelector(".dream-trace-still");
       const traceToggle = result.querySelector(".dream-trace-toggle");
       const traceReturn = result.querySelector(".dream-trace-return");
+      result.querySelector(".evidence-next-comparison button")?.addEventListener("click", (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+        if (!nextComparison || !hasComparisonTarget) return;
+        compareEvidencePair(sourceName, nextComparison.target);
+      });
       traceToggle?.addEventListener("click", () => {
+        const viewed = new Set(readStoredNames(joseonDreamTraceViewedKey));
+        viewed.add(sourceName);
+        localStorage.setItem(joseonDreamTraceViewedKey, JSON.stringify([...viewed]));
         result.classList.remove("trace-revealed");
         dreamTraceStill.hidden = false;
         evidenceStill.hidden = true;
@@ -6199,6 +6525,7 @@
 
     function prepareSpecialPuzzle(mode, folder, title, guide, gesture) {
       specialPuzzleMode = mode;
+      specialPuzzleFolder = folder;
       specialPuzzleStep = 0;
       tactilePuzzleProgress = 0;
       tactilePuzzlePointer = null;
@@ -6207,6 +6534,8 @@
       document.querySelector("#specialPuzzleGuide").textContent = guide;
       document.querySelector("#specialPuzzleGesture").textContent = gesture;
       document.querySelector("#ledgerRecoveredRecords")?.remove();
+      document.querySelector("#bundleDiaryReview")?.remove();
+      document.querySelector("#motiveQuestionReview")?.remove();
       const puzzleImage = document.querySelector("#specialPuzzleImage");
       puzzleImage.src = getSpecialPuzzleImageSrc(folder, 1);
       puzzleImage.onload = () => requestAnimationFrame(syncDirectAffordanceFragments);
@@ -6230,19 +6559,49 @@
       const explorerTool = document.querySelector("#specialExplorerTool");
       const explorerImage = document.querySelector("#specialExplorerToolImage");
       const explorerReaction = document.querySelector("#specialExplorerReaction");
-      const usesExplorerTool = mode === "ink";
+      const usesExplorerTool = ["ink", "hopaeCaseFit", "silkNeckFit", "goreumJeogoriFit", "shoePrintFit", "bandageArmFit", "scratchHandFit"].includes(mode);
       explorerTool.hidden = !usesExplorerTool;
-      explorerTool.classList.remove("dragging", "wrong-fit", "complete");
+      explorerTool.classList.remove("dragging", "wrong-fit", "complete", "placed");
       explorerTool.style.setProperty("--explorer-x", "0px");
       explorerTool.style.setProperty("--explorer-y", "0px");
       specialExplorerDrag = null;
       if (usesExplorerTool) {
-        explorerImage.src = "/samunmong/assets/interactions/direct-affordances/finger-loop-rubbing-wad-v1.png";
-        explorerImage.alt = "먹선을 문지를 손가락 고리 먹뭉치";
-        explorerReaction.src = mode === "ink"
-            ? "/samunmong/assets/interactions/evidence-tools/ink-reveal.png"
-            : "/samunmong/assets/interactions/evidence-tools/charcoal-sweep.png";
-        explorerTool.setAttribute("aria-label", "먹뭉치를 잡아 겹친 먹선 문지르기");
+        if (mode === "hopaeCaseFit") {
+          explorerImage.src = "/samunmong/assets/evidence-transparent/evidence-wooden-hopae-slot-fit-v1.png";
+          explorerImage.alt = "현장에서 수집한 글자 지워진 호패";
+          explorerReaction.src = "";
+          explorerTool.setAttribute("aria-label", "호패를 잡아 목제 호패함 가운데 빈자리에 넣기");
+        } else if (mode === "silkNeckFit") {
+          explorerImage.src = "/samunmong/assets/evidence-transparent/evidence-torn-wine-goreum-v1.png";
+          explorerImage.alt = "뒷문에서 수집한 자주빛 찢긴 옷고름";
+          explorerReaction.src = "";
+          explorerTool.setAttribute("aria-label", "찢긴 옷고름을 잡아 검안서의 목 자국 위에 포개기");
+        } else if (mode === "goreumJeogoriFit") {
+          explorerImage.src = "/samunmong/assets/evidence-transparent/evidence-torn-wine-goreum-v1.png";
+          explorerImage.alt = "뒷문에서 수집한 자주빛 찢긴 옷고름";
+          explorerReaction.src = "";
+          explorerTool.setAttribute("aria-label", "찢긴 옷고름을 잡아 저고리의 비어 있는 고름 자리에 대기");
+        } else if (mode === "shoePrintFit") {
+          explorerImage.src = "/samunmong/assets/evidence-transparent/evidence-muddy-straw-shoes-clean-v2.png";
+          explorerImage.alt = "무덕의 방에서 수집한 진흙 묻은 짚신 한 켤레";
+          explorerReaction.src = "";
+          explorerTool.setAttribute("aria-label", "진흙 묻은 짚신을 잡아 뒷문의 작은 발자국 위에 포개기");
+        } else if (mode === "bandageArmFit") {
+          explorerImage.src = "/samunmong/assets/evidence-transparent/evidence-bloodied-bandage.webp";
+          explorerImage.alt = "돌쇠의 처소에서 수집한 붉은 얼룩 모시 붕대";
+          explorerReaction.src = "";
+          explorerTool.setAttribute("aria-label", "피 묻은 붕대를 잡아 돌쇠의 팔 상처와 붕대 눌림 위에 놓기");
+        } else if (mode === "scratchHandFit") {
+          explorerImage.src = "/samunmong/assets/evidence-transparent/evidence-scratched-arm.webp";
+          explorerImage.alt = "취조실에서 확인한 춘월의 긁힌 팔 흔적";
+          explorerReaction.src = "";
+          explorerTool.setAttribute("aria-label", "춘월의 긁힌 팔 흔적을 잡아 점순의 손톱 검안 기록 위에 포개기");
+        } else {
+          explorerImage.src = "/samunmong/assets/interactions/direct-affordances/finger-loop-rubbing-wad-v1.png";
+          explorerImage.alt = "먹선을 문지를 손가락 고리 먹뭉치";
+          explorerReaction.src = "/samunmong/assets/interactions/evidence-tools/ink-reveal.png";
+          explorerTool.setAttribute("aria-label", "먹뭉치를 잡아 겹친 먹선 문지르기");
+        }
       }
       const gestureArrows = getSpecialGestureArrows(mode);
       points.querySelectorAll("button").forEach((button, index) => {
@@ -6277,6 +6636,12 @@
                                 : mode === "shoeMud" ? ["들린 진흙 껍질", "", ""][index]
                                 : mode === "footprintTrace" ? ["기름 한지 대나무 축", "", ""][index]
             : "";
+        if (mode === "hopaeCaseFit") button.dataset.label = index === 0 ? "목제 호패함 가운데 빈 홈" : "";
+        if (mode === "silkNeckFit") button.dataset.label = index === 0 ? "검안서에 그려진 목의 좁은 압박 자국" : "";
+        if (mode === "goreumJeogoriFit") button.dataset.label = index === 0 ? "저고리 오른쪽의 뜯긴 고름 자리" : "";
+        if (mode === "shoePrintFit") button.dataset.label = index === 0 ? "뒷문 마당의 작은 신발 자국" : "";
+        if (mode === "bandageArmFit") button.dataset.label = index === 0 ? "돌쇠 팔의 한 줄 베임과 붕대 눌림" : "";
+        if (mode === "scratchHandFit") button.dataset.label = index === 0 ? "점순의 손톱 간격과 긁힌 방향 기록" : "";
         button.setAttribute("aria-label", ["pouch", "ledger", "bandage", "portrait", "ink", "norigae", "bundle", "silk", "hopaeThread", "stride", "thread", "diary", "hopaeMark", "shoeMud", "footprintTrace"].includes(mode) ? `${button.dataset.label} 직접 움직이기` : `${index + 1}번째 흔적 직접 움직이기`);
         button.classList.remove("dragging", "wrong-fit");
         button.style.removeProperty("--special-x");
@@ -6288,6 +6653,9 @@
     }
 
     function getSpecialPuzzleImageSrc(folder, state) {
+      if (folder === "ledger-access-puzzle" && state === 2) {
+        return "/samunmong/assets/interactions/ledger-access-puzzle/state-2-blank-ledger-v2.png";
+      }
       const versions = {
         "bandage-puzzle": "unrolled-blood-pattern-v4",
         "bundle-puzzle": "two-person-escape-kit-v6",
@@ -6439,7 +6807,9 @@
       }
       button.classList.add("wrong-fit");
       window.setTimeout(() => button.classList.remove("wrong-fit"), 280);
-      document.querySelector("#specialPuzzleGuide").textContent = specialPuzzleMode === "pouch"
+      document.querySelector("#specialPuzzleGuide").textContent = specialPuzzleMode === "hopaeCaseFit"
+        ? ["", "현장에서 발견한 호패가 함의 가운데 빈자리에 꼭 맞습니다. 유문석이 흘린 것이 아니라 누군가 이 함에서 꺼내 옮긴 것일까요?"][specialPuzzleStep]
+        : specialPuzzleMode === "pouch"
         ? "입구 밖으로 나온 베이지색 안감의 아래 끝을 잡아 아래로 끝까지 뒤집으십시오."
         : `${button.dataset.label || "움직이는 부분"}을 잡고 물건이 풀리는 결을 따라 끝까지 움직이십시오.`;
       playSfx("buttonAlt", 0.34);
@@ -6447,7 +6817,7 @@
 
     function startSpecialExplorerDrag(event) {
       const tool = document.querySelector("#specialExplorerTool");
-      if (!tool || tool.hidden || !["portrait", "ink"].includes(specialPuzzleMode)) return;
+      if (!tool || tool.hidden || !["portrait", "ink", "hopaeCaseFit", "silkNeckFit", "goreumJeogoriFit", "shoePrintFit", "bandageArmFit", "scratchHandFit"].includes(specialPuzzleMode)) return;
       specialExplorerDrag = { pointerId: event.pointerId, x: event.clientX, y: event.clientY };
       tool.setPointerCapture?.(event.pointerId);
       tool.classList.add("dragging");
@@ -6481,7 +6851,19 @@
       }
       tool?.classList.add("wrong-fit");
       window.setTimeout(() => tool?.classList.remove("wrong-fit"), 320);
-      document.querySelector("#specialPuzzleGuide").textContent = specialPuzzleMode === "portrait"
+      document.querySelector("#specialPuzzleGuide").textContent = specialPuzzleMode === "hopaeCaseFit"
+          ? "호패 자체를 잡아 목제 함 가운데 비어 있는 호패 모양 홈에 넣어 보십시오."
+          : specialPuzzleMode === "silkNeckFit"
+            ? "자주빛 옷고름 자체를 잡아 검안서에 그려진 목의 붉은 자국 위에 포개십시오."
+          : specialPuzzleMode === "goreumJeogoriFit"
+            ? "자주빛 옷고름의 거칠게 끊긴 끝을 저고리 오른쪽의 빈 고름 자리에 대어 보십시오."
+          : specialPuzzleMode === "shoePrintFit"
+            ? "수집한 짚신 자체를 잡아 진흙 속 두 발자국 위에 같은 방향으로 포개십시오."
+          : specialPuzzleMode === "bandageArmFit"
+            ? "붉은 얼룩 붕대 자체를 잡아 돌쇠 팔의 한 줄 베임과 붕대 눌림 위에 놓으십시오."
+          : specialPuzzleMode === "scratchHandFit"
+            ? "춘월의 긁힌 팔 기록을 잡아 점순의 손톱 간격과 방향이 표시된 검안 기록 위에 포개십시오."
+          : specialPuzzleMode === "portrait"
           ? "먹뭉치를 겹쳐진 얼굴선 위에 대고 문질러 보십시오."
           : "먹뭉치를 번짐 테두리가 다른 먹자국 위에 대고 문질러 보십시오.";
       playSfx("buttonAlt", 0.34);
@@ -6502,19 +6884,137 @@
         prepareSpecialPuzzle("hopaeThread", "hopae-thread-puzzle", "붉은 꼰끈의 주인 찾기", "따로 놓인 끈의 거칠게 끊어진 끝을 잡아 호패의 둥근 구멍에 직접 대어 보십시오.", "끊어진 끝을 호패 구멍에 맞추기");
         return;
       }
+      if (names.has("호패 조각") && names.has("빈 호패 주머니")) {
+        prepareSpecialPuzzle("hopaeCaseFit", "hopae-case-fit", "빈 호패함에 호패 맞추기", "오른쪽에 놓인 호패를 직접 잡아 목제 함 가운데 비어 있는 호패 모양 홈에 넣어 보십시오.", "호패를 빈 홈에 직접 넣기");
+        document.querySelector("#specialPuzzleImage").src = "/samunmong/assets/evidence-transparent/evidence-empty-hopae-case-v2.png";
+        return;
+      }
       if (names.has("진흙 묻은 짚신") && names.has("작은 발자국")) {
-        prepareSpecialPuzzle("stride", "stride-puzzle", "짚신과 발자국 포개기", "따로 놓인 짚신을 직접 잡아 진흙 발자국 위에 포개십시오.", "윤곽 포개기 → 실측줄 늘리기");
+        prepareSpecialPuzzle("shoePrintFit", "shoe-print-fit", "무덕의 짚신과 뒷문 발자국 포개기", "오른쪽의 실제 짚신을 잡아 진흙 속 두 발자국 위에 같은 방향으로 포개십시오.", "실제 짚신을 발자국에 직접 포개기");
+        document.querySelector("#specialPuzzleImage").src = "/samunmong/assets/evidence-transparent/evidence-small-footprints-v2.png";
+        return;
+      }
+      if (names.has("피 묻은 붕대") && names.has("돌쇠의 팔 상처")) {
+        prepareSpecialPuzzle("bandageArmFit", "bandage-arm-fit", "붕대와 돌쇠의 팔 상처 대조하기", "오른쪽의 실제 붕대를 잡아 돌쇠 팔의 한 줄 베임과 붕대 눌림 위에 놓으십시오.", "실제 붕대를 팔 상처에 직접 대기");
+        document.querySelector("#specialPuzzleImage").src = "/samunmong/assets/evidence-transparent/evidence-dolsoe-work-cut-v3.png";
+        return;
+      }
+      if (names.has("찢어진 옷고름") && names.has("점순의 목 압박 흔적")) {
+        prepareSpecialPuzzle("silkNeckFit", "silk-neck-fit", "옷고름과 목 자국 포개기", "뒷문에서 주운 자주빛 옷고름을 직접 잡아 검안서의 목 자국 위에 포개십시오.", "실제 옷고름을 목 자국에 포개기");
+        document.querySelector("#specialPuzzleImage").src = "/samunmong/assets/mudeok-interaction/evidence-jeomsun-neck-exam-paper.webp";
+        return;
+      }
+      if (names.has("찢어진 옷고름") && names.has("고름이 뜯긴 저고리")) {
+        prepareSpecialPuzzle("goreumJeogoriFit", "goreum-jeogori-direct", "뜯긴 고름 자리 이어 보기", "감식상 오른쪽에 놓인 옷고름 자체를 잡아, 저고리 앞섶의 끊긴 실밥에 이어 대십시오.", "옷고름 자체를 잡아 끊긴 자리에 대기");
+        document.querySelector("#specialPuzzleImage").src = "/samunmong/assets/interactions/evidence-tools/goreum-jeogori-direct/state-open-v1.png";
+        return;
+      }
+      if (names.has("긁힌 팔 흔적") && names.has("점순의 손톱 밑 흔적")) {
+        prepareSpecialPuzzle("scratchHandFit", "scratch-hand-fit", "긁힌 팔과 점순의 손톱 흔적 포개기", "오른쪽의 춘월 팔 기록을 직접 잡아 점순의 손톱 간격과 긁힌 방향이 표시된 검안서 위에 포개십시오.", "팔 흔적을 손톱 검안서에 직접 포개기");
+        document.querySelector("#specialPuzzleImage").src = "/samunmong/assets/mudeok-interaction/evidence-jeomsun-hand-exam-paper.webp";
+        return;
+      }
+      if (names.has("도망 보따리") && names.has("무덕의 번진 일기")) {
+        openBundleDiaryReview();
+        return;
+      }
+      if (names.has("돌쇠의 그림") && names.has("도망 보따리")) {
+        openMotiveQuestionReview();
         return;
       }
       prepareSpecialPuzzle("thread", "red-thread-puzzle", "두 증거의 공통 흔적 묶기", "첫 증거패에서 풀려 나온 붉은 실을 잡아 다른 증거패에 이으십시오.", "증거 잇기 → 결론 매듭 죄기");
     }
 
+    function openBundleDiaryReview() {
+      prepareSpecialPuzzle("bundleDiaryReview", "bundle-canonical-puzzle", "보따리와 무덕의 밤 기록 대조하기", "열린 보따리의 내용과 이어지는 일기 날짜를 고르십시오.", "도망 준비와 이어지는 밤 기록 고르기");
+      document.querySelector("#specialPuzzleImage").src = "/samunmong/assets/interactions/bundle-canonical-puzzle/state-2.png";
+      const stage = document.querySelector("#specialPuzzleStage");
+      const points = document.querySelector("#specialTouchPoints");
+      if (!stage || !points) return;
+      points.hidden = true;
+      const review = document.createElement("section");
+      review.id = "bundleDiaryReview";
+      review.className = "bundle-diary-review";
+      review.innerHTML = `
+        <header><img src="/samunmong/assets/mudeok-interaction/evidence-mudeok-smeared-diary.webp" alt="무덕의 번진 일기"><span><b>무덕의 세 날짜</b><small>보따리와 직접 이어지는 기록 하나를 고르십시오.</small></span></header>
+        <div>
+          <button type="button" data-diary-date="wrong"><b>6월 29일</b><span>점순이 사랑방 쪽에서 꾸중을 듣고 울었다.</span></button>
+          <button type="button" data-diary-date="correct"><b>6월 30일 밤</b><span>뒷문이 열렸고 점순은 한동안 돌아오지 않았다.</span></button>
+          <button type="button" data-diary-date="wrong"><b>7월 1일</b><span>무덕이 밤 외출 이야기를 안채에 말했다.</span></button>
+        </div>`;
+      review.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => {
+        if (button.dataset.diaryDate !== "correct") {
+          button.classList.add("wrong");
+          window.setTimeout(() => button.classList.remove("wrong"), 360);
+          document.querySelector("#specialPuzzleGuide").textContent = button.textContent.includes("29일")
+            ? "꾸중 기록은 도망 보따리가 준비됐다는 사실과 직접 이어지지 않습니다."
+            : "말이 퍼진 것은 다음 날입니다. 먼저 보따리와 같은 밤의 움직임을 찾으십시오.";
+          playSfx("buttonAlt", 0.35);
+          return;
+        }
+        button.classList.add("correct");
+        review.querySelectorAll("button").forEach((item) => { item.disabled = true; });
+        document.querySelector("#specialPuzzleGuide").textContent = "두 사람 몫의 보따리와 같은 밤의 뒷문 기록이 이어집니다. 다음 날 무덕의 말로 계획이 퍼졌을 가능성이 생겼습니다.";
+        selectSpecialPoint("1");
+      }));
+      stage.appendChild(review);
+    }
+
+    function openMotiveQuestionReview() {
+      prepareSpecialPuzzle("motiveQuestionReview", "portrait-stroke-puzzle", "숨긴 초상과 도망 보따리 대조하기", "‘떠나지 마라’와 실제 도망 준비에서 확인할 질문을 고르십시오.", "두 증거가 충돌하는 시점 묻기");
+      document.querySelector("#specialPuzzleImage").src = "/samunmong/assets/interactions/bundle-canonical-puzzle/state-2.png";
+      const stage = document.querySelector("#specialPuzzleStage");
+      const points = document.querySelector("#specialTouchPoints");
+      if (!stage || !points) return;
+      points.hidden = true;
+      const review = document.createElement("section");
+      review.id = "motiveQuestionReview";
+      review.className = "bundle-diary-review motive-question-review";
+      review.innerHTML = `
+        <header><img src="/samunmong/assets/evidence-transparent/evidence-portrait-strokes-clean-v2.png" alt="펼친 돌쇠 초상"><span><b>‘떠나지 마라’와 도망 준비</b><small>두 증거가 충돌하는 시점을 확인하십시오.</small></span></header>
+        <div>
+          <button type="button" data-question-kind="wrong"><b>범인 확정</b><span>돌쇠를 붙잡고 싶었으니 그림 주인이 범인이다.</span></button>
+          <button type="button" data-question-kind="correct"><b>시간선 확인</b><span>그림을 숨긴 사람은 두 사람의 도망 계획을 언제 알았나?</span></button>
+          <button type="button" data-question-kind="wrong"><b>도망 방해 확정</b><span>‘떠나지 마라’는 곧 점순을 해치겠다는 뜻이다.</span></button>
+        </div>`;
+      review.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => {
+        if (button.dataset.questionKind !== "correct") {
+          button.classList.add("wrong");
+          window.setTimeout(() => button.classList.remove("wrong"), 360);
+          document.querySelector("#specialPuzzleGuide").textContent = button.textContent.includes("범인")
+            ? "돌쇠를 붙잡고 싶은 마음만으로 범행은 증명되지 않습니다."
+            : "‘떠나지 마라’만으로 점순을 해칠 뜻까지 확정할 수는 없습니다.";
+          playSfx("buttonAlt", 0.35);
+          return;
+        }
+        button.classList.add("correct");
+        review.querySelectorAll("button").forEach((item) => { item.disabled = true; });
+        document.querySelector("#specialPuzzleGuide").textContent = "그림을 숨긴 사람에게 도망 계획을 안 시점을 물을 수 있습니다.";
+        selectSpecialPoint("1");
+      }));
+      stage.appendChild(review);
+    }
+
     function openBundlePuzzle() {
-      prepareSpecialPuzzle("bundle", "bundle-puzzle", "돌쇠의 도망 보따리 풀기", "중앙 매듭에서 오른쪽으로 길게 나온 붉은 끈을 잡아 한 번에 당기십시오.", "실제 매듭끈을 당겨 보따리 펼치기");
+      prepareSpecialPuzzle("bundle", "bundle-canonical-puzzle", "묶인 보따리의 주인 수 확인하기", "중앙 매듭에서 오른쪽으로 이어진 실제 갈색 끈 끝을 잡아 한 번에 당기십시오.", "갈색 매듭끈을 당겨 베이지색 보따리 펼치기");
     }
 
     function openBandagePuzzle() {
-      prepareSpecialPuzzle("bandage", "bandage-puzzle", "피 묻은 붕대 펼치기", "오른쪽 끝에서 들려 있는 실제 붕대 끝을 잡아 오른쪽으로 길게 당기십시오.", "붕대 한 번에 펼치기");
+      const firstName = "피 묻은 붕대";
+      const secondName = "돌쇠의 팔 상처";
+      const collected = new Set(readStoredNames(collectedEvidenceKey));
+      if (!collected.has(secondName)) {
+        showToast("이 붕대와 맞춰 볼 상처가 필요합니다. 취조실에서 돌쇠의 소매를 확인하십시오.", {
+          image: joseonEvidenceImageByName[firstName],
+          title: "붕대만으로는 피의 주인을 알 수 없습니다",
+          dismissible: true,
+          duration: 0
+        });
+        return;
+      }
+      const key = evidencePairKey(firstName, secondName);
+      const comparison = evidencePairComparisons.get(key);
+      if (comparison) openRedThreadPuzzle(firstName, secondName, key, comparison);
     }
 
     function openInkMatchPuzzle() {
@@ -6526,27 +7026,100 @@
     }
 
     function openPouchLiningPuzzle() {
-      prepareSpecialPuzzle("pouch", "pouch-lining-puzzle", "주머니 속에 있던 물건 확인하기", "주머니 가운데로 길게 나온 베이지색 안감의 접힌 아랫단을 잡아 아래로 당기십시오. 안쪽에 남은 물건 자국이 선명해집니다.", "베이지색 안감 아랫단 당기기");
+      const collected = new Set(readStoredNames(collectedEvidenceKey));
+      if (!collected.has("호패 조각")) {
+        showToast("가운데 홈에 맞춰 볼 물건이 필요합니다.", {
+          image: "/samunmong/assets/evidence-transparent/evidence-empty-hopae-case-v2.png",
+          title: "빈 호패함",
+          dismissible: true,
+          duration: 0
+        });
+        return;
+      }
+      const firstName = "호패 조각";
+      const secondName = "빈 호패 주머니";
+      const key = evidencePairKey(firstName, secondName);
+      const comparison = evidencePairComparisons.get(key);
+      if (!comparison) return;
+      openRedThreadPuzzle(firstName, secondName, key, comparison);
+    }
+
+    function openHopaeThreadComparison() {
+      const firstName = "호패 조각";
+      const secondName = "끊어진 호패끈";
+      const collected = new Set(readStoredNames(collectedEvidenceKey));
+      if (!collected.has(firstName)) {
+        showToast("이 끈을 대어 볼 나무패가 필요합니다. 사건 현장에서 글자 지워진 나무패를 찾으십시오.", {
+          image: joseonEvidenceImageByName[secondName],
+          title: "끈만으로는 원래 달렸던 물건을 알 수 없습니다",
+          dismissible: true,
+          duration: 0
+        });
+        return;
+      }
+      const key = evidencePairKey(firstName, secondName);
+      const comparison = evidencePairComparisons.get(key);
+      if (comparison) openRedThreadPuzzle(firstName, secondName, key, comparison);
+    }
+
+    function getCompletedHopaeChainReveal(linkedPairs) {
+      const cordKey = evidencePairKey("호패 조각", "끊어진 호패끈");
+      const caseKey = evidencePairKey("호패 조각", "빈 호패 주머니");
+      if (!linkedPairs.has(cordKey) || !linkedPairs.has(caseKey)) return null;
+      return {
+        firstName: "호패 조각",
+        secondName: "빈 호패 주머니",
+        comparison: {
+          verdict: "현장 호패·끊어진 끈·사랑방 호패함은 원래 한 물건의 흔적인 듯하다",
+          confirmed: "호패 구멍에는 이 붉은 끈의 굵기와 같은 마찰 홈이 있고, 호패 자체는 사랑방 목제함의 빈 홈에 정확히 맞는다.",
+          unresolved: "누가 사랑방에서 호패를 꺼냈고, 이름의 새 긁힘과 끊어진 붉은 끈은 언제 생겼을까?",
+          result: "호패는 함의 빈 홈에 맞고, 붉은 끈은 호패 구멍의 마찰 홈에 맞는다. 세 흔적은 이어지지만 옮긴 사람은 아직 모른다.",
+          asset: "/samunmong/assets/interactions/evidence-tools/crosscheck/result-hopae-chain-v1.png"
+        }
+      };
     }
 
     function openSilkTensionPuzzle() {
-      prepareSpecialPuzzle("silk", "silk-tension-puzzle", "조인 비단끈 풀어 보기", "매듭에서 길게 빠져나온 찢긴 비단 끝을 잡아 왼쪽으로 천천히 당기십시오.", "찢긴 비단 끝 잡아당기기");
+      const firstName = "찢어진 옷고름";
+      const secondName = "점순의 목 압박 흔적";
+      const key = evidencePairKey(firstName, secondName);
+      const comparison = evidencePairComparisons.get(key);
+      if (comparison) openRedThreadPuzzle(firstName, secondName, key, comparison);
+    }
+
+    function openShoeFootprintComparison(sourceName) {
+      const firstName = "진흙 묻은 짚신";
+      const secondName = "작은 발자국";
+      const collected = new Set(readStoredNames(collectedEvidenceKey));
+      const missingName = collected.has(firstName) ? secondName : firstName;
+      if (!collected.has(firstName) || !collected.has(secondName)) {
+        showToast(sourceName === firstName ? "이 짚신과 맞춰 볼 현장의 발자국이 필요합니다." : "이 발자국과 맞춰 볼 실제 신발이 필요합니다.", {
+          image: joseonEvidenceImageByName[missingName],
+          title: missingName === secondName ? "뒷문에서 비교 대상을 찾으십시오" : "무덕의 방에서 비교 대상을 찾으십시오",
+          dismissible: true,
+          duration: 0
+        });
+        return;
+      }
+      const key = evidencePairKey(firstName, secondName);
+      const comparison = evidencePairComparisons.get(key);
+      if (comparison) openRedThreadPuzzle(firstName, secondName, key, comparison);
     }
 
     function openLedgerTimelinePuzzle() {
-      prepareSpecialPuzzle("ledger", "ledger-timeline-puzzle", "덧칠된 출입 기록 비추기", "장부틀 왼쪽에서 튀어나온 검은 나무 손잡이를 잡아 오른쪽으로 미십시오.", "등잔 손잡이 오른쪽으로 밀기");
+      prepareSpecialPuzzle("ledger", "ledger-access-puzzle", "덧칠된 출입 기록 비추기", "장부틀 왼쪽에서 튀어나온 검은 나무 손잡이를 잡아 오른쪽으로 미십시오.", "등잔 손잡이 오른쪽으로 밀기");
     }
 
     function showLedgerRecoveredRecords() {
       const stage = document.querySelector("#specialPuzzleStage");
       if (!stage || document.querySelector("#ledgerRecoveredRecords")) return;
       const records = [
-        ["유시", "무덕", "사랑방에 차를 올림"],
-        ["초경", "돌쇠", "심부름 뒤 바깥채로 돌아감"],
-        ["초경 반", "춘월", "혼서 문제로 사랑방을 다녀감"],
-        ["이경", "유문석", "대문과 뒷문 빗장을 살핌"],
-        ["이경 뒤", "무덕", "빗소리에 젖은 빨래를 걷음"],
-        ["이경 뒤", "먹으로 덧칠됨", "안채에서 뒷문 쪽으로 나감"]
+        ["유시", "무덕", "사랑방에 차를 올림", "평소 맡은 심부름 · 차를 받은 사람에게 확인"],
+        ["초경", "돌쇠", "심부름 뒤 바깥채로 돌아감", "귀환 기록 · 돌쇠의 밤 진술과 대조"],
+        ["초경 반", "춘월", "혼서 문갑을 찾겠다며 사랑방에 들어감", "호패함이 있던 방에 들어갈 기회가 있었음"],
+        ["이경", "유문석", "대문과 뒷문 빗장을 살핌", "집주인의 점검 · 마지막으로 호패를 본 때 확인"],
+        ["이경 뒤", "무덕", "빗소리에 젖은 빨래를 걷음", "날씨에 따른 심부름 · 뒷문 목격 여부 확인"],
+        ["이경 뒤", "이름을 먹으로 덮음", "안채에서 뒷문 쪽으로 나감", "이름은 읽히지 않음 · 누구인지 아직 단정 불가"]
       ];
       const reveal = document.createElement("section");
       reveal.id = "ledgerRecoveredRecords";
@@ -6554,28 +7127,55 @@
       reveal.setAttribute("aria-label", "등잔으로 복원한 하인 장부 출입 기록");
       reveal.innerHTML = `
         <header><span>등잔 아래 드러난 기록</span><strong>유월 그믐밤 출입 장부</strong></header>
-        <ol>${records.map(([time, name, action], index) => `
+        <ol>${records.map(([time, name, action, reading], index) => `
           <li class="${index === records.length - 1 ? "erased" : ""}">
-            <time>${escapeHtml(time)}</time><b>${escapeHtml(name)}</b><span>${escapeHtml(action)}</span>
+            <time>${escapeHtml(time)}</time><b>${escapeHtml(name)}</b><span>${escapeHtml(action)}<small>${escapeHtml(reading)}</small></span>
           </li>`).join("")}</ol>
-        <p>여러 사람이 오간 기록 사이에서 마지막 이름만 덮였음. 누가 지웠고 누구의 이름인지는 이 장부만으로 알 수 없음.</p>
-        <button type="button">장부에 옮겨 적기</button>`;
+        <p><strong>장부가 밝힌 것</strong> 모두에게 저마다의 이동 사유가 있었고, 춘월에게는 호패함이 있던 사랑방에 들어갈 기회가 있었음.<br><strong>아직 모르는 것</strong> 덮인 마지막 이름과 그 사람이 호패를 건드렸는지 여부.</p>
+        <button type="button">확인할 질문을 기록하기</button>`;
       reveal.querySelector("button")?.addEventListener("click", () => {
         finishTactilePuzzle("촛불 비추기");
       }, { once: true });
       stage.appendChild(reveal);
-      document.querySelector("#specialPuzzleGuide").textContent = "여러 사람이 오간 기록 사이에서 이름 하나만 나중에 덮였습니다. 내용을 살핀 뒤 장부에 옮겨 적으십시오.";
+      document.querySelector("#specialPuzzleGuide").textContent = "장부는 범인을 가리키지 않습니다. 평범한 이동과 수상한 빈칸을 나누어 보고, 각 사람에게 확인할 질문을 남기십시오.";
       playSfx("paper", 0.65);
     }
 
     function openDiaryTimelinePuzzle() {
       prepareSpecialPuzzle("diary", "diary-timeline-puzzle", "먹에 붙은 일기 세 장 펼치기", "오른쪽으로 튀어나온 대나무 손잡이를 잡아 오른쪽으로 당기면, 붙어 있던 세 장의 날짜 기록이 펼쳐집니다.", "오른쪽 대나무 손잡이 당기기");
     }
+
+    function showDiaryRecoveredRecords() {
+      const stage = document.querySelector("#specialExplorerStage");
+      if (!stage || stage.querySelector("#diaryRecoveredRecords")) return;
+      const records = [
+        ["유월 스무아흐레", "낮의 울음", "사랑방 쪽에서 점순이가 꾸중을 들은 뒤 한참 울었다.", "유문석에게 무엇을 꾸짖었는지 묻기"],
+        ["유월 그믐밤", "밤의 뒷문", "뒷문이 열리고 낮은 목소리가 오갔다. 무덕은 얼굴을 보지 못했다.", "작은 발자국과 돌쇠의 밤 진술 확인"],
+        ["칠월 초하루", "옮겨진 말", "무덕이 점순의 밤 외출을 안채에 말했다. 뒤이어 누군가 돌쇠 이름을 되물었다.", "무덕에게 누구 앞에서 말했는지 묻기"],
+      ];
+      const reveal = document.createElement("section");
+      reveal.id = "diaryRecoveredRecords";
+      reveal.className = "ledger-recovered-records diary-recovered-records";
+      reveal.setAttribute("aria-label", "펼쳐진 무덕의 일기 속 밤 기록");
+      reveal.innerHTML = `
+        <header><span>먹 사이로 이어진 기록</span><strong>무덕의 일기 속 밤 기록</strong></header>
+        <ol>${records.map(([date, label, entry, next]) => `
+          <li><time>${escapeHtml(date)}</time><b>${escapeHtml(label)}</b><span>${escapeHtml(entry)}<small>다음 확인 · ${escapeHtml(next)}</small></span></li>`).join("")}</ol>
+        <p><strong>일기가 밝힌 것</strong> 점순의 밤 외출 이야기가 이튿날 안채로 퍼졌음.<br><strong>아직 모르는 것</strong> 돌쇠 이름을 되물은 사람의 얼굴과 그 말을 들은 범위.</p>
+        <button type="button">세 가지 질문을 기록장에 옮기기</button>`;
+      reveal.querySelector("button")?.addEventListener("click", () => {
+        finishTactilePuzzle("촛불 비추기");
+      }, { once: true });
+      stage.appendChild(reveal);
+      saveCompletedToolStep("무덕의 번진 일기", "촛불 비추기");
+      document.querySelector("#specialPuzzleGuide").textContent = "각 날짜 아래의 다음 확인 대상을 읽으십시오. 일기는 범인을 밝히는 답이 아니라 심문할 세 가지 질문을 만듭니다.";
+      playSfx("paper", 0.65);
+    }
     function openHopaeMarkPuzzle() {
       prepareSpecialPuzzle("hopaeMark", "hopae-mark-puzzle", "호패 이름 홈 탁본 벗기기", "호패 위에서 말려 올라온 한지 귀퉁이를 잡아 왼쪽 위로 벗기십시오.", "한지 탁본 벗기기");
     }
-    function openShoeMudPuzzle() { prepareSpecialPuzzle("shoeMud", "shoe-mud-puzzle", "짚신 밑창의 진흙 본 벗기기", "뒤꿈치에서 들린 진흙 껍질을 잡아 짚신 앞쪽으로 한 번에 벗기십시오.", "진흙 껍질 벗기기"); }
-    function openFootprintTracePuzzle() { prepareSpecialPuzzle("footprintTrace", "footprint-trace-puzzle", "작은 발자국 윤곽 뜨기", "오른쪽 대나무 축을 잡아 왼쪽으로 굴려 기름 한지를 발자국 위에 펼치십시오.", "한지 축 왼쪽으로 굴리기"); }
+    function openShoeMudPuzzle() { openShoeFootprintComparison("진흙 묻은 짚신"); }
+    function openFootprintTracePuzzle() { openShoeFootprintComparison("작은 발자국"); }
 
     function selectSpecialPoint(point) {
       if (specialPuzzleMode === "soil") return;
@@ -6590,7 +7190,7 @@
         pouch: [1],
         silk: [1],
         ledger: [1],
-        diary: [1], hopaeMark: [1], shoeMud: [1], footprintTrace: [1],
+        diary: [1], hopaeMark: [1], shoeMud: [1], footprintTrace: [1], hopaeCaseFit: [1], silkNeckFit: [1], goreumJeogoriFit: [1], shoePrintFit: [1], bandageArmFit: [1], scratchHandFit: [1], bundleDiaryReview: [1], motiveQuestionReview: [1],
         thread: [1, 3]
       };
       const expected = expectedSequences[specialPuzzleMode] || [1, 2, 3];
@@ -6601,9 +7201,10 @@
         return;
       }
       specialPuzzleStep += 1;
-      const folderByMode = { norigae: "norigae-puzzle", bundle: "bundle-puzzle", bandage: "bandage-puzzle", ink: "ink-match-puzzle", portrait: "portrait-stroke-puzzle", hopaeThread: "hopae-thread-puzzle", stride: "stride-puzzle", pouch: "pouch-lining-puzzle", silk: "silk-tension-puzzle", ledger: "ledger-timeline-puzzle", diary: "diary-timeline-puzzle", hopaeMark: "hopae-mark-puzzle", shoeMud: "shoe-mud-puzzle", footprintTrace: "footprint-trace-puzzle", thread: "red-thread-puzzle" };
-      const folder = folderByMode[specialPuzzleMode] || "red-thread-puzzle";
-      document.querySelector("#specialPuzzleImage").src = getSpecialPuzzleImageSrc(folder, specialPuzzleStep + 1);
+      const folder = specialPuzzleFolder || "red-thread-puzzle";
+      if (!["hopaeCaseFit", "silkNeckFit", "goreumJeogoriFit", "shoePrintFit", "bandageArmFit", "scratchHandFit"].includes(specialPuzzleMode)) {
+        document.querySelector("#specialPuzzleImage").src = getSpecialPuzzleImageSrc(folder, specialPuzzleStep + 1);
+      }
       document.querySelector(`[data-special-point="${point}"]`)?.setAttribute("disabled", "true");
       document.querySelector("#specialTouchPoints").dataset.activeStep = String(Math.min(3, specialPuzzleStep + 1));
       requestAnimationFrame(syncDirectAffordanceFragments);
@@ -6612,7 +7213,7 @@
         : specialPuzzleMode === "norigae"
           ? ["", "휘어진 고리에서 노리개와 재질이 다른 남색 옷감이 빠졌습니다. 오래 닳은 것이 아니라 다른 옷에 강하게 걸렸던 흔적입니다."][specialPuzzleStep]
         : specialPuzzleMode === "bundle"
-            ? ["", "크기가 다른 두 벌의 옷과 두 끼분 식량, 노잣돈이 함께 싸여 있습니다. 두 사람이 떠날 준비였고, 젖은 마당 흙이 묻은 뒤 마른 실내에서 한 번 열렸습니다."][specialPuzzleStep]
+            ? ["", "크기가 다른 옷 두 벌과 두 끼분 식량, 함께 쓸 노잣돈과 빗이 나왔습니다. 돌쇠 혼자 떠날 짐은 아닌 것 같습니다."][specialPuzzleStep]
             : specialPuzzleMode === "bandage"
               ? ["", "왼쪽의 짙은 최초 혈흔에서 오른쪽으로 옅어지는 반복 자국이 이어집니다. 좁은 팔에 감았던 붕대이며, 팔 상처와 대조해야 주인을 알 수 있습니다."][specialPuzzleStep]
           : specialPuzzleMode === "silk"
@@ -6626,20 +7227,22 @@
         : specialPuzzleMode === "ledger"
           ? ["", "등잔의 배면광 아래 검은 덧칠보다 먼저 눌린 붓획이 한 줄 전체에 이어집니다. 이 칸은 처음부터 빈칸이 아니라 기록한 뒤 일부러 지운 자리입니다."][specialPuzzleStep]
         : specialPuzzleMode === "diary"
-            ? ["", "세 장이 펼쳐졌습니다. 6월 29일의 울음, 6월 30일의 뒷문 발자국, 7월 1일 아씨가 돌쇠 이름을 물었다는 기록이 이어집니다."][specialPuzzleStep]
+            ? ["", "세 장이 펼쳐졌습니다. 6월 29일의 울음, 6월 30일의 뒷문 기척, 7월 1일 무덕이 말을 옮긴 뒤 누군가 돌쇠 이름을 되물은 기록이 이어집니다."][specialPuzzleStep]
             : specialPuzzleMode === "hopaeMark"
               ? ["", "탁본의 짙고 이어진 원래 홈 위로, 옅고 끊긴 새 긁힘이 겹칩니다. 누군가 이름 홈을 나중에 일부러 훼손했습니다."][specialPuzzleStep]
               : specialPuzzleMode === "shoeMud" ? ["", "진흙 본과 드러난 짚신 밑창에 같은 짜임이 남았습니다. 다른 발자국과 대조할 수 있는 밑창 무늬를 확보했습니다."][specialPuzzleStep]
               : specialPuzzleMode === "footprintTrace" ? ["", "기름 한지에 짧고 좁은 발 윤곽과 이동 방향이 그대로 남았습니다. 짚신 밑창 기록과 대조할 수 있습니다."][specialPuzzleStep]
           : specialPuzzleMode === "portrait"
-            ? ["", "묶인 초상에서 여러 번 고친 얼굴과 가장자리의 지운 글씨 획이 드러났습니다."][specialPuzzleStep]
+            ? ["", "돌쇠의 얼굴을 여러 번 고친 초상과 지우다 남은 ‘떠나지 마라’가 드러났습니다. 누가 그렸고 왜 이 방에 숨겼을까요?"][specialPuzzleStep]
             : specialPuzzleMode === "ink"
               ? ["", "첫 먹은 천천히 번지고 가장자리가 고르게 마릅니다.", "다른 먹은 빠르게 퍼져 테두리가 짙게 남습니다.", "원문과 덧쓴 문장은 같은 때 쓴 것이 아니라, 다른 먹으로 나중에 고친 흔적입니다."][specialPuzzleStep]
           : specialPuzzleStep < 3 ? `한 단계 진행했습니다 · ${specialPuzzleStep}/3` : specialPuzzleMode === "norigae" ? "매듭 속 낯선 남색 섬유가 드러났습니다." : specialPuzzleMode === "bundle" ? "보따리 속 이동 준비물이 모두 드러났습니다." : specialPuzzleMode === "ink" ? "문서와 같은 먹 농도를 찾았습니다." : specialPuzzleMode === "portrait" ? "처음 그린 선과 지워진 흔적을 복원했습니다." : specialPuzzleMode === "hopaeThread" ? "끈 굵기와 오래된 마찰 홈이 정확히 맞습니다." : specialPuzzleMode === "stride" ? "짚신보다 발자국의 길이와 보폭이 짧습니다." : specialPuzzleMode === "silk" ? "비단실이 날이 아니라 강한 힘에 끊겼습니다." : "두 증거의 물리적 관계가 이어졌습니다.";
       playSfx("buttonAlt", 0.58);
-      const requiredSpecialSteps = ["ledger", "bandage", "hopaeMark", "portrait", "norigae", "diary", "shoeMud", "footprintTrace", "pouch", "silk", "bundle", "hopaeThread"].includes(specialPuzzleMode) ? 1 : ["stride", "thread"].includes(specialPuzzleMode) ? 2 : 3;
+      const requiredSpecialSteps = ["ledger", "bandage", "hopaeMark", "portrait", "norigae", "diary", "shoeMud", "footprintTrace", "pouch", "silk", "bundle", "hopaeThread", "hopaeCaseFit", "silkNeckFit", "goreumJeogoriFit", "shoePrintFit", "bandageArmFit", "scratchHandFit", "bundleDiaryReview", "motiveQuestionReview"].includes(specialPuzzleMode) ? 1 : ["stride", "thread"].includes(specialPuzzleMode) ? 2 : 3;
       if (specialPuzzleStep !== requiredSpecialSteps) return;
-      document.querySelector("#specialExplorerTool")?.classList.add("complete");
+      const explorerTool = document.querySelector("#specialExplorerTool");
+      if (["hopaeCaseFit", "silkNeckFit", "goreumJeogoriFit", "shoePrintFit", "bandageArmFit", "scratchHandFit"].includes(specialPuzzleMode)) explorerTool?.classList.add("placed");
+      else explorerTool?.classList.add("complete");
       if (specialPuzzleMode === "norigae") {
         finishTactilePuzzle(getPendingToolStep(currentEvidenceForTool)?.tool || "매듭 해체 송곳");
         return;
@@ -6669,7 +7272,7 @@
         return;
       }
       if (specialPuzzleMode === "diary") {
-        finishTactilePuzzle("촛불 비추기");
+        showDiaryRecoveredRecords();
         return;
       }
       if (specialPuzzleMode === "hopaeMark") { finishTactilePuzzle("먼지털이 붓"); return; }
@@ -6688,14 +7291,19 @@
       linkedPairs.add(pending.key);
       localStorage.setItem(linkedEvidenceKey, JSON.stringify([...linkedPairs]));
       document.querySelectorAll(`#toolEvidenceList [data-evidence="${pending.firstName}"], #toolEvidenceList [data-evidence="${pending.secondName}"]`).forEach((item) => item.classList.add("linked"));
-      const storyConclusion = evidenceConnections.find(([first, second]) => evidencePairKey(first, second) === pending.key)?.[2] || "두 증거가 같은 사건 흐름을 가리킵니다.";
+      const isHopaeChainStep = pending.key === evidencePairKey("호패 조각", "끊어진 호패끈")
+        || pending.key === evidencePairKey("호패 조각", "빈 호패 주머니");
+      const hopaeChainReveal = isHopaeChainStep ? getCompletedHopaeChainReveal(linkedPairs) : null;
+      const revealPending = hopaeChainReveal || pending;
+      const storyConclusion = hopaeChainReveal
+        ? "유문석이 현장에서 흘린 물건이라기보다 누군가 사랑방에서 꺼내 옮긴 증거일 가능성이 생겼습니다."
+        : evidenceConnections.find(([first, second]) => evidencePairKey(first, second) === pending.key)?.[2] || "두 증거가 같은 사건 흐름을 가리킵니다.";
       window.setTimeout(() => {
-        openGlobalPanel("toolPanel");
         const previewNote = document.querySelector("#toolPreviewNote");
-        if (previewNote) previewNote.textContent = sentenceBreakText(pending.comparison.result).split("\n").find(Boolean) || "두 증거의 관계를 확인했습니다.";
-        showToolConclusion(pending.firstName, pending.comparison.result, storyConclusion);
+        if (previewNote) previewNote.textContent = sentenceBreakText(revealPending.comparison.result).split("\n").find(Boolean) || "두 증거의 관계를 확인했습니다.";
+        showToolConclusion(revealPending.firstName, revealPending.comparison.result, storyConclusion);
         updateEvidenceThreadUI();
-        showToast("증거 연결 완료");
+        showEvidenceLinkReveal(revealPending, storyConclusion);
       }, 420);
       playSfx("evidence", 0.86);
     }
@@ -6754,7 +7362,7 @@
         document.querySelector("#specialPuzzleImage").src = getSpecialPuzzleImageSrc(folder, 4);
         tactilePuzzleProgress = -999;
         handle?.classList.add("complete");
-        finishTactilePuzzle(specialPuzzleMode === "bandage" ? "상처 대조첩" : "흙 대조 접시");
+        finishTactilePuzzle(specialPuzzleMode === "bandage" ? (getPendingToolStep(currentEvidenceForTool)?.tool || "혈흔 시험포") : "흙 대조 접시");
       }
     }
 
@@ -6808,10 +7416,6 @@
         openRubbingPuzzle();
         return;
       }
-      if (!tactilePuzzleBypass && toolName === "돋보기" && currentEvidenceForTool === "헐거워진 노리개") {
-        openNorigaePuzzle();
-        return;
-      }
       if (!tactilePuzzleBypass && toolName === "먼지털이 붓" && currentEvidenceForTool === "호패 조각") { openHopaeMarkPuzzle(); return; }
       if (!tactilePuzzleBypass && toolName === "먼지털이 붓" && currentEvidenceForTool === "도망 보따리") { openBundlePuzzle(); return; }
       if (!tactilePuzzleBypass && toolName === "돋보기" && currentEvidenceForTool === "돌쇠의 그림") {
@@ -6835,10 +7439,6 @@
         return;
       }
       if (!tactilePuzzleBypass && toolName === "매듭 해체 송곳") {
-        if (currentEvidenceForTool === "헐거워진 노리개") {
-          openNorigaePuzzle();
-          return;
-        }
         if (currentEvidenceForTool === "도망 보따리") {
           openBundlePuzzle();
           return;
@@ -7071,28 +7671,787 @@
       playSfx("evidence", 0.85);
       addEvidenceToBag("호패 조각");
       addEvidenceToNote("호패 조각");
+      showToast("", {
+        image: getEvidenceImage("호패 조각"),
+        title: getEvidenceDisplayName("호패 조각"),
+        dismissible: true,
+      });
     }
-    function collectPortrait() {
-      const alreadyCollected = portraitCollected || readStoredNames(collectedEvidenceKey).includes("돌쇠의 그림");
-      if (alreadyCollected) {
-        portraitCollected = true;
-        setAnalysisTarget("돌쇠의 그림");
-        openGlobalPanel("toolPanel");
+
+    const joseonRoomAuthorityRules = {
+      backGateCourtyard: {
+        id: "search-back-gate", kind: "search",
+        title: "뒷문 마당 수색",
+        lead: "피해자를 불러낸 문서를 전령에 올리고 관인을 찍으면 뒷문 마당을 수색할 수 있습니다.",
+        reason: "점순을 집 밖으로 불러낸 약속 편지가 발견되었습니다.",
+        hint: "사건 현장에서 찢어진 약속 편지를 먼저 확보하십시오.",
+        requirements: ["찢어진 약속 편지"]
+      },
+      yoomunseokSarangbang: {
+        id: "search-yoomunseok-room", kind: "search",
+        title: "유문석 사랑방 수색",
+        lead: "현장에서 찾은 물증을 전령에 올리고 관인을 찍으면 사랑방을 수색할 수 있습니다.",
+        reason: "피해 현장에서 유문석 집안과 이어지는 호패 조각이 발견되었습니다.",
+        hint: "사건 현장에서 호패 조각을 먼저 확보하십시오.",
+        requirements: ["호패 조각"]
+      },
+      chunwolRoom: {
+        id: "search-chunwol-room", kind: "search",
+        title: "춘월 방 수색",
+        lead: "서로 맞물리는 기록을 전령에 올리고 관인을 찍으면 춘월의 방을 수색할 수 있습니다.",
+        reason: "복원한 약속 편지와 무덕의 번진 일기가 같은 도망 계획을 가리킵니다.",
+        hint: "찢어진 약속 편지를 복원하고, 먹 번진 책자를 끝까지 읽으십시오.",
+        requirements: ["찢어진 약속 편지", "무덕의 번진 일기"],
+        analyzed: ["찢어진 약속 편지"]
+      }
+    };
+    let pendingJoseonAuthority = null;
+    const joseonSpatialSearches = {
+      "돌쇠의 그림": {
+        title: "병풍의 천자락 젖히기",
+        guide: "자주빛 천자락을 눌러 뒤쪽을 젖혀 보십시오.",
+        closed: "/samunmong/assets/interactions/spatial-search/chunwol-screen-covered-v1.png",
+        opened: "/samunmong/assets/interactions/spatial-search/chunwol-screen-revealed-v1.png",
+        empty: "/samunmong/assets/interactions/spatial-search/chunwol-screen-empty-v1.png",
+        handle: { x: 58, y: 18, w: 27, h: 70 },
+        axis: "x", direction: 1,
+        discovery: "천 뒤에서 묶인 두루마리가 드러났습니다."
+      },
+      "고름이 뜯긴 저고리": {
+        title: "안쪽 벽의 잠긴 의복장",
+        guide: "의복장 두 문짝 사이의 쇠 자물쇠를 살펴보십시오.",
+        lockedGuide: "작은 열쇠가 필요한 조선식 쇠 자물쇠다. 최근에도 여닫은 듯 열쇠 구멍의 먼지만 닦여 있다.",
+        requiredFieldTool: "작은 쇠열쇠",
+        closed: "/samunmong/assets/interactions/spatial-search/chunwol-separate-chest/chest-locked-v2.png",
+        opened: "/samunmong/assets/interactions/spatial-search/chunwol-separate-chest/chest-open-jeogori-v2.png",
+        empty: "/samunmong/assets/interactions/spatial-search/chunwol-separate-chest/chest-open-empty-v2.png",
+        handle: { x: 45, y: 39, w: 12, h: 25 },
+        axis: "y", direction: -1,
+        discovery: "열쇠가 맞았다. 열린 의복장 안에서 고름 한 짝이 뜯긴 자주빛 저고리가 드러났습니다."
+      },
+      "쇠열쇠": {
+        title: "검은 문갑 살피기",
+        guide: "문갑의 잠금쇠를 살펴보십시오.",
+        requiredFieldTool: "매화무늬 장열쇠",
+        lockedGuide: "문갑은 단단히 잠겨 있다. 방 주인이 아니라면 열쇠가 어디 있는지 알기 어렵다.",
+        closed: "/samunmong/assets/interactions/spatial-search/chunwol-key-cabinet/cabinet-closed-v1.png",
+        intermediate: "/samunmong/assets/interactions/spatial-search/chunwol-key-cabinet/drawer-open-false-bottom-v1.png",
+        opened: "/samunmong/assets/interactions/spatial-search/chunwol-key-cabinet/secret-key-v1.png",
+        empty: "/samunmong/assets/interactions/spatial-search/chunwol-key-cabinet/secret-empty-v1.png",
+        handle: { x: 20, y: 34, w: 64, h: 43 },
+        secondHandle: { x: 43, y: 43, w: 37, h: 25 },
+        axis: "y", direction: 1,
+        discovery: "헐거운 바닥판 아래의 숨은 칸에서 작은 쇠열쇠를 찾았습니다."
+      },
+      "빈 호패 주머니": {
+        title: "사랑방 책상 서랍 열기",
+        guide: "서랍의 작은 자물쇠를 살펴보십시오.",
+        requiredFieldTool: "놋쇠 고리열쇠",
+        lockedGuide: "호패함이 든 서랍은 잠겨 있다. 사랑방 안에 열쇠를 따로 두었을 법하다.",
+        closed: "/samunmong/assets/interactions/spatial-search/sarangbang-drawer-locked-v2.png",
+        opened: "/samunmong/assets/interactions/spatial-search/sarangbang-drawer-open-v1.png",
+        empty: "/samunmong/assets/interactions/spatial-search/sarangbang-drawer-empty-v1.png",
+        handle: { x: 38, y: 54, w: 25, h: 28 },
+        axis: "y", direction: 1,
+        discovery: "열린 서랍 안에서 가운데 자리만 빈 호패함이 드러났습니다."
+      },
+      "하인 장부": {
+        title: "쌓인 문서 더미 살피기",
+        guide: "남색 책의 책갈피를 눌러 문서 더미를 살펴보십시오.",
+        closed: "/samunmong/assets/interactions/spatial-search/sarangbang-ledger-covered-v1.png",
+        opened: "/samunmong/assets/interactions/spatial-search/sarangbang-ledger-revealed-v1.png",
+        empty: "/samunmong/assets/interactions/spatial-search/sarangbang-ledger-empty-v1.png",
+        handle: { x: 40, y: 47, w: 43, h: 32 },
+        axis: "x", direction: -1,
+        discovery: "큰 책 아래에서 먹으로 덧칠된 출입 장부가 드러났습니다."
+      },
+      "혼서 조각": {
+        title: "검은 문서함의 걸쇠 풀기",
+        guide: "문서함 앞의 잠금쇠를 살펴보십시오.",
+        requiredFieldTool: "놋쇠 고리열쇠",
+        lockedGuide: "혼서 문서함은 잠겨 있다. 사랑방 안에서 열쇠를 먼저 찾아야 한다.",
+        closed: "/samunmong/assets/interactions/spatial-search/sarangbang-honseo-locked-v1.png",
+        opened: "/samunmong/assets/interactions/spatial-search/sarangbang-honseo-revealed-v1.png",
+        empty: "/samunmong/assets/interactions/spatial-search/sarangbang-honseo-empty-v1.png",
+        handle: { x: 52, y: 38, w: 12, h: 24 },
+        axis: "y", direction: -1,
+        discovery: "열린 문서함 안에서 붉은 인장이 나뉜 혼서 조각이 드러났습니다."
+      },
+      "피 묻은 붕대": {
+        title: "침상 곁 작은 서랍 열기",
+        guide: "서랍의 쇠고리를 눌러 열어 보십시오.",
+        closed: "/samunmong/assets/interactions/spatial-search/dolsoe-bandage-drawer-closed-v1.png",
+        opened: "/samunmong/assets/interactions/spatial-search/dolsoe-bandage-drawer-open-v1.png",
+        empty: "/samunmong/assets/interactions/spatial-search/dolsoe-bandage-drawer-empty-v1.png",
+        handle: { x: 32, y: 43, w: 22, h: 31 },
+        axis: "y", direction: 1,
+        discovery: "열린 서랍 안에서 마른 피가 밴 붕대가 드러났습니다."
+      },
+      "도망 보따리": {
+        title: "작업대의 짚바구니 열기",
+        guide: "바구니 덮개의 고리를 눌러 덮개를 여십시오.",
+        closed: "/samunmong/assets/interactions/spatial-search/dolsoe-bundle-basket-closed-v1.png",
+        opened: "/samunmong/assets/interactions/spatial-search/dolsoe-bundle-basket-open-v1.png",
+        empty: "/samunmong/assets/interactions/spatial-search/dolsoe-bundle-basket-empty-v1.png",
+        handle: { x: 35, y: 31, w: 27, h: 29 },
+        axis: "x", direction: 1,
+        discovery: "덮개 아래에서 갈색 끈으로 단단히 묶인 모시 보따리가 드러났습니다."
+      },
+      "찢어진 약속 편지": {
+        title: "점순이 쥔 손 살피기",
+        guide: "손가락 사이의 종이 끝을 눌러 조심스럽게 꺼내십시오.",
+        closed: "/samunmong/assets/interactions/spatial-search/field-letter-hand-closed-v1.png",
+        opened: "/samunmong/assets/interactions/spatial-search/field-letter-hand-open-v1.png",
+        empty: "/samunmong/assets/interactions/spatial-search/field-letter-hand-empty-v1.png",
+        handle: { x: 57, y: 43, w: 23, h: 31 },
+        axis: "x", direction: 1,
+        discovery: "점순의 손 안에서 찢어진 글줄 세 조각이 드러났습니다."
+      },
+      "호패 조각": {
+        title: "점순의 겉옷 안쪽 살피기",
+        guide: "겹쳐진 겉옷 자락을 눌러 안쪽을 살펴보십시오.",
+        closed: "/samunmong/assets/interactions/spatial-search/field-hopae-clothing-closed-v1.png",
+        opened: "/samunmong/assets/interactions/spatial-search/field-hopae-clothing-open-v1.png",
+        empty: "/samunmong/assets/interactions/spatial-search/field-hopae-clothing-empty-v1.png",
+        handle: { x: 28, y: 38, w: 39, h: 35 },
+        axis: "y", direction: -1,
+        discovery: "겉옷 안쪽에서 끈이 없고 글자가 지워진 나무패 조각이 드러났습니다."
+      },
+      "무덕의 번진 일기": {
+        title: "궤짝 위 침구 더미 살피기",
+        guide: "윗이불의 앞쪽 모서리를 눌러 들춰 보십시오.",
+        closed: "/samunmong/assets/interactions/spatial-search/mudeok-diary-bedding-closed-v1.png",
+        opened: "/samunmong/assets/interactions/spatial-search/mudeok-diary-bedding-open-v2.png",
+        empty: "/samunmong/assets/interactions/spatial-search/mudeok-diary-bedding-empty-v1.png",
+        handle: { x: 41, y: 41, w: 43, h: 35 },
+        axis: "y", direction: -1,
+        discovery: "겹친 침구 사이에서 물과 먹이 번진 작은 일기장이 드러났습니다."
+      },
+      "진흙 묻은 짚신": {
+        title: "빨랫바구니 안쪽 살피기",
+        guide: "바구니에 걸친 천을 눌러 안쪽을 살펴보십시오.",
+        closed: "/samunmong/assets/interactions/spatial-search/mudeok-shoes-basket-closed-v1.png",
+        opened: "/samunmong/assets/interactions/spatial-search/mudeok-shoes-basket-open-v1.png",
+        empty: "/samunmong/assets/interactions/spatial-search/mudeok-shoes-basket-empty-v1.png",
+        handle: { x: 50, y: 39, w: 39, h: 47 },
+        axis: "x", direction: 1,
+        discovery: "걷힌 천 아래에서 가장자리에 젖은 흙이 남은 짚신 한 켤레가 드러났습니다."
+      },
+      "작은 발자국": {
+        title: "젖은 낙엽 아래 흔적 살피기",
+        guide: "한데 뭉친 젖은 낙엽과 짚을 눌러 걷어 내십시오.",
+        closed: "/samunmong/assets/interactions/spatial-search/backgate-footprints-covered-v1.png",
+        opened: "/samunmong/assets/interactions/spatial-search/backgate-footprints-revealed-v1.png",
+        empty: "/samunmong/assets/interactions/spatial-search/backgate-footprints-revealed-v1.png",
+        handle: { x: 32, y: 48, w: 42, h: 34 },
+        axis: "x", direction: -1,
+        discovery: "비에 씻겨 일부만 남은 작은 짚신 자국 세 곳이 불규칙하게 드러났습니다."
+      },
+      "끊어진 호패끈": {
+        title: "뒤집힌 짚바구니 들어 보기",
+        guide: "뒤집힌 짚바구니를 눌러 들어 보십시오.",
+        closed: "/samunmong/assets/interactions/spatial-search/backgate-cord-basket-closed-v1.png",
+        opened: "/samunmong/assets/interactions/spatial-search/backgate-cord-basket-open-v1.png",
+        empty: "/samunmong/assets/interactions/spatial-search/backgate-cord-basket-empty-v1.png",
+        handle: { x: 34, y: 35, w: 36, h: 43 },
+        axis: "x", direction: -1,
+        discovery: "바구니 아래에서 한쪽 끝이 거칠게 끊어진 붉은 호패끈이 드러났습니다."
+      },
+      "찢어진 옷고름": {
+        title: "금이 간 장독 열기",
+        guide: "장독은 단단히 봉해져 있다. 돌쇠 처소에서 챙긴 장작 도끼로 금 간 윗부분을 내리치십시오.",
+        closed: "/samunmong/assets/interactions/spatial-search/backgate-onggi-closed-v1.png",
+        opened: "/samunmong/assets/interactions/spatial-search/backgate-onggi-goreum-v1.png",
+        empty: "/samunmong/assets/interactions/spatial-search/backgate-onggi-empty-v1.png",
+        handle: { x: 35, y: 18, w: 34, h: 44 },
+        axis: "y", direction: 1,
+        discovery: "금 간 윗부분이 무너지자 짚 사이에 숨겨 둔 자주빛 옷고름이 드러났습니다."
+      }
+    };
+    let pendingSpatialSearch = null;
+    let spatialSearchDrag = null;
+    let selectedJoseonFieldTool = "";
+
+    // The room key previously appeared at the first crime scene and the two
+    // sarangbang locks could remain open from that test build. Migrate that
+    // invalid state once so the corrected investigation starts locked.
+    const yoomunseokLockMigrationKey = "samunmong-yoomunseok-lock-placement-v2";
+    if (localStorage.getItem(yoomunseokLockMigrationKey) !== "true") {
+      const migratedTools = readStoredNames(joseonFieldToolsKey).filter((name) => name !== "놋쇠 고리열쇠");
+      const migratedEvidence = readStoredNames(collectedEvidenceKey)
+        .filter((name) => !["빈 호패 주머니", "혼서 조각"].includes(name));
+      localStorage.setItem(joseonFieldToolsKey, JSON.stringify(migratedTools));
+      localStorage.setItem(collectedEvidenceKey, JSON.stringify(migratedEvidence));
+      localStorage.removeItem("samunmong-yoomunseok-hopae-drawer-unlocked-v1");
+      localStorage.removeItem("samunmong-yoomunseok-honseo-box-unlocked-v1");
+      localStorage.setItem(yoomunseokLockMigrationKey, "true");
+    }
+
+    const joseonKeyNameMigrationKey = "samunmong-joseon-key-names-v2";
+    if (localStorage.getItem(joseonKeyNameMigrationKey) !== "true") {
+      const renamedTools = readStoredNames(joseonFieldToolsKey).map((name) => {
+        if (name === "검은 문갑 열쇠") return "매화무늬 장열쇠";
+        if (name === "사랑방 쇠열쇠") return "놋쇠 고리열쇠";
+        return name;
+      });
+      localStorage.setItem(joseonFieldToolsKey, JSON.stringify([...new Set(renamedTools)]));
+      localStorage.setItem(joseonKeyNameMigrationKey, "true");
+    }
+
+    // Local QA shortcut: seed the three keys without changing the normal
+    // investigation and interrogation unlock conditions.
+    const localKeyTestEnabled = ["localhost", "127.0.0.1"].includes(window.location.hostname)
+      && new URLSearchParams(window.location.search).get("testKeys") === "1";
+    if (localKeyTestEnabled) {
+      const storedTools = readStoredNames(joseonFieldToolsKey);
+      localStorage.setItem(joseonFieldToolsKey, JSON.stringify([
+        ...new Set([...storedTools, "놋쇠 고리열쇠", "매화무늬 장열쇠", "작은 쇠열쇠"]),
+      ]));
+    }
+
+    function syncJoseonFieldToolsInBag() {
+      const section = document.querySelector("#joseonFieldTools");
+      const axeButton = document.querySelector("#selectJoseonFieldAxe");
+      const keyButton = document.querySelector("#selectJoseonFieldKey");
+      const cabinetKeyButton = document.querySelector("#selectJoseonCabinetKey");
+      const roomKeyButton = document.querySelector("#selectYoomunseokRoomKey");
+      const hasAxe = readStoredNames(joseonFieldToolsKey).includes("장작 도끼");
+      const hasKey = readStoredNames(joseonFieldToolsKey).includes("작은 쇠열쇠");
+      const hasCabinetKey = readStoredNames(joseonFieldToolsKey).includes("매화무늬 장열쇠");
+      const hasRoomKey = readStoredNames(joseonFieldToolsKey).includes("놋쇠 고리열쇠");
+      document.querySelectorAll('[data-evidence-name="놋쇠 고리열쇠"]').forEach((hotspot) => {
+        const roomKeyRevealed = localStorage.getItem("samunmong-yoomunseok-room-key-revealed-v1") === "true";
+        hotspot.classList.toggle("key-revealed", roomKeyRevealed && !hasRoomKey);
+        hotspot.classList.toggle("collected", hasRoomKey);
+        hotspot.setAttribute("aria-disabled", String(hasRoomKey));
+        if (hotspot instanceof HTMLButtonElement) hotspot.disabled = hasRoomKey;
+      });
+      const canUseAxe = pendingSpatialSearch?.name === "찢어진 옷고름"
+        && !pendingSpatialSearch.empty
+        && !pendingSpatialSearch.revealed;
+      if (section) section.hidden = !hasAxe && !hasKey && !hasCabinetKey && !hasRoomKey;
+      if (roomKeyButton) {
+        const canUseRoomKey = ["빈 호패 주머니", "혼서 조각"].includes(pendingSpatialSearch?.name)
+          && !pendingSpatialSearch.empty && !pendingSpatialSearch.revealed;
+        roomKeyButton.hidden = !hasRoomKey;
+        roomKeyButton.disabled = !canUseRoomKey;
+        roomKeyButton.setAttribute("aria-pressed", String(selectedJoseonFieldTool === "놋쇠 고리열쇠"));
+        roomKeyButton.querySelector("small").textContent = canUseRoomKey ? "사용하기" : "사랑방의 잠금쇠에 맞을까?";
+      }
+      if (cabinetKeyButton) {
+        const canUseCabinetKey = pendingSpatialSearch?.name === "쇠열쇠" && !pendingSpatialSearch.empty && !pendingSpatialSearch.revealed && pendingSpatialSearch.phase === 0;
+        cabinetKeyButton.hidden = !hasCabinetKey;
+        cabinetKeyButton.disabled = !canUseCabinetKey;
+        cabinetKeyButton.setAttribute("aria-pressed", String(selectedJoseonFieldTool === "매화무늬 장열쇠"));
+        cabinetKeyButton.querySelector("small").textContent = canUseCabinetKey ? "사용하기" : "무덕이 내놓은 열쇠";
+      }
+      if (keyButton) {
+        const canUseKey = pendingSpatialSearch?.name === "고름이 뜯긴 저고리" && !pendingSpatialSearch.empty && !pendingSpatialSearch.revealed;
+        keyButton.hidden = !hasKey;
+        keyButton.disabled = !canUseKey;
+        keyButton.setAttribute("aria-pressed", String(selectedJoseonFieldTool === "작은 쇠열쇠"));
+        const status = keyButton.querySelector("small");
+        if (status) status.textContent = canUseKey ? "사용하기" : "어디에 맞는 열쇠일까?";
+      }
+      if (axeButton) {
+        axeButton.disabled = !canUseAxe;
+        axeButton.setAttribute("aria-pressed", String(selectedJoseonFieldTool === "장작 도끼"));
+        const status = axeButton.querySelector("small");
+        if (status) status.textContent = canUseAxe ? "사용하기" : "어디에 쓸 수 있을까?";
+      }
+    }
+
+    function ensureJoseonFieldToolCursor() {
+      let cursor = document.querySelector("#joseonFieldToolCursor");
+      if (cursor) return cursor;
+      cursor = document.createElement("img");
+      cursor.id = "joseonFieldToolCursor";
+      cursor.className = "joseon-field-tool-cursor";
+      cursor.alt = "";
+      cursor.setAttribute("aria-hidden", "true");
+      cursor.src = "/samunmong/assets/evidence-transparent/field-tool-chopping-axe-v1.png";
+      document.body.appendChild(cursor);
+      return cursor;
+    }
+
+    function resetJoseonFieldTool() {
+      selectedJoseonFieldTool = "";
+      document.body.classList.remove("joseon-field-tool-cursor-active");
+      document.querySelector("#joseonFieldToolCursor")?.classList.remove("show");
+      document.querySelector("#spatialSearchStage")?.classList.remove("field-tool-selected");
+      syncJoseonFieldToolsInBag();
+    }
+
+    function activateJoseonAxe() {
+      if (!readStoredNames(joseonFieldToolsKey).includes("장작 도끼")
+        || pendingSpatialSearch?.name !== "찢어진 옷고름"
+        || pendingSpatialSearch.empty
+        || pendingSpatialSearch.revealed) return false;
+      selectedJoseonFieldTool = "장작 도끼";
+      const cursor = ensureJoseonFieldToolCursor();
+      cursor.src = "/samunmong/assets/evidence-transparent/field-tool-chopping-axe-v1.png";
+      cursor.classList.add("show");
+      document.body.classList.add("joseon-field-tool-cursor-active");
+      document.querySelector("#spatialSearchStage")?.classList.add("field-tool-selected");
+      const guide = document.querySelector("#spatialSearchGuide");
+      if (guide && pendingSpatialSearch?.name === "찢어진 옷고름") {
+        guide.hidden = false;
+        guide.textContent = "장작 도끼를 들었습니다. 금이 간 장독 윗부분을 내리치십시오.";
+      }
+      syncJoseonFieldToolsInBag();
+      return true;
+    }
+
+    function activateJoseonKey() {
+      if (!readStoredNames(joseonFieldToolsKey).includes("작은 쇠열쇠")
+        || pendingSpatialSearch?.name !== "고름이 뜯긴 저고리"
+        || pendingSpatialSearch.empty || pendingSpatialSearch.revealed) return false;
+      selectedJoseonFieldTool = "작은 쇠열쇠";
+      const cursor = ensureJoseonFieldToolCursor();
+      cursor.src = "/samunmong/assets/evidence-transparent/field-tool-joseon-wardrobe-key-v1.png";
+      cursor.classList.add("show");
+      document.body.classList.add("joseon-field-tool-cursor-active");
+      document.querySelector("#spatialSearchStage")?.classList.add("field-tool-selected");
+      syncJoseonFieldToolsInBag();
+      return true;
+    }
+
+    function activateJoseonCabinetKey() {
+      if (!readStoredNames(joseonFieldToolsKey).includes("매화무늬 장열쇠")
+        || pendingSpatialSearch?.name !== "쇠열쇠" || pendingSpatialSearch.empty
+        || pendingSpatialSearch.revealed || pendingSpatialSearch.phase !== 0) return false;
+      selectedJoseonFieldTool = "매화무늬 장열쇠";
+      const cursor = ensureJoseonFieldToolCursor();
+      cursor.src = "/samunmong/assets/evidence-transparent/field-tool-joseon-black-cabinet-key-v1.png";
+      cursor.classList.add("show");
+      document.body.classList.add("joseon-field-tool-cursor-active");
+      document.querySelector("#spatialSearchStage")?.classList.add("field-tool-selected");
+      syncJoseonFieldToolsInBag();
+      return true;
+    }
+
+    function activateYoomunseokRoomKey() {
+      if (!readStoredNames(joseonFieldToolsKey).includes("놋쇠 고리열쇠")
+        || !["빈 호패 주머니", "혼서 조각"].includes(pendingSpatialSearch?.name)
+        || pendingSpatialSearch.empty || pendingSpatialSearch.revealed) return false;
+      selectedJoseonFieldTool = "놋쇠 고리열쇠";
+      const cursor = ensureJoseonFieldToolCursor();
+      cursor.src = "/samunmong/assets/evidence-transparent/field-tool-joseon-sarangbang-key-v1.png";
+      cursor.classList.add("show");
+      document.body.classList.add("joseon-field-tool-cursor-active");
+      document.querySelector("#spatialSearchStage")?.classList.add("field-tool-selected");
+      syncJoseonFieldToolsInBag();
+      return true;
+    }
+
+    function moveJoseonFieldToolCursor(event) {
+      const cursor = document.querySelector("#joseonFieldToolCursor");
+      if (!cursor?.classList.contains("show")) return;
+      cursor.style.left = `${event.clientX - 42}px`;
+      cursor.style.top = `${event.clientY - 58}px`;
+    }
+
+    function openJoseonSpatialSearch(name, hotspot) {
+      if (!isJoseonToolInteraction || !hotspot) return false;
+      const config = joseonSpatialSearches[name];
+      if (!config) return false;
+      resetJoseonFieldTool();
+      const alreadyCollected = hotspot.classList.contains("collected")
+        || readStoredNames(collectedEvidenceKey).includes(name)
+        || (name === "쇠열쇠" && readStoredNames(joseonFieldToolsKey).includes("작은 쇠열쇠"))
+        || (name === "놋쇠 고리열쇠" && readStoredNames(joseonFieldToolsKey).includes("놋쇠 고리열쇠"));
+      // Collected evidence stays collected. Reopening the detail starts with the
+      // furniture/cover closed so only that physical layer can be toggled again.
+      pendingSpatialSearch = { name, hotspot, config, revealed: false, empty: alreadyCollected, closing: false, phase: 0 };
+      spatialSearchDrag = null;
+      const panel = document.querySelector("#spatialSearchPanel");
+      const stage = document.querySelector("#spatialSearchStage");
+      const image = document.querySelector("#spatialSearchImage");
+      const handle = document.querySelector("#spatialSearchHandle");
+      const discovery = document.querySelector("#spatialSearchDiscovery");
+      const guide = document.querySelector("#spatialSearchGuide");
+      if (!panel || !stage || !image || !handle || !discovery) return false;
+      panel.querySelector("#spatialSearchTitle").textContent = config.title;
+      image.src = config.closed;
+      image.alt = alreadyCollected ? `${config.title} · 증거를 가져간 뒤 다시 닫힌 상태` : `${config.title} 전`;
+      handle.style.setProperty("--spatial-x", `${config.handle.x}%`);
+      handle.style.setProperty("--spatial-y", `${config.handle.y}%`);
+      handle.style.setProperty("--spatial-w", `${config.handle.w}%`);
+      handle.style.setProperty("--spatial-h", `${config.handle.h}%`);
+      handle.dataset.spatialAxis = config.axis;
+      handle.style.removeProperty("--spatial-drag-x");
+      handle.style.removeProperty("--spatial-drag-y");
+      handle.hidden = false;
+      discovery.hidden = true;
+      if (guide) {
+        guide.hidden = true;
+        guide.textContent = "";
+      }
+      stage.classList.remove("revealed", "dragging", "closing-object", "field-tool-selected");
+      stage.classList.toggle("field-tool-required", ["찢어진 옷고름", "고름이 뜯긴 저고리", "빈 호패 주머니", "혼서 조각"].includes(name) && !alreadyCollected);
+      stage.classList.toggle("collected", alreadyCollected);
+      openGlobalPanel("spatialSearchPanel");
+      playSfx("paper", 0.5);
+      return true;
+    }
+
+    function revealJoseonSpatialSearch() {
+      if (!pendingSpatialSearch || pendingSpatialSearch.revealed || pendingSpatialSearch.closing) return;
+      const spatialUnlockKey = pendingSpatialSearch.name === "쇠열쇠"
+        ? "samunmong-chunwol-key-cabinet-unlocked-v1"
+        : pendingSpatialSearch.name === "고름이 뜯긴 저고리"
+          ? "samunmong-chunwol-wardrobe-unlocked-v1"
+          : pendingSpatialSearch.name === "빈 호패 주머니"
+            ? "samunmong-yoomunseok-hopae-drawer-unlocked-v1"
+            : pendingSpatialSearch.name === "혼서 조각"
+              ? "samunmong-yoomunseok-honseo-box-unlocked-v1"
+          : "";
+      const requiresToolNow = pendingSpatialSearch.config.requiredFieldTool
+        && !pendingSpatialSearch.empty
+        && (!pendingSpatialSearch.config.intermediate || pendingSpatialSearch.phase === 0);
+      if (requiresToolNow && selectedJoseonFieldTool !== pendingSpatialSearch.config.requiredFieldTool) {
+        if (pendingSpatialSearch.name === "쇠열쇠") {
+          localStorage.setItem("samunmong-chunwol-cabinet-lock-seen-v1", "true");
+          addObservationToNote("잠긴 검은 문갑", "춘월의 검은 문갑은 단단히 잠겨 있다. 방 사정을 아는 사람에게 열쇠의 행방을 물어야 한다.");
+        }
+        const guide = document.querySelector("#spatialSearchGuide");
+        if (guide) {
+          guide.hidden = false;
+          guide.textContent = readStoredNames(joseonFieldToolsKey).includes(pendingSpatialSearch.config.requiredFieldTool)
+            ? "자물쇠와 맞을 만한 열쇠를 보따리에서 골라야 한다."
+            : pendingSpatialSearch.config.lockedGuide;
+        }
+        playSfx("buttonAlt", 0.48);
         return;
       }
-      portraitCollected = true;
+      if (requiresToolNow && selectedJoseonFieldTool === pendingSpatialSearch.config.requiredFieldTool && spatialUnlockKey) {
+        localStorage.setItem(spatialUnlockKey, "true");
+        if (["빈 호패 주머니", "혼서 조각"].includes(pendingSpatialSearch.name)) {
+          resetJoseonFieldTool();
+        }
+        if (pendingSpatialSearch.name === "고름이 뜯긴 저고리"
+          && localStorage.getItem("samunmong-chunwol-wardrobe-reveal-seen-v2") !== "true") {
+          pendingSpatialSearch.empty = false;
+        }
+      }
+      if (pendingSpatialSearch.config.intermediate && pendingSpatialSearch.phase === 0 && !pendingSpatialSearch.empty) {
+        if (pendingSpatialSearch.config.requiredFieldTool) resetJoseonFieldTool();
+        pendingSpatialSearch.phase = 1;
+        const { config } = pendingSpatialSearch;
+        const image = document.querySelector("#spatialSearchImage");
+        const handle = document.querySelector("#spatialSearchHandle");
+        const guide = document.querySelector("#spatialSearchGuide");
+        if (image) { image.src = config.intermediate; image.alt = "열린 서랍 안쪽. 바닥판 한쪽에 미세한 틈이 있다."; }
+        if (handle && config.secondHandle) {
+          handle.style.setProperty("--spatial-x", `${config.secondHandle.x}%`);
+          handle.style.setProperty("--spatial-y", `${config.secondHandle.y}%`);
+          handle.style.setProperty("--spatial-w", `${config.secondHandle.w}%`);
+          handle.style.setProperty("--spatial-h", `${config.secondHandle.h}%`);
+        }
+        if (guide) { guide.hidden = true; guide.textContent = ""; }
+        playSfx("paper", 0.68);
+        return;
+      }
+      if (pendingSpatialSearch.config.intermediate && pendingSpatialSearch.phase === 0 && pendingSpatialSearch.empty) {
+        pendingSpatialSearch.phase = 1;
+        const { config } = pendingSpatialSearch;
+        const image = document.querySelector("#spatialSearchImage");
+        const handle = document.querySelector("#spatialSearchHandle");
+        if (image) image.src = config.empty;
+        if (handle && config.secondHandle) {
+          handle.style.setProperty("--spatial-x", `${config.secondHandle.x}%`);
+          handle.style.setProperty("--spatial-y", `${config.secondHandle.y}%`);
+          handle.style.setProperty("--spatial-w", `${config.secondHandle.w}%`);
+          handle.style.setProperty("--spatial-h", `${config.secondHandle.h}%`);
+        }
+        resetJoseonFieldTool();
+        playSfx("paper", 0.68);
+        return;
+      }
+      if (pendingSpatialSearch.config.requiresEvidence
+        && !pendingSpatialSearch.empty
+        && !readStoredNames(collectedEvidenceKey).includes(pendingSpatialSearch.config.requiresEvidence)) {
+        const guide = document.querySelector("#spatialSearchGuide");
+        if (guide) {
+          guide.hidden = false;
+          guide.textContent = pendingSpatialSearch.config.lockedGuide || "잠겨 있어 지금은 열 수 없다.";
+        }
+        playSfx("buttonAlt", 0.5);
+        return;
+      }
+      if (pendingSpatialSearch.name === "찢어진 옷고름" && !pendingSpatialSearch.empty && selectedJoseonFieldTool !== "장작 도끼") {
+        const guide = document.querySelector("#spatialSearchGuide");
+        if (guide) {
+          guide.hidden = false;
+          guide.textContent = "맨손으로는 잘 깨지지 않는다.";
+        }
+        playSfx("buttonAlt", 0.48);
+        return;
+      }
+      pendingSpatialSearch.revealed = true;
+      const { config, empty } = pendingSpatialSearch;
+      const stage = document.querySelector("#spatialSearchStage");
+      const image = document.querySelector("#spatialSearchImage");
+      const handle = document.querySelector("#spatialSearchHandle");
+      const discovery = document.querySelector("#spatialSearchDiscovery");
+      const guide = document.querySelector("#spatialSearchGuide");
+      if (image) {
+        image.src = empty ? config.empty : config.opened;
+        image.alt = empty ? `${config.title} · 증거를 가져간 뒤의 빈자리` : config.discovery;
+      }
+      if (handle) handle.hidden = !empty;
+      if (discovery) {
+        discovery.textContent = empty ? "" : config.discovery;
+        discovery.setAttribute("aria-label", empty ? "" : `${config.discovery} 보따리에 넣기`);
+        discovery.hidden = empty;
+      }
+      stage?.classList.remove("dragging");
+      stage?.classList.add("revealed");
+      if (pendingSpatialSearch.name === "찢어진 옷고름" && !empty) {
+        stage?.classList.remove("field-tool-required", "field-tool-selected");
+        resetJoseonFieldTool();
+        playSfx("evidence", 0.82);
+      }
+      if (pendingSpatialSearch.name === "고름이 뜯긴 저고리" && !empty) {
+        stage?.classList.remove("field-tool-required", "field-tool-selected");
+        resetJoseonFieldTool();
+        playSfx("evidence", 0.78);
+      }
+      if (guide) {
+        guide.hidden = true;
+        guide.textContent = "";
+      }
+      playSfx("paper", 0.82);
+    }
+
+    function collectPendingSpatialEvidence() {
+      if (!pendingSpatialSearch?.revealed || pendingSpatialSearch.empty) return;
+      const { name, hotspot, config } = pendingSpatialSearch;
+      if (name === "고름이 뜯긴 저고리") {
+        localStorage.setItem("samunmong-chunwol-wardrobe-reveal-seen-v2", "true");
+      }
+      pendingSpatialSearch.empty = true;
+      const stage = document.querySelector("#spatialSearchStage");
+      const image = document.querySelector("#spatialSearchImage");
+      const discovery = document.querySelector("#spatialSearchDiscovery");
+      const guide = document.querySelector("#spatialSearchGuide");
+      if (image) {
+        image.src = config.empty;
+        image.alt = `${config.title} · 증거를 가져간 뒤의 빈자리`;
+      }
+      if (discovery) discovery.hidden = true;
+      const handle = document.querySelector("#spatialSearchHandle");
+      if (handle) handle.hidden = false;
+      if (guide) {
+        guide.hidden = true;
+        guide.textContent = "";
+      }
+      stage?.classList.add("collected");
+      if (name === "쇠열쇠") {
+        const stored = readStoredNames(joseonFieldToolsKey);
+        if (!stored.includes("작은 쇠열쇠")) {
+          window.localStorage.setItem(joseonFieldToolsKey, JSON.stringify([...stored, "작은 쇠열쇠"]));
+          window.dispatchEvent(new CustomEvent("samunmong:joseon-field-tool-acquired", { detail: { name: "작은 쇠열쇠" } }));
+        }
+        hotspot.classList.add("collected");
+        return;
+      }
+      beginEvidenceCollection(name, hotspot);
+    }
+
+    function closeCollectedJoseonSpatialSearch() {
+      if (!pendingSpatialSearch?.empty || pendingSpatialSearch.closing) return false;
+      pendingSpatialSearch.closing = true;
+      const { config } = pendingSpatialSearch;
+      const stage = document.querySelector("#spatialSearchStage");
+      const image = document.querySelector("#spatialSearchImage");
+      const guide = document.querySelector("#spatialSearchGuide");
+      if (image) {
+        image.src = config.closed;
+        image.alt = `${config.title} · 다시 닫힌 상태`;
+      }
+      if (guide) {
+        guide.hidden = true;
+        guide.textContent = "";
+      }
+      stage?.classList.add("closing-object");
+      playSfx("paper", 0.64);
+      window.setTimeout(() => {
+        stage?.classList.remove("closing-object", "revealed");
+        stage?.classList.add("collected");
+        if (pendingSpatialSearch) {
+          pendingSpatialSearch.revealed = false;
+          pendingSpatialSearch.closing = false;
+        }
+      }, 280);
+      return true;
+    }
+
+    function getJoseonAuthorityState(rule) {
+      const collected = new Set(readStoredNames(collectedEvidenceKey));
+      const missing = (rule.requirements || []).filter((name) => !collected.has(name));
+      const unanalyzed = (rule.analyzed || []).filter((name) => !hasAuthorityEvidenceBeenRead(name));
+      const traceMissing = rule.dreamTrace && !readStoredNames(joseonDreamTraceViewedKey).includes(rule.dreamTrace);
+      return { ready: missing.length === 0 && unanalyzed.length === 0 && !traceMissing, missing, unanalyzed, traceMissing };
+    }
+
+    function hasAuthorityEvidenceBeenRead(name) {
+      const analyzed = readStoredNames(analyzedEvidenceKey);
+      if (analyzed.includes(name) || analyzed.some((entry) => entry.startsWith(`${name}::`))) return true;
+      const examined = readStored(examinedCluesKey, []);
+      return Array.isArray(examined) && examined.some((entry) => entry?.source === name);
+    }
+
+    function syncJoseonAuthorityMapPins() {
+      if (!isJoseonToolInteraction) return;
+      const authorized = new Set(readStoredNames(joseonInvestigationAuthorityKey));
+      const lockedRooms = {
+        backGateCourtyard: "search-back-gate",
+        chunwolRoom: "search-chunwol-room",
+        yoomunseokSarangbang: "search-yoomunseok-room"
+      };
+      Object.entries(lockedRooms).forEach(([screenId, authorityId]) => {
+        const pin = document.querySelector(`.map-pin-button[data-location-screen="${screenId}"]`);
+        const label = document.querySelector(`.map-label[data-location-screen="${screenId}"]`);
+        if (!(pin instanceof HTMLButtonElement)) return;
+        const locked = !authorized.has(authorityId);
+        const baseLabel = pin.dataset.baseAriaLabel || pin.getAttribute("aria-label") || "장소로 이동";
+        pin.dataset.baseAriaLabel = baseLabel.replace(/^잠김 · /, "");
+        pin.classList.toggle("authority-locked", locked);
+        pin.setAttribute("aria-label", locked ? `잠김 · ${pin.dataset.baseAriaLabel}` : pin.dataset.baseAriaLabel);
+        pin.removeAttribute("aria-disabled");
+        pin.title = locked ? "수색 전령이 필요합니다." : pin.dataset.baseAriaLabel;
+        label?.classList.toggle("authority-locked", locked);
+      });
+    }
+
+    function renderJoseonAuthorityEvidence(panel, rule, state) {
+      const row = panel?.querySelector("#joseonAuthorityEvidence");
+      if (!row) return;
+      const collected = new Set(readStoredNames(collectedEvidenceKey));
+      const requirements = rule.requirements || [];
+      if (!requirements.length) {
+        row.innerHTML = "";
+        return;
+      }
+      row.classList.toggle("multiple", requirements.length > 1);
+      row.innerHTML = requirements.map((name) => {
+        const needsAnalysis = (rule.analyzed || []).includes(name);
+        const needsTrace = rule.dreamTrace === name;
+        const hasItem = collected.has(name);
+        const analysisReady = !needsAnalysis || hasAuthorityEvidenceBeenRead(name);
+        const traceReady = !needsTrace || !state.traceMissing;
+        const ready = hasItem && analysisReady && traceReady;
+        const status = !hasItem
+          ? "미확보"
+          : !analysisReady
+            ? (name === "무덕의 번진 일기" ? "먹 번진 책자 읽기 필요" : "복원 필요")
+            : !traceReady
+              ? "꿈자취 확인 필요"
+              : "근거 성립";
+        return `<span class="joseon-authority-evidence-card${ready ? " ready" : " missing"}">
+          <img src="${escapeHtml(getEvidenceImage(name))}" alt="${escapeHtml(getEvidenceDisplayName(name))}">
+          <span><b>${escapeHtml(getEvidenceDisplayName(name))}</b><small>${escapeHtml(status)}</small></span>
+        </span>`;
+      }).join("");
+    }
+
+    function requestJoseonRoomAuthority(screenId) {
+      const rule = joseonRoomAuthorityRules[screenId];
+      if (!rule) return;
+      const state = getJoseonAuthorityState(rule);
+      pendingJoseonAuthority = { screenId, rule, state };
+      const panel = document.querySelector("#joseonAuthorityPanel");
+      if (!panel) return;
+      panel.classList.add("room-authority");
+      panel.classList.remove("order-open");
+      panel.classList.toggle("authority-ready", state.ready);
+      panel.querySelector("#joseonAuthorityKicker").textContent = "수색 전령";
+      panel.querySelector("#joseonAuthorityTitle").textContent = `${rule.title} 전령`;
+      panel.querySelector("#joseonAuthorityLead").textContent = "필요한 증거를 확인하고 관인을 찍으십시오.";
+      panel.querySelector("#joseonAuthorityReason").textContent = state.ready
+        ? "수색할 근거가 갖춰졌습니다."
+        : "수색 근거가 부족합니다.";
+      panel.querySelector("#joseonAuthorityHint").textContent = state.ready
+        ? "오른쪽 관인을 눌러 전령을 완성하십시오."
+        : "표시된 증거를 먼저 확보하십시오.";
+      renderJoseonAuthorityEvidence(panel, rule, state);
+      panel.querySelector("#joseonAuthorityPlaque").src = "/samunmong/assets/interactions/sato-skills/official-seal/objects/seal-inked.png";
+      panel.querySelector("#joseonAuthorityPlaque").alt = "관인";
+      panel.querySelector("#joseonAuthorityAction").textContent = "수색 전령 확정하기";
+      panel.querySelector("#issueJoseonAuthority").disabled = !state.ready;
+      openGlobalPanel("joseonAuthorityPanel");
+      playSfx("buttonAlt", 0.58);
+    }
+
+    window.addEventListener("samunmong:joseon-room-access-request", (event) => {
+      requestJoseonRoomAuthority(event.detail?.screenId);
+    });
+
+    window.addEventListener("samunmong:joseon-field-tool-acquired", (event) => {
+      if (!["장작 도끼", "작은 쇠열쇠", "매화무늬 장열쇠", "놋쇠 고리열쇠"].includes(event.detail?.name)) return;
+      syncJoseonFieldToolsInBag();
+      const showFieldToolTutorial = localStorage.getItem(joseonFieldToolTutorialSeenKey) !== "true";
+      if (showFieldToolTutorial) localStorage.setItem(joseonFieldToolTutorialSeenKey, "true");
+      const fieldToolImages = {
+        "장작 도끼": "/samunmong/assets/evidence-transparent/field-tool-chopping-axe-v1.png",
+        "작은 쇠열쇠": "/samunmong/assets/evidence-transparent/field-tool-joseon-wardrobe-key-v1.png",
+        "매화무늬 장열쇠": "/samunmong/assets/evidence-transparent/field-tool-joseon-black-cabinet-key-v1.png",
+        "놋쇠 고리열쇠": "/samunmong/assets/evidence-transparent/field-tool-joseon-sarangbang-key-v1.png",
+      };
+      showToast(showFieldToolTutorial ? "보따리에서 도구를 선택해 사용하십시오. 마우스 오른쪽 버튼을 누르면 도구를 내려놓습니다." : "", {
+        image: fieldToolImages[event.detail?.name] || "/samunmong/assets/evidence-transparent/field-tool-chopping-axe-v1.png",
+        title: event.detail?.name,
+        dismissible: true,
+      });
+      playSfx("evidence", 0.66);
+    });
+
+    function collectPortrait() {
+      const alreadyCollected = portraitCollected || readStoredNames(collectedEvidenceKey).includes("돌쇠의 그림");
       const portraitHotspot = document.querySelector("#portraitHotspot");
+      if (alreadyCollected) {
+        portraitCollected = true;
+        if (portraitHotspot) openJoseonSpatialSearch("돌쇠의 그림", portraitHotspot);
+        return;
+      }
+      if (portraitHotspot && openJoseonSpatialSearch("돌쇠의 그림", portraitHotspot)) return;
+      portraitCollected = true;
       if (portraitHotspot) beginEvidenceCollection("돌쇠의 그림", portraitHotspot);
       const collectButton = document.querySelector("#collectPortrait");
       if (collectButton) collectButton.textContent = "보따리에서 분석하기";
       hideInspectPanels();
     }
     function showGenericEvidence(name, hotspot) {
+      if (name === "놋쇠 고리열쇠") {
+        if (!hotspot.classList.contains("key-revealed")) {
+          hotspot.classList.add("key-revealed");
+          hotspot.setAttribute("aria-label", "붓통 사이에서 들어 올린 사랑방 놋쇠 열쇠 줍기");
+          localStorage.setItem("samunmong-yoomunseok-room-key-revealed-v1", "true");
+          playSfx("paper", 0.5);
+          return;
+        }
+        const stored = readStoredNames(joseonFieldToolsKey);
+        if (!stored.includes(name)) {
+          window.localStorage.setItem(joseonFieldToolsKey, JSON.stringify([...stored, name]));
+          window.dispatchEvent(new CustomEvent("samunmong:joseon-field-tool-acquired", { detail: { name } }));
+        }
+        localStorage.removeItem("samunmong-yoomunseok-room-key-revealed-v1");
+        hotspot.classList.add("collected");
+        hotspot.setAttribute("aria-disabled", "true");
+        if (hotspot instanceof HTMLButtonElement) hotspot.disabled = true;
+        return;
+      }
       const data = evidenceData[name] || {};
       pendingEvidenceName = name;
       pendingEvidenceHotspot = hotspot;
       const alreadyCollected = hotspot.classList.contains("collected");
+      if (alreadyCollected && joseonSpatialSearches[name]) {
+        openJoseonSpatialSearch(name, hotspot);
+        return;
+      }
       if (!alreadyCollected) {
+        if (openJoseonSpatialSearch(name, hotspot)) return;
         beginEvidenceCollection(name, hotspot);
         return;
       }
@@ -7117,7 +8476,7 @@
       addEvidenceToBag(name);
       addEvidenceToNote(name);
       if (evidenceData[name]?.tool) setAnalysisTarget(name);
-      showToast("보따리에 담았습니다.", {
+      showToast("", {
         image: getEvidenceImage(name),
         title: getEvidenceDisplayName(name),
         dismissible: true,
@@ -7126,9 +8485,106 @@
       pendingEvidenceHotspot = null;
     }
 
+    function showEvidenceAcquisitionPopup(name) {
+      showToast("", {
+        image: getEvidenceImage(name),
+        title: getEvidenceDisplayName(name),
+        dismissible: true,
+      });
+    }
+
     document.addEventListener("click", (event) => {
       const target = event.target instanceof Element ? event.target : null;
       if (!target) return;
+
+      if (target.closest("#selectJoseonFieldAxe")) {
+        if (activateJoseonAxe()) {
+          setEvidenceBag(false);
+          playSfx("buttonAlt", 0.62);
+        }
+        return;
+      }
+      if (target.closest("#selectJoseonFieldKey")) {
+        if (activateJoseonKey()) {
+          setEvidenceBag(false);
+          playSfx("buttonAlt", 0.62);
+        }
+        return;
+      }
+      if (target.closest("#selectJoseonCabinetKey")) {
+        if (activateJoseonCabinetKey()) {
+          setEvidenceBag(false);
+          playSfx("buttonAlt", 0.62);
+        }
+        return;
+      }
+      if (target.closest("#selectYoomunseokRoomKey")) {
+        if (activateYoomunseokRoomKey()) {
+          setEvidenceBag(false);
+          playSfx("buttonAlt", 0.62);
+        }
+        return;
+      }
+      if (target.closest("#unrollJoseonOrder")) {
+        const panel = target.closest("#joseonAuthorityPanel");
+        panel?.classList.add("order-open");
+        panel?.classList.remove("order-sealed");
+        playSfx("paper", 0.76);
+        return;
+      }
+      if (target.closest("#spatialSearchHandle")) {
+        if (pendingSpatialSearch?.empty && pendingSpatialSearch.revealed) closeCollectedJoseonSpatialSearch();
+        else revealJoseonSpatialSearch();
+        return;
+      }
+      const clickedRevealedSpatialEvidence = target.closest("#spatialSearchStage")
+        && !target.closest("#spatialSearchHandle")
+        && !target.closest(".spatial-search-guide");
+      if (clickedRevealedSpatialEvidence && pendingSpatialSearch?.empty) {
+        if (pendingSpatialSearch.revealed) closeCollectedJoseonSpatialSearch();
+        else revealJoseonSpatialSearch();
+        return;
+      }
+      if (target.closest("#spatialSearchDiscovery") || clickedRevealedSpatialEvidence) {
+        collectPendingSpatialEvidence();
+        return;
+      }
+      if (target.closest("#issueJoseonAuthority")) {
+        if (!pendingJoseonAuthority?.state.ready) return;
+        const authorityPanel = target.closest("#joseonAuthorityPanel");
+        const seal = authorityPanel?.querySelector("#joseonAuthorityPlaque");
+        const stampTarget = authorityPanel?.querySelector("#joseonOrderStampTarget");
+        if (seal && stampTarget) {
+          const sealRect = seal.getBoundingClientRect();
+          const targetRect = stampTarget.getBoundingClientRect();
+          authorityPanel.style.setProperty("--seal-travel-x", `${targetRect.left + targetRect.width / 2 - (sealRect.left + sealRect.width / 2)}px`);
+          authorityPanel.style.setProperty("--seal-travel-y", `${targetRect.top + targetRect.height / 2 - (sealRect.top + sealRect.height / 2)}px`);
+        }
+        authorityPanel?.classList.remove("order-sealed");
+        authorityPanel?.classList.add("seal-striking");
+        const authorized = new Set(readStoredNames(joseonInvestigationAuthorityKey));
+        authorized.add(pendingJoseonAuthority.rule.id);
+        localStorage.setItem(joseonInvestigationAuthorityKey, JSON.stringify([...authorized]));
+        syncJoseonAuthorityMapPins();
+        const { name, hotspot, screenId } = pendingJoseonAuthority;
+        pendingJoseonAuthority = null;
+        window.setTimeout(() => {
+          authorityPanel?.classList.add("order-sealed");
+          playSfx("evidence", 0.86);
+        }, 650);
+        if (screenId) {
+          window.setTimeout(() => {
+            closeGlobalPanel();
+            go(screenId, "수색 전령을 내리고 이동 중...");
+          }, 1450);
+        } else {
+          window.setTimeout(() => {
+            closeGlobalPanel();
+            beginEvidenceCollection(name, hotspot);
+          }, 1450);
+        }
+        return;
+      }
 
       if (!target.closest(".space-power-access-help")) {
         setSpacePowerAccessHelp(false);
@@ -7220,6 +8676,9 @@
       const hotspot = target.closest("[data-evidence-name], #hopaeHotspot, #portraitHotspot");
       if (!hotspot) return;
       if (hotspot.classList.contains("collected") || hotspot.getAttribute("aria-disabled") === "true") {
+        if (hotspot.classList.contains("concealed-space-hotspot") && openJoseonSpatialSearch(hotspot.dataset.evidenceName, hotspot)) {
+          return;
+        }
         if (isSpaceTheme && detailedSpaceEvidence[hotspot.dataset.evidenceName]) {
           setSpaceEvidenceDetail(true, hotspot.dataset.evidenceName);
           playSfx("buttonAlt", 0.48);
@@ -7231,10 +8690,12 @@
       if (hotspot.id === "hopaeHotspot") {
         const hasHopae = readStoredNames(collectedEvidenceKey).includes("호패 조각");
         if (!hasHopae) {
+          if (openJoseonSpatialSearch("호패 조각", hotspot)) return;
           hopaeCollected = true;
           beginEvidenceCollection("호패 조각", hotspot);
         } else {
           hopaeCollected = true;
+          if (openJoseonSpatialSearch("호패 조각", hotspot)) return;
           addEvidenceCardToInterrogation("호패 조각");
           setAnalysisTarget("호패 조각");
           showInspect("#hopaeInspect");
@@ -7247,9 +8708,52 @@
       }
       showGenericEvidence(hotspot.dataset.evidenceName, hotspot);
     });
+
+    const spatialSearchHandle = document.querySelector("#spatialSearchHandle");
+    spatialSearchHandle?.addEventListener("pointerdown", (event) => {
+      if (!pendingSpatialSearch || pendingSpatialSearch.revealed) return;
+      if (pendingSpatialSearch.name === "찢어진 옷고름") {
+        event.preventDefault();
+        return;
+      }
+      spatialSearchDrag = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY };
+      spatialSearchHandle.setPointerCapture?.(event.pointerId);
+      document.querySelector("#spatialSearchStage")?.classList.add("dragging");
+      event.preventDefault();
+    });
+    spatialSearchHandle?.addEventListener("pointermove", (event) => {
+      if (!spatialSearchDrag || spatialSearchDrag.pointerId !== event.pointerId || !pendingSpatialSearch) return;
+      const delta = pendingSpatialSearch.config.axis === "x"
+        ? event.clientX - spatialSearchDrag.startX
+        : event.clientY - spatialSearchDrag.startY;
+      const dragValue = `${Math.max(-90, Math.min(90, delta))}px`;
+      spatialSearchHandle.style.setProperty(pendingSpatialSearch.config.axis === "x" ? "--spatial-drag-x" : "--spatial-drag-y", dragValue);
+      if (delta * pendingSpatialSearch.config.direction >= 72) {
+        spatialSearchDrag = null;
+        spatialSearchHandle.style.removeProperty("--spatial-drag-x");
+        spatialSearchHandle.style.removeProperty("--spatial-drag-y");
+        revealJoseonSpatialSearch();
+      }
+      event.preventDefault();
+    });
+    const cancelSpatialDrag = (event) => {
+      if (!spatialSearchDrag || spatialSearchDrag.pointerId !== event.pointerId) return;
+      spatialSearchDrag = null;
+      spatialSearchHandle?.style.removeProperty("--spatial-drag-x");
+      spatialSearchHandle?.style.removeProperty("--spatial-drag-y");
+      document.querySelector("#spatialSearchStage")?.classList.remove("dragging");
+    };
+    spatialSearchHandle?.addEventListener("pointerup", cancelSpatialDrag);
+    spatialSearchHandle?.addEventListener("pointercancel", cancelSpatialDrag);
     document.addEventListener("pointermove", (event) => {
       updateToolAreaHover(event);
       moveToolCursor(event);
+      moveJoseonFieldToolCursor(event);
+    });
+    document.addEventListener("contextmenu", (event) => {
+      if (!selectedJoseonFieldTool) return;
+      event.preventDefault();
+      resetJoseonFieldTool();
     });
     document.querySelector(".tool-preview-image")?.addEventListener("pointerenter", (event) => {
       event.currentTarget.classList.add("cursor-inside");
@@ -7319,7 +8823,7 @@
     document.querySelectorAll("[data-ritual-kind]").forEach((piece) => {
       piece.addEventListener("pointerdown", (event) => startRitualDrag(piece, event));
     });
-    [document.querySelector("#confrontationStage"), document.querySelector("#sleeveInspectionStage")].forEach((stage) => {
+    [document.querySelector("#sleeveInspectionStage")].forEach((stage) => {
       stage?.addEventListener("pointermove", moveRitualDrag);
       stage?.addEventListener("pointerup", finishRitualDrag);
       stage?.addEventListener("pointercancel", finishRitualDrag);
@@ -7565,10 +9069,11 @@
     const evidenceBagPop = document.querySelector("#evidenceBagPop");
     const toggleEvidenceBag = document.querySelector("#toggleEvidenceBag");
     function setEvidenceBag(open) {
-      if (open && isFieldGuideBlockingControls()) return;
+      if (open && isFieldGuideBlockingControls() && !document.querySelector("#spatialSearchPanel")?.classList.contains("show")) return;
       if (open) {
         evidenceBagPop.classList.remove("closing");
         clearEvidenceBagUnread();
+        syncJoseonFieldToolsInBag();
       }
       if (!open && evidenceBagPop.classList.contains("open")) {
         evidenceBagPop.classList.add("closing");
@@ -7579,11 +9084,7 @@
       document.querySelectorAll("#toggleEvidenceBag, .bag-chip, .open-bag-panel").forEach((button) => {
         button.setAttribute("aria-expanded", String(open));
       });
-      const keepMapOverlay = !open
-        && isSpaceTheme
-        && document.documentElement.classList.contains("space-power-access-active")
-        && document.querySelector("#mapPanel")?.classList.contains("show");
-      globalOverlay.classList.toggle("show", open || keepMapOverlay);
+      globalOverlay.classList.toggle("show", open);
       if (open) playSfx("bag", 0.7);
     }
     toggleEvidenceBag.addEventListener("click", () => setEvidenceBag(!evidenceBagPop.classList.contains("open")));
@@ -7593,7 +9094,7 @@
     const globalPanels = [...document.querySelectorAll(".global-panel")];
 
     function openGlobalPanel(id) {
-      if (isSpaceTheme && id === "toolPanel") return;
+      if ((isSpaceTheme || isMagicTheme) && id === "toolPanel") return;
       if (id !== "mapPanel" && isFieldGuideBlockingControls()) return;
       if (document.querySelector("#mainScreen")?.classList.contains("active")) {
         globalPanels.forEach((panel) => {
@@ -7638,6 +9139,13 @@
     }
 
     function closeGlobalPanel() {
+      const closingSpatialSearch = document.querySelector("#spatialSearchPanel")?.classList.contains("show");
+      if (closingSpatialSearch && pendingSpatialSearch?.empty) {
+        const collectedSpatialName = pendingSpatialSearch.name;
+        if (collectedSpatialName !== "쇠열쇠") saveCollectedEvidence(collectedSpatialName);
+        markEvidenceCollectedInScene(collectedSpatialName);
+        pendingSpatialSearch.hotspot?.classList.add("collected");
+      }
       const wasGuideMapOpen = ["map-click", "map-open"].includes(fieldGuideStep) && document.querySelector("#mapPanel")?.classList.contains("show");
       clearTimeout(fieldGuideMapTimer);
       globalPanels.forEach((panel) => {
@@ -7654,6 +9162,8 @@
       globalOverlay.classList.remove("show");
       document.body.classList.remove("tool-cursor-active");
       document.querySelector("#selectedToolCursor")?.classList.remove("show");
+      if (closingSpatialSearch) resetJoseonFieldTool();
+      if (closingSpatialSearch) pendingSpatialSearch = null;
       if (wasGuideMapOpen) setFieldGuideStep("room");
     }
 
@@ -7682,10 +9192,18 @@
       closeGlobalPanel();
     }
 
+    function returnFromJoseonAuthority() {
+      pendingJoseonAuthority = null;
+      closeGlobalPanel();
+      syncJoseonAuthorityMapPins();
+      window.requestAnimationFrame(() => openGlobalPanel("mapPanel"));
+    }
+
     document.addEventListener("click", (event) => {
       const target = event.target instanceof Element ? event.target : null;
       if (!target) return;
       if (target.closest(".open-map-panel, #openMapFromField, #openMapFromRoom, #openMapFromMudeokRoom, #openMapFromInterrogation")) {
+        syncJoseonAuthorityMapPins();
         openGlobalPanel("mapPanel");
       } else if (target.closest(".open-bag-panel, #openBagFromField, #openBagFromRoom, #openBagFromMudeokRoom")) {
         setEvidenceBag(true);
@@ -7711,6 +9229,7 @@
       openGlobalPanel("toolPanel");
     });
     document.querySelectorAll(".global-close").forEach((button) => button.addEventListener("click", closeOrReturnFromGlobalPanel));
+    document.querySelector("#returnFromJoseonAuthority")?.addEventListener("click", returnFromJoseonAuthority);
     window.addEventListener("resize", syncDirectAffordanceFragments);
     on("#closeToolResult", "click", closeToolResultPopup);
     globalOverlay.addEventListener("click", () => {
@@ -7725,8 +9244,17 @@
       button.addEventListener("pointerup", () => button.classList.remove("pressing"));
       button.addEventListener("pointerleave", () => button.classList.remove("pressing"));
       button.addEventListener("blur", () => button.classList.remove("pressing"));
-      button.addEventListener("click", () => {
+      button.addEventListener("click", (event) => {
         const target = button.dataset.mapGo;
+        if (isJoseonToolInteraction && joseonRoomAuthorityRules[target]) {
+          const authorityId = joseonRoomAuthorityRules[target].id;
+          const authorized = readStoredNames(joseonInvestigationAuthorityKey).includes(authorityId);
+          if (!authorized) {
+            event.__samunmongAuthorityHandled = true;
+            window.dispatchEvent(new CustomEvent("samunmong:joseon-room-access-request", { detail: { screenId: target } }));
+            return;
+          }
+        }
         if (isSpaceTheme && target === "spaceOxygenGenerator") {
           requestSpacePowerAccess();
           return;
@@ -7748,7 +9276,7 @@
           return;
         }
         closeGlobalPanel();
-        go(resolvedTarget, isSpaceTheme ? "정거장 지도에서 이동 중..." : isMagicTheme ? "학교 지도에서 이동 중..." : "마을 지도에서 이동 중...");
+        go(target, isSpaceTheme ? "정거장 지도에서 이동 중..." : isMagicTheme ? "학교 지도에서 이동 중..." : "마을 지도에서 이동 중...");
       });
     });
 
@@ -7802,6 +9330,62 @@
       MUDEOK_TOLD_CHUNWOL: "무덕이 춘월에게 흘린 점순의 행방",
       MUDEOK_FOUND_RIBBON: "무덕이 집 근처에서 주운 옷고름"
     };
+
+    const statementEvidenceUnlocks = {
+      CHUNWOL_HEARD_ESCAPE_PLAN: ["도망 보따리", "무덕의 번진 일기"],
+      CHUNWOL_HIDDEN_PORTRAIT: ["돌쇠의 그림"],
+      CHUNWOL_LETTER_ACCESS: ["찢어진 약속 편지"],
+      CHUNWOL_RIBBON_MATERIAL: ["찢어진 옷고름", "고름이 뜯긴 저고리"],
+      CHUNWOL_ARM_SCRATCH: ["긁힌 팔 흔적", "점순의 손톱 밑 흔적"],
+      CHUNWOL_HOPAE_POWDER: ["호패 조각"],
+      DOLSOE_ESCAPE_PLAN: ["도망 보따리", "무덕의 번진 일기"],
+      DOLSOE_LETTER_MISMATCH: ["찢어진 약속 편지"],
+      YOOMUNSEOK_MISSING_HOPAE: ["호패 조각", "빈 호패 주머니", "끊어진 호패끈"],
+      MUDEOK_TOLD_CHUNWOL: ["무덕의 번진 일기", "도망 보따리"],
+      MUDEOK_FOUND_RIBBON: ["찢어진 옷고름"]
+    };
+
+    function isEvidenceRevealedByStatement(name) {
+      return readStoredNames(statementRevealedEvidenceKey).includes(getEvidenceSource(name));
+    }
+
+    function revealEvidenceMeaningFromStatement(factId) {
+      if (themeId !== "joseon" || !factId) return [];
+      const collected = new Set(readStoredNames(collectedEvidenceKey).map((name) => getEvidenceSource(name)));
+      const revealed = new Set(readStoredNames(statementRevealedEvidenceKey));
+      const unlocked = (statementEvidenceUnlocks[factId] || [])
+        .filter((name) => collected.has(name) && !revealed.has(name));
+      if (!unlocked.length) return [];
+      unlocked.forEach((name) => revealed.add(name));
+      localStorage.setItem(statementRevealedEvidenceKey, JSON.stringify([...revealed]));
+      unlocked.forEach((name) => refreshEvidenceCard(name));
+      if (selectedEvidence && unlocked.includes(getEvidenceSource(selectedEvidence))) {
+        showEvidenceStoryPreview(selectedEvidence);
+      }
+      updateEvidenceThreadUI();
+      return unlocked;
+    }
+
+    function recordStatementEvidenceLink(factId, suspect, answer) {
+      if (themeId !== "joseon" || !factId) return;
+      const collected = new Set(readStoredNames(collectedEvidenceKey).map((name) => getEvidenceSource(name)));
+      const evidenceNames = (statementEvidenceUnlocks[factId] || []).filter((name) => collected.has(name));
+      if (!evidenceNames.length) return;
+      const saved = readStatementEvidenceLinks();
+      const quote = sentenceBreakText(answer || "").replace(/\s+/g, " ").slice(0, 140);
+      const record = {
+        factId,
+        suspectId: suspect?.id || "",
+        suspectName: suspect?.name || "용의자",
+        evidenceNames,
+        summary: newFactTitles[factId] || "새로운 사실이 확인됨",
+        quote
+      };
+      const existingIndex = saved.findIndex((item) => item.factId === factId && item.suspectId === record.suspectId);
+      if (existingIndex >= 0) saved[existingIndex] = record;
+      else saved.push(record);
+      localStorage.setItem(statementEvidenceLinksKey, JSON.stringify(saved));
+    }
 
     function stopInterrogationThinkingSound() {
       window.clearInterval(interrogationThinkingSoundTimer);
@@ -7891,10 +9475,18 @@
       if (!factId) return;
       const toast = document.querySelector("#newFactToast");
       const title = document.querySelector("#newFactTitle");
+      const evidenceUnlock = document.querySelector("#newFactEvidenceUnlock");
       if (!toast || !title) return;
 
       window.clearTimeout(newFactToastTimer);
+      const unlockedEvidence = revealEvidenceMeaningFromStatement(factId);
       title.textContent = newFactTitles[factId] || "새로운 사실이 기록되었습니다";
+      if (evidenceUnlock) {
+        evidenceUnlock.hidden = unlockedEvidence.length === 0;
+        evidenceUnlock.textContent = unlockedEvidence.length
+          ? `진술로 의미 확인 · ${unlockedEvidence.map((name) => getEvidenceDisplayName(name)).join(" · ")}`
+          : "";
+      }
       toast.classList.add("show");
       toast.setAttribute("aria-hidden", "false");
       playSfx("evidence", 0.48);
@@ -7964,8 +9556,10 @@
             themeId,
             suspectId: suspect.id,
             userMessage: question,
-            presentedEvidenceNames: selectedEvidence ? [selectedEvidence] : [],
-            conversationHistory: history.slice(-8)
+            presentedEvidenceNames: getPresentedEvidenceContextNames(selectedEvidence),
+            collectedEvidenceNames: getCollectedEvidenceNames(),
+            conversationHistory: history.slice(-8),
+            knownFactIds: readStoredNames(interrogationKnownFactsKey)
           })
         });
 
@@ -7974,17 +9568,37 @@
           throw new Error(data.error || "AI 답변을 받지 못했습니다.");
         }
 
-        const answer = data.answer || "지금은 답하기 어렵습니다.";
+        let answer = data.answer || "지금은 답하기 어렵습니다.";
+        const canRevealChunwolCabinetKey = themeId === "joseon"
+          && suspect.id === "mudeok"
+          && localStorage.getItem("samunmong-chunwol-cabinet-lock-seen-v1") === "true"
+          && getEvidenceSource(selectedEvidence || "") === "무덕의 번진 일기"
+          && /(문갑|사물함|열쇠|잠긴|춘월.*방|방.*춘월)/.test(question)
+          && !readStoredNames(joseonFieldToolsKey).includes("매화무늬 장열쇠");
+        if (canRevealChunwolCabinetKey) {
+          answer = `${answer} …사또님, 실은 방을 치우다 검은 문갑 밑에서 작은 열쇠 하나를 주웠습니다. 괜히 의심받을까 두려워 제 품에 감춰 두었습니다. 이 열쇠가 맞는지 살펴보십시오.`;
+          const storedTools = readStoredNames(joseonFieldToolsKey);
+          localStorage.setItem(joseonFieldToolsKey, JSON.stringify([...storedTools, "매화무늬 장열쇠"]));
+          window.dispatchEvent(new CustomEvent("samunmong:joseon-field-tool-acquired", { detail: { name: "매화무늬 장열쇠" } }));
+          addObservationToNote("무덕이 내놓은 열쇠", "잠긴 검은 문갑을 확인한 뒤, 먹 번진 일기를 제시해 무덕을 심문하자 문갑 밑에서 주웠다는 열쇠를 내놓았다.");
+        }
         history.push({ role: "user", content: question }, { role: "assistant", content: answer });
         while (history.length > 8) history.shift();
         addInterrogationAnswer(suspect, answer, data.source, data.warning);
         maybeCollectInterrogationEvidence(suspect, answer, data.usedEvidenceNames);
         setInterrogationReaction(getLieExpressionReaction(answer, data.reaction || "attentive"), data.newFactId ? 4200 : 3000);
-        if (data.newFactId) showNewFactDiscovery(data.newFactId);
+        if (data.newFactId) {
+          recordStatementEvidenceLink(data.newFactId, suspect, answer);
+          showNewFactDiscovery(data.newFactId);
+        }
         if (data.newFactId) {
           const knownFactIds = new Set(readStoredNames(interrogationKnownFactsKey));
           knownFactIds.add(data.newFactId);
           localStorage.setItem(interrogationKnownFactsKey, JSON.stringify([...knownFactIds]));
+          (statementEvidenceUnlocks[data.newFactId] || []).forEach((name) => refreshEvidenceCard(name));
+          if (selectedEvidence && (statementEvidenceUnlocks[data.newFactId] || []).includes(getEvidenceSource(selectedEvidence))) {
+            showEvidenceStoryPreview(selectedEvidence);
+          }
         }
         if (suspects[suspectIndex]?.id === suspect.id) {
           setAiMode(suspect.name);
@@ -8008,18 +9622,6 @@
         clearPresentedEvidence();
         updateInterrogationQuestionLimitUI();
       }
-    }
-
-    function openEvidenceConfrontation(question) {
-      pendingConfrontationQuestion = question;
-      confrontationStep = 0;
-      document.querySelector("#confrontationTitle").textContent = `${suspects[suspectIndex].name}에게 증거 대면`;
-      document.querySelector("#confrontationEvidenceName").textContent = getEvidenceDisplayName(selectedEvidence);
-      document.querySelector("#confrontationGuide").textContent = "증거패를 심문상에 올린 뒤 관인을 끌어 찍어 대면을 확정하십시오.";
-      document.querySelector("#confrontationImage").src = "/samunmong/assets/interactions/confrontation-puzzle/state-1.png";
-      resetRitualDrag("confrontation");
-      openGlobalPanel("evidenceConfrontationPanel");
-      playSfx("map", 0.62);
     }
 
     function openSleeveInspection(question) {
@@ -8081,13 +9683,13 @@
           addEvidenceToNote("긁힌 팔 흔적");
           addObservationToNote("소매 확인", `${suspect.name}의 소매 아래에서 긁힌 듯한 흔적을 확인했다.`);
           setAnalysisTarget("긁힌 팔 흔적");
-          showToast("소매 밑에서 긁힌 팔 흔적을 발견했습니다.");
+          showEvidenceAcquisitionPopup("긁힌 팔 흔적");
         } else if (suspect.id === "dolsoe") {
           addEvidenceToBag("돌쇠의 팔 상처");
           addEvidenceToNote("돌쇠의 팔 상처");
           addObservationToNote("소매 확인", `${suspect.name}의 소매 아래에서 붕대를 감았던 듯한 팔 상처를 확인했다.`);
           setAnalysisTarget("돌쇠의 팔 상처");
-          showToast("돌쇠의 팔 상처를 증거로 기록했습니다.");
+          showEvidenceAcquisitionPopup("돌쇠의 팔 상처");
         } else {
           addObservationToNote("소매 확인", `${suspect.name}의 소매 아래를 확인했지만 뚜렷한 상처는 보이지 않았다.`);
           showToast(`${suspect.name}의 소매 아래를 확인했습니다.`);
@@ -8105,25 +9707,6 @@
       }
       document.querySelector("#questionInput").value = "";
       await requestAiAnswer(question);
-    }
-
-    function advanceEvidenceConfrontation(step) {
-      if (Number(step) !== confrontationStep + 1) {
-        showToast("대면 절차를 순서대로 진행하십시오.");
-        return;
-      }
-      confrontationStep += 1;
-      document.querySelector("#confrontationImage").src = `/samunmong/assets/interactions/confrontation-puzzle/state-${confrontationStep === 2 ? 4 : confrontationStep + 1}.png`;
-      completeRitualStep("confrontation", confrontationStep);
-      document.querySelector("#confrontationGuide").textContent = confrontationStep === 1 ? "증거가 심문상에 놓였습니다. 오른쪽 위의 관인을 끌어 찍으십시오." : "관인이 찍혀 증거 대면이 확정됐습니다.";
-      playSfx(confrontationStep === 2 ? "evidence" : "buttonAlt", confrontationStep === 2 ? 0.9 : 0.58);
-      if (confrontationStep === 2) {
-        const question = pendingConfrontationQuestion;
-        window.setTimeout(() => {
-          closeGlobalPanel();
-          performInterrogationQuestion(question);
-        }, 360);
-      }
     }
 
     function resetRitualDrag(kind) {
@@ -8181,8 +9764,7 @@
       piece.classList.remove("dragging");
       ritualDragState = null;
       if (hit) {
-        if (kind === "confrontation") advanceEvidenceConfrontation(step);
-        else advanceSleeveInspection(step);
+        advanceSleeveInspection(step);
         return;
       }
       piece.style.setProperty("--ritual-x", "0px");
@@ -8190,7 +9772,7 @@
       piece.classList.remove("wrong-fit");
       void piece.offsetWidth;
       piece.classList.add("wrong-fit");
-      showToast(kind === "confrontation" ? "빛나는 자리에 패를 직접 올려놓으십시오." : "화살표가 가리키는 자리까지 직접 움직이십시오.");
+      showToast("화살표가 가리키는 자리까지 직접 움직이십시오.");
     }
 
     document.querySelector("#askButton").addEventListener("click", async () => {
@@ -8203,11 +9785,6 @@
         showSuspectReply("더는 대답하지 않으려 한다.", "침묵");
         showToast("취조 가능한 질문 횟수를 모두 사용했습니다.");
         updateInterrogationQuestionLimitUI();
-        return;
-      }
-      const isSleeveQuestion = /소매/.test(question) && /(걷|올리|보|확인|드러|살펴)/.test(question);
-      if (isJoseonToolInteraction && selectedEvidence && !isSleeveQuestion) {
-        openEvidenceConfrontation(question);
         return;
       }
       await performInterrogationQuestion(question);

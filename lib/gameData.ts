@@ -100,8 +100,8 @@ export const fieldOneScene = {
   alt: "유문석 집 문 앞에 쓰러진 점순과 조사할 증거가 놓인 사건 현장",
   props: [] as SceneProp[],
   hotspots: [
-    { className: "scene-evidence-object field-letter-evidence", evidenceName: "찢어진 약속 편지", ariaLabel: "찢어진 편지 조각 조사", x: "72.7%", y: "87.3%", w: "8.2%", h: "8.5%", clipPath: "polygon(7% 35%, 44% 8%, 94% 24%, 98% 76%, 32% 96%, 2% 70%)", radius: "12px", rot: "7deg" },
-    { id: "hopaeHotspot", className: "scene-evidence-object field-hopae-evidence hopae-glow", evidenceName: "호패 조각", ariaLabel: "글자 지워진 나무패 조사", x: "62.8%", y: "87.2%", w: "5.2%", h: "8.5%", clipPath: "polygon(26% 6%, 75% 8%, 96% 58%, 70% 96%, 24% 90%, 3% 43%)", radius: "14px", rot: "-10deg" }
+    { className: "scene-evidence-object field-letter-evidence concealed-space-hotspot", evidenceName: "찢어진 약속 편지", ariaLabel: "점순이 쥔 손 살피기", x: "66%", y: "75%", w: "15%", h: "16%", clipPath: "ellipse(47% 42% at 52% 53%)", radius: "999px", rot: "5deg" },
+    { id: "hopaeHotspot", className: "scene-evidence-object field-hopae-evidence hopae-glow concealed-space-hotspot", evidenceName: "호패 조각", ariaLabel: "점순의 겉옷 안쪽 살피기", x: "49%", y: "61%", w: "19%", h: "20%", clipPath: "polygon(8% 13%, 83% 2%, 100% 71%, 78% 100%, 5% 84%)", radius: "16px", rot: "-4deg" }
   ] satisfies SceneHotspot[],
   lights: [
     { x: "18.5%", y: "39.2%", size: "4.6%", strength: 0.12, mode: "painted" },
@@ -127,12 +127,13 @@ export const fieldOneScene = {
 
 export const chunwolRoomScene = {
   id: "chunwolRoom",
-  image: "/samunmong/assets/scenes-integrated/scene-chunwol-room-clean-v3.png",
-  alt: "춘월의 방, 병풍에 걸린 저고리와 숨겨진 그림 증거",
+  image: "/samunmong/assets/scenes-integrated/scene-chunwol-room-separate-chest-v2.png",
+  alt: "춘월의 방, 안쪽 벽의 잠긴 세로형 의복장과 별도의 검은 문갑",
   props: [] as SceneProp[],
   hotspots: [
-    { id: "jeogoriHotspot", className: "scene-evidence-object hanging-norigae hanging-jeogori", evidenceName: "고름이 뜯긴 저고리", ariaLabel: "병풍에 걸린 고름이 뜯긴 저고리 조사", x: "65.2%", y: "21.5%", w: "8.8%", h: "31%", clipPath: "polygon(20% 0%, 86% 5%, 100% 90%, 58% 100%, 2% 78%, 12% 16%)", radius: "10px", rot: "1deg" },
-    { id: "portraitHotspot", className: "scene-evidence-object portrait-glow", evidenceName: "돌쇠의 그림", ariaLabel: "붉은 끈으로 묶인 의문의 두루마리 조사", x: "74%", y: "55.5%", w: "8%", h: "18%", clipPath: "polygon(18% 4%, 92% 16%, 81% 98%, 8% 84%)", radius: "8px", rot: "4deg" }
+    { id: "jeogoriHotspot", className: "scene-evidence-object concealed-space-hotspot locked-clothing-chest-hotspot", evidenceName: "고름이 뜯긴 저고리", ariaLabel: "왼쪽 안쪽 벽의 잠긴 의복장 살피기", x: "19.2%", y: "20%", w: "12.5%", h: "35%", clipPath: "polygon(4% 1%, 96% 1%, 98% 99%, 2% 99%)", radius: "8px", rot: "0deg" },
+    { id: "chunwolKeyHotspot", className: "scene-evidence-object concealed-space-hotspot", evidenceName: "쇠열쇠", ariaLabel: "안쪽 검은 문갑 살피기", x: "38.2%", y: "33%", w: "13.5%", h: "25%", clipPath: "polygon(3% 1%, 97% 1%, 100% 98%, 2% 100%)", radius: "8px", rot: "0deg" },
+    { id: "portraitHotspot", className: "scene-evidence-object portrait-glow concealed-space-hotspot", evidenceName: "돌쇠의 그림", ariaLabel: "병풍에 걸린 자주빛 천 뒤쪽 살피기", x: "75.2%", y: "27%", w: "9.8%", h: "36%", clipPath: "polygon(18% 0%, 91% 4%, 100% 87%, 68% 100%, 4% 84%, 10% 11%)", radius: "10px", rot: "1deg" }
   ] satisfies SceneHotspot[],
   lights: [{ x: "27.6%", y: "58.2%", size: "7.5%", strength: 0.38 }],
   dock: [
@@ -158,9 +159,8 @@ export const mudeokServantRoomScene = {
   alt: "무덕의 하인방",
   props: [] as SceneProp[],
   hotspots: [
-    { className: "scene-evidence-object mudeok-diary-evidence", evidenceName: "무덕의 번진 일기", ariaLabel: "무덕의 번진 일기 조사", x: "48.5%", y: "80.5%", w: "12%", h: "11%", clipPath: "polygon(10% 22%, 82% 5%, 96% 73%, 20% 96%)", radius: "8px", rot: "-2deg" },
-    { className: "scene-evidence-object mudeok-shoes-evidence", evidenceName: "진흙 묻은 짚신", ariaLabel: "진흙 묻은 짚신 조사", x: "69.5%", y: "61.5%", w: "9%", h: "12%", clipPath: "ellipse(45% 40% at 50% 52%)", radius: "999px", rot: "-12deg" },
-    { className: "scene-evidence-object mudeok-tie-evidence", evidenceName: "찢어진 옷고름", ariaLabel: "찢어진 옷고름 조사", x: "25.5%", y: "88%", w: "15%", h: "12%", clipPath: "polygon(8% 45%, 92% 8%, 98% 42%, 18% 96%)", radius: "999px", rot: "-13deg" }
+    { className: "scene-evidence-object mudeok-diary-evidence concealed-space-hotspot", evidenceName: "무덕의 번진 일기", ariaLabel: "오른쪽 침구 더미 살피기", x: "91%", y: "42%", w: "18%", h: "26%", clipPath: "polygon(5% 8%, 92% 2%, 100% 88%, 8% 99%)", radius: "16px", rot: "0deg" },
+    { className: "scene-evidence-object mudeok-shoes-evidence concealed-space-hotspot", evidenceName: "진흙 묻은 짚신", ariaLabel: "빨랫바구니 안쪽 살피기", x: "85%", y: "82%", w: "23%", h: "28%", clipPath: "ellipse(48% 47% at 52% 52%)", radius: "999px", rot: "0deg" }
   ] satisfies SceneHotspot[],
   lights: [{ x: "36.2%", y: "72%", size: "7%", strength: 0.36 }, { x: "78.4%", y: "23.2%", size: "4%", strength: 0.24, delay: "-1.1s" }],
   dock: [
@@ -178,9 +178,10 @@ export const yoomunseokSarangbangScene = {
   alt: "유문석의 사랑방",
   props: [] as SceneProp[],
   hotspots: [
-    { className: "scene-evidence-object yoomunseok-holder-evidence", evidenceName: "빈 호패 주머니", ariaLabel: "빈 호패 주머니 조사", x: "27%", y: "83%", w: "12%", h: "18%", clipPath: "ellipse(42% 48% at 50% 52%)", radius: "999px", rot: "-5deg" },
-    { className: "scene-evidence-object yoomunseok-ledger-evidence", evidenceName: "하인 장부", ariaLabel: "하인 장부 조사", x: "45.5%", y: "69.5%", w: "16%", h: "14%", clipPath: "polygon(4% 14%, 88% 4%, 98% 80%, 12% 96%)", radius: "10px", rot: "1deg" },
-    { className: "scene-evidence-object yoomunseok-marriage-evidence", evidenceName: "혼서 조각", ariaLabel: "혼서 조각 조사", x: "65.5%", y: "76%", w: "14%", h: "14%", clipPath: "polygon(5% 24%, 90% 8%, 98% 70%, 28% 96%)", radius: "8px", rot: "5deg" }
+    { className: "scene-evidence-object yoomunseok-room-key yoomunseok-room-key-concealed field-tool-hotspot", evidenceName: "놋쇠 고리열쇠", ariaLabel: "큰 서안의 붓통 사이에 섞인 놋쇠 고리 살피기", image: "/samunmong/assets/evidence-transparent/field-tool-joseon-sarangbang-key-v1.png", x: "67.5%", y: "43%", w: "9%", h: "25%", clipPath: "none", radius: "0", rot: "0deg" },
+    { className: "scene-evidence-object yoomunseok-holder-evidence concealed-space-hotspot", evidenceName: "빈 호패 주머니", ariaLabel: "서안 왼쪽의 닫힌 서랍 살피기", x: "41%", y: "76%", w: "12%", h: "15%", clipPath: "polygon(3% 22%, 94% 6%, 99% 83%, 8% 97%)", radius: "10px", rot: "-2deg" },
+    { className: "scene-evidence-object yoomunseok-ledger-evidence concealed-space-hotspot", evidenceName: "하인 장부", ariaLabel: "사랑방 왼쪽의 쌓인 문서 더미 살피기", x: "10%", y: "76%", w: "20%", h: "27%", clipPath: "polygon(4% 12%, 88% 2%, 99% 86%, 10% 100%)", radius: "14px", rot: "0deg" },
+    { className: "scene-evidence-object yoomunseok-marriage-evidence concealed-space-hotspot", evidenceName: "혼서 조각", ariaLabel: "문서장 안쪽의 검은 문서함 살피기", x: "25%", y: "19%", w: "19%", h: "24%", clipPath: "polygon(4% 4%, 96% 2%, 98% 94%, 2% 99%)", radius: "10px", rot: "0deg" }
   ] satisfies SceneHotspot[],
   lights: [{ x: "6.2%", y: "50.8%", size: "8%", strength: 0.34 }, { x: "36.6%", y: "53.4%", size: "6%", strength: 0.32, delay: "-.8s" }, { x: "95.2%", y: "23.8%", size: "5%", strength: 0.25, delay: "-1.4s" }],
   dock: investigationDock
@@ -192,8 +193,8 @@ export const dolsoeQuartersScene = {
   alt: "돌쇠의 처소",
   props: [] as SceneProp[],
   hotspots: [
-    { className: "scene-evidence-object dolsoe-bandage-evidence", evidenceName: "피 묻은 붕대", ariaLabel: "피 묻은 붕대 조사", x: "16%", y: "80%", w: "13%", h: "11%", clipPath: "polygon(8% 24%, 92% 8%, 98% 74%, 20% 96%)", radius: "12px", rot: "-8deg" },
-    { className: "scene-evidence-object dolsoe-bundle-evidence", evidenceName: "도망 보따리", ariaLabel: "도망 보따리 조사", x: "48.5%", y: "40.5%", w: "12%", h: "16%", clipPath: "ellipse(43% 48% at 50% 52%)", radius: "999px", rot: "-3deg" }
+    { className: "scene-evidence-object dolsoe-bandage-evidence concealed-space-hotspot", evidenceName: "피 묻은 붕대", ariaLabel: "침상 곁 작은 서랍 살피기", x: "50%", y: "62%", w: "10%", h: "17%", clipPath: "polygon(5% 4%, 96% 4%, 94% 96%, 3% 96%)", radius: "8px", rot: "0deg" },
+    { className: "scene-evidence-object dolsoe-bundle-evidence concealed-space-hotspot", evidenceName: "도망 보따리", ariaLabel: "작업대의 덮인 짚바구니 살피기", x: "14%", y: "69%", w: "22%", h: "19%", clipPath: "ellipse(48% 45% at 50% 52%)", radius: "999px", rot: "0deg" }
   ] satisfies SceneHotspot[],
   lights: [{ x: "7.3%", y: "45.7%", size: "5%", strength: 0.3 }, { x: "55.3%", y: "31.5%", size: "6%", strength: 0.34, delay: "-.9s" }],
   dock: investigationDock
@@ -205,8 +206,9 @@ export const backGateCourtyardScene = {
   alt: "대문 뒤쪽 뒷문 마당",
   props: [] as SceneProp[],
   hotspots: [
-    { className: "scene-evidence-object backgate-footprints-evidence", evidenceName: "작은 발자국", ariaLabel: "작은 발자국 조사", x: "58%", y: "77.5%", w: "8%", h: "16%", clipPath: "polygon(8% 34%, 24% 12%, 52% 18%, 68% 4%, 96% 34%, 82% 88%, 22% 96%)", radius: "999px", rot: "8deg" },
-    { className: "scene-evidence-object backgate-cord-evidence", evidenceName: "끊어진 호패끈", ariaLabel: "끊어진 호패끈 조사", x: "17.8%", y: "81.8%", w: "14.2%", h: "11.5%", clipPath: "polygon(1% 43%, 18% 20%, 49% 5%, 82% 19%, 99% 48%, 84% 78%, 52% 96%, 17% 84%)", radius: "999px", rot: "-5deg" }
+    { className: "scene-evidence-object backgate-footprints-evidence concealed-space-hotspot", evidenceName: "작은 발자국", ariaLabel: "바닥의 젖은 낙엽과 짚 걷어 보기", x: "55%", y: "78%", w: "36%", h: "27%", clipPath: "ellipse(48% 42% at 50% 53%)", radius: "999px", rot: "0deg" },
+    { className: "scene-evidence-object backgate-cord-evidence concealed-space-hotspot", evidenceName: "끊어진 호패끈", ariaLabel: "왼쪽의 뒤집힌 짚바구니 들어 보기", x: "29%", y: "63%", w: "16%", h: "19%", clipPath: "ellipse(47% 46% at 51% 52%)", radius: "999px", rot: "0deg" },
+    { className: "scene-evidence-object backgate-silk-tie-evidence concealed-space-hotspot onggi-search-hotspot", evidenceName: "찢어진 옷고름", ariaLabel: "왼쪽 장독의 금 간 뚜껑 살피기", x: "18%", y: "61%", w: "14%", h: "22%", clipPath: "ellipse(48% 46% at 50% 52%)", radius: "999px", rot: "0deg" }
   ] satisfies SceneHotspot[],
   lights: [{ x: "69.7%", y: "28.5%", size: "6.2%", strength: 0.16, mode: "painted" }],
   dock: investigationDock
@@ -224,12 +226,6 @@ const magicDock = [
     ariaLabel: "마법 가방 열기",
     image: "/samunmong/assets/magic-school/ui/icon-magic-bag.webp",
     label: "마법 가방"
-  },
-  {
-    className: "tool-chip open-tool-panel magic-chip",
-    ariaLabel: "마력 도구 열기",
-    image: "/samunmong/assets/magic-school/ui/icon-mana-tools.webp",
-    label: "마력 도구"
   },
   {
     className: "note-chip open-note-panel magic-chip",
