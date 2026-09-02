@@ -8201,9 +8201,9 @@
       }
       if (handle) handle.hidden = !empty;
       if (discovery) {
-        discovery.textContent = empty ? "" : config.discovery;
-        discovery.setAttribute("aria-label", empty ? "" : `${config.discovery} 보따리에 넣기`);
-        discovery.hidden = empty;
+        discovery.textContent = "";
+        discovery.setAttribute("aria-label", "");
+        discovery.hidden = true;
       }
       stage?.classList.remove("dragging");
       stage?.classList.add("revealed");
