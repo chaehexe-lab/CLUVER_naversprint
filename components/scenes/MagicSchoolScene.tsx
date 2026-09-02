@@ -111,6 +111,7 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
   const [frozenBookNotice, setFrozenBookNotice] = useState<string | null>(null);
   const [iceBurstCount, setIceBurstCount] = useState(0);
   const noticeTimer = useRef<number | null>(null);
+  const iceBurstTimer = useRef<number | null>(null);
 
   useEffect(() => {
     if (scene.id !== "magicLibrary") return;
@@ -119,6 +120,7 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
 
   useEffect(() => () => {
     if (noticeTimer.current !== null) window.clearTimeout(noticeTimer.current);
+    if (iceBurstTimer.current !== null) window.clearTimeout(iceBurstTimer.current);
   }, []);
 
   const showFrozenBookNotice = useCallback((message: string) => {
@@ -135,6 +137,8 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
     if (spellId === "ice-control" && scene.id === "magicLibrary") {
       setFrozenBookThawed(true);
       setIceBurstCount((count) => count + 1);
+      if (iceBurstTimer.current !== null) window.clearTimeout(iceBurstTimer.current);
+      iceBurstTimer.current = window.setTimeout(() => setIceBurstCount(0), 2200);
       window.localStorage.setItem(FROZEN_BOOK_THAWED_KEY, "1");
       showFrozenBookNotice("냉기가 걷혔습니다. 이제 책을 획득할 수 있습니다.");
       return "success";
