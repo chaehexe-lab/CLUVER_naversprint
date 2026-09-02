@@ -836,6 +836,7 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen.magic-entry-records .ma
 }
 
 html[data-samunmong-theme="magicSchool"] #briefingScreen.magic-entry-records .magic-guard-heading {
+  top: 12.4% !important;
   gap: 2px !important;
 }
 
