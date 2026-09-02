@@ -673,6 +673,17 @@ function fallbackAnswer(
   };
 }
 
+function applyFallbackConversationContinuity(answer: string, question: string, previousUserQuestions: string[]) {
+  const normalize = (value: string) => value.replace(/[\s~!?.。！？]+/g, "").toLowerCase();
+  const normalizedQuestion = normalize(question);
+  if (!normalizedQuestion || /^(아까|앞서|말씀드렸)/.test(answer)) return answer;
+  const repeatCount = previousUserQuestions.filter((previous) => normalize(previous) === normalizedQuestion).length;
+  if (repeatCount <= 0) return answer;
+  return repeatCount === 1
+    ? `아까 말씀드렸듯, ${answer}`
+    : `같은 질문에 대한 제 답은 달라지지 않습니다. ${answer}`;
+}
+
 export async function POST(req: Request) {
   const body = (await req.json()) as InterrogateRequest;
   const questionState = normalizeQuestion(body.userMessage || body.question || "");
@@ -687,21 +698,28 @@ export async function POST(req: Request) {
     return Response.json({ error: "정상 수사 진행에서 시작된 취조가 아닙니다." }, { status: 403 });
   }
   let responseProgress: GameProgress = signedProgress;
+  let previousUserQuestions: string[] = [];
 
   async function secureResponse(payload: Record<string, unknown>, status = 200) {
-    const newFactId = typeof payload.newFactId === "string" ? payload.newFactId : null;
+    const responsePayload = payload.source === "fallback" && typeof payload.answer === "string"
+      ? {
+          ...payload,
+          answer: applyFallbackConversationContinuity(payload.answer, question, previousUserQuestions)
+        }
+      : payload;
+    const newFactId = typeof responsePayload.newFactId === "string" ? responsePayload.newFactId : null;
     responseProgress = recordKnownFact(responseProgress, newFactId);
-    if (payload.grantSpacePowerAccessCard === true) {
+    if (responsePayload.grantSpacePowerAccessCard === true) {
       responseProgress =
         recordCollectedEvidence(responseProgress, "interrogationScreen", "전력 제어실 출입 카드") || responseProgress;
     }
-    return Response.json(payload, {
+    return Response.json(responsePayload, {
       status,
       headers: { "Set-Cookie": await serializeGameProgressCookie(responseProgress) }
     });
   }
   const conversationHistory = sanitizeConversationHistory(body.conversationHistory);
-  const previousUserQuestions = conversationHistory.filter((message) => message.role === "user").map((message) => message.content);
+  previousUserQuestions = conversationHistory.filter((message) => message.role === "user").map((message) => message.content);
 
   if (!questionState.originalQuestion) {
     return secureResponse({ error: "질문이 비어 있습니다." }, 400);

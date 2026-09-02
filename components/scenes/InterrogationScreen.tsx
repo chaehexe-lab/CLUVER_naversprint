@@ -295,7 +295,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
               <span className="sr-only">사건 브리핑</span>
             </button>
           ) : null}
-          {!isSpaceTheme ? (
+          {!isSpaceTheme && !isMagicTheme ? (
             <button className="scene-chip journal-chip" data-go="briefingScreen" type="button" aria-label={`${copy.journal} 다시 보기`}>
               <img src={journalIcon} alt="" />
               <span className="sr-only">{copy.journal}</span>
@@ -477,7 +477,7 @@ export default function InterrogationScreen({ initialTheme }: { initialTheme: Ga
             <button className="close-button global-close" type="button" aria-label="공간 수색 닫기">×</button>
           </div>
           <div className="spatial-search-stage" id="spatialSearchStage">
-            <img id="spatialSearchImage" src="/samunmong/assets/interactions/spatial-search/chunwol-screen-covered-v1.png" alt="가려진 공간 확대 화면" draggable={false} />
+            <img id="spatialSearchImage" src="/samunmong/assets/interactions/spatial-search/chunwol-screen-covered-v1.webp" alt="가려진 공간 확대 화면" draggable={false} />
             <p className="spatial-search-guide" id="spatialSearchGuide">물건을 직접 움직여 안쪽을 살피십시오.</p>
             <button className="spatial-search-handle" id="spatialSearchHandle" type="button" aria-label="가리고 있는 물건을 눌러 살펴보기" />
             <button className="spatial-search-discovery" id="spatialSearchDiscovery" type="button" hidden>드러난 증거 살펴보기</button>

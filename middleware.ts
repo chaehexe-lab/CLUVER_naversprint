@@ -37,6 +37,13 @@ export async function middleware(request: NextRequest) {
   const screenId = routeEntry?.screenId || queryScreen;
   if (!screenId || isPublicStartScreen(screenId)) return NextResponse.next();
 
+  const isLocalHost = request.nextUrl.hostname === "127.0.0.1" || request.nextUrl.hostname === "localhost";
+  const isLocalMagicReview = isLocalHost
+    && (process.env.NODE_ENV !== "production" || process.env.MAGIC_EVIDENCE_REVIEW === "1")
+    && request.nextUrl.searchParams.get("magicReview") === "1"
+    && screenId.startsWith("magic");
+  if (isLocalMagicReview) return NextResponse.next();
+
   const theme = routeEntry?.theme || getThemeForProtectedScreen(screenId, requestedTheme(request));
   if (!theme) return NextResponse.next();
 

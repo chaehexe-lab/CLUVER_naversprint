@@ -86,9 +86,6 @@ export default function InterrogationCharacter2D() {
     let lean = 0;
     let recoil = 0;
     let expression = 0;
-    let blink = 0;
-    let blinkStarted = -1;
-    let nextBlink = performance.now() + 1900 + Math.random() * 2600;
 
     const uniforms = {
       previousNormal: { value: null as THREE.Texture | null },
@@ -266,8 +263,6 @@ export default function InterrogationCharacter2D() {
       uniforms.currentNormalClosed.value = texture(current, "normal", true);
       uniforms.currentSleeveClosed.value = texture(current, "sleeve", true);
       transition = 0;
-      blinkStarted = -1;
-      nextBlink = performance.now() + 1000 + Math.random() * 1200;
       applyPose(current);
     };
     const screenObserver = new MutationObserver(updateSuspect);
@@ -296,15 +291,6 @@ export default function InterrogationCharacter2D() {
       transition += (1 - transition) * (1 - Math.exp(-dt * 6.5));
       const sleeveTarget = screen.dataset.characterScene?.includes("sleeve") ? 1 : 0;
       sleeve += (sleeveTarget - sleeve) * (1 - Math.exp(-dt * 4.3));
-      if (!reduced && blinkStarted < 0 && now >= nextBlink) blinkStarted = now;
-      if (blinkStarted >= 0) {
-        const progress = Math.min(1, (now - blinkStarted) / 220);
-        if (progress < .32) blink = Math.pow(progress / .32, .72);
-        else if (progress < .62) blink = 1;
-        else blink = Math.pow((1 - progress) / .38, .78);
-        if (progress >= 1) { blinkStarted = -1; nextBlink = now + 2600 + Math.random() * 3800; }
-      } else blink = 0;
-
       const face = faceAt(CHARACTERS[current] || CHARACTERS.dolsoe, sleeve);
       uniforms.colorGrade.value.set(current === "dolsoe" ? .84 : .97, current === "dolsoe" ? 1.04 : 1.005, current === "dolsoe" ? 1.1 : 1.02);
       uniforms.time.value = now / 1000;
@@ -313,7 +299,7 @@ export default function InterrogationCharacter2D() {
       uniforms.recoil.value = recoil;
       uniforms.tension.value = emotion.tension * motion;
       uniforms.expression.value = expression;
-      uniforms.blink.value = blink * motion;
+      uniforms.blink.value = 0;
       uniforms.speech.value = reaction === "attentive" || reaction === "thinking" ? motion * .55 : 0;
       uniforms.transition.value = transition;
       uniforms.previousSleeveMix.value = previousSleeve;
@@ -327,7 +313,7 @@ export default function InterrogationCharacter2D() {
       canvas.dataset.reaction = reaction;
       canvas.dataset.expression = expressionName;
       canvas.dataset.sleeve = sleeve > .98 ? "raised" : sleeve > .02 ? "transition" : "covered";
-      canvas.dataset.blink = blink > .72 ? "closed" : blink > .04 ? "moving" : "open";
+      canvas.dataset.blink = "disabled";
       animationFrame = requestAnimationFrame(render);
     };
 

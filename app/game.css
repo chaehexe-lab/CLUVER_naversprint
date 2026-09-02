@@ -3034,7 +3034,7 @@
       filter: none;
     }
 
-    .screen.hint-active .evidence-hotspot:not(.collected)::before {
+    .screen.hint-active .evidence-hotspot:not(.collected):not(.hint-ineligible)::before {
       inset: 0;
       background:
         radial-gradient(ellipse at 50% 52%, rgba(255, 219, 142, .23), rgba(226, 167, 96, .11) 44%, rgba(140, 49, 35, .05) 68%, transparent 90%);
@@ -3046,7 +3046,7 @@
       animation: hintEvidenceGlow 2.4s ease-in-out both;
     }
 
-    .screen.hint-active .evidence-hotspot:not(.collected)::after {
+    .screen.hint-active .evidence-hotspot:not(.collected):not(.hint-ineligible)::after {
       inset: 0;
       border: 0;
       background:
@@ -8631,15 +8631,22 @@ html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel:has(.special-tou
 .magic-school-screen.magic-light-required .plate { transition: filter 2.6s cubic-bezier(.18,.78,.22,1); }
 html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-required:not(.light-magic-active) .plate { filter: brightness(.55) contrast(1.08) saturate(.75); }
 html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-required.light-magic-active .plate { filter: brightness(1.16) contrast(1.03) saturate(1.04); }
+html[data-samunmong-theme="magicSchool"] #magicAlchemyLab.rush-in.magic-light-required:not(.light-magic-active) > .plate {
+  animation-name: magicDarkRushIn;
+}
+html[data-samunmong-theme="magicSchool"] #magicAlchemyLab.rush-in.magic-light-required.light-magic-active > .plate {
+  animation: none;
+  filter: brightness(1.16) contrast(1.03) saturate(1.04);
+}
 html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-required .magic-shade { z-index: 2; background: radial-gradient(circle at 50% 44%, rgba(20,25,45,.05), rgba(1,2,8,.3) 78%); opacity: 1; transition: opacity 2.4s cubic-bezier(.18,.78,.22,1); }
 html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-required.light-magic-active .magic-shade { opacity: 0; }
 .magic-light-bloom { position: absolute; z-index: 3; inset: 0; opacity: 0; pointer-events: none; background: radial-gradient(circle at 50% 46%, rgba(255,251,202,.74), rgba(245,203,104,.25) 24%, transparent 62%); mix-blend-mode: screen; }
-.magic-school-screen.light-magic-active .magic-light-bloom { animation: magicSceneIlluminate 2.8s ease-out both; }
+.magic-school-screen.light-cast-active .magic-light-bloom { animation: magicSceneIlluminate 2.8s ease-out both; }
 .magic-heavenly-light { position: absolute; z-index: 89; inset: 0; overflow: hidden; opacity: 0; pointer-events: none; mix-blend-mode: screen; isolation: isolate; will-change: opacity; transform: translateZ(0); }
 .heavenly-light-beam { position: absolute; left: var(--beam-start-x); top: var(--beam-start-y); width: var(--beam-length); height: calc(var(--beam-width) * 1.35); opacity: 0; clip-path: polygon(0 44%,100% 0,100% 100%,0 56%); background: linear-gradient(90deg,rgba(255,239,137,.7),rgba(255,205,45,.58) 34%,rgba(230,154,12,.28) 76%,rgba(183,103,0,0)); filter: brightness(var(--beam-brightness)) blur(1.8px) drop-shadow(0 0 18px rgba(255,217,90,.72)) drop-shadow(0 0 48px rgba(217,140,11,.5)); transform: translateX(-1%) rotate(var(--beam-angle)) scaleX(.02); transform-origin: 0 50%; }
 .heavenly-light-beam::after { content: ""; position: absolute; left: 0; right: 7%; top: 42%; height: 7%; min-height: 4px; background: linear-gradient(90deg,rgba(255,240,160,.72),rgba(255,201,40,.62) 48%,transparent); box-shadow: 0 0 14px rgba(255,233,137,.7),0 0 32px rgba(233,169,22,.55); }
-.magic-school-screen.light-magic-active .magic-heavenly-light { animation: magicHeavenlyLayerFade 4.6s linear both; }
-.magic-school-screen.light-magic-active .heavenly-light-beam { animation: magicHeavenlyDownpour 1.05s cubic-bezier(.12,.72,.2,1) var(--beam-delay) both; }
+.magic-school-screen.light-cast-active .magic-heavenly-light { animation: magicHeavenlyLayerFade 4.6s linear both; }
+.magic-school-screen.light-cast-active .heavenly-light-beam { animation: magicHeavenlyDownpour 1.05s cubic-bezier(.12,.72,.2,1) var(--beam-delay) both; }
 .magic-holy-particles { position: absolute; z-index: 90; inset: 0; overflow: hidden; contain: strict; pointer-events: none; transform: translateZ(0); }
 .holy-particle { position: absolute; left: var(--particle-start-x); top: -9%; width: var(--particle-size); height: var(--particle-size); opacity: 0; border-radius: 50%; background: radial-gradient(circle,#fff9bf 0 22%,#ffd74e 46%,rgba(226,150,25,.35) 72%,transparent 75%); box-shadow: 0 0 9px rgba(255,216,77,.72); }
 .holy-particle::before,.holy-particle::after { content: ""; display: none; position: absolute; left: 50%; top: 50%; border-radius: 999px; background: linear-gradient(90deg,transparent,#fff9bf,transparent); transform: translate(-50%,-50%); }
@@ -8647,7 +8654,24 @@ html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-requir
 .holy-particle::before { width: calc(var(--particle-size) * 4.2); height: 1px; }
 .holy-particle::after { width: 1px; height: calc(var(--particle-size) * 4.2); background: linear-gradient(transparent,#fff9bf,transparent); }
 .holy-particle.star { border-radius: 1px; background: #fff1a0; box-shadow: 0 0 12px rgba(255,216,77,.82); }
-.magic-school-screen.light-magic-active .holy-particle { animation: magicHolyParticleFall var(--particle-duration) linear calc(.2s + var(--particle-delay)) both; }
+.magic-school-screen.light-cast-active .holy-particle { animation: magicHolyParticleFall var(--particle-duration) linear calc(.2s + var(--particle-delay)) both; }
+
+@keyframes magicDarkRushIn {
+  0% {
+    opacity: 0;
+    transform: scale(1.12) translateY(18px);
+    filter: blur(10px) brightness(.2) contrast(1.18) saturate(.4);
+  }
+  58% {
+    opacity: 1;
+    filter: blur(1px) brightness(.34) contrast(1.18) saturate(.58);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+    filter: blur(0) brightness(.28) contrast(1.18) saturate(.55);
+  }
+}
 .magic-spell-system { position: absolute; z-index: 88; inset: 0; pointer-events: none; color: #eafcff; font-family: "Nanum BareunJeongsin", serif; }
 .magic-spell-toggle { pointer-events: auto; position: absolute; right: calc(2.4% + 11px); bottom: 47%; width: 96px; min-height: 94px; display: grid; place-items: center; align-content: center; gap: 4px; padding: 7px; color: #effcff; border: 1px solid rgba(132,226,255,.55); border-radius: 48% 48% 13px 13px; background: radial-gradient(circle at 50% 33%,rgba(82,196,239,.34),rgba(15,29,60,.95) 62%); box-shadow: inset 0 0 22px rgba(114,226,255,.24),0 9px 26px #000c; cursor: pointer; transition: transform .2s ease,box-shadow .2s ease; }
 .magic-spell-toggle:hover,.magic-spell-toggle.active { transform: translateX(-5px) scale(1.04); box-shadow: inset 0 0 28px rgba(154,239,255,.38),0 0 22px rgba(90,210,255,.48),0 12px 28px #000d; }
@@ -20697,4 +20721,514 @@ html[data-samunmong-theme="joseon"] #joseonAuthorityPanel.joseon-authority-redes
   right: auto !important;
   bottom: auto !important;
   transform: translate(-50%, -50%) !important;
+}
+
+/* Magic-school scene rebuild: restored plate -> evidence prop -> WebGL motion -> fixed UI. */
+html[data-samunmong-theme="magicSchool"] .magic-school-screen {
+  isolation: isolate;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-school-screen > .plate {
+  z-index: 0;
+}
+
+.magic-cleaning-ash-evidence {
+  position: absolute;
+  z-index: 1;
+  left: 52%;
+  top: 61.8%;
+  width: 13%;
+  height: auto;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scaleY(.58) rotate(-2deg);
+  transform-origin: center;
+  filter:
+    brightness(.62)
+    contrast(1.08)
+    saturate(.78)
+    sepia(.16)
+    drop-shadow(0 5px 5px rgba(10, 7, 4, .42));
+  transition: opacity .2s ease;
+}
+
+.magic-cleaning-ash-evidence.collected {
+  opacity: 0;
+}
+
+.magic-scene-rig-3d {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-school-screen > .magic-shade {
+  z-index: 2;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-school-screen > .hotspot.object-outline {
+  z-index: 6;
+  overflow: visible;
+  clip-path: var(--clip, none);
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-school-screen > .hotspot.object-outline::before,
+html[data-samunmong-theme="magicSchool"] .magic-school-screen > .hotspot.object-outline::after {
+  clip-path: inherit;
+}
+
+/* Local-only evidence registration overlay. It never ships visibly in production. */
+.magic-evidence-review {
+  position: absolute;
+  inset: 0;
+  z-index: 150;
+  pointer-events: none;
+  color: #effcff;
+  font-family: "Noto Sans KR", "Malgun Gothic", sans-serif;
+  letter-spacing: 0;
+}
+
+.magic-review-scene-tabs {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 14px;
+  display: flex;
+  gap: 6px;
+  padding: 6px;
+  border: 1px solid rgba(191, 229, 242, .28);
+  border-radius: 14px;
+  background: rgba(7, 12, 21, .9);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, .38);
+  transform: translateX(-50%);
+  pointer-events: auto;
+}
+
+.magic-review-scene-tabs button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid rgba(197, 221, 232, .18);
+  border-radius: 999px;
+  color: rgba(230, 242, 248, .72);
+  background: rgba(22, 31, 44, .88);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.magic-review-scene-tabs button.active {
+  color: #fff;
+  border-color: rgba(85, 226, 255, .76);
+  background: rgba(18, 76, 91, .94);
+  box-shadow: inset 0 0 12px rgba(79, 225, 255, .16);
+}
+
+.magic-review-panel {
+  position: absolute;
+  z-index: 3;
+  right: 18px;
+  top: 64px;
+  width: 348px;
+  padding: 14px;
+  border: 1px solid rgba(159, 207, 226, .34);
+  border-radius: 16px;
+  background: rgba(5, 10, 18, .92);
+  box-shadow: 0 14px 38px rgba(0, 0, 0, .52);
+  pointer-events: auto;
+}
+
+.magic-review-panel-head {
+  display: grid;
+  gap: 2px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(198, 222, 232, .14);
+}
+
+.magic-review-panel-head span {
+  color: #5fe8ff;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.magic-review-panel-head strong {
+  font-size: 17px;
+}
+
+.magic-review-measurement,
+.magic-review-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 12px;
+  padding-top: 10px;
+  color: rgba(232, 244, 248, .72);
+  font-size: 11px;
+}
+
+.magic-review-legend i {
+  display: inline-block;
+  width: 15px;
+  height: 3px;
+  margin-right: 5px;
+  vertical-align: middle;
+}
+
+.magic-review-legend i.visible {
+  background: #51ecff;
+}
+
+.magic-review-legend i.hitbox {
+  background: #ffb44f;
+}
+
+.magic-review-current {
+  display: grid;
+  grid-template-columns: 76px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  margin-top: 11px;
+  padding-top: 11px;
+  border-top: 1px solid rgba(198, 222, 232, .14);
+}
+
+.magic-review-current img {
+  width: 76px;
+  height: 64px;
+  object-fit: contain;
+  filter: drop-shadow(0 7px 7px rgba(0, 0, 0, .62));
+}
+
+.magic-review-current div {
+  min-width: 0;
+}
+
+.magic-review-current b,
+.magic-review-current span {
+  display: block;
+}
+
+.magic-review-current b {
+  font-size: 13px;
+}
+
+.magic-review-current span,
+.magic-review-current p,
+.magic-review-panel > small {
+  color: rgba(227, 241, 247, .7);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.magic-review-editor {
+  display: grid;
+  gap: 8px;
+  margin-top: 11px;
+  padding-top: 11px;
+  border-top: 1px solid rgba(198, 222, 232, .14);
+}
+
+.magic-review-fields {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.magic-review-fields label {
+  position: relative;
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) 12px;
+  align-items: center;
+  min-width: 0;
+  height: 30px;
+  padding: 0 4px;
+  border: 1px solid rgba(148, 199, 219, .24);
+  border-radius: 9px;
+  background: rgba(12, 23, 35, .92);
+}
+
+.magic-review-fields span,
+.magic-review-fields i {
+  color: rgba(205, 232, 242, .68);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.magic-review-fields input {
+  min-width: 0;
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: #fff5de;
+  background: transparent;
+  font: 700 11px/1 "Consolas", monospace;
+  appearance: textfield;
+  text-align: center;
+}
+
+.magic-review-fields input::-webkit-inner-spin-button,
+.magic-review-fields input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.magic-review-rotation-field {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr) 58px 12px;
+  gap: 6px;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 7px;
+  border: 1px solid rgba(148, 199, 219, .24);
+  border-radius: 9px;
+  background: rgba(12, 23, 35, .92);
+}
+
+.magic-review-rotation-field span,
+.magic-review-rotation-field i {
+  color: rgba(205, 232, 242, .68);
+  font-size: 9px;
+  font-style: normal;
+  font-weight: 800;
+}
+
+.magic-review-rotation-range {
+  width: 100%;
+  accent-color: #ffb44f;
+  cursor: ew-resize;
+}
+
+.magic-review-rotation-number {
+  width: 100%;
+  border: 0;
+  outline: 0;
+  color: #fff5de;
+  background: transparent;
+  font: 700 11px/1 "Consolas", monospace;
+  text-align: right;
+}
+
+.magic-review-editor textarea {
+  width: 100%;
+  height: 74px;
+  resize: none;
+  border: 1px solid rgba(148, 199, 219, .2);
+  border-radius: 9px;
+  padding: 7px 9px;
+  color: rgba(221, 239, 246, .78);
+  background: rgba(2, 7, 12, .72);
+  font: 10px/1.35 "Consolas", monospace;
+}
+
+.magic-review-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.magic-review-actions button {
+  flex: 1;
+  min-height: 30px;
+  border: 1px solid rgba(255, 180, 79, .38);
+  border-radius: 999px;
+  color: #ffe2b6;
+  background: rgba(58, 35, 12, .72);
+  font: 700 10px/1 "Noto Sans KR", "Malgun Gothic", sans-serif;
+  cursor: pointer;
+}
+
+.magic-review-actions button:last-child {
+  border-color: rgba(142, 189, 208, .3);
+  color: rgba(220, 239, 247, .78);
+  background: rgba(18, 34, 46, .74);
+}
+
+.magic-review-current p {
+  margin: 5px 0 0;
+}
+
+.magic-review-panel > small {
+  display: block;
+  margin-top: 10px;
+}
+
+.magic-review-visible-outline,
+.magic-review-hitbox-outline {
+  position: absolute;
+  z-index: 1;
+  box-sizing: border-box;
+  pointer-events: none;
+}
+
+.magic-review-hitbox-outline.editable {
+  overflow: visible;
+  pointer-events: auto;
+  cursor: move;
+  touch-action: none;
+}
+
+.magic-review-hitbox-shape {
+  position: absolute;
+  inset: 0;
+  box-sizing: border-box;
+  border: 2px dashed #ffb44f;
+  background: rgba(255, 180, 79, .045);
+  box-shadow: inset 0 0 0 1px rgba(30, 16, 0, .74);
+  pointer-events: none;
+}
+
+.magic-review-resize-handle {
+  position: absolute;
+  z-index: 2;
+  width: 14px;
+  height: 14px;
+  padding: 0;
+  border: 2px solid #ffb44f;
+  border-radius: 50%;
+  background: #1c1307;
+  box-shadow: 0 2px 7px rgba(0, 0, 0, .65);
+  touch-action: none;
+}
+
+.magic-review-resize-handle.nw { left: 0; top: 0; cursor: nwse-resize; transform: translate(-50%, -50%); }
+.magic-review-resize-handle.ne { right: 0; top: 0; cursor: nesw-resize; transform: translate(50%, -50%); }
+.magic-review-resize-handle.sw { left: 0; bottom: 0; cursor: nesw-resize; transform: translate(-50%, 50%); }
+.magic-review-resize-handle.se { right: 0; bottom: 0; cursor: nwse-resize; transform: translate(50%, 50%); }
+
+.magic-review-rotate-handle {
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: -34px;
+  display: grid;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 2px solid #ffb44f;
+  border-radius: 50%;
+  color: #ffcf86;
+  background: #1c1307;
+  box-shadow: 0 3px 9px rgba(0, 0, 0, .68);
+  font: 700 15px/1 sans-serif;
+  cursor: grab;
+  touch-action: none;
+  transform: translateX(-50%);
+}
+
+.magic-review-rotate-handle::after {
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  width: 1px;
+  height: 10px;
+  background: #ffb44f;
+  content: "";
+}
+
+.magic-review-rotate-handle:active {
+  cursor: grabbing;
+}
+
+.magic-review-visible-outline {
+  border: 3px solid #51ecff;
+  background: rgba(81, 236, 255, .06);
+  box-shadow: 0 0 0 1px rgba(0, 18, 24, .74), 0 0 13px rgba(81, 236, 255, .36);
+}
+
+.magic-review-hitbox-outline {
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.magic-review-visible-outline span,
+.magic-review-hitbox-outline span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 23px;
+  border-radius: 999px;
+  color: #07131a;
+  background: #51ecff;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, .52);
+  font-size: 12px;
+  font-weight: 900;
+  transform: translate(-50%, -50%);
+}
+
+.magic-review-hitbox-outline span {
+  left: auto;
+  right: -4px;
+  top: -4px;
+  color: #241503;
+  background: #ffb44f;
+  transform: translate(50%, -50%);
+}
+
+.magic-review-evidence:not(.active) .magic-review-visible-outline,
+.magic-review-evidence:not(.active) .magic-review-hitbox-outline {
+  opacity: .62;
+}
+
+.magic-review-evidence:not(.active) .magic-review-resize-handle {
+  display: none;
+}
+
+.magic-review-evidence:not(.active) .magic-review-rotate-handle {
+  display: none;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-review-active.magic-light-required:not(.light-magic-active) > .plate {
+  filter: brightness(1.16) contrast(1.03) saturate(1.04);
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-review-active.magic-light-required:not(.light-magic-active) > .magic-shade {
+  opacity: 0;
+}
+
+/* Stable catalog markers and progression order in the dimensional evidence bag. */
+html[data-samunmong-theme="magicSchool"] .evidence-bag-pop .evidence-visual {
+  position: relative;
+}
+
+html[data-samunmong-theme="magicSchool"] .magic-evidence-catalog-id {
+  position: absolute;
+  left: 8px;
+  top: 6px;
+  display: grid;
+  place-items: center;
+  width: 31px;
+  height: 25px;
+  border: 1px solid rgba(130, 233, 255, .7);
+  border-radius: 4px;
+  color: #edfcff !important;
+  background: rgba(10, 31, 48, .9);
+  box-shadow: 0 0 12px rgba(72, 219, 255, .3);
+  font-size: 11px;
+  font-weight: 800;
+  text-shadow: none !important;
+}
+
+@media (max-width: 1100px) {
+  .magic-review-panel {
+    right: 12px;
+    top: 58px;
+    width: 320px;
+  }
+
+  .magic-review-scene-tabs button {
+    padding-inline: 8px;
+    font-size: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .magic-scene-rig-3d {
+    opacity: .92;
+  }
 }

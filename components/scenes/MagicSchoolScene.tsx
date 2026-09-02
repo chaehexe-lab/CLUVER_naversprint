@@ -2,7 +2,15 @@
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from "react";
 import MagicSpellSystem, { type MagicSpellId, type MagicSpellResult } from "@/components/MagicSpellSystem";
+import MagicSceneRig3D from "@/components/effects/MagicSceneRig3D";
 import { magicSchoolScenes } from "@/lib/gameData";
+import {
+  getMagicEvidenceReviewId,
+  getMagicEvidenceReviewItems,
+  type MagicEvidenceBounds,
+  type MagicEvidenceReviewId
+} from "@/lib/magicEvidenceReview";
+import MagicEvidenceReviewOverlay from "./MagicEvidenceReviewOverlay";
 import { hotspotStyle } from "./hotspotStyle";
 
 type MagicScene = (typeof magicSchoolScenes)[number];
@@ -11,6 +19,8 @@ const FROZEN_BOOK_NAME = "빙결 흔적이 남은 반납 도서";
 const FROZEN_BOOK_THAWED_KEY = "samunmong-magic-library-frozen-book-thawed";
 const DORM_EVIDENCE_NAME = "버려진 지팡이 조각";
 const DORM_HALLWAY_CLEARED_KEY = "samunmong-magic-dorm-hallway-cleared";
+const ALCHEMY_LIGHT_CAST_KEY = "samunmong-magic-alchemy-light-cast";
+const MAGIC_REVIEW_BOUNDS_KEY = "samunmong-magic-evidence-review-bounds-v2";
 
 type HolyParticleStyle = CSSProperties & {
   "--particle-start-x": string;
@@ -133,12 +143,54 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
   const [iceBurstCount, setIceBurstCount] = useState(0);
   const [dormHallwayCleared, setDormHallwayCleared] = useState(false);
   const [windBurstCount, setWindBurstCount] = useState(0);
+  const [reviewMode, setReviewMode] = useState(false);
+  const [selectedReviewId, setSelectedReviewId] = useState<MagicEvidenceReviewId | undefined>();
+  const [reviewBounds, setReviewBounds] = useState<Record<string, MagicEvidenceBounds>>({});
   const noticeTimer = useRef<number | null>(null);
   const iceBurstTimer = useRef<number | null>(null);
 
   useEffect(() => {
+    const enabled = (process.env.NODE_ENV !== "production" || process.env.NEXT_PUBLIC_MAGIC_EVIDENCE_REVIEW === "1")
+      && new URLSearchParams(window.location.search).get("magicReview") === "1";
+    setReviewMode(enabled);
+    setSelectedReviewId(getMagicEvidenceReviewItems(scene.id)[0]?.id);
+    if (enabled) {
+      try {
+        const stored = JSON.parse(window.localStorage.getItem(MAGIC_REVIEW_BOUNDS_KEY) || "{}");
+        if (stored && typeof stored === "object") setReviewBounds(stored);
+      } catch {
+        window.localStorage.removeItem(MAGIC_REVIEW_BOUNDS_KEY);
+      }
+    }
+  }, [scene.id]);
+
+  const updateReviewBounds = useCallback((evidenceName: string, bounds: MagicEvidenceBounds) => {
+    setReviewBounds((current) => {
+      const next = { ...current, [evidenceName]: bounds };
+      window.localStorage.setItem(MAGIC_REVIEW_BOUNDS_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  const resetReviewBounds = useCallback((evidenceName: string) => {
+    setReviewBounds((current) => {
+      const next = { ...current };
+      delete next[evidenceName];
+      window.localStorage.setItem(MAGIC_REVIEW_BOUNDS_KEY, JSON.stringify(next));
+      return next;
+    });
+  }, []);
+
+  useEffect(() => {
     if (scene.id !== "magicLibrary") return;
     setFrozenBookThawed(window.localStorage.getItem(FROZEN_BOOK_THAWED_KEY) === "1");
+  }, [scene.id]);
+
+  useEffect(() => {
+    setLightEnabled(
+      scene.id === "magicAlchemyLab"
+      && window.localStorage.getItem(ALCHEMY_LIGHT_CAST_KEY) === "1"
+    );
   }, [scene.id]);
 
   useEffect(() => {
@@ -167,9 +219,18 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
     noticeTimer.current = window.setTimeout(() => setFrozenBookNotice(null), 2600);
   }, []);
   const handleLightChange = useCallback((enabled: boolean) => {
-    setLightEnabled(enabled);
-    if (enabled) setLightCastCount((count) => count + 1);
-  }, []);
+    if (scene.id !== "magicAlchemyLab") {
+      setLightEnabled(enabled);
+      return;
+    }
+    if (enabled) {
+      window.localStorage.setItem(ALCHEMY_LIGHT_CAST_KEY, "1");
+      setLightEnabled(true);
+      setLightCastCount((count) => count + 1);
+      return;
+    }
+    setLightEnabled(window.localStorage.getItem(ALCHEMY_LIGHT_CAST_KEY) === "1");
+  }, [scene.id]);
   const handleSpellCast = useCallback((spellId: MagicSpellId): MagicSpellResult => {
     if (spellId === "light") return "success";
     if (spellId === "ice-control" && scene.id === "magicLibrary") {
@@ -190,8 +251,12 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
     }
     return "no-effect";
   }, [scene.id, showFrozenBookNotice]);
-  const lightClassName = `${requiresLightSpell ? " magic-light-required" : ""}${lightEnabled ? " light-magic-active" : ""}${frozenBookThawed ? " frozen-book-thawed" : ""}${scene.id === "magicDormHallway" ? dormHallwayCleared ? " dorm-hallway-cleared" : " dorm-hallway-dirty" : ""}`;
+  const lightClassName = `${requiresLightSpell ? " magic-light-required" : ""}${lightEnabled ? " light-magic-active" : ""}${lightCastCount > 0 ? " light-cast-active" : ""}${frozenBookThawed ? " frozen-book-thawed" : ""}${scene.id === "magicDormHallway" ? dormHallwayCleared ? " dorm-hallway-cleared" : " dorm-hallway-dirty" : ""}`;
   const frozenBookHotspot = scene.hotspots.find((hotspot) => hotspot.evidenceName === FROZEN_BOOK_NAME);
+  const activeHotspots = scene.hotspots.map((hotspot) => {
+    const draft = hotspot.evidenceName ? reviewBounds[hotspot.evidenceName] : undefined;
+    return reviewMode && draft ? { ...hotspot, ...draft } : hotspot;
+  });
   const iceSpreadOrigin: IceSpreadOriginStyle = {
     "--ice-origin-x": frozenBookHotspot
       ? `${parseFloat(frozenBookHotspot.x) - 2}%`
@@ -202,8 +267,33 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
   };
 
   return (
-    <section className={`screen active magic-school-screen${lightClassName}`} id={scene.id}>
+    <section
+      className={`screen active magic-school-screen${lightClassName}${reviewMode ? " magic-review-active" : ""}`}
+      id={scene.id}
+      onClickCapture={(event) => {
+        if (!reviewMode) return;
+        const target = event.target instanceof Element
+          ? event.target.closest<HTMLElement>(".hotspot[data-evidence-name]")
+          : null;
+        if (!target) return;
+        event.preventDefault();
+        event.stopPropagation();
+        const reviewId = getMagicEvidenceReviewId(target.dataset.evidenceName);
+        if (reviewId) setSelectedReviewId(reviewId);
+      }}
+    >
       <img className="plate" src={scene.image} alt={scene.alt} />
+      {scene.id === "magicCleaningCloset" ? (
+        <img
+          className="magic-cleaning-ash-evidence"
+          src="/samunmong/assets/magic-school/evidence-cutouts/magic-cigarette-ash.webp"
+          alt=""
+          aria-hidden="true"
+          data-evidence-prop="금지된 마법 담배 재"
+          draggable="false"
+        />
+      ) : null}
+      <MagicSceneRig3D sceneId={scene.id} />
       <div className="shade magic-shade" />
       <div className="magic-light-bloom" aria-hidden="true" />
       <div className="magic-heavenly-light" aria-hidden="true" key={`heavenly-light-${lightCastCount}`}>
@@ -248,12 +338,13 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
         </div>
       ) : null}
 
-      {scene.hotspots.map((hotspot) => {
+      {activeHotspots.map((hotspot) => {
         const hotspotKey = "id" in hotspot && typeof hotspot.id === "string" ? hotspot.id : hotspot.evidenceName;
         const className = "className" in hotspot && typeof hotspot.className === "string" ? ` ${hotspot.className}` : "";
         const isFrozenBook = scene.id === "magicLibrary" && hotspot.evidenceName === FROZEN_BOOK_NAME;
         const isDormEvidence = scene.id === "magicDormHallway" && hotspot.evidenceName === DORM_EVIDENCE_NAME;
         const isDormEvidenceConcealed = isDormEvidence && !dormHallwayCleared;
+        const reviewId = getMagicEvidenceReviewId(hotspot.evidenceName);
 
         const handleHotspotClick = (event: ReactMouseEvent<HTMLButtonElement>) => {
           if (!isFrozenBook || frozenBookThawed || event.currentTarget.classList.contains("collected")) return;
@@ -275,13 +366,20 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
         return (
           <button
             key={hotspotKey}
-            className={`hotspot${className}${isFrozenBook ? frozenBookThawed ? " frozen-book-hotspot thawed" : " frozen-book-hotspot frozen" : ""}${isDormEvidence ? dormHallwayCleared ? " dorm-evidence revealed" : " dorm-evidence concealed" : ""}`}
+            className={`hotspot object-outline${className}${isFrozenBook ? frozenBookThawed ? " frozen-book-hotspot thawed" : " frozen-book-hotspot frozen" : ""}${isDormEvidence ? dormHallwayCleared ? " dorm-evidence revealed" : " dorm-evidence concealed" : ""}`}
             type="button"
             data-evidence-name={hotspot.evidenceName}
+            data-evidence-review-id={reviewId}
             aria-label={hotspot.ariaLabel}
             aria-description={isFrozenBook && !frozenBookThawed ? "얼음 조절 마법을 사용해야 획득할 수 있습니다" : isDormEvidenceConcealed ? "바람 마법으로 먼지와 쓰레기를 제거해야 발견할 수 있습니다" : undefined}
             aria-disabled={isFrozenBook && !frozenBookThawed || isDormEvidenceConcealed ? "true" : undefined}
             onClick={handleSceneHotspotClick}
+            onPointerEnter={() => {
+              if (reviewMode && reviewId) setSelectedReviewId(reviewId);
+            }}
+            onFocus={() => {
+              if (reviewMode && reviewId) setSelectedReviewId(reviewId);
+            }}
             style={{
               ...hotspotStyle(hotspot),
               clipPath: hotspot.clipPath,
@@ -290,6 +388,17 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
           />
         );
       })}
+
+      {reviewMode ? (
+        <MagicEvidenceReviewOverlay
+          sceneId={scene.id}
+          hotspots={activeHotspots}
+          selectedId={selectedReviewId}
+          onSelect={setSelectedReviewId}
+          onHotspotChange={updateReviewBounds}
+          onHotspotReset={resetReviewBounds}
+        />
+      ) : null}
 
       {frozenBookNotice ? (
         <div className="frozen-book-notice" role="status" aria-live="polite">
