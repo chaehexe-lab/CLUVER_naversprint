@@ -9,6 +9,8 @@ type MagicScene = (typeof magicSchoolScenes)[number];
 
 const FROZEN_BOOK_NAME = "빙결 흔적이 남은 반납 도서";
 const FROZEN_BOOK_THAWED_KEY = "samunmong-magic-library-frozen-book-thawed";
+const DORM_EVIDENCE_NAME = "버려진 지팡이 조각";
+const DORM_HALLWAY_CLEARED_KEY = "samunmong-magic-dorm-hallway-cleared";
 
 type HolyParticleStyle = CSSProperties & {
   "--particle-start-x": string;
@@ -43,6 +45,15 @@ type IceBurstParticleStyle = CSSProperties & {
 type IceSpreadOriginStyle = CSSProperties & {
   "--ice-origin-x": string;
   "--ice-origin-y": string;
+};
+
+type WindDebrisStyle = CSSProperties & {
+  "--wind-start-x": string;
+  "--wind-start-y": string;
+  "--wind-delay": string;
+  "--wind-dx": string;
+  "--wind-dy": string;
+  "--wind-spin": string;
 };
 
 const holyParticles: HolyParticleStyle[] = Array.from({ length: 180 }, (_, index) => {
@@ -103,13 +114,25 @@ const iceBurstParticles: IceBurstParticleStyle[] = Array.from({ length: 64 }, (_
   } satisfies IceBurstParticleStyle;
 });
 
+const windDebris: WindDebrisStyle[] = Array.from({ length: 18 }, (_, index) => ({
+  "--wind-start-x": `${52 + (index % 6) * 3.6}%`,
+  "--wind-start-y": `${77 + (index % 4) * 2}%`,
+  "--wind-delay": `${(index % 7) * 0.045}s`,
+  "--wind-dx": `${260 + (index % 5) * 38}px`,
+  "--wind-dy": `${-150 - (index % 6) * 24}px`,
+  "--wind-spin": `${220 + (index % 5) * 70}deg`,
+}));
+
 export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
   const requiresLightSpell = scene.id === "magicAlchemyLab";
   const [lightEnabled, setLightEnabled] = useState(false);
   const [lightCastCount, setLightCastCount] = useState(0);
   const [frozenBookThawed, setFrozenBookThawed] = useState(false);
   const [frozenBookNotice, setFrozenBookNotice] = useState<string | null>(null);
+  const [noticeIcon, setNoticeIcon] = useState("❄");
   const [iceBurstCount, setIceBurstCount] = useState(0);
+  const [dormHallwayCleared, setDormHallwayCleared] = useState(false);
+  const [windBurstCount, setWindBurstCount] = useState(0);
   const noticeTimer = useRef<number | null>(null);
   const iceBurstTimer = useRef<number | null>(null);
 
@@ -118,13 +141,28 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
     setFrozenBookThawed(window.localStorage.getItem(FROZEN_BOOK_THAWED_KEY) === "1");
   }, [scene.id]);
 
+  useEffect(() => {
+    if (scene.id !== "magicDormHallway") return;
+    let evidenceWasAlreadyCollected = false;
+    try {
+      const storedEvidence = JSON.parse(window.localStorage.getItem("samunmong-collected-evidence-magic-school") || "[]");
+      evidenceWasAlreadyCollected = Array.isArray(storedEvidence) && storedEvidence.includes(DORM_EVIDENCE_NAME);
+    } catch {
+      evidenceWasAlreadyCollected = false;
+    }
+    const isCleared = window.localStorage.getItem(DORM_HALLWAY_CLEARED_KEY) === "1" || evidenceWasAlreadyCollected;
+    setDormHallwayCleared(isCleared);
+    if (isCleared) window.localStorage.setItem(DORM_HALLWAY_CLEARED_KEY, "1");
+  }, [scene.id]);
+
   useEffect(() => () => {
     if (noticeTimer.current !== null) window.clearTimeout(noticeTimer.current);
     if (iceBurstTimer.current !== null) window.clearTimeout(iceBurstTimer.current);
   }, []);
 
-  const showFrozenBookNotice = useCallback((message: string) => {
+  const showFrozenBookNotice = useCallback((message: string, icon = "❄") => {
     if (noticeTimer.current !== null) window.clearTimeout(noticeTimer.current);
+    setNoticeIcon(icon);
     setFrozenBookNotice(message);
     noticeTimer.current = window.setTimeout(() => setFrozenBookNotice(null), 2600);
   }, []);
@@ -143,9 +181,16 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
       showFrozenBookNotice("냉기가 걷혔습니다. 이제 책을 획득할 수 있습니다.");
       return "success";
     }
+    if (spellId === "wind" && scene.id === "magicDormHallway") {
+      setDormHallwayCleared(true);
+      setWindBurstCount((count) => count + 1);
+      window.localStorage.setItem(DORM_HALLWAY_CLEARED_KEY, "1");
+      showFrozenBookNotice("바람이 흙먼지와 쓰레기를 걷어 냈습니다. 그 아래에서 지팡이 조각이 드러났습니다.", "≋");
+      return "success";
+    }
     return "no-effect";
   }, [scene.id, showFrozenBookNotice]);
-  const lightClassName = `${requiresLightSpell ? " magic-light-required" : ""}${lightEnabled ? " light-magic-active" : ""}${frozenBookThawed ? " frozen-book-thawed" : ""}`;
+  const lightClassName = `${requiresLightSpell ? " magic-light-required" : ""}${lightEnabled ? " light-magic-active" : ""}${frozenBookThawed ? " frozen-book-thawed" : ""}${scene.id === "magicDormHallway" ? dormHallwayCleared ? " dorm-hallway-cleared" : " dorm-hallway-dirty" : ""}`;
   const frozenBookHotspot = scene.hotspots.find((hotspot) => hotspot.evidenceName === FROZEN_BOOK_NAME);
   const iceSpreadOrigin: IceSpreadOriginStyle = {
     "--ice-origin-x": frozenBookHotspot
@@ -172,6 +217,27 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
         ))}
       </div>
 
+      {scene.id === "magicDormHallway" ? (
+        <img
+          className="magic-dorm-clutter"
+          src="/samunmong/assets/magic-school/scenes/dorm-hallway-dust-trash-v1.png"
+          alt=""
+          aria-hidden="true"
+          draggable="false"
+        />
+      ) : null}
+
+      {scene.id === "magicDormHallway" && windBurstCount > 0 ? (
+        <div className="dorm-wind-effect" aria-hidden="true" key={`wind-burst-${windBurstCount}`}>
+          <span className="wind-sweep wind-sweep-one" />
+          <span className="wind-sweep wind-sweep-two" />
+          <span className="wind-sweep wind-sweep-three" />
+          {windDebris.map((style, index) => (
+            <i className={index % 3 === 0 ? "wind-debris paper" : "wind-debris dust"} style={style} key={index} />
+          ))}
+        </div>
+      ) : null}
+
       {iceBurstCount > 0 ? (
         <div className="ice-spread-effect" style={iceSpreadOrigin} aria-hidden="true" key={`ice-burst-${iceBurstCount}`}>
           <span className="ice-burst-flash" />
@@ -186,6 +252,8 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
         const hotspotKey = "id" in hotspot && typeof hotspot.id === "string" ? hotspot.id : hotspot.evidenceName;
         const className = "className" in hotspot && typeof hotspot.className === "string" ? ` ${hotspot.className}` : "";
         const isFrozenBook = scene.id === "magicLibrary" && hotspot.evidenceName === FROZEN_BOOK_NAME;
+        const isDormEvidence = scene.id === "magicDormHallway" && hotspot.evidenceName === DORM_EVIDENCE_NAME;
+        const isDormEvidenceConcealed = isDormEvidence && !dormHallwayCleared;
 
         const handleHotspotClick = (event: ReactMouseEvent<HTMLButtonElement>) => {
           if (!isFrozenBook || frozenBookThawed || event.currentTarget.classList.contains("collected")) return;
@@ -194,16 +262,26 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
           showFrozenBookNotice("책이 꽁꽁 얼어 있어 획득할 수 없습니다.");
         };
 
+        const handleSceneHotspotClick = (event: ReactMouseEvent<HTMLButtonElement>) => {
+          if (isDormEvidenceConcealed) {
+            event.preventDefault();
+            event.stopPropagation();
+            showFrozenBookNotice("흙먼지와 쓰레기가 바닥을 덮고 있습니다. 바람 마법으로 치워야 합니다.", "≋");
+            return;
+          }
+          handleHotspotClick(event);
+        };
+
         return (
           <button
             key={hotspotKey}
-            className={`hotspot${className}${isFrozenBook ? frozenBookThawed ? " frozen-book-hotspot thawed" : " frozen-book-hotspot frozen" : ""}`}
+            className={`hotspot${className}${isFrozenBook ? frozenBookThawed ? " frozen-book-hotspot thawed" : " frozen-book-hotspot frozen" : ""}${isDormEvidence ? dormHallwayCleared ? " dorm-evidence revealed" : " dorm-evidence concealed" : ""}`}
             type="button"
             data-evidence-name={hotspot.evidenceName}
             aria-label={hotspot.ariaLabel}
-            aria-description={isFrozenBook && !frozenBookThawed ? "얼음 조절 마법을 사용해야 획득할 수 있습니다" : undefined}
-            aria-disabled={isFrozenBook && !frozenBookThawed ? "true" : undefined}
-            onClick={handleHotspotClick}
+            aria-description={isFrozenBook && !frozenBookThawed ? "얼음 조절 마법을 사용해야 획득할 수 있습니다" : isDormEvidenceConcealed ? "바람 마법으로 먼지와 쓰레기를 제거해야 발견할 수 있습니다" : undefined}
+            aria-disabled={isFrozenBook && !frozenBookThawed || isDormEvidenceConcealed ? "true" : undefined}
+            onClick={handleSceneHotspotClick}
             style={{
               ...hotspotStyle(hotspot),
               clipPath: hotspot.clipPath,
@@ -215,7 +293,7 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
 
       {frozenBookNotice ? (
         <div className="frozen-book-notice" role="status" aria-live="polite">
-          <span aria-hidden="true">❄</span>
+          <span aria-hidden="true">{noticeIcon}</span>
           <strong>{frozenBookNotice}</strong>
         </div>
       ) : null}
