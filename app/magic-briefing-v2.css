@@ -251,6 +251,10 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen.magic-entry-records #st
   pointer-events: auto !important;
 }
 
+html[data-samunmong-theme="magicSchool"] #briefingScreen.magic-entry-records [data-briefing-panel="2"] > .briefing-caption {
+  font-size: clamp(14px, 1.05vw, 18px) !important;
+}
+
 html[data-samunmong-theme="magicSchool"] #briefingScreen.magic-entry-records .briefing-card {
   width: 96vw !important;
   max-width: none !important;
