@@ -437,7 +437,7 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen.magic-entry-records .ma
   top: 26.3% !important;
   width: 36.7% !important;
   height: 63% !important;
-  grid-template-rows: repeat(3, 1fr) !important;
+  grid-template-rows: 1.05fr 1.08fr .72fr !important;
   gap: 1.5% !important;
 }
 
@@ -664,7 +664,7 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen.magic-entry-records .ma
 }
 
 html[data-samunmong-theme="magicSchool"] #briefingScreen.magic-entry-records .magic-guard-fields div {
-  padding: 8.5% 6.5% 1% !important;
+  padding: 4% 6.5% !important;
 }
 
 html[data-samunmong-theme="magicSchool"] #briefingScreen.magic-entry-records .magic-guard-fields .featured dd {
