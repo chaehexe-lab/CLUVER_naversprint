@@ -241,7 +241,7 @@ function MagicStartCaseButtonArt({ label }: { label: string }) {
         textAnchor="middle"
         fill="#f8ead0"
         fontFamily="NanumBareunJeongsin, Noto Serif KR, serif"
-        fontSize="25"
+        fontSize="20"
         fontWeight="700"
         letterSpacing="1"
       >
