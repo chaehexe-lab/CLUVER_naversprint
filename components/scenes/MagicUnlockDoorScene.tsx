@@ -19,7 +19,7 @@ export default function MagicUnlockDoorScene() {
   }, []);
 
   function castSpell(spellId: MagicSpellId): MagicSpellResult {
-    if (spellId !== "unlock" || phase !== "locked") return "no-effect";
+    if (spellId !== "metal-break" || phase !== "locked") return "no-effect";
     setPhase("casting");
     timer.current = window.setTimeout(() => {
       window.localStorage.setItem(UNLOCK_STORAGE_KEY, "1");
@@ -54,10 +54,10 @@ export default function MagicUnlockDoorScene() {
       </div>
       <header className="magic-unlock-copy">
         <p>현재 위치 · 도서관 앞</p>
-        <h1>{phase === "unlocked" ? "봉인이 풀렸습니다" : phase === "casting" ? "봉인 해제 중" : "문이 잠겨 있습니다"}</h1>
+        <h1>{phase === "unlocked" ? "금속 봉인이 파괴되었습니다" : phase === "casting" ? "금속 붕괴 중" : "문이 잠겨 있습니다"}</h1>
         <span aria-live="polite">
-          {phase === "locked" && "자물쇠 해제 마법으로 문에 걸린 봉인을 푸세요."}
-          {phase === "casting" && "해제 주문이 자물쇠의 룬을 분해하고 있습니다…"}
+          {phase === "locked" && "금속 파괴 마법으로 문을 묶은 자물쇠와 쇠사슬을 부수세요."}
+          {phase === "casting" && "파괴 주문이 금속의 결합을 무너뜨리고 있습니다…"}
           {phase === "unlocked" && "문 너머의 도서관을 조사할 수 있습니다."}
         </span>
       </header>
@@ -65,7 +65,10 @@ export default function MagicUnlockDoorScene() {
       <div className="magic-door-stage" aria-label={phase === "unlocked" ? "자물쇠가 풀려 열린 문" : "마법 자물쇠로 잠긴 문"}>
         <div className="unlock-spell-rings" aria-hidden="true">
           <i /><i /><i />
-          <svg viewBox="0 0 200 200" focusable="false"><path d="M100 12 121 62 174 40 138 82 188 100 138 118 174 160 121 138 100 188 79 138 26 160 62 118 12 100 62 82 26 40 79 62Z" /><circle cx="100" cy="100" r="58" /></svg>
+          <svg viewBox="0 0 200 200" focusable="false">
+            <path d="M55 30 H145 L175 60 V140 L145 170 H55 L25 140 V60 Z" />
+            <path d="M118 31 88 88 118 104 80 169 M88 88 53 71 M118 104 153 129" />
+          </svg>
         </div>
         <span className="lock-spark spark-one" aria-hidden="true" />
         <span className="lock-spark spark-two" aria-hidden="true" />
