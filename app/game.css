@@ -953,6 +953,11 @@
       display: none;
     }
 
+    #fieldOne .hotspot.field-letter-evidence {
+      border-radius: var(--radius, 999px);
+      clip-path: var(--clip);
+    }
+
     /* Integrated evidence scenes: a collected object disappears from the room itself. */
     #chunwolRoom:has(.hanging-jeogori.collected) .scene-state-background[data-scene-state="all"],
     #chunwolRoom:has(.portrait-glow.collected) .scene-state-background[data-scene-state="all"],

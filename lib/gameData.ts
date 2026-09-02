@@ -100,7 +100,7 @@ export const fieldOneScene = {
   alt: "유문석 집 문 앞에 쓰러진 점순과 조사할 증거가 놓인 사건 현장",
   props: [] as SceneProp[],
   hotspots: [
-    { className: "scene-evidence-object field-letter-evidence concealed-space-hotspot", evidenceName: "찢어진 약속 편지", ariaLabel: "점순이 쥔 손 살피기", x: "66%", y: "75%", w: "15%", h: "16%", clipPath: "ellipse(47% 42% at 52% 53%)", radius: "999px", rot: "5deg" },
+    { className: "scene-evidence-object field-letter-evidence concealed-space-hotspot", evidenceName: "찢어진 약속 편지", ariaLabel: "점순이 쥔 손 살피기", x: "70%", y: "82%", w: "12%", h: "11.5%", clipPath: "ellipse(48% 44% at 52% 52%)", radius: "999px", rot: "5deg" },
     { id: "hopaeHotspot", className: "scene-evidence-object field-hopae-evidence hopae-glow concealed-space-hotspot", evidenceName: "호패 조각", ariaLabel: "점순의 겉옷 안쪽 살피기", x: "49%", y: "61%", w: "19%", h: "20%", clipPath: "polygon(8% 13%, 83% 2%, 100% 71%, 78% 100%, 5% 84%)", radius: "16px", rot: "-4deg" }
   ] satisfies SceneHotspot[],
   lights: [
