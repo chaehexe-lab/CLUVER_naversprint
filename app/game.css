@@ -8629,10 +8629,10 @@ html[data-samunmong-theme="joseon"] #specialEvidencePuzzlePanel:has(.special-tou
 
 /* Magic-school rune drawing and light spell */
 .magic-school-screen.magic-light-required .plate { transition: filter 2.6s cubic-bezier(.18,.78,.22,1); }
-html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-required:not(.light-magic-active) .plate { filter: brightness(.28) contrast(1.18) saturate(.55); }
+html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-required:not(.light-magic-active) .plate { filter: brightness(.55) contrast(1.08) saturate(.75); }
 html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-required.light-magic-active .plate { filter: brightness(1.16) contrast(1.03) saturate(1.04); }
-.magic-school-screen.magic-light-required .magic-shade { z-index: 2; background: radial-gradient(circle at 50% 44%, rgba(20,25,45,.18), rgba(1,2,8,.82) 72%); opacity: 1; transition: opacity 2.4s cubic-bezier(.18,.78,.22,1); }
-.magic-school-screen.magic-light-required.light-magic-active .magic-shade { opacity: 0; }
+html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-required .magic-shade { z-index: 2; background: radial-gradient(circle at 50% 44%, rgba(20,25,45,.05), rgba(1,2,8,.3) 78%); opacity: 1; transition: opacity 2.4s cubic-bezier(.18,.78,.22,1); }
+html[data-samunmong-theme="magicSchool"] .magic-school-screen.magic-light-required.light-magic-active .magic-shade { opacity: 0; }
 .magic-light-bloom { position: absolute; z-index: 3; inset: 0; opacity: 0; pointer-events: none; background: radial-gradient(circle at 50% 46%, rgba(255,251,202,.74), rgba(245,203,104,.25) 24%, transparent 62%); mix-blend-mode: screen; }
 .magic-school-screen.light-magic-active .magic-light-bloom { animation: magicSceneIlluminate 2.8s ease-out both; }
 .magic-heavenly-light { position: absolute; z-index: 89; inset: 0; overflow: hidden; opacity: 0; pointer-events: none; mix-blend-mode: screen; isolation: isolate; will-change: opacity; transform: translateZ(0); }
