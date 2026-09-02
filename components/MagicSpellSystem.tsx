@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointer
 type Point = { x: number; y: number };
 type SpellPhase = "select" | "draw" | "casting" | "complete";
 
-export type MagicSpellId = "light" | "metal-break" | "ice-control";
+export type MagicSpellId = "light" | "metal-break" | "ice-control" | "wind";
 export type MagicSpellResult = "success" | "no-effect";
 
 type MagicSpellDefinition = {
@@ -15,7 +15,7 @@ type MagicSpellDefinition = {
   description: string;
   symbol: string;
   drawingTitle: string;
-  trace: "star" | "shattered-metal" | "snowflake";
+  trace: "star" | "shattered-metal" | "snowflake" | "spiral";
   traceName: string;
 };
 
@@ -52,7 +52,18 @@ const iceControlSpell: MagicSpellDefinition = {
   traceName: "눈송이",
 };
 
-const availableSpells = [lightSpell, metalBreakSpell, iceControlSpell];
+const windSpell: MagicSpellDefinition = {
+  id: "wind",
+  name: "바람 마법",
+  incantation: "VENTUS",
+  description: "바람을 일으켜 먼지와 가벼운 쓰레기를 걷어 낸다",
+  symbol: "≋",
+  drawingTitle: "세 갈래 바람 문양을 따라 마법진을 그리세요",
+  trace: "spiral",
+  traceName: "세 갈래 바람",
+};
+
+const availableSpells = [lightSpell, metalBreakSpell, iceControlSpell, windSpell];
 
 function SpellIcon({ spell }: { spell: MagicSpellDefinition }) {
   if (spell.id === "metal-break") {
@@ -72,6 +83,16 @@ function SpellIcon({ spell }: { spell: MagicSpellDefinition }) {
         <path d="M50 8 L42 20 M50 8 L58 20 M50 92 L42 80 M50 92 L58 80" />
         <path d="M14 29 L29 30 M14 29 L21 43 M86 71 L71 70 M86 71 L79 57" />
         <path d="M14 71 L21 57 M14 71 L29 70 M86 29 L71 30 M86 29 L79 43" />
+      </svg>
+    );
+  }
+
+  if (spell.id === "wind") {
+    return (
+      <svg className="wind-spell-icon" viewBox="0 0 100 100" focusable="false" aria-hidden="true">
+        <path d="M8 35 C30 19 52 42 72 32 C92 22 87 3 72 8 C61 12 65 25 74 20" />
+        <path d="M8 50 C29 36 39 69 60 57 C76 48 69 33 58 37 C49 40 53 51 60 47" />
+        <path d="M8 66 C29 54 39 91 66 84 C94 77 94 52 77 53 C64 54 65 70 76 67" />
       </svg>
     );
   }
@@ -154,6 +175,27 @@ const snowflakeTrace: Point[][] = [
   linePoints({ x: 145, y: 325 }, { x: 455, y: 145 }, 64),
 ];
 
+const windTopTrace: Point[] = [
+  ...cubicBezierPoints({ x: 80, y: 175 }, { x: 165, y: 105 }, { x: 245, y: 190 }, { x: 345, y: 160 }, 42),
+  ...cubicBezierPoints({ x: 345, y: 160 }, { x: 455, y: 128 }, { x: 455, y: 42 }, { x: 385, y: 34 }, 34).slice(1),
+  ...cubicBezierPoints({ x: 385, y: 34 }, { x: 325, y: 28 }, { x: 310, y: 105 }, { x: 354, y: 119 }, 30).slice(1),
+  ...cubicBezierPoints({ x: 354, y: 119 }, { x: 391, y: 131 }, { x: 405, y: 86 }, { x: 374, y: 78 }, 24).slice(1),
+];
+
+const windMiddleTrace: Point[] = [
+  ...cubicBezierPoints({ x: 80, y: 225 }, { x: 170, y: 160 }, { x: 205, y: 305 }, { x: 305, y: 267 }, 44),
+  ...cubicBezierPoints({ x: 305, y: 267 }, { x: 365, y: 244 }, { x: 350, y: 174 }, { x: 300, y: 180 }, 32).slice(1),
+  ...cubicBezierPoints({ x: 300, y: 180 }, { x: 258, y: 185 }, { x: 255, y: 236 }, { x: 292, y: 239 }, 28).slice(1),
+  ...cubicBezierPoints({ x: 292, y: 239 }, { x: 322, y: 241 }, { x: 326, y: 205 }, { x: 299, y: 205 }, 22).slice(1),
+];
+
+const windBottomTrace: Point[] = [
+  ...cubicBezierPoints({ x: 82, y: 286 }, { x: 180, y: 245 }, { x: 230, y: 430 }, { x: 365, y: 395 }, 48),
+  ...cubicBezierPoints({ x: 365, y: 395 }, { x: 492, y: 363 }, { x: 500, y: 244 }, { x: 416, y: 241 }, 38).slice(1),
+  ...cubicBezierPoints({ x: 416, y: 241 }, { x: 345, y: 238 }, { x: 337, y: 326 }, { x: 399, y: 337 }, 34).slice(1),
+  ...cubicBezierPoints({ x: 399, y: 337 }, { x: 448, y: 346 }, { x: 461, y: 282 }, { x: 417, y: 280 }, 26).slice(1),
+];
+
 const traceSets = {
   star: {
     paths: ["M300 55 C310 135 385 220 500 235 C385 250 310 335 300 415 C290 335 215 250 100 235 C215 220 290 135 300 55 Z"],
@@ -175,6 +217,14 @@ const traceSets = {
       "M145 325 L455 145",
     ],
     strokes: snowflakeTrace,
+  },
+  spiral: {
+    paths: [
+      "M80 175 C165 105 245 190 345 160 C455 128 455 42 385 34 C325 28 310 105 354 119 C391 131 405 86 374 78",
+      "M80 225 C170 160 205 305 305 267 C365 244 350 174 300 180 C258 185 255 236 292 239 C322 241 326 205 299 205",
+      "M82 286 C180 245 230 430 365 395 C492 363 500 244 416 241 C345 238 337 326 399 337 C448 346 461 282 417 280",
+    ],
+    strokes: [windTopTrace, windMiddleTrace, windBottomTrace],
   },
 };
 
