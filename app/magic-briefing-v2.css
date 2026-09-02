@@ -387,9 +387,11 @@ html[data-samunmong-theme="magicSchool"] #briefingScreen.magic-entry-records .ma
   z-index: 30 !important;
   width: 44px !important;
   height: 58px !important;
-  border: 1px solid rgba(111, 72, 42, .5) !important;
-  border-radius: 999px !important;
-  background: rgba(39, 24, 22, .78) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  outline: 0 !important;
   color: #f1d8a6 !important;
   font-size: 32px !important;
   cursor: pointer !important;
