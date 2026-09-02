@@ -5,7 +5,7 @@ import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointer
 type Point = { x: number; y: number };
 type SpellPhase = "select" | "draw" | "casting" | "complete";
 
-export type MagicSpellId = "light" | "unlock" | "ice-control";
+export type MagicSpellId = "light" | "metal-break" | "ice-control";
 export type MagicSpellResult = "success" | "no-effect";
 
 type MagicSpellDefinition = {
@@ -15,7 +15,7 @@ type MagicSpellDefinition = {
   description: string;
   symbol: string;
   drawingTitle: string;
-  trace: "star" | "key" | "snowflake";
+  trace: "star" | "shattered-metal" | "snowflake";
   traceName: string;
 };
 
@@ -30,15 +30,15 @@ const lightSpell: MagicSpellDefinition = {
   traceName: "별",
 };
 
-const unlockSpell: MagicSpellDefinition = {
-  id: "unlock",
-  name: "자물쇠 해제 마법",
-  incantation: "ALOHOMORA",
-  description: "문에 걸린 마법 봉인과 자물쇠를 해제한다",
+const metalBreakSpell: MagicSpellDefinition = {
+  id: "metal-break",
+  name: "금속 파괴 마법",
+  incantation: "FERRUM FRACTUM",
+  description: "금속의 결합을 무너뜨려 자물쇠와 쇠사슬을 파괴한다",
   symbol: "✦",
-  drawingTitle: "열쇠 모양을 따라 해제 마법진을 그리세요",
-  trace: "key",
-  traceName: "열쇠",
+  drawingTitle: "금이 간 철판 모양을 따라 파괴 마법진을 그리세요",
+  trace: "shattered-metal",
+  traceName: "금이 간 철판",
 };
 
 const iceControlSpell: MagicSpellDefinition = {
@@ -52,15 +52,15 @@ const iceControlSpell: MagicSpellDefinition = {
   traceName: "눈송이",
 };
 
-const availableSpells = [lightSpell, unlockSpell, iceControlSpell];
+const availableSpells = [lightSpell, metalBreakSpell, iceControlSpell];
 
 function SpellIcon({ spell }: { spell: MagicSpellDefinition }) {
-  if (spell.id === "unlock") {
+  if (spell.id === "metal-break") {
     return (
-      <svg className="unlock-key-spell-icon" viewBox="0 0 100 100" focusable="false" aria-hidden="true">
-        <circle cx="29" cy="50" r="17" />
-        <path d="M46 50 H86 V64 H75 V57 H64 V50" />
-        <circle cx="29" cy="50" r="6" />
+      <svg className="metal-break-spell-icon" viewBox="0 0 100 100" focusable="false" aria-hidden="true">
+        <path d="M22 15 H78 L91 35 V65 L78 85 H22 L9 65 V35 Z" />
+        <path d="M58 16 L43 43 L58 51 L39 84" />
+        <path d="M43 43 L27 36 M58 51 L76 63" />
       </svg>
     );
   }
@@ -126,18 +126,26 @@ function linePoints(from: Point, to: Point, count: number) {
   });
 }
 
-const keyBowTrace: Point[] = Array.from({ length: 65 }, (_, index) => {
-  const angle = (Math.PI * 2 * index) / 64;
-  return { x: 205 + Math.cos(angle) * 82, y: 235 + Math.sin(angle) * 82 };
-});
+const shatteredMetalOutlineTrace: Point[] = [
+  ...linePoints({ x: 190, y: 70 }, { x: 410, y: 70 }, 32),
+  ...linePoints({ x: 410, y: 70 }, { x: 485, y: 150 }, 18),
+  ...linePoints({ x: 485, y: 150 }, { x: 485, y: 320 }, 26),
+  ...linePoints({ x: 485, y: 320 }, { x: 410, y: 400 }, 18),
+  ...linePoints({ x: 410, y: 400 }, { x: 190, y: 400 }, 32),
+  ...linePoints({ x: 190, y: 400 }, { x: 115, y: 320 }, 18),
+  ...linePoints({ x: 115, y: 320 }, { x: 115, y: 150 }, 26),
+  ...linePoints({ x: 115, y: 150 }, { x: 190, y: 70 }, 18),
+];
 
-const keyShaftTrace: Point[] = [
-  ...linePoints({ x: 287, y: 235 }, { x: 485, y: 235 }, 34),
-  ...linePoints({ x: 485, y: 235 }, { x: 485, y: 292 }, 12),
-  ...linePoints({ x: 485, y: 292 }, { x: 440, y: 292 }, 10),
-  ...linePoints({ x: 440, y: 292 }, { x: 440, y: 264 }, 7),
-  ...linePoints({ x: 440, y: 264 }, { x: 398, y: 264 }, 10),
-  ...linePoints({ x: 398, y: 264 }, { x: 398, y: 235 }, 7),
+const shatteredMetalCrackTrace: Point[] = [
+  ...linePoints({ x: 340, y: 72 }, { x: 268, y: 205 }, 28),
+  ...linePoints({ x: 268, y: 205 }, { x: 342, y: 244 }, 18),
+  ...linePoints({ x: 342, y: 244 }, { x: 255, y: 398 }, 32),
+];
+
+const shatteredMetalBranchTrace: Point[][] = [
+  linePoints({ x: 268, y: 205 }, { x: 188, y: 168 }, 20),
+  linePoints({ x: 342, y: 244 }, { x: 425, y: 300 }, 20),
 ];
 
 const snowflakeTrace: Point[][] = [
@@ -151,12 +159,14 @@ const traceSets = {
     paths: ["M300 55 C310 135 385 220 500 235 C385 250 310 335 300 415 C290 335 215 250 100 235 C215 220 290 135 300 55 Z"],
     strokes: [starTrace],
   },
-  key: {
+  "shattered-metal": {
     paths: [
-      "M287 235 A82 82 0 1 1 123 235 A82 82 0 1 1 287 235",
-      "M287 235 H485 V292 H440 V264 H398 V235",
+      "M190 70 H410 L485 150 V320 L410 400 H190 L115 320 V150 Z",
+      "M340 72 L268 205 L342 244 L255 398",
+      "M268 205 L188 168",
+      "M342 244 L425 300",
     ],
-    strokes: [keyBowTrace, keyShaftTrace],
+    strokes: [shatteredMetalOutlineTrace, shatteredMetalCrackTrace, ...shatteredMetalBranchTrace],
   },
   snowflake: {
     paths: [
