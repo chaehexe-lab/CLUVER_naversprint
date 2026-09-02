@@ -74,6 +74,15 @@ const magicGuardRecord = {
   testimony: "말포일은 평소 매일 도서관에 머무는 모범생이라며 강하게 신뢰하고 있음."
 } as const;
 
+const magicFacultyRecord = {
+  name: "덩쿨도어",
+  subtitle: "학년부장 · 화염 마법 담당",
+  subject: "제1 연금술 실습실 수업과 화염 마법 과목을 담당하며 실습실 관리 권한을 가지고 있음.",
+  conduct: "냉담하고 무관심한 태도가 잦으며 학생 문제에 깊게 관여하지 않는 편.",
+  notes: "사건 직후 몸에서 탄 냄새가 났고 현장 근처에서 목격되어 의심을 받음.",
+  memo: "금지된 마법 담배 흡연 의심이 있음. 방화 여부와 별개로 당시 행적 확인이 필요함."
+} as const;
+
 const memoryTraceEvidence = [
   {
     name: "부러진 지팡이",
@@ -405,6 +414,8 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
   const [orbSmokeFrame, setOrbSmokeFrame] = useState(1);
   const [incidentMagicFrame, setIncidentMagicFrame] = useState(1);
   const [investigatedMagicEvidence, setInvestigatedMagicEvidence] = useState<string[]>([]);
+  const [magicRecordIndex, setMagicRecordIndex] = useState(0);
+  const [magicStudentIndex, setMagicStudentIndex] = useState(0);
   const isMagicTheme = initialTheme === "magicSchool";
   const isMagicSceneComplete = investigatedMagicEvidence.length === memoryTraceEvidence.length;
 
@@ -793,14 +804,17 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
           {isMagicTheme ? (
             <div className={`briefing-step${activeStep === 2 ? " active" : ""}`} data-briefing-panel="2" aria-hidden={activeStep !== 2}>
               <p className="briefing-caption strong">세 권의 기록 책을 차례로 펼쳐 보십시오, 선생님.</p>
-              <div className="magic-record-intro" data-record-kind="card">
+              <div className="magic-record-intro" data-record-kind={magicRecordIndex}>
                 <nav className="magic-record-tabs" aria-label="관계자 기록 바로가기">
                   {magicRecordCards.map((record, index) => (
                     <button
-                      className={`magic-record-tab${index === 0 ? " active" : ""}`}
+                      className={`magic-record-tab${index === magicRecordIndex ? " active" : ""}`}
                       type="button"
-                      data-record-card-tab={index}
                       key={record.name}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        setMagicRecordIndex(index);
+                      }}
                     >
                       <span>{record.kind}</span>
                       <br />
@@ -812,18 +826,19 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
                 <section className="magic-record-carousel" aria-label="관계자 기록 카드">
                   {magicRecordCards.map((record, index) => (
                     <article
-                      className={`magic-record-card${index === 0 ? " active" : ""}`}
+                      className={`magic-record-card${index === magicRecordIndex ? " active" : ""}`}
                       data-record-card={index}
+                      aria-hidden={index !== magicRecordIndex}
                       key={record.name}
                     >
                       {index === 1 ? (
                         <div className="magic-student-ledger" data-magic-student-ledger>
-                          <img className="magic-student-ledger-book" src="/samunmong/assets/magic-school/intro/records/student-record-book-blank-v1.png" alt="펼쳐진 마법학교 학생기록부" draggable={false} />
+                          <img className="magic-student-ledger-book" src="/samunmong/assets/magic-school/intro/records/student-ledger-blank-v2.png" alt="펼쳐진 마법학교 학생기록부" draggable={false} />
                           {magicStudentRecords.map((student, studentIndex) => (
                             <section
-                              className={`magic-student-record${studentIndex === 0 ? " active" : ""}`}
+                              className={`magic-student-record${studentIndex === magicStudentIndex ? " active" : ""}`}
                               data-magic-student-record={studentIndex}
-                              aria-hidden={studentIndex !== 0}
+                              aria-hidden={studentIndex !== magicStudentIndex}
                               key={student.name}
                             >
                               <div className="magic-student-portrait-frame">
@@ -837,20 +852,21 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
                               <dl className="magic-student-record-fields">
                                 <div><dt>평소 행실</dt><dd>{student.conduct}</dd></div>
                                 <div><dt>특이 사항</dt><dd>{student.notes}</dd></div>
-                                <div><dt>수강 기록</dt><dd>{student.courses}</dd></div>
-                                <div><dt>담임 관찰 기록</dt><dd>{student.memo}</dd></div>
+                                <div><dt>수강 및 관찰 기록</dt><dd>{student.courses}<br />{student.memo}</dd></div>
                               </dl>
                             </section>
                           ))}
+                          <button className="magic-student-page-arrow previous" type="button" aria-label="이전 학생 기록" onClick={() => setMagicStudentIndex((magicStudentIndex - 1 + magicStudentRecords.length) % magicStudentRecords.length)}>‹</button>
+                          <button className="magic-student-page-arrow next" type="button" aria-label="다음 학생 기록" onClick={() => setMagicStudentIndex((magicStudentIndex + 1) % magicStudentRecords.length)}>›</button>
                           <div className="magic-student-ledger-tabs" aria-label="학생 선택">
                             {magicStudentRecords.map((student, studentIndex) => (
-                              <button className={studentIndex === 0 ? "active" : ""} type="button" data-magic-student-tab={studentIndex} key={student.name}>{student.name}</button>
+                              <button className={studentIndex === magicStudentIndex ? "active" : ""} type="button" key={student.name} onClick={() => setMagicStudentIndex(studentIndex)}>{student.name}</button>
                             ))}
                           </div>
                         </div>
                       ) : index === 2 ? (
                         <div className="magic-guard-ledger">
-                          <img className="magic-guard-ledger-book" src="/samunmong/assets/magic-school/intro/records/guard-duty-log-blank-v1.png" alt="펼쳐진 마법학교 경비근무일지" draggable={false} />
+                          <img className="magic-guard-ledger-book" src="/samunmong/assets/magic-school/intro/records/guard-ledger-blank-v2.png" alt="펼쳐진 마법학교 경비근무일지" draggable={false} />
                           <div className="magic-guard-portrait-frame">
                             <img src={magicGuardRecord.portrait} alt={`${magicGuardRecord.name} 경비원 초상`} draggable={false} />
                           </div>
@@ -863,29 +879,49 @@ export default function BriefingScreen({ initialTheme, active = false }: { initi
                             <h3>경비근무일지</h3>
                           </header>
                           <dl className="magic-guard-fields">
+                            <div className="featured"><dt>특이 사항 및 참고 진술</dt><dd>{magicGuardRecord.notes}<br />{magicGuardRecord.testimony}</dd></div>
                             <div><dt>사건 당일 순찰 기록</dt><dd>{magicGuardRecord.duty}</dd></div>
                             <div><dt>평소 근무 태도</dt><dd>{magicGuardRecord.conduct}</dd></div>
-                            <div><dt>특이 사항</dt><dd>{magicGuardRecord.notes}</dd></div>
-                            <div><dt>참고 진술</dt><dd>{magicGuardRecord.testimony}</dd></div>
+                          </dl>
+                        </div>
+                      ) : index === 3 ? (
+                        <div className="magic-faculty-ledger">
+                          <img className="magic-faculty-ledger-book" src="/samunmong/assets/magic-school/intro/records/faculty-ledger-blank-v2.png" alt="펼쳐진 마법학교 교직원 기록부" draggable={false} />
+                          <div className="magic-faculty-portrait-frame">
+                            <img src="/samunmong/assets/magic-school/interrogation/dunguldoor-sprite.webp" alt="덩쿨도어 교직원 초상" draggable={false} />
+                          </div>
+                          <div className="magic-faculty-id">
+                            <strong>{magicFacultyRecord.name}</strong>
+                            <span>{magicFacultyRecord.subtitle}</span>
+                          </div>
+                          <header className="magic-faculty-heading">
+                            <p>아르카나 마법학교 교직원 기록부</p>
+                            <h3>교직원 기록</h3>
+                          </header>
+                          <dl className="magic-faculty-fields">
+                            <div><dt>담당 과목</dt><dd>{magicFacultyRecord.subject}</dd></div>
+                            <div><dt>평소 행실</dt><dd>{magicFacultyRecord.conduct}</dd></div>
+                            <div><dt>특이 사항</dt><dd>{magicFacultyRecord.notes}</dd></div>
+                            <div><dt>수사 메모</dt><dd>{magicFacultyRecord.memo}</dd></div>
                           </dl>
                         </div>
                       ) : (
                         <img src={record.image} alt={`${record.name} ${record.kind}`} draggable={false} />
                       )}
-                      {index === 0 ? (
-                        <div className="magic-book-click-zones" aria-label="기록 책 선택">
-                          <button type="button" data-record-card-tab="1" aria-label="학생기록부 펼치기" />
-                          <button type="button" data-record-card-tab="2" aria-label="경비근무일지 펼치기" />
-                          <button type="button" data-record-card-tab="3" aria-label="교직원 기록 펼치기" />
-                        </div>
-                      ) : null}
                     </article>
                   ))}
-                  <div className="magic-record-page-controls" aria-label="관계자 기록 넘기기">
-                    <button type="button" data-student-prev aria-label="이전 관계자 기록">‹</button>
-                    <span data-student-page-indicator>1 / 5</span>
-                    <button type="button" data-student-next aria-label="다음 관계자 기록">›</button>
-                  </div>
+                  {magicRecordIndex === 0 ? (
+                    <div className="magic-book-click-zones" aria-label="기록 책 선택">
+                      <button type="button" aria-label="학생기록부 펼치기" onPointerDown={() => setMagicRecordIndex(1)} onClick={() => setMagicRecordIndex(1)} />
+                      <button type="button" aria-label="경비근무일지 펼치기" onPointerDown={() => setMagicRecordIndex(2)} onClick={() => setMagicRecordIndex(2)} />
+                      <button type="button" aria-label="교직원 기록 펼치기" onPointerDown={() => setMagicRecordIndex(3)} onClick={() => setMagicRecordIndex(3)} />
+                    </div>
+                  ) : null}
+                  {magicRecordIndex !== 0 ? (
+                    <button className="magic-record-back" type="button" aria-label="장부 목록으로 돌아가기" title="장부 목록" onClick={() => setMagicRecordIndex(0)}>
+                      <img src="/samunmong/assets/magic-school/ui/icon-ledger-list-v1.png" alt="" draggable={false} />
+                    </button>
+                  ) : null}
                 </section>
               </div>
             </div>
