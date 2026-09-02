@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { type MouseEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import GameSettingsOverlay from "@/components/GameSettingsOverlay";
 import { finalCulpritId } from "@/lib/persona";
 import { joseonAjeonAssets, joseonSatoSkillAssets } from "@/lib/joseonSatoSkillAssets";
 import { spaceStationResultSuspects, spaceStationTheme } from "@/lib/spaceStationTheme";
@@ -183,25 +184,40 @@ const magicSchoolOutcomeCopy = {
 const spaceStationOutcomeCopy = {
   success: {
     kicker: "보안 판정",
-    title: "오르빗-13의 진범이 확인됐다",
-    stamp: "확정",
+    title: "진범이 확인되었습니다",
+    stamp: "범인",
     lines: [
-      "정거장 기록과 생체 분석 결과가 하나의 범행 경로로 이어졌다.",
-      "조작된 전력 계통과 삭제된 의료 기록이 마지막 진술을 무너뜨렸다.",
-      "오르빗-13 의문사 사건의 최종 보고가 승인된다."
+      "범행 과정 요약과 메르스의 자백",
+      "메르스는 불법 약물 연구를 숨기기 위해 정전을 일으키고 데이비드의 비상 추진 장치를 방해했다. 의료 기록까지 삭제했지만, 마지막 무전과 비밀 계약서가 그의 범행을 드러냈다.",
+      "“데이비드 한 사람 때문에 내 연구와 귀환 기회를 포기할 수는 없었어요.”"
     ]
   },
   failure: {
-    kicker: "판정 불일치",
-    title: "지목과 수사 기록이 일치하지 않는다",
+    kicker: "수사 실패",
+    title: "진범을 놓쳤다",
     stamp: "보류",
     lines: [
-      "현재 기록만으로는 이 대원을 범인으로 확정할 수 없다.",
-      "접속 기록과 의료 자료, 전력 계통의 연결을 다시 확인해야 한다.",
-      "보안 조사실로 돌아가 남은 모순을 추적하라."
+      "잘못된 지목으로 사건의 진실은 밝혀지지 않았다.",
+      "진범은 처벌을 피했고, 오르빗-13의 죽음은 사고로 기록되었다.",
+      "다시 조사하여 진실을 바로잡아야 한다."
     ]
   }
 } as const;
+
+const spaceVerdictEvidence = [
+  {
+    name: "삭제된 의료 기록",
+    image: spaceStationTheme.evidence["삭제된 의료 기록"].img
+  },
+  {
+    name: "마지막 무전 기록",
+    image: spaceStationTheme.evidence["마지막 무전 기록"].img
+  },
+  {
+    name: spaceStationTheme.evidence["암호화된 파일"].recoveredName,
+    image: spaceStationTheme.evidence["암호화된 파일"].recoveredImg
+  }
+] as const;
 
 const insufficientEvidenceCopy = {
   joseon: {
@@ -433,7 +449,7 @@ export default function ResultScreen({
     : theme === "magicSchool"
       ? "/samunmong/assets/magic-school/interrogation/office-empty.webp"
       : "/samunmong/assets/final-accusation-bg.webp";
-  const accusationTitle = theme === "spaceStation" ? "최종 보고 대상 지목" : theme === "magicSchool" ? "최종 방화범 지목" : "최종 범인 지목";
+  const accusationTitle = theme === "spaceStation" ? "최종 범인 지목" : theme === "magicSchool" ? "최종 방화범 지목" : "최종 범인 지목";
   const backToInterrogationHref = forcedBackHref ?? (theme === "spaceStation"
     ? "/?start=interrogationScreen&theme=spaceStation"
     : theme === "magicSchool"
@@ -526,6 +542,10 @@ export default function ResultScreen({
   }
 
   function confirmAccusation(force = false) {
+    if (theme === "spaceStation") {
+      finalizeAccusation();
+      return;
+    }
     if (!force && missingEvidence.length > 0) {
       withLoading(() => {
         setShowLoading(false);
@@ -543,15 +563,18 @@ export default function ResultScreen({
   }
 
   function openExitPrompt() {
-    withLoading(() => {
-      setShowLoading(false);
-      setShowExitPrompt(true);
-    });
+    setShowExitPrompt(true);
   }
 
   if (verifiedVerdict) {
     const outcome = verifiedVerdict.outcome;
     const accusedSuspect = activeSuspects.find((suspect) => suspect.id === verifiedVerdict.suspectId) ?? selectedSuspect;
+    const accusedSpaceProfile = theme === "spaceStation"
+      ? spaceStationTheme.suspects.find((suspect) => suspect.id === accusedSuspect.id)
+      : undefined;
+    const isSpaceSuccess = theme === "spaceStation" && outcome === "success";
+    const isSpaceFailure = theme === "spaceStation" && outcome === "failure";
+    const isSpaceVerdict = theme === "spaceStation";
     const baseCopy = outcomeCopy[outcome];
     const magicCopy = magicSchoolOutcomeCopy[outcome];
     const spaceCopy = spaceStationOutcomeCopy[outcome];
@@ -579,57 +602,126 @@ export default function ResultScreen({
           >
             <span className="verdict-seal" aria-hidden="true" />
             <span className="verdict-corner-stamp" aria-hidden="true">{theme === "spaceStation" ? "SEC" : "失證"}</span>
+            {isSpaceVerdict ? (
+              <div className="space-verdict-identity">
+                <strong>{accusedSuspect.name}</strong>
+                <span>{accusedSpaceProfile?.role}</span>
+              </div>
+            ) : null}
             <div className="verdict-portrait-frame">
               <img src={accusedSuspect.image} alt="" />
             </div>
-            <div className={`verdict-stamp verdict-stamp-${outcome}`} aria-hidden="true">
-              {copy.stamp}
-            </div>
-            <strong>{accusedSuspect.name}</strong>
+            {isSpaceVerdict ? (
+              <>
+                <p className="space-verdict-auth">ID : {accusedSpaceProfile?.authId}</p>
+                {isSpaceSuccess ? (
+                  <div className="space-verdict-confirmation" aria-label="범인 확정">
+                    <span aria-hidden="true" />
+                    <div><small>VERDICT</small><b>범인 확정</b></div>
+                  </div>
+                ) : (
+                  <div className="space-verdict-rejection" aria-label="판정 불일치">
+                    <span aria-hidden="true">×</span>
+                    <div><small>VERDICT</small><b>판정 불일치</b></div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <div className={`verdict-stamp verdict-stamp-${outcome}`} aria-hidden="true">
+                  {copy.stamp}
+                </div>
+                <strong>{accusedSuspect.name}</strong>
+              </>
+            )}
           </article>
 
           <article className="verdict-message">
-            <p className="verdict-kicker">{copy.kicker}</p>
-            <h1 id="resultTitle">{copy.title}</h1>
-            <TypewriterLines lines={copy.lines} onType={playTypingSfx} />
-            <div className="verdict-actions">
-              {theme === "joseon" && outcome === "success" ? (
-                <button
-                  className="wood-result-button"
-                  type="button"
-                  onClick={() => navigateWithLoading("/interpretation", unlockTruthPage)}
-                >
-                  해몽하기
-                </button>
-              ) : theme === "magicSchool" && outcome === "success" ? (
-                <button
-                  className="wood-result-button"
-                  type="button"
-                  onClick={() => navigateWithLoading("/?start=briefingScreen&theme=magicSchool")}
-                >
-                  사건 다시 보기
-                </button>
-              ) : theme === "spaceStation" && outcome === "success" ? (
-                <button
-                  className="wood-result-button"
-                  type="button"
-                  onClick={() => navigateWithLoading("/?start=briefingScreen&theme=spaceStation")}
-                >
-                  사건 기록 다시 보기
-                </button>
-              ) : (
-                <button
-                  className="wood-result-button"
-                  type="button"
-                  onClick={() => navigateWithLoading(backToInterrogationHref, theme === "joseon" ? returnToBriefingWithProgress : undefined)}
-                >
-                  다시 조사하기
-                </button>
-              )}
-              <button className="wood-result-button primary" type="button" onClick={openExitPrompt}>
-                꿈에서 나가기
-              </button>
-            </div>
+            {isSpaceSuccess ? (
+              <>
+                <p className="space-verdict-final-label">최종 판정</p>
+                <h1 id="resultTitle">{copy.title}</h1>
+                <section className="space-verdict-summary" aria-labelledby="spaceVerdictSummaryTitle">
+                  <h2 id="spaceVerdictSummaryTitle">{copy.lines[0]}</h2>
+                  <p>{copy.lines[1]}</p>
+                </section>
+                <blockquote className="space-verdict-confession">{copy.lines[2]}</blockquote>
+                <section className="space-verdict-evidence" aria-labelledby="spaceVerdictEvidenceTitle">
+                  <h2 id="spaceVerdictEvidenceTitle">관련 증거</h2>
+                  <div>
+                    {spaceVerdictEvidence.map((evidence) => (
+                      <article key={evidence.name}>
+                        <img src={evidence.image} alt="" />
+                        <span>{evidence.name}</span>
+                      </article>
+                    ))}
+                  </div>
+                </section>
+                <div className="verdict-actions">
+                  <button
+                    className="wood-result-button primary"
+                    type="button"
+                    onClick={() => navigateWithLoading("/?start=dreamScreen&dreamExit=1")}
+                  >
+                    꿈에서 나가기 <span className="space-verdict-exit-arrow" aria-hidden="true">→</span>
+                  </button>
+                </div>
+              </>
+            ) : isSpaceFailure ? (
+              <>
+                <p className="space-verdict-final-label">{copy.kicker}</p>
+                <h1 id="resultTitle">{copy.title}</h1>
+                <TypewriterLines lines={copy.lines} onType={playTypingSfx} />
+                <div className="verdict-actions">
+                  <button
+                    className="wood-result-button"
+                    type="button"
+                    onClick={() => navigateWithLoading(backToInterrogationHref)}
+                  >
+                    다시 조사하기
+                  </button>
+                  <button className="wood-result-button primary" type="button" onClick={openExitPrompt}>
+                    꿈에서 나가기
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="verdict-kicker">{copy.kicker}</p>
+                <h1 id="resultTitle">{copy.title}</h1>
+                <TypewriterLines lines={copy.lines} onType={playTypingSfx} />
+                <div className="verdict-actions">
+                  {theme === "joseon" && outcome === "success" ? (
+                    <button
+                      className="wood-result-button"
+                      type="button"
+                      onClick={() => navigateWithLoading("/interpretation", unlockTruthPage)}
+                    >
+                      해몽하기
+                    </button>
+                  ) : theme === "magicSchool" && outcome === "success" ? (
+                    <button
+                      className="wood-result-button"
+                      type="button"
+                      onClick={() => navigateWithLoading("/?start=briefingScreen&theme=magicSchool")}
+                    >
+                      사건 다시 보기
+                    </button>
+                  ) : (
+                    <button
+                      className="wood-result-button"
+                      type="button"
+                      onClick={() => navigateWithLoading(backToInterrogationHref, theme === "joseon" ? returnToBriefingWithProgress : undefined)}
+                    >
+                      다시 조사하기
+                    </button>
+                  )}
+                  <button className="wood-result-button primary" type="button" onClick={openExitPrompt}>
+                    꿈에서 나가기
+                  </button>
+                </div>
+              </>
+            )}
           </article>
         </section>
 
@@ -662,6 +754,7 @@ export default function ResultScreen({
           </aside>
         ) : null}
         {showLoading ? <div className="dream-loading-overlay" role="status" aria-label="이동 중">이동 중...</div> : null}
+        {theme === "spaceStation" ? <GameSettingsOverlay homeHref="/" /> : null}
       </main>
     );
   }
@@ -722,7 +815,7 @@ export default function ResultScreen({
 
         <div className="accusation-actions">
           <button className="wood-result-button primary" type="button" onClick={() => confirmAccusation()}>
-            {theme === "spaceStation" ? "이 대원을 지목한다" : theme === "magicSchool" ? "이 학생을 지목한다" : "이 자를 지목한다"}
+            {theme === "spaceStation" ? "지목" : theme === "magicSchool" ? "이 학생을 지목한다" : "이 자를 지목한다"}
           </button>
           {theme !== "spaceStation" ? (
             <Link className="wood-result-button" href={backToInterrogationHref}>
@@ -776,6 +869,7 @@ export default function ResultScreen({
         </div>
       ) : null}
       {showLoading ? <div className="dream-loading-overlay" role="status" aria-label="이동 중">이동 중...</div> : null}
+      {theme === "spaceStation" ? <GameSettingsOverlay homeHref="/" /> : null}
     </main>
   );
 }

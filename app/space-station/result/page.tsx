@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import ResultScreen from "@/components/result/ResultScreen";
+import SpaceStationResultViewport from "@/components/space-station/SpaceStationResultViewport";
 import { getProgressCookieName, verifyGameProgressToken } from "@/lib/server/gameProgress";
 
 type SpaceStationResultPageProps = {
@@ -21,13 +22,15 @@ export default async function SpaceStationResultPage({ searchParams }: SpaceStat
   if (wantsVerdict && !progress.accusation) redirect("/space-station/result");
 
   return (
-    <ResultScreen
-      initialTheme="spaceStation"
-      collectedEvidenceNames={progress.collectedEvidenceNames}
-      analyzedEvidenceNames={progress.analyzedEvidenceNames}
-      verifiedVerdict={wantsVerdict ? progress.accusation : undefined}
-      backToInterrogationHref="/space-station/interrogation"
-      resultBasePath="/space-station/result"
-    />
+    <SpaceStationResultViewport>
+      <ResultScreen
+        initialTheme="spaceStation"
+        collectedEvidenceNames={progress.collectedEvidenceNames}
+        analyzedEvidenceNames={progress.analyzedEvidenceNames}
+        verifiedVerdict={wantsVerdict ? progress.accusation : undefined}
+        backToInterrogationHref="/space-station/interrogation"
+        resultBasePath="/space-station/result"
+      />
+    </SpaceStationResultViewport>
   );
 }

@@ -110,7 +110,7 @@
     if (isMagicTheme || isSpaceTheme) startCaseLabel = "조사 시작";
     document.documentElement.dataset.samunmongTheme = activeTheme;
     const magicBriefingText = sentenceBreakText("“선생님, 제1 연금술 실습실이 밤새 불탔습니다.”\n\n당신은 이 꿈에서 갓 부임한 마법 교사입니다.\n마력의 시선으로 잔류 마법을 살피고, 학생과 교직원을 심문해 방화의 진범을 찾아야 합니다.");
-    const spaceBriefingText = sentenceBreakText("“오르빗-13에서 외부 작업 중 정거장 밖으로 이탈했습니다.”\n\n당신은 이 꿈에서 사건 조사관입니다.\n현장에 남겨진 단서와 대원들의 진술을 맞춰 보며,\n사고처럼 보이는 죽음의 진실을 추적해야 합니다.");
+    const spaceBriefingText = sentenceBreakText("“오르빗-13에서 한 대원이 외부 작업 중 정거장 밖으로 이탈했습니다.”\n\n당신은 이 꿈에서 사건 조사관입니다.\n현장에 남겨진 단서와 대원들의 진술을 맞춰 보며,\n사고로 위장된 죽음의 진실을 밝히고 그 뒤에 숨은 범인을 찾아야 합니다.");
     const briefingText = isSpaceTheme
       ? spaceBriefingText
       : isMagicTheme
@@ -1058,6 +1058,24 @@
         emphasis,
         document.createTextNode(visibleRoleText.slice(emphasisEnd))
       );
+
+      const missionText = "사고로 위장된 죽음의 진실을 밝히고 그 뒤에 숨은 범인을 찾아야 합니다.";
+      const missionStart = briefingText.indexOf(missionText, roleEnd);
+      if (missionStart >= 0 && text.length > missionStart) {
+        const missionEnd = Math.min(text.length, missionStart + missionText.length);
+        const missionLine = document.createElement("strong");
+        missionLine.className = "space-briefing-mission-line";
+        missionLine.textContent = text.slice(missionStart, missionEnd);
+        briefingCopy.replaceChildren(
+          document.createTextNode(text.slice(0, roleStart)),
+          roleLine,
+          document.createTextNode(text.slice(roleEnd, missionStart)),
+          missionLine,
+          document.createTextNode(text.slice(missionEnd))
+        );
+        return;
+      }
+
       briefingCopy.replaceChildren(
         document.createTextNode(text.slice(0, roleStart)),
         roleLine,
@@ -3052,10 +3070,19 @@
       playSfx("dream", 0.85);
       writeBgmState(currentBgm || bgmForScreen(getActiveScreenId()), bgmTracks[currentBgm || bgmForScreen(getActiveScreenId())]);
       showLoading("이동 중...");
-      setTimeout(() => {
-        window.samunmongFlushProgress?.().finally(() => {
-          navigateWithinApp(`/result?${params.toString()}`);
-        });
+      setTimeout(async () => {
+        if (isSpaceTheme) {
+          await Promise.race([
+            window.samunmongFlushProgress?.(),
+            new Promise((resolve) => window.setTimeout(resolve, 800))
+          ]);
+        } else {
+          await window.samunmongFlushProgress?.();
+        }
+        const resultHref = isSpaceTheme
+          ? "/space-station/result"
+          : `/result?${params.toString()}`;
+        navigateWithinApp(resultHref);
       }, loadingDuration);
     }
 

@@ -2,7 +2,11 @@
 
 import { useEffect, useState } from "react";
 
-export default function GameSettingsOverlay() {
+type GameSettingsOverlayProps = {
+  homeHref?: string;
+};
+
+export default function GameSettingsOverlay({ homeHref }: GameSettingsOverlayProps = {}) {
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
@@ -62,6 +66,10 @@ export default function GameSettingsOverlay() {
 
   const goToMain = () => {
     document.querySelector("#settingsDialog")?.classList.remove("open");
+    if (homeHref) {
+      window.location.assign(homeHref);
+      return;
+    }
     window.dispatchEvent(
       new CustomEvent("samunmong:screen-request", {
         cancelable: true,

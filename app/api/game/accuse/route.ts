@@ -39,7 +39,8 @@ export async function POST(request: Request) {
 
   const missingRequirements = getMissingRequirements(progress);
   const correctSuspect = body.suspectId === culpritByTheme[body.theme];
-  const reason = missingRequirements.length
+  const hasInsufficientEvidence = body.theme !== "spaceStation" && missingRequirements.length > 0;
+  const reason = hasInsufficientEvidence
     ? "insufficient-evidence"
     : correctSuspect
       ? "correct"

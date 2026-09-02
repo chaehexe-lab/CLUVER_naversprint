@@ -12,9 +12,10 @@ type SpaceStationShellProps = {
 
 export default function SpaceStationShell({ children }: SpaceStationShellProps) {
   const pathname = usePathname();
-  if (pathname === "/space-station/result") return children;
+  const normalizedPathname = pathname.length > 1 ? pathname.replace(/\/+$/, "") : pathname;
+  if (normalizedPathname === "/space-station/result") return children;
 
-  const initialScreen = getSpaceStationScreen(pathname) ?? "briefingScreen";
+  const initialScreen = getSpaceStationScreen(normalizedPathname) ?? "briefingScreen";
   return (
     <SceneLayout sceneId={initialScreen}>
       <div className="space-station-route-shell" data-space-station-route={initialScreen}>
