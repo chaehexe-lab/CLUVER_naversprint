@@ -8,7 +8,7 @@ type SpellPhase = "select" | "draw" | "casting" | "complete";
 export type MagicSpellId = "light" | "metal-break" | "ice-control" | "wind";
 export type MagicSpellResult = "success" | "no-effect";
 
-type MagicSpellDefinition = {
+export type MagicSpellDefinition = {
   id: MagicSpellId;
   name: string;
   incantation: string;
@@ -64,6 +64,7 @@ const windSpell: MagicSpellDefinition = {
 };
 
 const availableSpells = [lightSpell, metalBreakSpell, iceControlSpell, windSpell];
+export const battleSpells = [metalBreakSpell, iceControlSpell, windSpell, lightSpell];
 
 function SpellIcon({ spell }: { spell: MagicSpellDefinition }) {
   if (spell.id === "metal-break") {
@@ -246,12 +247,14 @@ export default function MagicSpellSystem({
   onSpellCast,
   spells = availableSpells,
   showLockedSpell = true,
+  noEffectMessage = "아무일도 없었다",
 }: {
   sceneId: string;
   onLightChange?: (enabled: boolean) => void;
   onSpellCast?: (spellId: MagicSpellId) => MagicSpellResult;
   spells?: MagicSpellDefinition[];
   showLockedSpell?: boolean;
+  noEffectMessage?: string;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [phase, setPhase] = useState<SpellPhase>("select");
@@ -293,7 +296,7 @@ export default function MagicSpellSystem({
     if (selectedSpell.id === "light" && result === "success") onLightChange?.(true);
     closeTimer.current = window.setTimeout(() => {
       setPhase("complete");
-      if (result === "no-effect") setFeedback("아무일도 없었다");
+      if (result === "no-effect") setFeedback(noEffectMessage);
       closeTimer.current = window.setTimeout(() => {
         setMenuOpen(false);
         setPhase("select");

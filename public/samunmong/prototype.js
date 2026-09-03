@@ -229,6 +229,8 @@
     const fieldGuidePendingKey = "samunmong-field-guide-pending";
     const fieldGuideSeenKey = "samunmong-field-guide-seen";
     const magicLibraryDoorKey = "samunmong-magic-library-door-unlocked";
+    const magicBeastBattleCompleteKey = "samunmong-magic-beast-battle-complete";
+    const magicBeastBattleTriggeredKey = "samunmong-magic-beast-battle-triggered";
     const settingsKey = "samunmong-demo-settings";
     const bgmStateKey = "samunmong-bgm-state";
     const interrogationQuestionLimit = 50;
@@ -345,6 +347,22 @@
       if (!isMagicTheme) return true;
       const targetIndex = magicLinearProgression.findIndex((location) => location.screenId === targetScreenId);
       return targetIndex < 0 || targetIndex <= getMagicUnlockedIndex();
+    }
+
+    function resolveMagicBattleTarget(targetScreenId) {
+      if (
+        isMagicTheme
+        && targetScreenId === "interrogationScreen"
+        && localStorage.getItem(magicBeastBattleCompleteKey) !== "1"
+      ) {
+        if (canAccessMagicScreen(targetScreenId)) {
+          localStorage.setItem(magicBeastBattleTriggeredKey, "1");
+          window.dispatchEvent(new CustomEvent("samunmong:magic-beast-triggered"));
+        }
+        return "magicDormHallway";
+      }
+
+      return targetScreenId;
     }
 
     function syncMagicMapProgress({ announce = false } = {}) {
@@ -638,6 +656,8 @@
       localStorage.removeItem(`samunmong-statement-evidence-links-${suffix}`);
       if (normalizedTheme === "magicSchool") {
         localStorage.removeItem(magicGandalfReportsKey);
+        localStorage.removeItem(magicBeastBattleCompleteKey);
+        localStorage.removeItem(magicBeastBattleTriggeredKey);
       }
       if (normalizedTheme === "spaceStation") {
         localStorage.removeItem(spaceMedicalRecordRecoveryKey);
@@ -3368,7 +3388,8 @@
         openBriefingJournal();
         return;
       }
-      go(target, isJournalBriefing ? "사건 일지를 펼치는 중..." : "이동 중...");
+      const resolvedTarget = resolveMagicBattleTarget(target);
+      go(resolvedTarget, isJournalBriefing ? "사건 일지를 펼치는 중..." : "이동 중...");
       if (isJournalBriefing) {
         setTimeout(() => startBriefingSequence("deathOnly"), 340);
       }
@@ -9295,7 +9316,7 @@
           && (!button.dataset.mapGatewayFrom || button.dataset.mapGatewayFrom === getActiveScreenId())
           && localStorage.getItem(magicLibraryDoorKey) !== "1"
         );
-        const resolvedTarget = needsGateway ? button.dataset.mapGateway : target;
+        const resolvedTarget = needsGateway ? button.dataset.mapGateway : resolveMagicBattleTarget(target);
         button.classList.add("pressing");
         playSfx("move", 0.82);
         if (["map-click", "map-open"].includes(fieldGuideStep)) {
@@ -9303,7 +9324,7 @@
           return;
         }
         closeGlobalPanel();
-        go(target, isSpaceTheme ? "정거장 지도에서 이동 중..." : isMagicTheme ? "학교 지도에서 이동 중..." : "마을 지도에서 이동 중...");
+        go(resolvedTarget, isSpaceTheme ? "정거장 지도에서 이동 중..." : isMagicTheme ? "학교 지도에서 이동 중..." : "마을 지도에서 이동 중...");
       });
     });
 

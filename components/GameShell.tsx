@@ -37,8 +37,10 @@ import {
 } from "@/lib/gameTheme";
 
 const CONTENT_SCRIPT = "/samunmong/content.js?v=20260902-joseon-merge-v2";
-const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260902-space-verdict-v144";
+const PROTOTYPE_SCRIPT = "/samunmong/prototype.js?v=20260903-magic-beast-dorm-v145";
 const MAIN_SCREEN = "mainScreen";
+const MAGIC_DORM_EVIDENCE_NAME = "버려진 지팡이 조각";
+const MAGIC_BEAST_TRIGGERED_KEY = "samunmong-magic-beast-battle-triggered";
 
 const INVESTIGATION_SCENE_COMPONENTS: Record<string, ComponentType> = {
   fieldOne: FieldOneScene,
@@ -81,6 +83,20 @@ function requestScreen(screenId: string) {
       detail: { screenId }
     })
   );
+}
+
+function hasMagicDormEvidence() {
+  try {
+    const storedEvidence = JSON.parse(window.localStorage.getItem("samunmong-collected-evidence-magic-school") || "[]");
+    return Array.isArray(storedEvidence) && storedEvidence.includes(MAGIC_DORM_EVIDENCE_NAME);
+  } catch {
+    return false;
+  }
+}
+
+function triggerMagicBeastEvent() {
+  window.localStorage.setItem(MAGIC_BEAST_TRIGGERED_KEY, "1");
+  window.dispatchEvent(new CustomEvent("samunmong:magic-beast-triggered"));
 }
 
 function startMagicBriefingAudio(event: MouseEvent<HTMLDivElement>) {
@@ -191,6 +207,17 @@ export default function GameShell({ initialScreen, initialTheme, routeMode }: Ga
       if (destinationTheme && destinationTheme !== mountedTheme) {
         event.preventDefault();
         window.location.assign(getThemeEntryHref(screenId, destinationTheme));
+        return;
+      }
+
+      if (
+        mountedTheme === "magicSchool"
+        && screenId === "interrogationScreen"
+        && window.localStorage.getItem("samunmong-magic-beast-battle-complete") !== "1"
+      ) {
+        event.preventDefault();
+        if (hasMagicDormEvidence()) triggerMagicBeastEvent();
+        setCurrentScreen("magicDormHallway");
         return;
       }
 

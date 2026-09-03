@@ -8716,9 +8716,22 @@ button.magic-spell-card:hover { border-color: #a5edff; background: rgba(31,74,11
 .wind-debris { position:absolute; left:var(--wind-start-x); top:var(--wind-start-y); opacity:0; animation:dormDebrisFly 1.35s cubic-bezier(.16,.65,.18,1) var(--wind-delay) both; }
 .wind-debris.dust { width:8px; height:8px; border-radius:50%; background:#b8a277; box-shadow:0 0 6px rgba(211,190,145,.72); }
 .wind-debris.paper { width:34px; height:24px; border:1px solid #776b54; background:#b4a27d; box-shadow:0 4px 8px #0007; }
+.magic-dorm-beast { position:absolute; z-index:34; left:33%; top:13%; width:47%; height:70%; display:grid; place-items:center; pointer-events:none; isolation:isolate; transform-origin:50% 82%; animation:dormBeastAppear .75s cubic-bezier(.18,.78,.2,1) both; }
+.magic-dorm-beast img { position:relative; z-index:2; width:100%; height:100%; object-fit:contain; filter:drop-shadow(0 34px 30px rgba(0,0,0,.78)); user-select:none; }
+.magic-dorm-beast-aura { position:absolute; z-index:0; left:12%; top:10%; width:74%; height:72%; border-radius:50%; background:radial-gradient(circle,rgba(129,44,238,.28),rgba(33,128,182,.12) 48%,transparent 72%); filter:blur(24px); animation:dormBeastAura 2.2s ease-in-out infinite alternate; }
+.magic-dorm-beast-stage-0 img { width:94%; height:94%; mix-blend-mode:screen; filter:saturate(.95) contrast(1.08) drop-shadow(0 36px 31px rgba(0,0,0,.82)); }
+.magic-dorm-beast-stage-1 img { filter:saturate(.9) contrast(1.05) drop-shadow(0 34px 30px rgba(0,0,0,.8)); }
+.magic-dorm-beast-stage-2 img { filter:brightness(.92) saturate(.82) drop-shadow(0 32px 31px rgba(0,0,0,.82)) drop-shadow(0 0 16px rgba(161,235,255,.28)); }
+.magic-dorm-beast-stage-3 img { filter:brightness(.68) saturate(.5) drop-shadow(0 30px 30px rgba(0,0,0,.88)); transform:translateY(3%) scale(.95); }
+.magic-dorm-beast-stage-3 .magic-dorm-beast-aura { opacity:.28; animation-duration:3.4s; }
+.magic-dorm-beast-frost { position:absolute; z-index:3; left:19%; right:18%; bottom:9%; height:28%; border-radius:50%; background:radial-gradient(ellipse,rgba(221,252,255,.42),rgba(97,200,239,.16) 48%,transparent 74%); filter:blur(14px); }
+.magic-dorm-beast-weak-pulse { position:absolute; z-index:3; left:31%; top:28%; width:31%; height:27%; border:1px solid rgba(132,232,240,.18); border-radius:50%; box-shadow:0 0 34px rgba(76,185,199,.12),inset 0 0 28px rgba(72,209,218,.08); animation:dormBeastWeakPulse 2.4s ease-in-out infinite; }
 @keyframes dormWindSweep { 0% { opacity:0; transform:translateX(-18%) rotate(-10deg) scaleX(.35); } 22% { opacity:1; } 100% { opacity:0; transform:translateX(48%) translateY(-75%) rotate(-18deg) scaleX(1.35); } }
 @keyframes dormDebrisFly { 0% { opacity:0; transform:translate(0,0) rotate(0deg) scale(.6); } 18% { opacity:1; } 100% { opacity:0; transform:translate(var(--wind-dx),var(--wind-dy)) rotate(var(--wind-spin)) scale(.35); } }
 @keyframes dormEvidenceReveal { 0% { opacity:0; filter:brightness(2.2) drop-shadow(0 0 18px #adfff0); } 45% { opacity:1; filter:brightness(1.8) drop-shadow(0 0 15px #8effe5); } 100% { opacity:1; filter:none; } }
+@keyframes dormBeastAppear { 0% { opacity:0; transform:translateY(18px) scale(.96); } 100% { opacity:1; transform:translateY(0) scale(1); } }
+@keyframes dormBeastAura { to { opacity:.72; transform:scale(1.04); } }
+@keyframes dormBeastWeakPulse { 0%,100% { opacity:.22; transform:scale(.86); } 45% { opacity:.66; transform:scale(1.06); } }
 @keyframes frozenBookPulse { to { opacity:1; box-shadow:inset 0 0 26px rgba(227,253,255,.68),0 0 23px rgba(103,218,255,.7); } }
 @keyframes frozenBookThaw { 0% { opacity:1; filter:brightness(1.5); transform:scale(1); } 55% { opacity:.42; filter:blur(2px) brightness(1.8); transform:scale(1.08); } 100% { opacity:0; filter:blur(7px); transform:scale(1.16); } }
 @keyframes frozenBookNotice { 0% { opacity:0; transform:translate(-50%,12px); } 10%,82% { opacity:1; transform:translate(-50%,0); } 100% { opacity:0; transform:translate(-50%,-8px); } }
@@ -8749,7 +8762,7 @@ button.magic-spell-card:hover { border-color: #a5edff; background: rgba(31,74,11
 }
 @keyframes magicRuneBreathe { to { transform: scale(1.06) rotate(8deg); box-shadow: inset 0 0 22px #bff9ff55,0 0 17px #83dfff8c; } }
 @media (prefers-reduced-motion: reduce) {
-  .magic-spell-toggle-rune,.holy-particle,.heavenly-light-beam,.frozen-book-hotspot::before,.frozen-book-notice,.ice-burst-flash,.ice-burst-ring,.ice-particle,.wind-sweep,.wind-debris,.dorm-evidence.revealed { animation: none; }
+  .magic-spell-toggle-rune,.holy-particle,.heavenly-light-beam,.frozen-book-hotspot::before,.frozen-book-notice,.ice-burst-flash,.ice-burst-ring,.ice-particle,.wind-sweep,.wind-debris,.dorm-evidence.revealed,.magic-dorm-beast,.magic-dorm-beast-aura,.magic-dorm-beast-weak-pulse { animation: none; }
   .magic-holy-particles,.magic-heavenly-light { display: none; }
   .ice-burst-flash { opacity:.72; transform:translate(-50%,-50%) scale(1.35); }
   .ice-burst-ring { opacity:.9; transform:translate(-50%,-50%) scale(4.2); }
