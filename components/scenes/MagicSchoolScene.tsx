@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from "react";
-import MagicSpellSystem, { type MagicSpellId, type MagicSpellResult } from "@/components/MagicSpellSystem";
+import MagicSpellSystem, { battleSpells, type MagicSpellId, type MagicSpellResult } from "@/components/MagicSpellSystem";
 import { magicSchoolScenes } from "@/lib/gameData";
 import { hotspotStyle } from "./hotspotStyle";
 
@@ -11,6 +11,36 @@ const FROZEN_BOOK_NAME = "빙결 흔적이 남은 반납 도서";
 const FROZEN_BOOK_THAWED_KEY = "samunmong-magic-library-frozen-book-thawed";
 const DORM_EVIDENCE_NAME = "버려진 지팡이 조각";
 const DORM_HALLWAY_CLEARED_KEY = "samunmong-magic-dorm-hallway-cleared";
+const DORM_BEAST_STAGE_KEY = "samunmong-magic-beast-battle-stage";
+const DORM_BEAST_COMPLETE_KEY = "samunmong-magic-beast-battle-complete";
+const DORM_BEAST_TRIGGERED_KEY = "samunmong-magic-beast-battle-triggered";
+
+const dormBeastStages = [
+  {
+    spellId: "metal-break" as MagicSpellId,
+    hint: "갑옷을 부숴야 할 것 같다.",
+    success: "연금술 금속 갑옷이 산산이 부서졌다.",
+    image: "/samunmong/assets/magic-school/beast-encounter/escaped-magic-beast-armored-v2.png",
+  },
+  {
+    spellId: "ice-control" as MagicSpellId,
+    hint: "움직임을 얼려서 막아야 할 것 같다.",
+    success: "얼음이 동물을 다치게 하지 않고 움직임을 붙잡았다.",
+    image: "/samunmong/assets/magic-school/beast-encounter/states/beast-state-1-armor-broken-alpha-v1.png",
+  },
+  {
+    spellId: "wind" as MagicSpellId,
+    hint: "바람으로 불길을 약하게 해야 할 것 같다.",
+    success: "바람이 불길과 연금술 증기를 흩어 냈다.",
+    image: "/samunmong/assets/magic-school/beast-encounter/states/beast-state-2-frozen-alpha-v1.png",
+  },
+  {
+    spellId: "light" as MagicSpellId,
+    hint: "빛으로 변이 마력을 정화해야 할 것 같다.",
+    success: "빛이 동물에게 엉겨 붙은 변이 마력만 정화했다.",
+    image: "/samunmong/assets/magic-school/beast-encounter/states/beast-state-3-wind-weakened-alpha-v1.png",
+  },
+] as const;
 
 type HolyParticleStyle = CSSProperties & {
   "--particle-start-x": string;
@@ -132,6 +162,8 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
   const [noticeIcon, setNoticeIcon] = useState("❄");
   const [iceBurstCount, setIceBurstCount] = useState(0);
   const [dormHallwayCleared, setDormHallwayCleared] = useState(false);
+  const [dormBeastStage, setDormBeastStage] = useState(0);
+  const [dormBeastTriggered, setDormBeastTriggered] = useState(false);
   const [windBurstCount, setWindBurstCount] = useState(0);
   const noticeTimer = useRef<number | null>(null);
   const iceBurstTimer = useRef<number | null>(null);
@@ -153,6 +185,21 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
     const isCleared = window.localStorage.getItem(DORM_HALLWAY_CLEARED_KEY) === "1" || evidenceWasAlreadyCollected;
     setDormHallwayCleared(isCleared);
     if (isCleared) window.localStorage.setItem(DORM_HALLWAY_CLEARED_KEY, "1");
+
+    const battleComplete = window.localStorage.getItem(DORM_BEAST_COMPLETE_KEY) === "1";
+    setDormBeastTriggered(window.localStorage.getItem(DORM_BEAST_TRIGGERED_KEY) === "1" && !battleComplete);
+    const storedStage = Number.parseInt(window.localStorage.getItem(DORM_BEAST_STAGE_KEY) ?? "0", 10);
+    const restoredStage = battleComplete
+      ? dormBeastStages.length
+      : Math.min(Math.max(Number.isFinite(storedStage) ? storedStage : 0, 0), dormBeastStages.length - 1);
+    setDormBeastStage(restoredStage);
+  }, [scene.id]);
+
+  useEffect(() => {
+    if (scene.id !== "magicDormHallway") return;
+    const showDormBeast = () => setDormBeastTriggered(true);
+    window.addEventListener("samunmong:magic-beast-triggered", showDormBeast);
+    return () => window.removeEventListener("samunmong:magic-beast-triggered", showDormBeast);
   }, [scene.id]);
 
   useEffect(() => () => {
@@ -170,7 +217,51 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
     setLightEnabled(enabled);
     if (enabled) setLightCastCount((count) => count + 1);
   }, []);
+  const isDormBeastBlocking = scene.id === "magicDormHallway" && dormBeastTriggered && dormBeastStage < dormBeastStages.length;
+  const dormBeast = dormBeastStages[Math.min(dormBeastStage, dormBeastStages.length - 1)];
+
+  useEffect(() => {
+    if (!isDormBeastBlocking) return;
+    const handleBattleHint = (event: MouseEvent) => {
+      const target = event.target;
+      if (!(target instanceof Element) || !target.closest("#magicDormHallway .scene-hint")) return;
+      event.preventDefault();
+      event.stopPropagation();
+      showFrozenBookNotice(dormBeast.hint, "?");
+    };
+    document.addEventListener("click", handleBattleHint, true);
+    return () => document.removeEventListener("click", handleBattleHint, true);
+  }, [dormBeast.hint, isDormBeastBlocking, showFrozenBookNotice]);
+
   const handleSpellCast = useCallback((spellId: MagicSpellId): MagicSpellResult => {
+    if (scene.id === "magicDormHallway" && dormBeastTriggered && dormBeastStage < dormBeastStages.length) {
+      const expectedStage = dormBeastStages[dormBeastStage];
+      if (spellId !== expectedStage.spellId) {
+        showFrozenBookNotice(expectedStage.hint, "?");
+        return "no-effect";
+      }
+
+      const nextStage = dormBeastStage + 1;
+      setDormBeastStage(nextStage);
+      window.localStorage.setItem(DORM_BEAST_STAGE_KEY, String(nextStage));
+      showFrozenBookNotice(expectedStage.success, "✦");
+
+      if (spellId === "wind") {
+        setDormHallwayCleared(true);
+        setWindBurstCount((count) => count + 1);
+        window.localStorage.setItem(DORM_HALLWAY_CLEARED_KEY, "1");
+      }
+
+      if (nextStage === dormBeastStages.length) {
+        window.localStorage.setItem(DORM_BEAST_COMPLETE_KEY, "1");
+        window.localStorage.removeItem(DORM_BEAST_TRIGGERED_KEY);
+        setDormBeastTriggered(false);
+        showFrozenBookNotice("온순했던 동물이 정신을 되찾았다. 교무 조사실로 가야 할 것 같다.", "☼");
+      }
+
+      return "success";
+    }
+
     if (spellId === "light") return "success";
     if (spellId === "ice-control" && scene.id === "magicLibrary") {
       setFrozenBookThawed(true);
@@ -189,7 +280,7 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
       return "success";
     }
     return "no-effect";
-  }, [scene.id, showFrozenBookNotice]);
+  }, [dormBeastStage, dormBeastTriggered, scene.id, showFrozenBookNotice]);
   const lightClassName = `${requiresLightSpell ? " magic-light-required" : ""}${lightEnabled ? " light-magic-active" : ""}${frozenBookThawed ? " frozen-book-thawed" : ""}${scene.id === "magicDormHallway" ? dormHallwayCleared ? " dorm-hallway-cleared" : " dorm-hallway-dirty" : ""}`;
   const frozenBookHotspot = scene.hotspots.find((hotspot) => hotspot.evidenceName === FROZEN_BOOK_NAME);
   const iceSpreadOrigin: IceSpreadOriginStyle = {
@@ -235,6 +326,15 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
           {windDebris.map((style, index) => (
             <i className={index % 3 === 0 ? "wind-debris paper" : "wind-debris dust"} style={style} key={index} />
           ))}
+        </div>
+      ) : null}
+
+      {isDormBeastBlocking ? (
+        <div className={`magic-dorm-beast magic-dorm-beast-stage-${dormBeastStage}`} aria-hidden="true">
+          <span className="magic-dorm-beast-aura" />
+          <img src={dormBeast.image} alt="" draggable="false" />
+          {dormBeastStage === 2 ? <span className="magic-dorm-beast-frost" /> : null}
+          {dormBeastStage === 3 ? <span className="magic-dorm-beast-weak-pulse" /> : null}
         </div>
       ) : null}
 
@@ -318,7 +418,13 @@ export default function MagicSchoolScene({ scene }: { scene: MagicScene }) {
           );
         })}
       </nav>
-      <MagicSpellSystem sceneId={scene.id} onLightChange={handleLightChange} onSpellCast={handleSpellCast} />
+      <MagicSpellSystem
+        sceneId={scene.id}
+        onLightChange={handleLightChange}
+        onSpellCast={handleSpellCast}
+        spells={isDormBeastBlocking ? battleSpells : undefined}
+        noEffectMessage={isDormBeastBlocking ? "상황에 맞는 마법을 써야 할 것 같다." : undefined}
+      />
     </section>
   );
 }
