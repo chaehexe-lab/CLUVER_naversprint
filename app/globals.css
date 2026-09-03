@@ -1174,6 +1174,11 @@ html body [contenteditable="true"] {
   cursor: var(--cursor-disabled) !important;
 }
 
+html body .evidence-bag-pop button:not(:disabled):not([aria-disabled="true"]),
+html body .evidence-bag-pop button:not(:disabled):not([aria-disabled="true"]) * {
+  cursor: var(--cursor-click) !important;
+}
+
 html:active body:active:not(.tool-cursor-active) *:active:not(:disabled):not([disabled]):not([aria-disabled="true"]):not([data-dream-disabled="true"]):not(.disabled) {
   cursor: var(--cursor-click) !important;
 }

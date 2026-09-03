@@ -4393,6 +4393,7 @@
       button.textContent = location;
       button.addEventListener("click", () => {
         playSfx("buttonAlt", 0.48);
+        closeEvidenceStoryPreview();
         setEvidenceStoryFilter("all");
         setActiveEvidenceLocation(location);
       });
@@ -4939,6 +4940,8 @@
     function closeEvidenceStoryPreview() {
       const preview = document.querySelector("#evidenceStoryPreview");
       if (preview) preview.hidden = true;
+      const directActionButton = document.querySelector("#evidenceDirectAction");
+      if (directActionButton) directActionButton.dataset.evidence = "";
     }
 
     document.querySelector("#closeEvidenceStoryPreview")?.addEventListener("click", () => {
@@ -7645,6 +7648,10 @@
       if (open) {
         evidenceBagPop.classList.remove("closing");
         clearEvidenceBagUnread();
+      } else {
+        closeEvidenceStoryPreview();
+        const threadPanel = document.querySelector("#evidenceThreadPanel");
+        if (threadPanel) threadPanel.hidden = true;
       }
       if (!open && evidenceBagPop.classList.contains("open")) {
         evidenceBagPop.classList.add("closing");
@@ -7664,6 +7671,20 @@
     }
     toggleEvidenceBag.addEventListener("click", () => setEvidenceBag(!evidenceBagPop.classList.contains("open")));
     document.querySelector("#closeEvidenceBag").addEventListener("click", () => setEvidenceBag(false));
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape" || !evidenceBagPop.classList.contains("open")) return;
+      const threadPanel = document.querySelector("#evidenceThreadPanel");
+      const storyPreview = document.querySelector("#evidenceStoryPreview");
+      if (threadPanel && !threadPanel.hidden) {
+        threadPanel.hidden = true;
+      } else if (storyPreview && !storyPreview.hidden) {
+        closeEvidenceStoryPreview();
+      } else {
+        setEvidenceBag(false);
+      }
+      event.preventDefault();
+      event.stopPropagation();
+    });
 
     const globalOverlay = document.querySelector("#globalOverlay");
     const globalPanels = [...document.querySelectorAll(".global-panel")];
